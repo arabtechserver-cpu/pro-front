@@ -26,6 +26,21 @@ function getLocale(request: NextRequest): string | undefined {
 export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
+  // Ignore static SEO files, favicon, public assets, and API
+  if (
+    pathname === '/sitemap.xml' ||
+    pathname === '/robots.txt' ||
+    pathname === '/favicon.ico' ||
+    pathname === '/icon.png' ||
+    pathname === '/apple-icon.png' ||
+    pathname.startsWith('/images/') ||
+    pathname.startsWith('/uploads/') ||
+    pathname.startsWith('/api/') ||
+    pathname.startsWith('/_next/')
+  ) {
+    return NextResponse.next();
+  }
+
   // Protect Admin Routes
   if (pathname.startsWith('/admin')) {
     if (pathname === '/admin/login') {
@@ -68,6 +83,7 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  // Matcher ignoring `/_next/`, `/api/`, and `/images/`
-  matcher: ['/((?!api|_next/static|_next/image|images|favicon.ico).*)'],
+  // Matcher ignoring `/_next/`, `/api/`, `/images/`, `/sitemap.xml`, `/robots.txt`, etc.
+  matcher: ['/((?!api|_next/static|_next/image|images|uploads|sitemap.xml|robots.txt|favicon.ico|icon.png|apple-icon.png).*)'],
 };
+
