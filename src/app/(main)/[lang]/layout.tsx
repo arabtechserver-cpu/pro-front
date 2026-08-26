@@ -53,6 +53,15 @@ export async function generateMetadata({ params }: { params: { lang: string } })
         'en': 'https://arabtechproserver.tech/en',
       },
     },
+    icons: {
+      icon: [
+        { url: '/favicon.ico', sizes: 'any' },
+        { url: '/images/logo_en.png', type: 'image/png' },
+        { url: '/icon.png', type: 'image/png' },
+      ],
+      shortcut: '/favicon.ico',
+      apple: '/apple-icon.png',
+    },
   };
 }
 
