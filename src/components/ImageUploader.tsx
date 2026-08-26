@@ -23,8 +23,8 @@ export default function ImageUploader({ name, defaultValue, onChange, className 
       return;
     }
 
-    if (file.size > 2 * 1024 * 1024) {
-      setError("حجم الصورة يجب أن لا يتجاوز 2 ميجابايت");
+    if (file.size > 5 * 1024 * 1024) {
+      setError("حجم الصورة يجب أن لا يتجاوز 5 ميجابايت");
       return;
     }
 
