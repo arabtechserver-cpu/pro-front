@@ -62,6 +62,9 @@ export async function generateMetadata({ params }: { params: { lang: string } })
       shortcut: '/favicon.ico',
       apple: '/apple-icon.png',
     },
+    verification: {
+      google: "N34n3oI-P5elZmLFHgFqp_BK93EijixhnIHEj_2oGnI",
+    },
   };
 }
 
@@ -79,6 +82,7 @@ export default async function RootLayout({
   return (
     <html lang={lang} dir={dir}>
       <head>
+        <meta name="google-site-verification" content="N34n3oI-P5elZmLFHgFqp_BK93EijixhnIHEj_2oGnI" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
