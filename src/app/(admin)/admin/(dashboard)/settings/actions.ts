@@ -7,7 +7,7 @@ export async function getAdminProfile() {
   if (!token) return null;
 
   try {
-    const res = await fetch('http://127.0.0.1:3001/api/users/profile', {
+    const res = await fetch('https://api.arabtechproserver.tech/api/users/profile', {
       headers: { 'Authorization': `Bearer ${token}` },
       cache: 'no-store'
     });
@@ -26,7 +26,7 @@ export async function updateAdminCredentials(data: any) {
   if (!token) return { success: false, error: "غير مصرح لك" };
 
   try {
-    const res = await fetch('http://127.0.0.1:3001/api/users/update-credentials', {
+    const res = await fetch('https://api.arabtechproserver.tech/api/users/update-credentials', {
       method: 'POST',
       headers: { 
         'Content-Type': 'application/json',

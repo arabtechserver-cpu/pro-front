@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 async function getOrders() {
   const token = cookies().get('admin_token')?.value;
   try {
-    const res = await fetch('http://127.0.0.1:3001/api/orders', {
+    const res = await fetch('https://api.arabtechproserver.tech/api/orders', {
       headers: { 'Authorization': `Bearer ${token}` },
       cache: 'no-store'
     });
