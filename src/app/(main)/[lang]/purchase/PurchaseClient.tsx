@@ -125,8 +125,11 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
         setUserBalance(parseFloat(parsed.balance || 0));
 
         if (parsed.email || parsed.id) {
+          const token = localStorage.getItem("user_token");
           const queryParam = parsed.id ? `userId=${encodeURIComponent(parsed.id)}` : `email=${encodeURIComponent(parsed.email)}`;
-          fetch(`/api/users/profile?${queryParam}`)
+          fetch(`/api/users/profile?${queryParam}`, {
+            headers: token ? { "Authorization": `Bearer ${token}` } : {}
+          })
             .then(res => res.json())
             .then(data => {
               if (data.user) {
@@ -354,9 +357,13 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
 
     setSubmittingOrder(true);
     try {
+      const token = localStorage.getItem("user_token");
       const res = await fetch("/api/orders", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          ...(token ? { "Authorization": `Bearer ${token}` } : {})
+        },
         body: JSON.stringify({
           userId: userSession.id,
           email: userSession.email,

@@ -37,8 +37,7 @@ export default function AnalyticsTracker() {
           }),
         });
       } catch (err) {
-        // Silently fail if analytics tracking fails
-        console.error("Analytics tracking failed:", err);
+        // Silently ignore if blocked by browser ad blocker / client extensions
       }
     };
 

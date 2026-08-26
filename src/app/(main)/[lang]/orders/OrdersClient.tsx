@@ -23,8 +23,11 @@ export default function OrdersClient({ lang, dict }: { lang: string, dict: any }
         setUserBalance(parseFloat(parsed.balance || 0));
 
         if (parsed.email || parsed.id) {
+          const token = localStorage.getItem("user_token");
           const queryParam = parsed.id ? `userId=${encodeURIComponent(parsed.id)}` : `email=${encodeURIComponent(parsed.email)}`;
-          fetch(`/api/users/profile?${queryParam}`)
+          fetch(`/api/users/profile?${queryParam}`, {
+            headers: token ? { "Authorization": `Bearer ${token}` } : {}
+          })
             .then(res => res.json())
             .then(data => {
               if (data.user) {
@@ -41,7 +44,7 @@ export default function OrdersClient({ lang, dict }: { lang: string, dict: any }
     }
   }, []);
 
-  // 2. Fetch Real Customer Orders from SQLite Database
+  // 2. Fetch Real Customer Orders from Database
   const fetchCustomerOrders = async () => {
     if (!userSession?.email && !userSession?.id) {
       setLoadingOrders(false);
@@ -49,8 +52,11 @@ export default function OrdersClient({ lang, dict }: { lang: string, dict: any }
     }
     setLoadingOrders(true);
     try {
+      const token = localStorage.getItem("user_token");
       const param = userSession?.id ? `userId=${encodeURIComponent(userSession.id)}` : `email=${encodeURIComponent(userSession.email)}`;
-      const res = await fetch(`/api/orders?${param}`);
+      const res = await fetch(`/api/orders?${param}`, {
+        headers: token ? { "Authorization": `Bearer ${token}` } : {}
+      });
       if (res.ok) {
         const data = await res.json();
         if (data.orders) {

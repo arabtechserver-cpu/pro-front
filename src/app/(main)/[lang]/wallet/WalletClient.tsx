@@ -217,7 +217,10 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
         url += `?email=${encodeURIComponent(email)}`;
       }
 
-      const res = await fetch(url);
+      const token = localStorage.getItem("user_token");
+      const res = await fetch(url, {
+        headers: token ? { "Authorization": `Bearer ${token}` } : {}
+      });
       const data = await res.json();
 
       if (res.ok && data.success) {
@@ -310,9 +313,13 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
     }
 
     try {
+      const token = localStorage.getItem("user_token");
       const res = await fetch("/api/transactions", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          ...(token ? { "Authorization": `Bearer ${token}` } : {})
+        },
         body: JSON.stringify({
           userId: userSession?.id,
           email: userSession?.email,

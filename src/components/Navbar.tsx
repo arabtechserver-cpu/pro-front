@@ -91,8 +91,11 @@ export default function Navbar({ lang, dict }: NavbarProps) {
 
           // Fetch fresh user profile from DB to sync live balance
           if (parsed?.email || parsed?.id) {
+            const token = localStorage.getItem("user_token");
             const queryParam = parsed.id ? `userId=${encodeURIComponent(parsed.id)}` : `email=${encodeURIComponent(parsed.email)}`;
-            const res = await fetch(`/api/users/profile?${queryParam}`);
+            const res = await fetch(`/api/users/profile?${queryParam}`, {
+              headers: token ? { "Authorization": `Bearer ${token}` } : {}
+            });
             const data = await res.json();
             if (res.ok && data.success && data.user) {
               const freshUser = { ...parsed, ...data.user };
