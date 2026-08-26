@@ -68,11 +68,18 @@ export default function AdminUsersPage() {
   const fetchUsers = async () => {
     try {
       setLoading(true);
-      const url = new URL("/api/users");
-      if (searchQuery) url.searchParams.append("q", searchQuery);
-      if (statusFilter !== "all") url.searchParams.append("status", statusFilter);
+      const params = new URLSearchParams();
+      if (searchQuery) params.append("q", searchQuery);
+      if (statusFilter !== "all") params.append("status", statusFilter);
 
-      const res = await fetch(url.toString());
+      const queryString = params.toString();
+      const endpoint = queryString ? `/api/users?${queryString}` : "/api/users";
+
+      const res = await fetch(endpoint, {
+        headers: {
+          "Cache-Control": "no-cache",
+        },
+      });
       const data = await res.json();
 
       if (res.ok && data.users) {
@@ -81,8 +88,8 @@ export default function AdminUsersPage() {
           setStats(data.stats);
         }
       }
-    } catch {
-      console.error("Failed to fetch users");
+    } catch (err) {
+      console.error("Failed to fetch users:", err);
     } finally {
       setLoading(false);
     }
