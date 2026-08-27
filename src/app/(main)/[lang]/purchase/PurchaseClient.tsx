@@ -24,26 +24,25 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
   const [notes, setNotes] = useState<string>("");
   const [submittingOrder, setSubmittingOrder] = useState<boolean>(false);
   const [submitFeedback, setSubmitFeedback] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const [showServiceInfo, setShowServiceInfo] = useState<boolean>(false);
 
   /**
    * يقرأ حقول المزود من بنيتين مختلفتين:
-   * 1. Array (النظام الجديد): [{id, label, type, options, required}]
-   * 2. Object (Dhru القديم): {key: {fieldname, required, fieldtype, fieldoptions}}
+   * 1. Array (النظام الجديد): [{id, label, type, options, required, description}]
+   * 2. Object (Dhru القديم): {key: {fieldname, required, fieldtype, fieldoptions, description}}
    * يُعيد دائماً: Record<key, fieldObj> أو null
    */
   const getProviderCustomFields = (service: any): Record<string, any> | null => {
     if (!service) return null;
 
-    // ── البنية الجديدة: fields كـ array مباشرة على الـ service
     const rawFields = service.fields ?? service.requiresCustom;
     if (!rawFields) return null;
 
     try {
       const parsed = typeof rawFields === 'string' ? JSON.parse(rawFields) : rawFields;
 
-      // Array من field objects: [{id, label, type, options, required}]
+      // Array من field objects
       if (Array.isArray(parsed) && parsed.length > 0) {
-        // حوّل لـ Record<id, fieldObj> عشان يتوافق مع باقي الكود
         const result: Record<string, any> = {};
         for (const field of parsed) {
           if (field.adminonly) continue; // تجاهل الحقول المخصصة للأدمن
@@ -53,7 +52,7 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
         return Object.keys(result).length > 0 ? result : null;
       }
 
-      // Object قديم من Dhru: {key: {fieldname, required, ...}}
+      // Object من Dhru API
       if (parsed && typeof parsed === 'object' && !Array.isArray(parsed) && Object.keys(parsed).length > 0) {
         return parsed;
       }
@@ -64,12 +63,9 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
   // Helper to extract options list for select/dropdown fields — يقرأ من بيانات Dhru API الحقيقية
   const extractFieldOptions = (key: string, fieldObj: any): string[] => {
     let options: string[] = [];
-
-    // البيانات من Dhru API: options كـ array أو string أو fieldoptions
     const raw = fieldObj?.options ?? fieldObj?.fieldoptions ?? fieldObj?.FIELDOPTIONS ?? fieldObj?.Options;
 
     if (Array.isArray(raw)) {
-      // array of strings أو array of objects {value, label}
       options = raw
         .map((item: any) => {
           if (typeof item === 'string') return item.trim();
@@ -79,7 +75,6 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
         })
         .filter(Boolean);
     } else if (typeof raw === 'string' && raw.trim()) {
-      // string مفصولة بـ \n أو , أو | أو \\n
       if (raw.includes('Router Beeline')) {
         options = ['Router Beeline TC-100', 'Router Beeline TC-150'];
       } else {
@@ -88,6 +83,43 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
     }
 
     return options;
+  };
+
+  const getLocalizedFieldLabel = (rawKey: string, fieldObj: any, lang: string): string => {
+    const raw = fieldObj?.label || fieldObj?.fieldname || fieldObj?.reqid || fieldObj?.name || rawKey;
+    const clean = String(raw).replace(/^custom_/i, '').trim();
+    const lower = clean.toLowerCase();
+
+    if (lang === 'ar') {
+      if (lower === 'email' || lower === 'user email' || lower === 'user_email' || lower === 'e-mail') return 'البريد الإلكتروني (Email)';
+      if (lower === 'username' || lower === 'user name' || lower === 'user_name' || lower === 'login' || lower === 'targetlogin') return 'اسم المستخدم (Username / Login)';
+      if (lower === 'password' || lower === 'pass' || lower === 'user password') return 'كلمة المرور (Password)';
+      if (lower === 'ecid' || lower === 'ecid copy from tool') return 'رقم الـ ECID (من الأداة)';
+      if (lower === 'serial number' || lower === 'serial_number' || lower === 'sn' || lower === 'serial' || lower === 'serial no') return 'الرقم التسلسلي للجهاز (Serial Number)';
+      if (lower === 'imei' || lower === 'imei number') return 'رقم الـ IMEI (15 رقم)';
+      if (lower === 'sn or imei' || lower === 'imei/sn' || lower === 'sn / imeis' || lower === 'serial number or imei' || lower === 'imei or serial number' || lower === 'imei or sn') return 'رقم IMEI أو Serial Number';
+      if (lower === 'model' || lower === 'model no') return 'موديل الجهاز (Model)';
+      if (lower === 'lock code' || lower === 'code lock' || lower === 'keylock' || lower === 'lock code / imei') return 'رمز القفل (Lock Code)';
+      if (lower.includes('lock screen photo') || lower.includes('screenshot') || lower.includes('picture')) return 'رابط صورة الشاشة (Screenshot Link)';
+      if (lower.includes('video link') || lower.includes('video')) return 'رابط فيديو الإثبات (Video Link)';
+      if (lower === 'checker report' || lower === 'link proof') return 'تقرير الفحص أو الإثبات (Report / Proof)';
+      if (lower === 'apple id' || lower === 'icloud email id' || lower === 'apple id email') return 'حساب أبل (Apple ID / iCloud Email)';
+      if (lower.includes('apple id hint') || lower.includes('link apple id hint')) return 'تلميح حساب أبل (Apple ID Hint Link)';
+      if (lower === 'country' || lower === 'current country') return 'الدولة الحالية للجهاز (Country)';
+      if (lower === 'mobile' || lower === 'phonenumber' || lower === 'whatsapp number') return 'رقم الهاتف / واتساب (Phone Number)';
+      if (lower.includes('anydesk') || lower.includes('any desk') || lower.includes('ultra viewer') || lower.includes('ultraview')) return 'معرف وبيانات AnyDesk / UltraViewer';
+      if (lower === 'playerid') return 'معرف اللاعب (Player ID)';
+      if (lower === 'account id' || lower === 'userid') return 'معرف الحساب (Account ID / User ID)';
+      if (lower === 'hardware id' || lower === 'hwid' || lower === 'machine id' || lower === 'processor id' || lower === 'fingerprint') return 'المعرف الصلب للجهاز (HWID / Machine ID)';
+      if (lower === 'license key' || lower === 'domain name' || lower === 'workspace') return 'مفتاح الترخيص / النطاق (License / Domain)';
+    }
+
+    return clean;
+  };
+
+  const isLongTextField = (rawKey: string, fieldObj: any): boolean => {
+    const raw = (fieldObj?.label || fieldObj?.fieldname || fieldObj?.reqid || fieldObj?.name || rawKey).toLowerCase();
+    return raw.includes('report') || raw.includes('proof') || raw.includes('questions') || raw.includes('comments') || raw.includes('notes') || raw.includes('bulk') || raw.includes('link');
   };
 
   const getFieldIdentityText = (key: string, fieldObj: any): string => {
@@ -246,7 +278,23 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
     selectedService?.maxQty !== undefined;
 
   // Unit price & total calculation
-  const unitPrice = selectedService ? (selectedService.credit + (selectedService.margin || 0)) : 0;
+  const getCalculatedUnitPrice = (service: any): number => {
+    if (!service) return 0;
+    if (service.finalPrice !== undefined && service.finalPrice !== null) return Number(service.finalPrice) || 0;
+    if (service.price !== undefined && service.price !== null) return Number(service.price) || 0;
+    const c = typeof service.credit === 'number' ? service.credit : parseFloat(service.credit) || 0;
+    const m = typeof service.margin === 'number' ? service.margin : parseFloat(service.margin) || 0;
+    return Number((c + m).toFixed(2));
+  };
+
+  const unitPrice = getCalculatedUnitPrice(selectedService);
+  const isFreeService = Boolean(selectedService && unitPrice === 0 && (
+    selectedService.name?.toLowerCase().includes("free") || 
+    selectedService.name?.includes("مجاني") || 
+    selectedService.name?.includes("مجانا")
+  ));
+  const isZeroUnpriced = Boolean(selectedService && unitPrice === 0 && !isFreeService);
+
   const totalPrice = unitPrice * (quantity > 0 ? quantity : 1);
   const hasEnoughBalance = userBalance >= totalPrice;
 
@@ -292,10 +340,10 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
     let payloadTarget = targetInput.trim();
     let rawImeiStr = "";
 
-    if (providerFields) {
+    if (providerFields && Object.keys(providerFields).length > 0) {
       const missingKeys = Object.entries(providerFields)
         .filter(([k, f]: [string, any]) => (f?.required === "1" || f?.required === true) && !customFieldValues[k]?.trim())
-        .map(([k, f]: [string, any]) => f?.fieldname || f?.reqid || k);
+        .map(([k, f]: [string, any]) => getLocalizedFieldLabel(k, f, lang));
 
       if (missingKeys.length > 0) {
         setSubmitFeedback({
@@ -308,6 +356,7 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
       }
 
       let customString = Object.entries(customFieldValues)
+        .filter(([_, v]) => Boolean(v && String(v).trim()))
         .map(([k, v]) => `${k}: ${v}`)
         .join(" | ");
 
@@ -320,17 +369,24 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
           return;
         }
         rawImeiStr = targetInput.trim();
-        payloadTarget = `IMEI: ${targetInput.trim()} | ${customString}`;
+        payloadTarget = customString ? `IMEI: ${targetInput.trim()} | ${customString}` : `IMEI: ${targetInput.trim()}`;
       } else {
-        // If provider explicitly required an IMEI custom field, find it to send as rawImei
+        // If provider explicitly required an IMEI/SN custom field, find it to send as rawImei
         const imeiKey = Object.keys(providerFields).find(k => {
           const f = providerFields[k];
           return isPrimaryImeiProviderField(k, f);
         });
         if (imeiKey && customFieldValues[imeiKey]) {
           rawImeiStr = customFieldValues[imeiKey];
+        } else if (targetInput.trim()) {
+          rawImeiStr = targetInput.trim();
         }
-        payloadTarget = customString;
+
+        if (targetInput.trim() && customString) {
+          payloadTarget = `${targetInput.trim()} | ${customString}`;
+        } else {
+          payloadTarget = customString || targetInput.trim() || (lang === 'ar' ? 'طلب فوري' : 'Instant Order');
+        }
       }
     } else if (isImeiService) {
       if (!targetInput.trim()) {
@@ -341,8 +397,9 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
         return;
       }
       rawImeiStr = targetInput.trim();
+      payloadTarget = targetInput.trim();
     } else {
-      payloadTarget = targetInput.trim() || (lang === 'ar' ? 'طلب خدمة فورية بدون إدخال' : 'Instant Service Order (No Input)');
+      payloadTarget = targetInput.trim() || (lang === 'ar' ? 'طلب فوري' : 'Instant Order');
     }
 
     if (!hasEnoughBalance) {
@@ -541,11 +598,20 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
                   <option value="">{lang === 'ar' ? 'لا توجد خدمات متاحة في هذا القسم' : 'No services available'}</option>
                 ) : (
                   availableServices.map((srv: any) => {
-                    const price = (srv.credit + (srv.margin || 0)).toFixed(2);
+                    const c = typeof srv.credit === 'number' ? srv.credit : parseFloat(srv.credit) || 0;
+                    const m = typeof srv.margin === 'number' ? srv.margin : parseFloat(srv.margin) || 0;
+                    const p = srv.finalPrice ?? srv.price ?? (c + m);
+                    const pNum = typeof p === 'number' ? p : parseFloat(p) || 0;
+                    const isFree = pNum === 0 && (srv.name?.toLowerCase().includes("free") || srv.name?.includes("مجاني") || srv.name?.includes("مجانا"));
+                    const priceLabel = isFree 
+                      ? (lang === 'ar' ? 'مجاناً 🎁' : 'Free 🎁') 
+                      : pNum > 0 
+                      ? `$${pNum.toFixed(2)} USD` 
+                      : (lang === 'ar' ? 'سعر خاص 💬' : 'Special Price 💬');
                     const groupPrefix = srv.groupName ? `[${srv.groupName}] ` : '';
                     return (
                       <option key={srv.id} value={srv.id}>
-                        {groupPrefix}{srv.name} — (${price} USD)
+                        {groupPrefix}{srv.name} — ({priceLabel})
                       </option>
                     );
                   })
@@ -580,13 +646,47 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
                     <span>وقت التسليم: {selectedService.time || "فوري - 30 دقيقة"}</span>
                   </span>
                 </div>
+
+                {/* Collapsible Provider Instructions & Info */}
+                {selectedService.info && (
+                  <div className="mt-3 pt-2.5 border-t border-outline-variant/15">
+                    <button
+                      type="button"
+                      onClick={() => setShowServiceInfo(!showServiceInfo)}
+                      className="text-xs font-bold text-primary flex items-center gap-1.5 hover:underline"
+                    >
+                      <span className="material-symbols-outlined text-sm">info</span>
+                      <span>
+                        {showServiceInfo
+                          ? (lang === 'ar' ? 'إخفاء شروط وتعليمات المزود ▲' : 'Hide provider rules & instructions ▲')
+                          : (lang === 'ar' ? 'عرض شروط وتعليمات المزود للخدمة ▼' : 'View provider rules & instructions ▼')}
+                      </span>
+                    </button>
+                    {showServiceInfo && (
+                      <div 
+                        className="mt-2.5 p-3 rounded-xl bg-surface-container-lowest border border-outline-variant/30 text-xs text-on-surface-variant leading-relaxed max-h-56 overflow-y-auto whitespace-pre-wrap"
+                        dangerouslySetInnerHTML={{ __html: selectedService.info }}
+                      />
+                    )}
+                  </div>
+                )}
               </div>
 
               <div className="text-start sm:text-end shrink-0">
                 <span className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider block">سعر الخدمة</span>
-                <span className="text-2xl font-bold font-mono text-primary glow-cyan">
-                  ${unitPrice.toFixed(2)} USD
-                </span>
+                {unitPrice > 0 ? (
+                  <span className="text-2xl font-bold font-mono text-primary glow-cyan">
+                    ${unitPrice.toFixed(2)} USD
+                  </span>
+                ) : isFreeService ? (
+                  <span className="text-sm font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-3 py-1 rounded-xl inline-block mt-1">
+                    {lang === 'ar' ? 'خدمة مجانية 🎁' : 'Free Service 🎁'}
+                  </span>
+                ) : (
+                  <span className="text-xs font-bold text-amber-400 bg-amber-500/10 border border-amber-500/30 px-3 py-1 rounded-xl inline-block mt-1">
+                    {lang === 'ar' ? 'سعر خاص عند الطلب 💬' : 'Price on Request 💬'}
+                  </span>
+                )}
               </div>
             </div>
           )}
@@ -594,12 +694,12 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
           {/* PROVIDER REQUIRED CUSTOM FIELDS VS STANDARD INPUT — يتحكم فيها API المزود تلقائياً */}
           {(() => {
             const providerFields = getProviderCustomFields(selectedService);
-            const hasCustomFields = providerFields && Object.keys(providerFields).length > 0;
+            const hasCustomFields = Boolean(providerFields && Object.keys(providerFields).length > 0);
 
             if (isImeiService || hasCustomFields) {
               return (
                 <div className="space-y-6">
-                  {/* ── حالة 2: الخدمة IMEI وتحتاج حقل مخصص ── */}
+                  {/* ── حالة: الخدمة IMEI وتحتاج حقل مخصص ── */}
                   {isImeiService && (
                     <div className="flex flex-col gap-2">
                       <label className="text-xs font-bold text-on-surface-variant uppercase tracking-wider flex items-center justify-between">
@@ -617,48 +717,28 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
                     </div>
                   )}
 
-                  {/* ── حالة 1: المزود أرسل حقول مخصصة (model, network, ...) */}
+                  {/* ── حالة: المزود أرسل حقول مخصصة (Custom Fields) ── */}
                   {hasCustomFields && (
                     <div className="space-y-4 p-5 rounded-2xl bg-surface-container-high/40 border border-primary/20">
                       <div className="flex items-center gap-2 text-xs font-bold text-primary">
                         <span className="material-symbols-outlined text-base">tune</span>
                         <span>
                           {lang === 'ar'
-                            ? 'بيانات الطلب (حسب متطلبات المزود):'
-                            : 'Order Details (Provider Requirements):'}
+                            ? 'بيانات وحقول الطلب المطلوبة من المزود:'
+                            : 'Order Details & Provider Required Fields:'}
                         </span>
                       </div>
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {Object.entries(providerFields).map(([key, fieldObj]: [string, any]) => {
-                          // قراءة التسمية من بيانات Dhru API الحقيقية
-                          const rawLabel = fieldObj?.label || fieldObj?.fieldname || fieldObj?.reqid || fieldObj?.name || key;
-                          const cleanLabel = rawLabel.replace(/^custom_/i, '');
+                        {Object.entries(providerFields!).map(([key, fieldObj]: [string, any]) => {
+                          const cleanLabel = getLocalizedFieldLabel(key, fieldObj, lang);
                           const isRequired = fieldObj?.required === "1" || fieldObj?.required === true || fieldObj?.REQUIRED === "1";
                           const fieldType = (fieldObj?.fieldtype || fieldObj?.type || fieldObj?.FIELDTYPE || '').toLowerCase();
+                          const fieldDesc = fieldObj?.description || fieldObj?.DESCRIPTION || fieldObj?.hint || '';
                           const optionsList = extractFieldOptions(key, fieldObj);
+                          const isLong = isLongTextField(key, fieldObj);
 
-                          // حقل IMEI/Serial ضمن providerFields → input text
-                          if (isPrimaryImeiProviderField(key, fieldObj)) {
-                            return (
-                              <div key={key} className="flex flex-col gap-2">
-                                <label className="text-xs font-bold text-on-surface-variant uppercase tracking-wider flex items-center justify-between">
-                                  <span>{cleanLabel}:</span>
-                                  {isRequired && <span className="text-primary text-[11px] font-normal">{lang === 'ar' ? '* إجباري' : '* Required'}</span>}
-                                </label>
-                                <input
-                                  type="text"
-                                  value={customFieldValues[key] || ""}
-                                  onChange={(e) => setCustomFieldValues({ ...customFieldValues, [key]: e.target.value })}
-                                  placeholder={lang === 'ar' ? 'أدخل رقم الـ IMEI أو Serial...' : 'Enter IMEI or Serial...'}
-                                  className="w-full bg-surface-container-lowest border border-outline-variant/40 rounded-xl py-3.5 px-4 text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all font-mono text-sm dir-ltr"
-                                  required={isRequired}
-                                />
-                              </div>
-                            );
-                          }
-
-                          // حقل select / dropdown — فقط لو فيه options حقيقية
+                          // حقل select / dropdown — لو فيه options حقيقية
                           if (fieldType === 'select' && optionsList.length > 0) {
                             return (
                               <div key={key} className="flex flex-col gap-2">
@@ -672,16 +752,48 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
                                   className="w-full bg-surface-container-lowest border border-outline-variant/40 rounded-xl py-3.5 px-4 text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all font-semibold text-xs cursor-pointer"
                                   required={isRequired}
                                 >
-                                  <option value="">{lang === 'ar' ? '-- اختر --' : '-- Select --'}</option>
+                                  <option value="">{lang === 'ar' ? '-- اختر من القائمة --' : '-- Select from list --'}</option>
                                   {optionsList.map((opt, i) => (
                                     <option key={i} value={opt}>{opt}</option>
                                   ))}
                                 </select>
+                                {fieldDesc && (
+                                  <p className="text-[11px] text-on-surface-variant/80 flex items-center gap-1 mt-0.5">
+                                    <span className="material-symbols-outlined text-xs text-primary">info</span>
+                                    <span>{fieldDesc}</span>
+                                  </p>
+                                )}
                               </div>
                             );
                           }
 
-                          // حقل نصي عادي
+                          // حقل نصي طويل (تقرير، إثبات، روابط متعددة)
+                          if (isLong) {
+                            return (
+                              <div key={key} className="flex flex-col gap-2 md:col-span-2">
+                                <label className="text-xs font-bold text-on-surface-variant uppercase tracking-wider flex items-center justify-between">
+                                  <span>{cleanLabel}:</span>
+                                  {isRequired && <span className="text-primary text-[11px] font-normal">{lang === 'ar' ? '* إجباري' : '* Required'}</span>}
+                                </label>
+                                <textarea
+                                  rows={2}
+                                  value={customFieldValues[key] || ""}
+                                  onChange={(e) => setCustomFieldValues({ ...customFieldValues, [key]: e.target.value })}
+                                  placeholder={lang === 'ar' ? `أدخل ${cleanLabel}...` : `Enter ${cleanLabel}...`}
+                                  className="w-full bg-surface-container-lowest border border-outline-variant/40 rounded-xl py-3 px-4 text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all font-mono text-sm dir-ltr"
+                                  required={isRequired}
+                                />
+                                {fieldDesc && (
+                                  <p className="text-[11px] text-on-surface-variant/80 flex items-center gap-1 mt-0.5">
+                                    <span className="material-symbols-outlined text-xs text-primary">info</span>
+                                    <span>{fieldDesc}</span>
+                                  </p>
+                                )}
+                              </div>
+                            );
+                          }
+
+                          // حقل نصي عادي / كلمة مرور / إيميل / سيريال
                           return (
                             <div key={key} className="flex flex-col gap-2">
                               <label className="text-xs font-bold text-on-surface-variant uppercase tracking-wider flex items-center justify-between">
@@ -696,6 +808,12 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
                                 className="w-full bg-surface-container-lowest border border-outline-variant/40 rounded-xl py-3.5 px-4 text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all font-mono text-sm dir-ltr"
                                 required={isRequired}
                               />
+                              {fieldDesc && (
+                                <p className="text-[11px] text-on-surface-variant/80 flex items-center gap-1 mt-0.5">
+                                  <span className="material-symbols-outlined text-xs text-primary">info</span>
+                                  <span>{fieldDesc}</span>
+                                </p>
+                              )}
                             </div>
                           );
                         })}
@@ -706,15 +824,26 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
               );
             }
 
-            // ── حالة 3: خدمة فورية بدون حقول
+            // ── حالة: خدمة سيرفر عامة لا تتطلب حقول مخصصة إجبارية من المزود
             return (
-              <div className="p-4 rounded-2xl bg-primary/10 border border-primary/30 text-xs font-bold text-primary flex items-center gap-3">
-                <span className="material-symbols-outlined text-xl text-primary shrink-0">verified</span>
-                <span>
-                  {lang === 'ar'
-                    ? '✨ هذه الخدمة لا تطلب أي بيانات إضافية - جاهزة للتأكيد الفوري!'
-                    : '✨ This service requires no additional input - Ready for instant order!'}
-                </span>
+              <div className="space-y-3">
+                <div className="flex flex-col gap-2">
+                  <label className="text-xs font-bold text-on-surface-variant uppercase tracking-wider flex items-center justify-between">
+                    <span>{lang === 'ar' ? 'بيانات الحساب / المعرف المستهدف (اسم المستخدم، البريد، أو السيريال)' : 'Target Account / Username / Email / Serial'}</span>
+                    <span className="text-on-surface-variant text-[11px] font-normal">{lang === 'ar' ? '(اختياري/حسب نوع الخدمة)' : '(Optional)'}</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={targetInput}
+                    onChange={(e) => setTargetInput(e.target.value)}
+                    placeholder={lang === 'ar' ? 'أدخل اسم المستخدم أو الإيميل أو المعرف المستهدف للخدمة...' : 'Enter target username, email or device ID...'}
+                    className="w-full bg-surface-container-lowest border border-outline-variant/40 rounded-xl py-3.5 px-4 text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all font-mono text-sm dir-ltr"
+                  />
+                </div>
+                <p className="text-[11px] text-primary/90 flex items-center gap-1.5 px-1">
+                  <span className="material-symbols-outlined text-xs">verified</span>
+                  <span>{lang === 'ar' ? 'إذا كانت الخدمة تتطلب ربط حساب أو تفعيل، يرجى كتابة اسم الحساب أعلاه.' : 'If this service requires account binding, enter the account details above.'}</span>
+                </p>
               </div>
             );
           })()}
@@ -804,7 +933,11 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
             ) : (
               <>
                 <span className="material-symbols-outlined text-lg">rocket_launch</span>
-                <span>{lang === 'ar' ? `تأكيد وإرسال الطلب ($${totalPrice.toFixed(2)} USD)` : `Confirm & Send Order ($${totalPrice.toFixed(2)} USD)`}</span>
+                <span>
+                  {isFreeService
+                    ? (lang === 'ar' ? 'تأكيد وإرسال الطلب (مجاناً 🎁)' : 'Confirm & Send Order (Free 🎁)')
+                    : (lang === 'ar' ? `تأكيد وإرسال الطلب ($${totalPrice.toFixed(2)} USD)` : `Confirm & Send Order ($${totalPrice.toFixed(2)} USD)`)}
+                </span>
               </>
             )}
           </button>

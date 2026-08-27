@@ -16,8 +16,13 @@ export default function ServicesPage() {
   // Edit Service Modal State
   const [editingService, setEditingService] = useState<any | null>(null);
   const [editName, setEditName] = useState("");
+  const [editCredit, setEditCredit] = useState<number>(0);
   const [editMargin, setEditMargin] = useState<number>(0);
+  const [editIsActive, setEditIsActive] = useState<boolean>(true);
   const [isSavingEdit, setIsSavingEdit] = useState(false);
+
+  // Filter state (all, active, hidden, zeroPrice)
+  const [filterType, setFilterType] = useState<"all" | "active" | "hidden" | "zeroPrice">("all");
 
   // Sync from Provider State
   const [isSyncModalOpen, setIsSyncModalOpen] = useState(false);
@@ -147,8 +152,10 @@ export default function ServicesPage() {
   // Open Edit Modal
   const handleOpenEdit = (service: any) => {
     setEditingService(service);
-    setEditName(service.name);
-    setEditMargin(service.margin || 0);
+    setEditName(service.name || "");
+    setEditCredit(Number(service.credit) || 0);
+    setEditMargin(Number(service.margin) || 0);
+    setEditIsActive(service.isActive !== false);
   };
 
   // Save Service Edits
@@ -164,21 +171,32 @@ export default function ServicesPage() {
         body: JSON.stringify({
           serviceId: editingService.id,
           name: editName,
-          margin: editMargin
+          credit: editCredit,
+          margin: editMargin,
+          isActive: editIsActive
         })
       });
 
       const data = await res.json();
       if (res.ok && data.success) {
+        const finalCalculated = Number((Number(editCredit) + Number(editMargin)).toFixed(2));
         setCategories((prev) =>
           prev.map((cat) => ({
             ...cat,
             services: cat.services.map((s: any) =>
-              s.id === editingService.id ? { ...s, name: editName, margin: Number(editMargin) } : s
+              s.id === editingService.id ? { 
+                ...s, 
+                name: editName, 
+                credit: Number(editCredit), 
+                margin: Number(editMargin),
+                price: finalCalculated,
+                finalPrice: finalCalculated,
+                isActive: editIsActive
+              } : s
             )
           }))
         );
-        showToast("تم حفظ تعديلات الخدمة بنجاح!");
+        showToast("تم حفظ تعديلات الخدمة والأسعار بنجاح!");
         setEditingService(null);
       } else {
         showToast(data.error || "فشل حفظ التعديلات", "error");
@@ -197,14 +215,35 @@ export default function ServicesPage() {
     }));
   };
 
-  // Filtered categories & services based on search query
+  // Filtered categories & services based on search query and filterType
   const filteredCategories = useMemo(() => {
-    if (!searchQuery.trim()) return categories;
+    let result = categories;
+
+    if (filterType === "active") {
+      result = result.map(c => ({
+        ...c,
+        services: (c.services || []).filter((s: any) => s.isActive)
+      }));
+    } else if (filterType === "hidden") {
+      result = result.map(c => ({
+        ...c,
+        services: (c.services || []).filter((s: any) => !s.isActive)
+      }));
+    } else if (filterType === "zeroPrice") {
+      result = result.map(c => ({
+        ...c,
+        services: (c.services || []).filter((s: any) => (Number(s.credit) || 0) + (Number(s.margin) || 0) === 0)
+      }));
+    }
+
+    if (!searchQuery.trim()) {
+      return result.filter((cat) => (cat.services || []).length > 0);
+    }
 
     const query = searchQuery.trim().toLowerCase();
-    return categories
+    return result
       .map((cat) => {
-        const matchingServices = cat.services.filter(
+        const matchingServices = (cat.services || []).filter(
           (s: any) =>
             s.name.toLowerCase().includes(query) ||
             s.groupName.toLowerCase().includes(query) ||
@@ -213,12 +252,19 @@ export default function ServicesPage() {
         return { ...cat, services: matchingServices };
       })
       .filter((cat) => cat.services.length > 0);
-  }, [categories, searchQuery]);
+  }, [categories, searchQuery, filterType]);
+
+  // Count zero price services overall
+  const zeroPriceCount = useMemo(() => {
+    return categories.reduce((total, cat) => {
+      return total + (cat.services || []).filter((s: any) => (Number(s.credit) || 0) + (Number(s.margin) || 0) === 0).length;
+    }, 0);
+  }, [categories]);
 
   // Group services by groupName
   const getGroupedServices = (services: any[]) => {
     const groups: Record<string, any[]> = {};
-    services.forEach((service) => {
+    (services || []).forEach((service) => {
       if (!groups[service.groupName]) {
         groups[service.groupName] = [];
       }
@@ -243,14 +289,14 @@ export default function ServicesPage() {
         </div>
       )}
 
-      {/* Edit Modal */}
+      {/* Enhanced Edit Modal */}
       {editingService && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-surface-container border border-outline-variant/30 rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl">
+          <div className="bg-surface-container border border-outline-variant/30 rounded-3xl p-6 sm:p-8 max-w-lg w-full shadow-2xl animate-in fade-in zoom-in-95">
             <div className="flex items-center justify-between mb-6 pb-3 border-b border-outline-variant/20">
               <h3 className="text-xl font-bold text-on-surface flex items-center gap-2">
                 <span className="material-symbols-outlined text-primary">edit_square</span>
-                تعديل بيانات الخدمة
+                تعديل بيانات وسعر الخدمة
               </h3>
               <button
                 type="button"
@@ -273,39 +319,82 @@ export default function ServicesPage() {
                 />
               </div>
 
-              <div>
-                <label className="block text-xs font-bold text-on-surface-variant mb-2">هامش الربح الإضافي ($)</label>
-                <input
-                  type="number"
-                  step="0.01"
-                  value={editMargin}
-                  onChange={(e) => setEditMargin(parseFloat(e.target.value) || 0)}
-                  className="w-full px-4 py-3 bg-surface border border-outline-variant/50 rounded-xl focus:border-primary outline-none text-sm transition-all"
-                />
-                <div className="bg-surface-container-low p-3 rounded-xl border border-outline-variant/20 mt-3 space-y-1">
-                  <p className="text-xs text-on-surface-variant flex justify-between">
-                    <span>التكلفة الأصلية (Dhru API):</span>
-                    <span className="font-mono font-bold">${editingService.credit?.toFixed(2) || "0.00"}</span>
-                  </p>
-                  <p className="text-xs text-primary font-bold flex justify-between pt-1 border-t border-outline-variant/10">
-                    <span>السعر الإجمالي للعميل:</span>
-                    <span className="font-mono text-base">${((editingService.credit || 0) + Number(editMargin || 0)).toFixed(2)}</span>
-                  </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-on-surface-variant mb-2">
+                    سعر التكلفة / الأساسي ($)
+                  </label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    value={editCredit}
+                    onChange={(e) => setEditCredit(parseFloat(e.target.value) || 0)}
+                    className="w-full px-4 py-3 bg-surface border border-outline-variant/50 rounded-xl focus:border-primary outline-none text-sm font-mono transition-all"
+                  />
+                  <span className="text-[10px] text-on-surface-variant mt-1 block">سعر المزود أو التكلفة المخصصة</span>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-on-surface-variant mb-2">
+                    هامش الربح الإضافي ($)
+                  </label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={editMargin}
+                    onChange={(e) => setEditMargin(parseFloat(e.target.value) || 0)}
+                    className="w-full px-4 py-3 bg-surface border border-outline-variant/50 rounded-xl focus:border-primary outline-none text-sm font-mono transition-all"
+                  />
+                  <span className="text-[10px] text-on-surface-variant mt-1 block">الربح المضاف فوق التكلفة</span>
                 </div>
               </div>
 
-              <div className="flex gap-3 pt-4">
+              <div>
+                <label className="block text-xs font-bold text-on-surface-variant mb-2">حالة الظهور للعملاء</label>
+                <select
+                  value={editIsActive ? "true" : "false"}
+                  onChange={(e) => setEditIsActive(e.target.value === "true")}
+                  className="w-full px-4 py-3 bg-surface border border-outline-variant/50 rounded-xl focus:border-primary outline-none text-sm font-semibold transition-all cursor-pointer"
+                >
+                  <option value="true">ظاهرة ومتاحة للعملاء في المتجر 🟢</option>
+                  <option value="false">مخفية عن العملاء 🔴</option>
+                </select>
+              </div>
+
+              <div className="bg-surface-container-low p-4 rounded-2xl border border-outline-variant/20 space-y-2">
+                <div className="flex justify-between text-xs text-on-surface-variant">
+                  <span>سعر التكلفة:</span>
+                  <span className="font-mono font-bold">${(Number(editCredit) || 0).toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between text-xs text-on-surface-variant">
+                  <span>هامش الربح:</span>
+                  <span className="font-mono font-bold text-secondary">+${(Number(editMargin) || 0).toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between text-sm text-primary font-bold pt-2 border-t border-outline-variant/20">
+                  <span>السعر الإجمالي النهائي للعميل:</span>
+                  <span className="font-mono text-lg font-bold">${((Number(editCredit) || 0) + (Number(editMargin) || 0)).toFixed(2)} USD</span>
+                </div>
+                {((Number(editCredit) || 0) + (Number(editMargin) || 0)) === 0 && (
+                  <p className="text-[11px] text-amber-400 font-bold flex items-center gap-1 pt-1">
+                    <span className="material-symbols-outlined text-xs">info</span>
+                    تنبيه: السعر الإجمالي 0. ستظهر الخدمة كخدمة مجانية أو بسعر خاص.
+                  </p>
+                )}
+              </div>
+
+              <div className="flex gap-3 pt-2">
                 <button
                   type="submit"
                   disabled={isSavingEdit}
-                  className="flex-1 bg-primary text-on-primary py-3 rounded-xl font-bold hover:shadow-lg transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                  className="flex-1 bg-primary text-on-primary py-3 rounded-xl font-bold hover:shadow-lg transition-all flex items-center justify-center gap-2 disabled:opacity-50 shadow-md"
                 >
                   {isSavingEdit ? (
                     <span className="material-symbols-outlined animate-spin text-sm">refresh</span>
                   ) : (
                     <span className="material-symbols-outlined text-sm">save</span>
                   )}
-                  حفظ التعديلات
+                  حفظ وتطبيق التعديلات
                 </button>
                 <button
                   type="button"
@@ -388,49 +477,107 @@ export default function ServicesPage() {
       )}
 
       {/* Header & Controls */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-outline-variant/20 pb-6">
-        <div>
-          <h1 className="text-3xl font-display font-bold text-on-surface mb-2">إدارة الخدمات والأسعار</h1>
-          <p className="text-on-surface-variant text-sm">
-            التحكم المباشر في إظهار وإخفاء الباقات والخدمات للعملاء، وتعديل المسميات وهامش الربح.
-          </p>
+      <div className="flex flex-col gap-4 border-b border-outline-variant/20 pb-6">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-display font-bold text-on-surface mb-2">إدارة الخدمات والأسعار</h1>
+            <p className="text-on-surface-variant text-sm">
+              التحكم المباشر في أسعار الخدمات، هوامش الربح، وإظهار أو إخفاء الباقات والخدمات للعملاء.
+            </p>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-3">
+            {/* Sync from Provider Button */}
+            <button
+              onClick={() => setIsSyncModalOpen(true)}
+              disabled={isSyncing || loading}
+              className="bg-primary/10 hover:bg-primary/20 text-primary border border-primary/30 px-4 py-2.5 rounded-xl font-bold text-sm transition-all flex items-center gap-2 shadow-sm disabled:opacity-50"
+              title="مسح وتحديث الخدمات والأسعار من مزود Dhru"
+            >
+              <span className={`material-symbols-outlined text-lg ${isSyncing ? "animate-spin" : ""}`}>
+                {isSyncing ? "refresh" : "cloud_sync"}
+              </span>
+              <span>{isSyncing ? "جاري المزامنة..." : "مزامنة كاملة مع المزود"}</span>
+            </button>
+
+            {/* Live Search Box */}
+            <div className="relative min-w-[240px] sm:min-w-[300px]">
+              <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-lg">
+                search
+              </span>
+              <input
+                type="text"
+                placeholder="بحث بالاسم أو الباقة..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pr-10 pl-4 py-2.5 bg-surface-container border border-outline-variant/40 rounded-xl focus:border-primary outline-none text-sm transition-all"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery("")}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-on-surface-variant hover:text-on-surface"
+                >
+                  مسح
+                </button>
+              )}
+            </div>
+          </div>
         </div>
 
-        <div className="flex flex-wrap items-center gap-3">
-          {/* Sync from Provider Button */}
+        {/* Filter Tabs */}
+        <div className="flex flex-wrap items-center gap-2 pt-2">
           <button
-            onClick={() => setIsSyncModalOpen(true)}
-            disabled={isSyncing || loading}
-            className="bg-primary/10 hover:bg-primary/20 text-primary border border-primary/30 px-4 py-2.5 rounded-xl font-bold text-sm transition-all flex items-center gap-2 shadow-sm disabled:opacity-50"
-            title="مسح وتحديث الخدمات والأسعار من مزود Dhru"
+            onClick={() => setFilterType("all")}
+            className={`px-4 py-2 rounded-xl font-bold text-xs transition-all flex items-center gap-1.5 ${
+              filterType === "all"
+                ? "bg-primary text-on-primary shadow-md"
+                : "bg-surface-container border border-outline-variant/30 text-on-surface-variant hover:text-on-surface"
+            }`}
           >
-            <span className={`material-symbols-outlined text-lg ${isSyncing ? "animate-spin" : ""}`}>
-              {isSyncing ? "refresh" : "cloud_sync"}
-            </span>
-            <span>{isSyncing ? "جاري المزامنة..." : "مزامنة كاملة مع المزود"}</span>
+            <span className="material-symbols-outlined text-sm">view_list</span>
+            <span>جميع الخدمات</span>
           </button>
 
-          {/* Live Search Box */}
-          <div className="relative min-w-[240px] sm:min-w-[300px]">
-            <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-lg">
-              search
-            </span>
-            <input
-              type="text"
-              placeholder="بحث بالاسم أو الباقة..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pr-10 pl-4 py-2.5 bg-surface-container border border-outline-variant/40 rounded-xl focus:border-primary outline-none text-sm transition-all"
-            />
-            {searchQuery && (
-              <button
-                onClick={() => setSearchQuery("")}
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-on-surface-variant hover:text-on-surface"
-              >
-                مسح
-              </button>
+          <button
+            onClick={() => setFilterType("active")}
+            className={`px-4 py-2 rounded-xl font-bold text-xs transition-all flex items-center gap-1.5 ${
+              filterType === "active"
+                ? "bg-emerald-500 text-black shadow-md"
+                : "bg-surface-container border border-outline-variant/30 text-on-surface-variant hover:text-on-surface"
+            }`}
+          >
+            <span className="material-symbols-outlined text-sm">visibility</span>
+            <span>النشطة للعملاء فقط</span>
+          </button>
+
+          <button
+            onClick={() => setFilterType("hidden")}
+            className={`px-4 py-2 rounded-xl font-bold text-xs transition-all flex items-center gap-1.5 ${
+              filterType === "hidden"
+                ? "bg-amber-500 text-black shadow-md"
+                : "bg-surface-container border border-outline-variant/30 text-on-surface-variant hover:text-on-surface"
+            }`}
+          >
+            <span className="material-symbols-outlined text-sm">visibility_off</span>
+            <span>المخفية عن العملاء</span>
+          </button>
+
+          <button
+            onClick={() => setFilterType("zeroPrice")}
+            className={`px-4 py-2 rounded-xl font-bold text-xs transition-all flex items-center gap-1.5 ${
+              filterType === "zeroPrice"
+                ? "bg-error text-surface shadow-md"
+                : "bg-surface-container border border-error/30 text-error hover:bg-error/10"
+            }`}
+          >
+            <span className="material-symbols-outlined text-sm">price_change</span>
+            <span>خدمات بسعر 0$ (تحتاج ضبط)</span>
+            {zeroPriceCount > 0 && (
+              <span className={`px-2 py-0.2 rounded-full text-[10px] font-bold ${filterType === "zeroPrice" ? "bg-black/30 text-white" : "bg-error/20 text-error"}`}>
+                {zeroPriceCount}
+              </span>
             )}
-          </div>
+          </button>
         </div>
       </div>
 
@@ -451,7 +598,7 @@ export default function ServicesPage() {
 
         {!loading && !error && filteredCategories.length === 0 && (
           <div className="p-12 text-center bg-surface-container rounded-3xl border border-outline-variant/30 text-on-surface-variant">
-            لم يتم العثور على خدمات مطابقة للبحث.
+            لم يتم العثور على خدمات مطابقة للبحث أو الفلتر المحدد.
           </div>
         )}
 
@@ -557,82 +704,97 @@ export default function ServicesPage() {
 
                           {/* Services List */}
                           <div className="grid grid-cols-1 gap-3">
-                            {visibleServices.map((service: any) => (
-                              <div
-                                key={service.id}
-                                className={`bg-surface p-4 rounded-xl border transition-all flex flex-col md:flex-row md:items-center justify-between gap-4 ${
-                                  service.isActive
-                                    ? "border-outline-variant/30 hover:border-primary/50"
-                                    : "border-error/30 bg-error/5 opacity-60"
-                                }`}
-                              >
-                                <div className="space-y-1.5">
-                                  <div className="font-bold text-on-surface flex items-center gap-2 text-sm">
-                                    {service.name}
-                                    {!service.isActive && (
-                                      <span className="text-[11px] bg-error/15 text-error px-2 py-0.5 rounded-md font-bold">
-                                        مخفي عن العميل
-                                      </span>
-                                    )}
-                                  </div>
-                                  <div className="text-xs text-on-surface-variant flex flex-wrap items-center gap-4">
-                                    <span className="flex items-center gap-1">
-                                      <span className="material-symbols-outlined text-xs text-secondary">schedule</span>
-                                      {service.time || "1-24 Hours"}
-                                    </span>
-                                    <span className="text-[11px] text-on-surface-variant font-mono">
-                                      سعر المزود: ${service.credit?.toFixed(2) || "0.00"}
-                                    </span>
-                                    {service.margin > 0 && (
-                                      <span className="text-[11px] text-secondary font-bold font-mono">
-                                        + ربح: ${service.margin?.toFixed(2)}
-                                      </span>
-                                    )}
-                                  </div>
-                                </div>
+                            {visibleServices.map((service: any) => {
+                              const srvCost = Number(service.credit) || 0;
+                              const srvMargin = Number(service.margin) || 0;
+                              const srvTotal = Number((srvCost + srvMargin).toFixed(2));
+                              const isZeroPrice = srvTotal === 0;
 
-                                <div className="flex items-center gap-2 md:min-w-fit justify-between md:justify-end border-t md:border-t-0 pt-2 md:pt-0 border-outline-variant/10">
-                                  <div className="flex flex-col items-start md:items-end mr-2">
-                                    <span className="text-[10px] text-on-surface-variant">السعر للعميل</span>
-                                    <div
-                                      className={`font-bold text-base font-price-display ${
-                                        service.margin > 0 ? "text-secondary" : "text-primary"
-                                      }`}
-                                    >
-                                      ${((service.credit || 0) + (service.margin || 0)).toFixed(2)}
+                              return (
+                                <div
+                                  key={service.id}
+                                  className={`bg-surface p-4 rounded-xl border transition-all flex flex-col md:flex-row md:items-center justify-between gap-4 ${
+                                    !service.isActive
+                                      ? "border-error/30 bg-error/5 opacity-60"
+                                      : isZeroPrice
+                                      ? "border-amber-500/40 bg-amber-500/5 hover:border-amber-500"
+                                      : "border-outline-variant/30 hover:border-primary/50"
+                                  }`}
+                                >
+                                  <div className="space-y-1.5">
+                                    <div className="font-bold text-on-surface flex items-center gap-2 text-sm flex-wrap">
+                                      <span>{service.name}</span>
+                                      {!service.isActive && (
+                                        <span className="text-[11px] bg-error/15 text-error px-2 py-0.5 rounded-md font-bold">
+                                          مخفي عن العميل
+                                        </span>
+                                      )}
+                                      {isZeroPrice && (
+                                        <span className="text-[11px] bg-amber-500/15 border border-amber-500/30 text-amber-400 px-2 py-0.5 rounded-md font-bold flex items-center gap-1">
+                                          <span className="material-symbols-outlined text-xs">warning</span>
+                                          السعر $0.00 (يحتاج ضبط)
+                                        </span>
+                                      )}
+                                    </div>
+                                    <div className="text-xs text-on-surface-variant flex flex-wrap items-center gap-4">
+                                      <span className="flex items-center gap-1">
+                                        <span className="material-symbols-outlined text-xs text-secondary">schedule</span>
+                                        {service.time || "1-24 Hours"}
+                                      </span>
+                                      <span className="text-[11px] text-on-surface-variant font-mono">
+                                        سعر التكلفة: ${srvCost.toFixed(2)}
+                                      </span>
+                                      {srvMargin > 0 && (
+                                        <span className="text-[11px] text-secondary font-bold font-mono">
+                                          + ربح: ${srvMargin.toFixed(2)}
+                                        </span>
+                                      )}
                                     </div>
                                   </div>
 
-                                  {/* Toggle Single Service Button */}
-                                  <button
-                                    onClick={() => toggleVisibility(service)}
-                                    disabled={actionLoadingKey === service.id}
-                                    className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all ${
-                                      service.isActive
-                                        ? "bg-error/10 text-error hover:bg-error/20 border border-error/20"
-                                        : "bg-primary/10 text-primary hover:bg-primary/20 border border-primary/30"
-                                    }`}
-                                    title={service.isActive ? "إخفاء عن العملاء" : "إظهار للعملاء"}
-                                  >
-                                    {actionLoadingKey === service.id ? (
-                                      <span className="material-symbols-outlined animate-spin text-sm">refresh</span>
-                                    ) : (
-                                      <span className="material-symbols-outlined text-sm">
-                                        {service.isActive ? "visibility_off" : "visibility"}
-                                      </span>
-                                    )}
-                                  </button>
+                                  <div className="flex items-center gap-2 md:min-w-fit justify-between md:justify-end border-t md:border-t-0 pt-2 md:pt-0 border-outline-variant/10">
+                                    <div className="flex flex-col items-start md:items-end mr-2">
+                                      <span className="text-[10px] text-on-surface-variant">السعر للعميل</span>
+                                      <div
+                                        className={`font-bold text-base font-price-display ${
+                                          isZeroPrice ? "text-amber-400" : srvMargin > 0 ? "text-secondary" : "text-primary"
+                                        }`}
+                                      >
+                                        ${srvTotal.toFixed(2)} USD
+                                      </div>
+                                    </div>
 
-                                  {/* Edit Single Service Button */}
-                                  <button
-                                    onClick={() => handleOpenEdit(service)}
-                                    className="bg-surface-variant hover:bg-outline-variant/30 text-on-surface px-3 py-2 rounded-xl font-medium text-xs transition-colors flex items-center gap-1 border border-outline-variant/20"
-                                  >
-                                    <span className="material-symbols-outlined text-xs">edit</span> تعديل
-                                  </button>
+                                    {/* Toggle Single Service Button */}
+                                    <button
+                                      onClick={() => toggleVisibility(service)}
+                                      disabled={actionLoadingKey === service.id}
+                                      className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all ${
+                                        service.isActive
+                                          ? "bg-error/10 text-error hover:bg-error/20 border border-error/20"
+                                          : "bg-primary/10 text-primary hover:bg-primary/20 border border-primary/30"
+                                      }`}
+                                      title={service.isActive ? "إخفاء عن العملاء" : "إظهار للعملاء"}
+                                    >
+                                      {actionLoadingKey === service.id ? (
+                                        <span className="material-symbols-outlined animate-spin text-sm">refresh</span>
+                                      ) : (
+                                        <span className="material-symbols-outlined text-sm">
+                                          {service.isActive ? "visibility_off" : "visibility"}
+                                        </span>
+                                      )}
+                                    </button>
+
+                                    {/* Edit Single Service Button */}
+                                    <button
+                                      onClick={() => handleOpenEdit(service)}
+                                      className="bg-surface-variant hover:bg-outline-variant/30 text-on-surface px-3 py-2 rounded-xl font-medium text-xs transition-colors flex items-center gap-1 border border-outline-variant/20"
+                                    >
+                                      <span className="material-symbols-outlined text-xs">edit</span> تعديل
+                                    </button>
+                                  </div>
                                 </div>
-                              </div>
-                            ))}
+                              );
+                            })}
 
                             {hiddenCount > 0 && !isExpanded && (
                               <button

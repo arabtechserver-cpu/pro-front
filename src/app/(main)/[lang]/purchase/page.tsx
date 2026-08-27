@@ -33,14 +33,18 @@ export async function generateMetadata(
     const service = await getServiceDetails(serviceId);
     if (service) {
       const serviceName = service.name || (isAr ? "طلب خدمة سيرفر" : "Order Server Service");
-      const price = service.sellingPrice || service.price || "0";
-      const deliveryTime = service.deliveryTime || (isAr ? "1-24 ساعة" : "1-24 Hours");
+      const calcPrice = service.finalPrice ?? service.price ?? ((Number(service.credit) || 0) + (Number(service.margin) || 0));
+      const priceNum = typeof calcPrice === 'number' ? calcPrice : parseFloat(calcPrice) || 0;
+      const isFree = priceNum === 0 && (serviceName.toLowerCase().includes("free") || serviceName.includes("مجاني"));
+      const priceStr = isFree ? (isAr ? "مجاني" : "Free") : priceNum > 0 ? `${priceNum.toFixed(2)}` : (isAr ? "تواصل معنا" : "Contact Us");
+      const deliveryTime = service.time || service.deliveryTime || (isAr ? "1-24 ساعة" : "1-24 Hours");
       const groupName = service.groupName || service.category?.name || "";
 
-      const title = `${serviceName} - $${price} | ${isAr ? "عرب تك برو سيرفر" : "Arab Tech Pro Server"}`;
+      const priceDisplayForTitle = isFree ? (isAr ? "مجاناً" : "Free") : priceNum > 0 ? `$${priceNum.toFixed(2)}` : (isAr ? "سعر خاص" : "Special Price");
+      const title = `${serviceName} - ${priceDisplayForTitle} | ${isAr ? "عرب تك برو سيرفر" : "Arab Tech Pro Server"}`;
       const description = isAr
-        ? `اطلب خدمة ${serviceName} بسعر $${price} فقط. وقت التسليم: ${deliveryTime}. قسم: ${groupName}. فك رسمي وسريع عبر منصة عرب تك برو سيرفر.`
-        : `Order ${serviceName} for only $${price}. Delivery time: ${deliveryTime}. Category: ${groupName}. Fast & official remote phone unlocking from Arab Tech Pro Server.`;
+        ? `اطلب خدمة ${serviceName} بسعر ${priceStr} فقط. وقت التسليم: ${deliveryTime}. قسم: ${groupName}. فك رسمي وسريع عبر منصة عرب تك برو سيرفر.`
+        : `Order ${serviceName} for only ${priceStr}. Delivery time: ${deliveryTime}. Category: ${groupName}. Fast & official remote phone unlocking from Arab Tech Pro Server.`;
 
       const pageUrl = `https://arabtechproserver.tech/${params.lang}/purchase?serviceId=${serviceId}`;
 

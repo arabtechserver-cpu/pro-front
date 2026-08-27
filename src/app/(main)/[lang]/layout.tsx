@@ -13,23 +13,61 @@ const jetbrains = JetBrains_Mono({ subsets: ["latin"], variable: "--font-jetbrai
 
 export async function generateMetadata({ params }: { params: { lang: string } }): Promise<Metadata> {
   const isAr = params.lang === "ar";
+  const siteTitle = isAr ? "عرب تك برو سيرفر | Arab Tech Pro Server" : "Arab Tech Pro Server | GSM & Remote Unlock Services";
+  const siteDesc = isAr
+    ? "الموقع الرسمي لمنصة عرب تك برو سيرفر (Arab Tech Pro Server) - أفضل وأسرع سيرفر لفك شفرات الهواتف، تخطي آيكلود وFRP، وشراء رصيد البوكسات والدونجل وسيرفرات IMEI عن بعد."
+    : "Official Arab Tech Pro Server - The leading platform for remote phone unlocking, iCloud & FRP bypass, box and dongle activations, and instant IMEI services.";
+
   return {
     title: {
       template: "%s | Arab Tech Pro Server",
-      default: isAr 
-        ? "عرب تك برو سيرفر - أفضل منصة لفك الهواتف وخدمات IMEI"
-        : "Arab Tech Pro Server - Best Platform for Phone Unlocking & IMEI Services",
+      default: siteTitle,
     },
-    description: isAr
-      ? "اطلب خدمات فك الشبكات الرسمية، تخطي iCloud و FRP، وتقارير IMEI عن بعد من موقع عرب تيك سيرفر برو. خدمات موثوقة وسريعة."
-      : "Order official network unlocking, iCloud & FRP bypass, and IMEI reports remotely from Arab Tech Server Pro. Reliable and fast services.",
-    keywords: ["Arab Tech Pro Server", "Arab Tech Server", "عرب تيك سيرفر", "عرب تك برو", "IMEI", "فك شبكات", "تخطي iCloud"],
+    description: siteDesc,
+    keywords: [
+      "عرب تك برو سيرفر",
+      "عرب تيك برو سيرفر",
+      "عرب تك سيرفر",
+      "عرب تيك سيرفر",
+      "Arab Tech Pro Server",
+      "Arab Tech Server Pro",
+      "Arab Tech Server",
+      "arabtechproserver.tech",
+      "سيرفر فك الهواتف",
+      "فك شبكات",
+      "تخطي iCloud",
+      "تخطي FRP",
+      "تقارير IMEI",
+      "تفعيل بوكسات ودونجل",
+      "شراء كردت سيرفر",
+      "UnlockTool",
+      "Chimera Tool",
+      "iCloud Bypass",
+      "FRP Bypass"
+    ],
     metadataBase: new URL("https://arabtechproserver.tech"),
+    applicationName: "Arab Tech Pro Server",
+    authors: [{ name: "Arab Tech Pro Server", url: "https://arabtechproserver.tech" }],
+    creator: "Arab Tech Pro Server",
+    publisher: "Arab Tech Pro Server",
+    robots: {
+      index: true,
+      follow: true,
+      nocache: false,
+      googleBot: {
+        index: true,
+        follow: true,
+        noimageindex: false,
+        "max-video-preview": -1,
+        "max-image-preview": "large",
+        "max-snippet": -1,
+      },
+    },
     openGraph: {
-      title: isAr ? "عرب تك برو سيرفر | Arab Tech Pro Server" : "Arab Tech Pro Server",
-      description: isAr ? "أفضل منصة لفك الهواتف وخدمات السوفتوير وتخطي الحسابات وIMEI عن بعد." : "Best platform for phone unlocking and remote software services.",
+      title: siteTitle,
+      description: siteDesc,
       url: "https://arabtechproserver.tech",
-      siteName: "Arab Tech Pro Server",
+      siteName: "Arab Tech Pro Server - عرب تك برو سيرفر",
       images: [
         {
           url: "https://arabtechproserver.tech/images/og-image.png",
@@ -43,25 +81,27 @@ export async function generateMetadata({ params }: { params: { lang: string } })
     },
     twitter: {
       card: "summary_large_image",
-      title: isAr ? "عرب تك برو سيرفر | Arab Tech Pro Server" : "Arab Tech Pro Server",
-      description: isAr ? "أفضل منصة لفك الهواتف وخدمات السوفتوير وتخطي الحسابات وIMEI عن بعد." : "Arab Tech Pro Server for Remote Phone Unlocking",
+      title: siteTitle,
+      description: siteDesc,
+      site: "@arabtechserveronline",
+      creator: "@arabtechserveronline",
       images: ["https://arabtechproserver.tech/images/og-image.png"],
     },
     alternates: {
       canonical: "https://arabtechproserver.tech",
       languages: {
-        'ar': 'https://arabtechproserver.tech/ar',
-        'en': 'https://arabtechproserver.tech/en',
+        "ar": "https://arabtechproserver.tech/ar",
+        "en": "https://arabtechproserver.tech/en",
       },
     },
     icons: {
       icon: [
-        { url: '/favicon.ico', sizes: 'any' },
-        { url: '/images/logo_en.png', type: 'image/png' },
-        { url: '/icon.png', type: 'image/png' },
+        { url: "/favicon.ico", sizes: "any" },
+        { url: "/images/logo_en.png", type: "image/png" },
+        { url: "/icon.png", type: "image/png" },
       ],
-      shortcut: '/favicon.ico',
-      apple: '/apple-icon.png',
+      shortcut: "/favicon.ico",
+      apple: "/apple-icon.png",
     },
     verification: {
       google: "N34n3oI-P5elZmLFHgFqp_BK93EijixhnIHEj_2oGnI",
@@ -81,34 +121,61 @@ export default async function RootLayout({
   const dir = lang === "ar" ? "rtl" : "ltr";
   const isAr = lang === "ar";
 
+  const jsonLdWebsite = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "Arab Tech Pro Server",
+    "alternateName": [
+      "عرب تك برو سيرفر",
+      "عرب تيك برو سيرفر",
+      "Arab Tech Server Pro",
+      "Arab Tech Server",
+      "عرب تك سيرفر",
+      "عرب تيك سيرفر"
+    ],
+    "url": "https://arabtechproserver.tech",
+    "inLanguage": ["ar", "en"],
+    "description": isAr
+      ? "الموقع الرسمي لمنصة عرب تك برو سيرفر لخدمات فك الهواتف، تخطي iCloud وFRP، وخدمات IMEI والسيرفر عن بعد."
+      : "Official Arab Tech Pro Server for remote phone unlocking, iCloud & FRP bypass, and IMEI server services.",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": "https://arabtechproserver.tech/ar/pricing?q={search_term_string}",
+      "query-input": "required name=search_term_string"
+    }
+  };
+
+  const jsonLdOrganization = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "Arab Tech Pro Server",
+    "alternateName": "عرب تك برو سيرفر",
+    "url": "https://arabtechproserver.tech",
+    "logo": "https://arabtechproserver.tech/images/logo_en.png",
+    "sameAs": [
+      "https://t.me/arabtechserveronline"
+    ],
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "telephone": "+201141749849",
+      "contactType": "customer service",
+      "availableLanguage": ["Arabic", "English"]
+    }
+  };
+
   return (
     <html lang={lang} dir={dir}>
       <head>
         <meta name="google-site-verification" content="N34n3oI-P5elZmLFHgFqp_BK93EijixhnIHEj_2oGnI" />
-        <meta property="og:title" content={isAr ? "عرب تك برو سيرفر | Arab Tech Pro Server" : "Arab Tech Pro Server"} />
-        <meta property="og:description" content={isAr ? "أفضل منصة لفك الهواتف وخدمات السوفتوير وتخطي الحسابات وIMEI عن بعد." : "Best platform for phone unlocking and remote software services."} />
-        <meta property="og:image" content="https://arabtechproserver.tech/images/og-image.png" />
-        <meta property="og:url" content="https://arabtechproserver.tech" />
-        <meta property="og:type" content="website" />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={isAr ? "عرب تك برو سيرفر | Arab Tech Pro Server" : "Arab Tech Pro Server"} />
-        <meta name="twitter:description" content={isAr ? "أفضل منصة لفك الهواتف وخدمات السوفتوير وتخطي الحسابات وIMEI عن بعد." : "Best platform for phone unlocking and remote software services."} />
-        <meta name="twitter:image" content="https://arabtechproserver.tech/images/og-image.png" />
+        <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+        <link rel="canonical" href={`https://arabtechproserver.tech/${lang}`} />
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "Organization",
-              "name": "Arab Tech Pro Server",
-              "alternateName": "Arab Tech Server Pro",
-              "url": "https://arabtechproserver.tech",
-              "logo": "https://arabtechproserver.tech/images/logo.png",
-              "sameAs": [
-                "https://t.me/arabtechserveronline"
-              ]
-            })
-          }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdWebsite) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdOrganization) }}
         />
       </head>
       <body className={`${inter.variable} ${jakarta.variable} ${jetbrains.variable} bg-background text-on-surface antialiased min-h-screen flex flex-col relative`}>

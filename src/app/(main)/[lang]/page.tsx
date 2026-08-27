@@ -19,11 +19,51 @@ async function getHomepageConfig() {
 
 export async function generateMetadata({ params }: { params: { lang: Locale } }): Promise<Metadata> {
   const isAr = params.lang === "ar";
+  const title = isAr
+    ? "عرب تك برو سيرفر | Arab Tech Pro Server - أفضل منصة لفك الهواتف وخدمات IMEI"
+    : "Arab Tech Pro Server - The Best Platform for Remote Phone Unlocking & IMEI Services";
+  const description = isAr 
+    ? "الموقع الرسمي لمنصة عرب تك برو سيرفر (Arab Tech Pro Server). خدمات فك شبكات الهواتف الرسمية، تخطي iCloud و FRP، وتفعيل بوكسات ودونجل وسيرفرات IMEI بأفضل الأسعار وأعلى سرعة."
+    : "Official Arab Tech Pro Server for phone network unlocking, iCloud & FRP bypass, box and dongle activations, and IMEI services worldwide.";
+
   return {
-    title: isAr ? "عرب تك برو سيرفر - أفضل منصة لفك الهواتف" : "Arab Tech Pro Server - Best Phone Unlocking Platform",
-    description: isAr 
-      ? "الموقع الرسمي لعرب تك برو سيرفر لخدمات فك الهواتف، تخطي iCloud و FRP، وتقارير IMEI عن بعد. ضمان 100% ودعم فني متواصل."
-      : "Official Arab Tech Pro Server for phone unlocking, iCloud/FRP bypass, and remote IMEI reports. 100% guarantee with 24/7 support.",
+    title,
+    description,
+    keywords: [
+      "عرب تك برو سيرفر",
+      "عرب تيك برو سيرفر",
+      "عرب تك سيرفر",
+      "عرب تيك سيرفر",
+      "Arab Tech Pro Server",
+      "Arab Tech Server Pro",
+      "Arab Tech Server",
+      "arabtechproserver.tech",
+      "سيرفر فك الهواتف",
+      "فك شبكات",
+      "تخطي iCloud",
+      "تخطي FRP"
+    ],
+    openGraph: {
+      title,
+      description,
+      url: `https://arabtechproserver.tech/${params.lang}`,
+      siteName: "Arab Tech Pro Server",
+      images: [
+        {
+          url: "https://arabtechproserver.tech/images/og-image.png",
+          width: 1200,
+          height: 630,
+          alt: "Arab Tech Pro Server",
+        },
+      ],
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: ["https://arabtechproserver.tech/images/og-image.png"],
+    },
   };
 }
 

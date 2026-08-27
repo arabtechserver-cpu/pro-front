@@ -4,6 +4,45 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 
+function getServicePriceInfo(service: any) {
+  const credit = typeof service.credit === 'number' ? service.credit : parseFloat(service.credit) || 0;
+  const margin = typeof service.margin === 'number' ? service.margin : parseFloat(service.margin) || 0;
+  const finalPrice = service.finalPrice ?? service.price ?? (credit + margin);
+  const priceNum = typeof finalPrice === 'number' ? finalPrice : parseFloat(finalPrice) || 0;
+  
+  const nameLower = (service.name || '').toLowerCase();
+  const isFree = priceNum === 0 && (nameLower.includes('free') || service.name?.includes('مجاني') || service.name?.includes('مجانا'));
+  const isZeroCost = priceNum === 0 && !isFree;
+
+  return { priceNum, isFree, isZeroCost };
+}
+
+function RenderPriceBadge({ service, lang }: { service: any; lang: string }) {
+  const { priceNum, isFree, isZeroCost } = getServicePriceInfo(service);
+
+  if (priceNum > 0) {
+    return (
+      <span className="font-price-display text-primary glow-cyan font-bold text-base mt-0.5">
+        ${priceNum.toFixed(2)}
+      </span>
+    );
+  }
+
+  if (isFree) {
+    return (
+      <span className="px-2.5 py-1 rounded-lg bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 font-bold text-xs inline-flex items-center gap-1">
+        <span>{lang === 'ar' ? 'مجاناً 🎁' : 'Free 🎁'}</span>
+      </span>
+    );
+  }
+
+  return (
+    <span className="px-2.5 py-1 rounded-lg bg-amber-500/15 border border-amber-500/30 text-amber-400 font-bold text-xs inline-flex items-center gap-1">
+      <span>{lang === 'ar' ? 'سعر خاص 💬' : 'On Request 💬'}</span>
+    </span>
+  );
+}
+
 function ServicesListRenderer({ servicesList, lang, dict }: { servicesList: any[], lang: string, dict: any }) {
   return (
     <div className="w-full">
@@ -18,11 +57,9 @@ function ServicesListRenderer({ servicesList, lang, dict }: { servicesList: any[
               <div className="flex flex-col">
                 <span className="text-[11px] text-on-surface-variant flex items-center gap-1">
                   <span className="material-symbols-outlined text-xs text-primary">schedule</span>
-                  {service.time}
+                  {service.time || "1-24 Hours"}
                 </span>
-                <span className="font-price-display text-primary glow-cyan font-bold text-base mt-0.5">
-                  ${(service.credit + service.margin).toFixed(2)}
-                </span>
+                <RenderPriceBadge service={service} lang={lang} />
               </div>
               <Link 
                 href={`/${lang}/purchase?serviceId=${service.id}`}
@@ -55,9 +92,9 @@ function ServicesListRenderer({ servicesList, lang, dict }: { servicesList: any[
                     {service.name}
                   </span>
                 </td>
-                <td className="py-4 px-6 text-on-surface-variant text-sm whitespace-nowrap">{service.time}</td>
-                <td className={`py-4 px-6 font-price-display text-primary glow-cyan font-bold text-base ${lang === 'ar' ? 'text-left' : 'text-right'}`}>
-                  ${(service.credit + service.margin).toFixed(2)}
+                <td className="py-4 px-6 text-on-surface-variant text-sm whitespace-nowrap">{service.time || "1-24 Hours"}</td>
+                <td className={`py-4 px-6 ${lang === 'ar' ? 'text-left' : 'text-right'}`}>
+                  <RenderPriceBadge service={service} lang={lang} />
                 </td>
                 <td className="py-4 px-6 text-center">
                   <Link 
