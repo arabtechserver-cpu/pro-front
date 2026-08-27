@@ -243,19 +243,61 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
     }, 2000);
   };
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const compressReceiptImage = (file: File): Promise<string> => {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          const maxDimension = 1600;
+          let { width, height } = img;
+          if (width > maxDimension || height > maxDimension) {
+            if (width > height) {
+              height = Math.round((height * maxDimension) / width);
+              width = maxDimension;
+            } else {
+              width = Math.round((width * maxDimension) / height);
+              height = maxDimension;
+            }
+          }
+          const canvas = document.createElement("canvas");
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext("2d");
+          if (ctx) {
+            ctx.drawImage(img, 0, 0, width, height);
+            const compressedBase64 = canvas.toDataURL("image/jpeg", 0.85);
+            resolve(compressedBase64);
+          } else {
+            resolve(e.target?.result as string);
+          }
+        };
+        img.onerror = () => resolve(e.target?.result as string);
+        img.src = e.target?.result as string;
+      };
+      reader.onerror = () => resolve("");
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      if (file.size > 10 * 1024 * 1024) {
-        setErrorMessage(lang === "ar" ? "حجم الصورة كبير جداً! الأقصى 10 ميجابايت." : "File size too large! Max 10MB.");
+      if (file.size > 20 * 1024 * 1024) {
+        setErrorMessage(lang === "ar" ? "حجم الصورة كبير جداً! الأقصى 20 ميجابايت." : "File size too large! Max 20MB.");
         return;
       }
       setReceiptFileName(file.name);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setReceiptImage(reader.result as string);
-      };
-      reader.readAsDataURL(file);
+      try {
+        const compressed = await compressReceiptImage(file);
+        setReceiptImage(compressed);
+      } catch {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setReceiptImage(reader.result as string);
+        };
+        reader.readAsDataURL(file);
+      }
     }
   };
 

@@ -19,6 +19,10 @@ export default function ServicesPage() {
   const [editMargin, setEditMargin] = useState<number>(0);
   const [isSavingEdit, setIsSavingEdit] = useState(false);
 
+  // Sync from Provider State
+  const [isSyncModalOpen, setIsSyncModalOpen] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(false);
+
   const fetchServices = async () => {
     setLoading(true);
     try {
@@ -34,6 +38,30 @@ export default function ServicesPage() {
       setError(err.message);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleSyncDhruServices = async () => {
+    setIsSyncing(true);
+    try {
+      const res = await fetch("/api/dhru/sync", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" }
+      });
+
+      const data = await res.json();
+      if (res.ok && data.success) {
+        showToast(data.message || `تمت المزامنة بنجاح! تم استيراد ${data.count || 0} خدمة.`);
+        setIsSyncModalOpen(false);
+        // Refresh the services list in the dashboard immediately
+        await fetchServices();
+      } else {
+        showToast(data.error || "فشلت عملية المزامنة مع المزود", "error");
+      }
+    } catch (err: any) {
+      showToast("حدث خطأ أثناء الاتصال بالسيرفر للمزامنة", "error");
+    } finally {
+      setIsSyncing(false);
     }
   };
 
@@ -292,8 +320,75 @@ export default function ServicesPage() {
         </div>
       )}
 
+      {/* Sync Confirmation Modal */}
+      {isSyncModalOpen && (
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-surface-container border border-outline-variant/30 rounded-3xl p-6 sm:p-8 max-w-lg w-full shadow-2xl animate-in fade-in zoom-in-95">
+            <div className="flex items-center gap-3 mb-4 text-warning">
+              <div className="w-12 h-12 rounded-2xl bg-warning/10 flex items-center justify-center text-warning">
+                <span className="material-symbols-outlined text-2xl">sync_problem</span>
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-on-surface">مزامنة وتحديث شامل من المزود</h3>
+                <p className="text-xs text-on-surface-variant">تحديث شامل لكافة الأقسام والخدمات والأسعار من Dhru API</p>
+              </div>
+            </div>
+
+            <div className="space-y-3 my-6 text-sm leading-relaxed text-on-surface-variant">
+              <div className="p-4 bg-error/10 border border-error/20 rounded-2xl text-error text-xs space-y-1.5">
+                <p className="font-bold flex items-center gap-1.5">
+                  <span className="material-symbols-outlined text-base">warning</span>
+                  تنبيه مهم قبل البدء:
+                </p>
+                <p>
+                  سيقوم هذا الإجراء بمسح جميع الخدمات والأقسام الحالية في قاعدة البيانات، وإعادة جلب كافة الأقسام والخدمات والأسعار المحدثة مباشرة من المزود.
+                </p>
+              </div>
+
+              <div className="p-4 bg-surface-container-low border border-outline-variant/20 rounded-2xl text-xs space-y-2">
+                <p className="text-on-surface font-semibold">ما الذي سيتم تحديثه؟</p>
+                <ul className="list-disc list-inside space-y-1 text-on-surface-variant">
+                  <li>جلب وتحديث كافة أسعار الخدمات (الخدمات المجانية $0.00 والمدفوعة).</li>
+                  <li>إضافة أي خدمات أو باقات جديدة أضافها المزود.</li>
+                  <li>تحديث شروط وحقول الطلب المخصصة (Requires Custom).</li>
+                </ul>
+              </div>
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={handleSyncDhruServices}
+                disabled={isSyncing}
+                className="flex-1 bg-primary text-on-primary py-3 px-4 rounded-xl font-bold hover:shadow-lg transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+              >
+                {isSyncing ? (
+                  <>
+                    <span className="material-symbols-outlined animate-spin text-sm">refresh</span>
+                    <span>جاري مسح القديم وجلب الخدمات...</span>
+                  </>
+                ) : (
+                  <>
+                    <span className="material-symbols-outlined text-sm">cloud_sync</span>
+                    <span>بدء المزامنة والتحديث الآن</span>
+                  </>
+                )}
+              </button>
+              <button
+                type="button"
+                onClick={() => setIsSyncModalOpen(false)}
+                disabled={isSyncing}
+                className="bg-surface-variant text-on-surface-variant hover:text-on-surface px-5 py-3 rounded-xl font-bold transition-all disabled:opacity-50"
+              >
+                إلغاء
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Header & Controls */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-outline-variant/20 pb-6">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-outline-variant/20 pb-6">
         <div>
           <h1 className="text-3xl font-display font-bold text-on-surface mb-2">إدارة الخدمات والأسعار</h1>
           <p className="text-on-surface-variant text-sm">
@@ -301,26 +396,41 @@ export default function ServicesPage() {
           </p>
         </div>
 
-        {/* Live Search Box */}
-        <div className="relative min-w-[280px] sm:min-w-[340px]">
-          <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-lg">
-            search
-          </span>
-          <input
-            type="text"
-            placeholder="بحث بالاسم أو الباقة..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pr-10 pl-4 py-2.5 bg-surface-container border border-outline-variant/40 rounded-xl focus:border-primary outline-none text-sm transition-all"
-          />
-          {searchQuery && (
-            <button
-              onClick={() => setSearchQuery("")}
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-on-surface-variant hover:text-on-surface"
-            >
-              مسح
-            </button>
-          )}
+        <div className="flex flex-wrap items-center gap-3">
+          {/* Sync from Provider Button */}
+          <button
+            onClick={() => setIsSyncModalOpen(true)}
+            disabled={isSyncing || loading}
+            className="bg-primary/10 hover:bg-primary/20 text-primary border border-primary/30 px-4 py-2.5 rounded-xl font-bold text-sm transition-all flex items-center gap-2 shadow-sm disabled:opacity-50"
+            title="مسح وتحديث الخدمات والأسعار من مزود Dhru"
+          >
+            <span className={`material-symbols-outlined text-lg ${isSyncing ? "animate-spin" : ""}`}>
+              {isSyncing ? "refresh" : "cloud_sync"}
+            </span>
+            <span>{isSyncing ? "جاري المزامنة..." : "مزامنة كاملة مع المزود"}</span>
+          </button>
+
+          {/* Live Search Box */}
+          <div className="relative min-w-[240px] sm:min-w-[300px]">
+            <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-lg">
+              search
+            </span>
+            <input
+              type="text"
+              placeholder="بحث بالاسم أو الباقة..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pr-10 pl-4 py-2.5 bg-surface-container border border-outline-variant/40 rounded-xl focus:border-primary outline-none text-sm transition-all"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery("")}
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-on-surface-variant hover:text-on-surface"
+              >
+                مسح
+              </button>
+            )}
+          </div>
         </div>
       </div>
 

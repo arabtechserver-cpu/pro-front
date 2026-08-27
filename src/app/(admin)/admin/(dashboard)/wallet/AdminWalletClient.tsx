@@ -280,12 +280,23 @@ export default function AdminWalletClient() {
                         {tx.refNo}
                       </td>
 
-                      {/* Telegram Direct Delivery Status */}
+                      {/* Telegram Direct Delivery & Receipt Image */}
                       <td className="p-4">
-                        <span className="px-2.5 py-1 rounded-lg bg-sky-500/10 border border-sky-500/30 text-sky-400 font-bold text-[11px] flex items-center gap-1.5 w-fit">
-                          <span className="material-symbols-outlined text-sm">send</span>
-                          <span>مباشر للتلجرام</span>
-                        </span>
+                        {tx.receiptImage ? (
+                          <button
+                            onClick={() => setViewReceiptModalImage(tx.receiptImage!)}
+                            className="px-2.5 py-1 rounded-lg bg-primary/15 hover:bg-primary/25 border border-primary/30 text-primary font-bold text-[11px] flex items-center gap-1.5 w-fit transition-all shadow-sm"
+                            title="اضغط لعرض صورة الإيصال المرفوعة من العميل"
+                          >
+                            <span className="material-symbols-outlined text-sm">image</span>
+                            <span>عرض الإيصال 📸</span>
+                          </button>
+                        ) : (
+                          <span className="px-2.5 py-1 rounded-lg bg-sky-500/10 border border-sky-500/30 text-sky-400 font-bold text-[11px] flex items-center gap-1.5 w-fit">
+                            <span className="material-symbols-outlined text-sm">send</span>
+                            <span>مباشر للتلجرام</span>
+                          </span>
+                        )}
                       </td>
 
                       {/* Amount */}
