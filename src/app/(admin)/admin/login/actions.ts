@@ -19,8 +19,8 @@ export async function loginAdmin(username: string, password: string) {
           value: data.token,
           httpOnly: true,
           secure: process.env.NODE_ENV === 'production',
-          sameSite: 'strict',
-          maxAge: 60 * 60 * 24, // 24 hours
+          sameSite: 'lax',
+          maxAge: 60 * 60 * 24 * 365, // 1 Year Persistent Login
           path: '/',
         });
         return { success: true };
