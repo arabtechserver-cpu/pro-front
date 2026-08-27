@@ -68,6 +68,11 @@ export async function middleware(request: NextRequest) {
     }
   }
 
+  // Check if there is any supported locale in the pathname
+  const pathnameIsMissingLocale = i18n.locales.every(
+    (locale) => !pathname.startsWith(`/${locale}/`) && pathname !== `/${locale}`
+  );
+
   // Handle locale routing
   if (pathnameIsMissingLocale) {
     const locale = getLocale(request);
