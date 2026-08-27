@@ -83,8 +83,8 @@ export async function generateMetadata({ params }: { params: { lang: string } })
       card: "summary_large_image",
       title: siteTitle,
       description: siteDesc,
-      site: "@arabtechserveronline",
-      creator: "@arabtechserveronline",
+      site: "@ARABTECHSUPPURT2",
+      creator: "@ARABTECHSUPPURT2",
       images: ["https://arabtechproserver.tech/images/og-image.png"],
     },
     alternates: {
@@ -153,11 +153,11 @@ export default async function RootLayout({
     "url": "https://arabtechproserver.tech",
     "logo": "https://arabtechproserver.tech/images/logo_en.png",
     "sameAs": [
-      "https://t.me/arabtechserveronline"
+      "https://t.me/ARABTECHSUPPURT2"
     ],
     "contactPoint": {
       "@type": "ContactPoint",
-      "telephone": "+201141749849",
+      "telephone": "+16728972935",
       "contactType": "customer service",
       "availableLanguage": ["Arabic", "English"]
     }

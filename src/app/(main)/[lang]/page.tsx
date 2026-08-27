@@ -89,9 +89,11 @@ export default async function Home({ params }: { params: { lang: Locale } }) {
   // Dynamic values or fallbacks
   const notice1 = isAr ? hp?.noticeBar?.text1Ar : hp?.noticeBar?.text1En;
   const notice2 = isAr ? hp?.noticeBar?.text2Ar : hp?.noticeBar?.text2En;
-  const whatsappNum = hp?.noticeBar?.whatsapp || "+201141749849";
-  const telegramUser = hp?.noticeBar?.telegram && !hp.noticeBar.telegram.includes('@gmail') ? hp.noticeBar.telegram : "@arabtechserveronline";
-  const telegramUrl = "https://t.me/arabtechserveronline";
+  const whatsappNum = hp?.noticeBar?.whatsapp || "+16728972935";
+  const telegramUser = hp?.noticeBar?.telegram && !hp.noticeBar.telegram.includes('@gmail') ? hp.noticeBar.telegram : "@ARABTECHSUPPURT2";
+  const telegramUrl = hp?.noticeBar?.telegram
+    ? (hp.noticeBar.telegram.startsWith("http") ? hp.noticeBar.telegram : `https://t.me/${hp.noticeBar.telegram.replace(/^@/, '')}`)
+    : "https://t.me/ARABTECHSUPPURT2";
   const emailAddr = hp?.noticeBar?.email || "eslamgsm1774@gmail.com";
 
   const liveTag = isAr ? hp?.heroSection?.liveTagAr : hp?.heroSection?.liveTagEn;
@@ -117,7 +119,7 @@ export default async function Home({ params }: { params: { lang: Locale } }) {
 
   const supportTitle = isAr ? hp?.sidebarPromos?.supportTitleAr : hp?.sidebarPromos?.supportTitleEn;
   const supportBtn = isAr ? hp?.sidebarPromos?.supportBtnAr : hp?.sidebarPromos?.supportBtnEn;
-  const whatsappUrl = hp?.sidebarPromos?.whatsappUrl || "https://wa.me/201141749849";
+  const whatsappUrl = hp?.sidebarPromos?.whatsappUrl || "https://api.whatsapp.com/send/?phone=16728972935&text&type=phone_number&app_absent=0";
 
   const imeiTitle = isAr ? hp?.serviceLanes?.imeiTitleAr : hp?.serviceLanes?.imeiTitleEn;
   const imeiDesc = isAr ? hp?.serviceLanes?.imeiDescAr : hp?.serviceLanes?.imeiDescEn;

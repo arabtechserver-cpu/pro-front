@@ -80,7 +80,7 @@ export default function Footer({ dict, lang = "ar" }: FooterProps) {
             {/* Social Media Links */}
             <div className="flex gap-3 pt-2">
               <a 
-                href="https://t.me/gsmteam" 
+                href="https://t.me/ARABTECHSUPPURT2" 
                 target="_blank" 
                 rel="noopener noreferrer" 
                 className="w-9 h-9 rounded-full bg-surface-container-high border border-outline-variant/30 flex items-center justify-center text-on-surface-variant hover:text-primary hover:bg-primary/10 hover:border-primary/50 transition-all duration-300 shadow-sm group"
