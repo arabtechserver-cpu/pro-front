@@ -2,6 +2,31 @@ import Link from "next/link";
 import { getDictionary } from "@/i18n/get-dictionary";
 import { Locale } from "@/i18n/config";
 import PricingClient from "./PricingClient";
+import { Metadata } from "next";
+
+export async function generateMetadata({ params }: { params: { lang: Locale } }): Promise<Metadata> {
+  const isAr = params.lang === "ar";
+  const title = isAr ? "قائمة الأسعار والخدمات | عرب تك برو سيرفر" : "Services & Price List | Arab Tech Pro Server";
+  const description = isAr
+    ? "تصفح قائمة أسعار جميع خدمات فك الشفرات، تخطي حسابات جوجل FRP و iCloud، وتنشيط الدونجلات والبوكسات بأفضل الأسعار وأعلى سرعة تسليم."
+    : "Browse our complete catalog and price list for phone unlocking, FRP & iCloud bypass, and tool activations.";
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      url: `https://arabtechproserver.tech/${params.lang}/pricing`,
+      images: [{ url: "https://arabtechproserver.tech/images/og-image.png" }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: ["https://arabtechproserver.tech/images/og-image.png"],
+    },
+  };
+}
 
 export default async function Pricing({ params }: { params: { lang: Locale } }) {
   const dict = await getDictionary(params.lang);
