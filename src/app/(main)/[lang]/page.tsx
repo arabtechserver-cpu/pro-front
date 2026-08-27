@@ -49,9 +49,10 @@ export default async function Home({ params }: { params: { lang: Locale } }) {
   // Dynamic values or fallbacks
   const notice1 = isAr ? hp?.noticeBar?.text1Ar : hp?.noticeBar?.text1En;
   const notice2 = isAr ? hp?.noticeBar?.text2Ar : hp?.noticeBar?.text2En;
-  const whatsappNum = hp?.noticeBar?.whatsapp || "+16728972935";
-  const telegramUser = hp?.noticeBar?.telegram || "@gsmteamofficial";
-  const emailAddr = hp?.noticeBar?.email || "arabtechsupport1@gmail.com";
+  const whatsappNum = hp?.noticeBar?.whatsapp || "+201141749849";
+  const telegramUser = hp?.noticeBar?.telegram && !hp.noticeBar.telegram.includes('@gmail') ? hp.noticeBar.telegram : "@arabtechserveronline";
+  const telegramUrl = "https://t.me/arabtechserveronline";
+  const emailAddr = hp?.noticeBar?.email || "eslamgsm1774@gmail.com";
 
   const liveTag = isAr ? hp?.heroSection?.liveTagAr : hp?.heroSection?.liveTagEn;
   const eyebrow = isAr ? hp?.heroSection?.eyebrowAr : hp?.heroSection?.eyebrowEn;
@@ -146,18 +147,18 @@ export default async function Home({ params }: { params: { lang: Locale } }) {
               <i className="fas fa-shield-alt text-secondary"></i>
               <span>{notice2 || "دفع آمن + دعم موثوق على مدار الساعة"}</span>
             </span>
-            <span className="flex items-center gap-2">
+            <a href={`https://wa.me/${whatsappNum.replace(/[^0-9]/g, '')}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-[#25D366] transition-colors">
               <i className="fab fa-whatsapp text-[#25D366]"></i>
               <span dir="ltr">WhatsApp: {whatsappNum}</span>
-            </span>
-            <span className="flex items-center gap-2">
+            </a>
+            <a href={telegramUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-[#0088cc] transition-colors">
               <i className="fab fa-telegram-plane text-[#0088cc]"></i>
               <span dir="ltr">Telegram: {telegramUser}</span>
-            </span>
-            <span className="flex items-center gap-2">
+            </a>
+            <a href={`mailto:${emailAddr}`} className="flex items-center gap-2 hover:text-tertiary transition-colors">
               <i className="fas fa-envelope text-tertiary"></i>
               <span>{emailAddr}</span>
-            </span>
+            </a>
 
             {/* Duplicate for infinite marquee effect */}
             <span className="flex items-center gap-2 ml-8" aria-hidden="true">
@@ -168,18 +169,18 @@ export default async function Home({ params }: { params: { lang: Locale } }) {
               <i className="fas fa-shield-alt text-secondary"></i>
               <span>{notice2 || "دفع آمن + دعم موثوق على مدار الساعة"}</span>
             </span>
-            <span className="flex items-center gap-2" aria-hidden="true">
+            <a href={`https://wa.me/${whatsappNum.replace(/[^0-9]/g, '')}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-[#25D366] transition-colors" aria-hidden="true">
               <i className="fab fa-whatsapp text-[#25D366]"></i>
               <span dir="ltr">WhatsApp: {whatsappNum}</span>
-            </span>
-            <span className="flex items-center gap-2" aria-hidden="true">
+            </a>
+            <a href={telegramUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-[#0088cc] transition-colors" aria-hidden="true">
               <i className="fab fa-telegram-plane text-[#0088cc]"></i>
               <span dir="ltr">Telegram: {telegramUser}</span>
-            </span>
-            <span className="flex items-center gap-2" aria-hidden="true">
+            </a>
+            <a href={`mailto:${emailAddr}`} className="flex items-center gap-2 hover:text-tertiary transition-colors" aria-hidden="true">
               <i className="fas fa-envelope text-tertiary"></i>
               <span>{emailAddr}</span>
-            </span>
+            </a>
           </div>
         </div>
       </div>

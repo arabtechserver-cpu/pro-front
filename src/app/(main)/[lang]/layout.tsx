@@ -105,7 +105,7 @@ export default async function RootLayout({
               "url": "https://arabtechproserver.tech",
               "logo": "https://arabtechproserver.tech/images/logo.png",
               "sameAs": [
-                "https://t.me/gsmteamofficial"
+                "https://t.me/arabtechserveronline"
               ]
             })
           }}
