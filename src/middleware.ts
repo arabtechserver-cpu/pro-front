@@ -68,14 +68,13 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  // Check if there is any supported locale in the pathname
-  const pathnameIsMissingLocale = i18n.locales.every(
-    (locale) => !pathname.startsWith(`/${locale}/`) && pathname !== `/${locale}`
-  );
-
-  // Redirect if there is no locale
+  // Handle locale routing
   if (pathnameIsMissingLocale) {
     const locale = getLocale(request);
+    // For root path, rewrite directly so OpenGraph preview crawlers (WhatsApp, Facebook, Telegram) get status 200 with meta tags
+    if (pathname === '' || pathname === '/') {
+      return NextResponse.rewrite(new URL(`/${locale}`, request.url));
+    }
     return NextResponse.redirect(
       new URL(`/${locale}${pathname.startsWith('/') ? '' : '/'}${pathname}`, request.url)
     );

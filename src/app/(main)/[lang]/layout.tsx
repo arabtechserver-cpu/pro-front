@@ -27,24 +27,25 @@ export async function generateMetadata({ params }: { params: { lang: string } })
     metadataBase: new URL("https://arabtechproserver.tech"),
     openGraph: {
       title: isAr ? "عرب تك برو سيرفر | Arab Tech Pro Server" : "Arab Tech Pro Server",
-      description: isAr ? "أفضل منصة لفك الهواتف وخدمات السوفتوير عن بعد." : "Best platform for phone unlocking and remote software services.",
+      description: isAr ? "أفضل منصة لفك الهواتف وخدمات السوفتوير وتخطي الحسابات وIMEI عن بعد." : "Best platform for phone unlocking and remote software services.",
       url: "https://arabtechproserver.tech",
       siteName: "Arab Tech Pro Server",
       images: [
         {
-          url: "/images/og-image.jpg",
+          url: "https://arabtechproserver.tech/images/og-image.png",
           width: 1200,
           height: 630,
           alt: "Arab Tech Pro Server",
         },
       ],
-      locale: isAr ? "ar_SA" : "en_US",
+      locale: isAr ? "ar_AR" : "en_US",
       type: "website",
     },
     twitter: {
       card: "summary_large_image",
-      title: "Arab Tech Pro Server",
-      description: isAr ? "عرب تك برو سيرفر لخدمات فك الهواتف عن بعد" : "Arab Tech Pro Server for Remote Phone Unlocking",
+      title: isAr ? "عرب تك برو سيرفر | Arab Tech Pro Server" : "Arab Tech Pro Server",
+      description: isAr ? "أفضل منصة لفك الهواتف وخدمات السوفتوير وتخطي الحسابات وIMEI عن بعد." : "Arab Tech Pro Server for Remote Phone Unlocking",
+      images: ["https://arabtechproserver.tech/images/og-image.png"],
     },
     alternates: {
       canonical: "https://arabtechproserver.tech",
@@ -78,11 +79,21 @@ export default async function RootLayout({
   const lang = params.lang as Locale;
   const dict = await getDictionary(lang);
   const dir = lang === "ar" ? "rtl" : "ltr";
+  const isAr = lang === "ar";
 
   return (
     <html lang={lang} dir={dir}>
       <head>
         <meta name="google-site-verification" content="N34n3oI-P5elZmLFHgFqp_BK93EijixhnIHEj_2oGnI" />
+        <meta property="og:title" content={isAr ? "عرب تك برو سيرفر | Arab Tech Pro Server" : "Arab Tech Pro Server"} />
+        <meta property="og:description" content={isAr ? "أفضل منصة لفك الهواتف وخدمات السوفتوير وتخطي الحسابات وIMEI عن بعد." : "Best platform for phone unlocking and remote software services."} />
+        <meta property="og:image" content="https://arabtechproserver.tech/images/og-image.png" />
+        <meta property="og:url" content="https://arabtechproserver.tech" />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={isAr ? "عرب تك برو سيرفر | Arab Tech Pro Server" : "Arab Tech Pro Server"} />
+        <meta name="twitter:description" content={isAr ? "أفضل منصة لفك الهواتف وخدمات السوفتوير وتخطي الحسابات وIMEI عن بعد." : "Best platform for phone unlocking and remote software services."} />
+        <meta name="twitter:image" content="https://arabtechproserver.tech/images/og-image.png" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
