@@ -23,12 +23,31 @@ html, body {
 }
 
 @layer components {
-  .btn-primary {
-    @apply bg-primary text-[#0c1324] font-bold py-3.5 px-6 rounded-xl hover:bg-primary-container transition-all flex items-center justify-center shadow-[0_0_20px_rgba(87,241,219,0.25)] hover:scale-[1.02] active:scale-[0.98];
+  .btn-primary, a.btn-primary, button.btn-primary {
+    @apply bg-primary font-bold py-3.5 px-6 rounded-xl hover:bg-primary-container transition-all flex items-center justify-center shadow-[0_0_20px_rgba(87,241,219,0.25)] hover:scale-[1.02] active:scale-[0.98];
+    color: #0c1324 !important;
+    text-decoration: none !important;
   }
-  .btn-secondary {
+  .btn-secondary, a.btn-secondary, button.btn-secondary {
     @apply bg-surface-container border border-outline-variant/30 text-on-surface font-bold py-3.5 px-6 rounded-xl hover:bg-surface-container-high transition-all flex items-center justify-center hover:scale-[1.02] active:scale-[0.98];
+    text-decoration: none !important;
   }
+}
+
+/* Ensure buttons inside rich text / prose always have ultra-clear dark text */
+.prose .btn-primary,
+.prose a.btn-primary,
+.prose a[class*="btn-primary"] {
+  color: #0c1324 !important;
+  background-color: #57f1db !important;
+  text-decoration: none !important;
+  font-weight: 800 !important;
+}
+
+.prose .btn-primary:hover,
+.prose a.btn-primary:hover {
+  background-color: #2dd4bf !important;
+  color: #0c1324 !important;
 }
 
 .glow-primary {
