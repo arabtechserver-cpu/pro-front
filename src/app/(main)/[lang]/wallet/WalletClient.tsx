@@ -449,23 +449,23 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
         {/* Left 2 Columns: Deposit Form */}
         <div className="lg:col-span-2 glass-card rounded-2xl p-6 sm:p-8 border border-outline-variant/30 shadow-xl">
           <div className="flex items-center gap-2.5 pb-4 mb-6 border-b border-outline-variant/20">
-            <span className="material-symbols-outlined text-primary text-xl">add_card</span>
-            <h2 className="text-lg font-bold text-on-surface">
-              {lang === "ar" ? "طلب شحن محفظة جديد" : "New Wallet Top-up Request"}
+            <span className="material-symbols-outlined text-primary text-2xl">add_card</span>
+            <h2 className="text-xl font-extrabold text-white">
+              {lang === "ar" ? "طلب شحن محفظة جديد" : "New Deposit Request"}
             </h2>
           </div>
 
           {/* Alerts */}
           {errorMessage && (
-            <div className="mb-6 p-4 rounded-xl bg-red-500/15 border border-red-500/30 text-red-300 text-xs font-semibold flex items-center gap-2.5">
-              <span className="material-symbols-outlined text-base shrink-0">error</span>
+            <div className="mb-6 p-4 rounded-xl bg-red-500/20 border-2 border-red-500/50 text-red-200 text-sm font-bold flex items-center gap-2.5 shadow-lg">
+              <span className="material-symbols-outlined text-lg shrink-0 text-red-400">error</span>
               <span>{errorMessage}</span>
             </div>
           )}
 
           {successMessage && (
-            <div className="mb-6 p-4 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs font-semibold flex items-center gap-2.5">
-              <span className="material-symbols-outlined text-base shrink-0">check_circle</span>
+            <div className="mb-6 p-4 rounded-xl bg-emerald-500/20 border-2 border-emerald-500/50 text-emerald-200 text-sm font-bold flex items-center gap-2.5 shadow-lg">
+              <span className="material-symbols-outlined text-lg shrink-0 text-emerald-400">check_circle</span>
               <span>{successMessage}</span>
             </div>
           )}
@@ -473,7 +473,7 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
           <form onSubmit={handleDepositSubmit} className="space-y-6">
             {/* 5 OFFICIAL PAYMENT METHODS BUTTONS */}
             <div className="space-y-3">
-              <label className="text-xs font-bold text-on-surface-variant uppercase tracking-wider">
+              <label className="text-xs font-extrabold text-slate-100 uppercase tracking-wider block">
                 {lang === "ar" ? "اختر طريقة الدفع المتاحة:" : "Select Payment Method:"}
               </label>
 
@@ -487,8 +487,8 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
                       onClick={() => setSelectedMethodId(m.id)}
                       className={`p-4 rounded-xl border text-xs font-semibold flex items-center gap-3.5 text-start transition-all ${
                         isSelected
-                          ? "bg-primary/20 border-primary text-primary shadow-lg ring-2 ring-primary/50"
-                          : "bg-surface-container-lowest border-outline-variant/30 text-on-surface hover:border-primary/40 hover:bg-surface-container-high/40"
+                          ? "bg-primary/25 border-2 border-primary text-white shadow-xl ring-2 ring-primary/60"
+                          : "bg-[#0f172a]/90 border border-slate-700/80 text-slate-200 hover:border-primary/50 hover:bg-[#1e293b]"
                       }`}
                     >
                       <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${m.color} text-white flex items-center justify-center text-lg shrink-0 shadow-md`}>
@@ -497,14 +497,14 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
 
                       <div className="overflow-hidden w-full">
                         <div className="flex items-center justify-between gap-1">
-                          <p className="font-bold text-sm text-on-surface truncate">
+                          <p className="font-extrabold text-sm text-white truncate">
                             {lang === "ar" ? m.nameAr : m.nameEn}
                           </p>
                           <span className="text-base shrink-0">{m.badge}</span>
                         </div>
-                        <p className="text-[11px] text-on-surface-variant mt-0.5 truncate">
+                        <p className={`text-xs mt-0.5 truncate font-medium ${isSelected ? "text-primary font-bold" : "text-slate-300"}`}>
                           {m.isAutomaticPayPal
-                            ? (lang === "ar" ? "⚡ شحن داخل الموقع" : "⚡ In-Page Direct Top-up")
+                            ? (lang === "ar" ? "⚡ شحن تلقائي داخل الموقع" : "⚡ In-Page Direct Top-up")
                             : isSelected
                             ? (lang === "ar" ? "محدد الآن 🟢" : "Selected 🟢")
                             : (lang === "ar" ? "انقر لعرض البيانات والنسخ" : "Click to view details")}
@@ -518,9 +518,9 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
 
             {/* EXPANDED FULL DETAILS & COPY PANEL FOR MANUAL METHODS ONLY */}
             {!activeMethod.isAutomaticPayPal && (
-              <div className="p-5 rounded-2xl bg-gradient-to-r from-primary/10 via-surface-container-high to-primary/10 border border-primary/40 shadow-xl space-y-3 animate-in fade-in slide-in-from-top-2 duration-300">
+              <div className="p-5 rounded-2xl bg-gradient-to-r from-primary/15 via-surface-container-high to-primary/15 border-2 border-primary/50 shadow-xl space-y-3 animate-in fade-in slide-in-from-top-2 duration-300">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 font-bold text-sm text-primary">
+                  <div className="flex items-center gap-2 font-extrabold text-sm text-primary">
                     <span className="text-xl">{activeMethod.badge}</span>
                     <span>{lang === "ar" ? activeMethod.detailLabelAr : activeMethod.detailLabelEn}</span>
                   </div>
@@ -547,13 +547,13 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
                 </div>
 
                 {/* Display Copy Value */}
-                <div className="p-3.5 rounded-xl bg-surface-container-lowest border border-outline-variant/40 flex items-center justify-between gap-3">
+                <div className="p-3.5 rounded-xl bg-[#0f172a] border border-primary/40 flex items-center justify-between gap-3">
                   <code className="text-sm font-mono font-bold text-primary select-all break-all dir-ltr">
                     {activeMethod.copyValue}
                   </code>
                 </div>
 
-                <p className="text-xs text-on-surface-variant leading-relaxed">
+                <p className="text-xs text-slate-200 leading-relaxed font-medium">
                   ℹ️ {lang === "ar" ? activeMethod.instructionsAr : activeMethod.instructionsEn}
                 </p>
               </div>
@@ -562,11 +562,11 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
             {/* Amount & Reference Input */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <div className="space-y-2">
-                <label className="text-xs font-bold text-on-surface-variant uppercase tracking-wider">
+                <label className="text-xs font-extrabold text-slate-100 uppercase tracking-wider block">
                   {lang === "ar" ? "المبلغ المطلوب إيداعه ($ USD)" : "Amount ($ USD)"}
                 </label>
                 <div className="relative">
-                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 font-bold text-primary">$</span>
+                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 font-bold text-primary text-lg">$</span>
                   <input
                     type="number"
                     step="0.01"
@@ -574,14 +574,14 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
                     value={depositAmount}
                     onChange={(e) => setDepositAmount(e.target.value)}
                     placeholder="10.00"
-                    className="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-xl py-3 pl-8 pr-4 text-on-surface font-mono font-bold focus:outline-none focus:border-primary"
+                    className="w-full bg-[#0f172a] border-2 border-slate-700 rounded-xl py-3 pl-8 pr-4 text-white font-mono font-bold text-base focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary placeholder:text-slate-500"
                   />
                 </div>
               </div>
 
               {!activeMethod.isAutomaticPayPal && (
                 <div className="space-y-2">
-                  <label className="text-xs font-bold text-on-surface-variant uppercase tracking-wider">
+                  <label className="text-xs font-extrabold text-slate-100 uppercase tracking-wider block">
                     {lang === "ar" ? "رقم التحويل / رقم المحفظة / الإيصال" : "Transaction Ref / Sender Number"}
                   </label>
                   <input
@@ -589,7 +589,7 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
                     value={transactionRef}
                     onChange={(e) => setTransactionRef(e.target.value)}
                     placeholder={lang === "ar" ? "مثال: VF-984321 أو رقم الحساب" : "e.g. Ref #984321"}
-                    className="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-xl py-3 px-4 text-on-surface font-mono text-xs focus:outline-none focus:border-primary"
+                    className="w-full bg-[#0f172a] border-2 border-slate-700 rounded-xl py-3 px-4 text-white font-mono text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary placeholder:text-slate-500"
                   />
                 </div>
               )}
@@ -598,11 +598,11 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
             {/* RECEIPT FILE UPLOAD FIELD FOR MANUAL METHODS */}
             {!activeMethod.isAutomaticPayPal && (
               <div className="space-y-2 pt-2 border-t border-outline-variant/20">
-                <label className="text-xs font-bold text-on-surface-variant uppercase tracking-wider block">
+                <label className="text-xs font-extrabold text-slate-100 uppercase tracking-wider block">
                   {lang === "ar" ? "إرفاق صورة إيصال التحويل للتأكيد (اختياري) 📸" : "Attach Receipt Screenshot 📸"}
                 </label>
 
-                <div className="relative flex flex-col items-center justify-center p-6 border-2 border-dashed border-primary/40 rounded-2xl bg-surface-container-lowest hover:border-primary transition-all text-center group cursor-pointer">
+                <div className="relative flex flex-col items-center justify-center p-6 border-2 border-dashed border-primary/50 rounded-2xl bg-[#0f172a]/80 hover:border-primary transition-all text-center group cursor-pointer">
                   <input
                     type="file"
                     accept="image/png, image/jpeg, image/jpg"
@@ -615,7 +615,7 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
                       <img
                         src={receiptImage}
                         alt="Receipt Preview"
-                        className="h-28 w-auto object-contain rounded-xl border border-primary/40 shadow-lg"
+                        className="h-28 w-auto object-contain rounded-xl border-2 border-primary shadow-lg"
                       />
                       <div className="flex items-center gap-2 text-xs font-bold text-emerald-400">
                         <span className="material-symbols-outlined text-base">check_circle</span>
@@ -635,13 +635,13 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
                     </div>
                   ) : (
                     <div className="flex flex-col items-center gap-2">
-                      <div className="w-12 h-12 rounded-full bg-primary/10 text-primary flex items-center justify-center group-hover:scale-110 transition-transform">
+                      <div className="w-12 h-12 rounded-full bg-primary/20 text-primary flex items-center justify-center group-hover:scale-110 transition-transform">
                         <span className="material-symbols-outlined text-2xl">add_photo_alternate</span>
                       </div>
-                      <p className="font-bold text-xs text-on-surface">
+                      <p className="font-bold text-sm text-white">
                         {lang === "ar" ? "انقر هنا لاختيار صورة الإيصال من جهازك" : "Click to select receipt screenshot"}
                       </p>
-                      <p className="text-[11px] text-on-surface-variant">
+                      <p className="text-xs text-slate-300">
                         {lang === "ar" ? "الصيغ المدعومة: PNG, JPG, JPEG (أقصى حجم 10MB)" : "Supports PNG, JPG, JPEG (Max 10MB)"}
                       </p>
                     </div>
@@ -653,18 +653,16 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
             {/* Submit Button / In-Page PayPal Smart Buttons */}
             {activeMethod.isAutomaticPayPal ? (
               <div className="space-y-3 pt-2">
-                <div className="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs flex items-center gap-2.5">
-                  <span className="material-symbols-outlined text-xl text-amber-400 shrink-0">bolt</span>
-                  <div className="space-y-0.5">
-                    <p className="font-bold text-amber-200">
-                      {lang === "ar" ? "الدفع المباشر داخل الموقع عبر PayPal ⚡" : "In-Page Direct PayPal Checkout ⚡"}
-                    </p>
-                    <p className="text-[11px] text-amber-300/80 leading-relaxed">
-                      {lang === "ar"
-                        ? `المبلغ المطلوب إيداعه: $${parseFloat(depositAmount || "10.00").toFixed(2)} USD. اضغط على زر PayPal بالأسفل للدفع الفوري داخل الموقع.`
-                        : `Top-up Amount: $${parseFloat(depositAmount || "10.00").toFixed(2)} USD. Click PayPal button below to pay directly.`}
-                    </p>
+                <div className="p-4 rounded-2xl bg-amber-500/15 border-2 border-amber-400/50 shadow-lg text-amber-200 space-y-1">
+                  <div className="flex items-center gap-2 text-amber-300 font-extrabold text-sm">
+                    <span className="material-symbols-outlined text-xl text-amber-400 shrink-0">bolt</span>
+                    <span>{lang === "ar" ? "الدفع المباشر داخل الموقع عبر PayPal ⚡" : "In-Page Direct PayPal Checkout ⚡"}</span>
                   </div>
+                  <p className="text-xs text-slate-200 font-medium leading-relaxed">
+                    {lang === "ar"
+                      ? `المبلغ المطلوب إيداعه: $${parseFloat(depositAmount || "10.00").toFixed(2)} USD. اضغط على زر PayPal بالأسفل لإتمام الدفع فوراً داخل الموقع.`
+                      : `Top-up Amount: $${parseFloat(depositAmount || "10.00").toFixed(2)} USD. Click PayPal button below to pay directly.`}
+                  </p>
                 </div>
 
                 <div className="w-full relative z-10">
@@ -780,46 +778,46 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
         {/* Right 1 Column: Quick Info & Support */}
         <div className="space-y-6">
           {/* Quick Notice Card */}
-          <div className="glass-card rounded-2xl p-6 border border-outline-variant/30 shadow-xl bg-surface-container-low/60">
+          <div className="glass-card rounded-2xl p-6 border border-outline-variant/30 shadow-xl bg-surface-container-low/80">
             <div className="flex items-center gap-2.5 pb-3 mb-4 border-b border-outline-variant/20">
-              <span className="material-symbols-outlined text-amber-400 text-xl">verified_user</span>
-              <h3 className="font-bold text-sm text-on-surface">
-                {lang === "ar" ? "تعليمات وتأكيد الإيداع" : "Deposit Verification Guidelines"}
+              <span className="material-symbols-outlined text-amber-400 text-2xl">verified_user</span>
+              <h3 className="font-extrabold text-base text-white">
+                {lang === "ar" ? "تعليمات وتأكيد الإيداع" : "Deposit Guidelines"}
               </h3>
             </div>
 
-            <ul className="space-y-3 text-xs text-on-surface-variant leading-relaxed">
-              <li className="flex items-start gap-2">
-                <span className="material-symbols-outlined text-emerald-400 text-sm shrink-0 mt-0.5">bolt</span>
-                <span>{lang === "ar" ? "تفتح نافذة PayPal الآمنة مباشرة داخل الموقع بدون مغادرة الصفحة." : "PayPal window opens inside site layout."}</span>
+            <ul className="space-y-3.5 text-xs text-slate-200 leading-relaxed font-medium">
+              <li className="flex items-start gap-2.5">
+                <span className="material-symbols-outlined text-emerald-400 text-base shrink-0 mt-0.5">bolt</span>
+                <span>{lang === "ar" ? "تفتح نافذة PayPal الآمنة مباشرة داخل الموقع بدون مغادرة الصفحة." : "PayPal window opens securely inside site."}</span>
               </li>
-              <li className="flex items-start gap-2">
-                <span className="material-symbols-outlined text-primary text-sm shrink-0 mt-0.5">check_circle</span>
-                <span>{lang === "ar" ? "تُحفظ جميع طلباتك في قاعدة البيانات وتظهر فوراً في الجدول بالأسفل." : "All transactions are saved in real DB and shown below."}</span>
+              <li className="flex items-start gap-2.5">
+                <span className="material-symbols-outlined text-primary text-base shrink-0 mt-0.5">check_circle</span>
+                <span>{lang === "ar" ? "تُحفظ جميع طلباتك في قاعدة البيانات وتظهر فوراً في جدول العمليات بالأسفل." : "All transactions are saved in real DB and shown below."}</span>
               </li>
-              <li className="flex items-start gap-2">
-                <span className="material-symbols-outlined text-primary text-sm shrink-0 mt-0.5">check_circle</span>
-                <span>{lang === "ar" ? "انقر على زر 'نسخ' بجانب العنوان/الرقم لنسخه فوراً في حافظة جهازك." : "Click 'Copy' button to copy address instantly to clipboard."}</span>
+              <li className="flex items-start gap-2.5">
+                <span className="material-symbols-outlined text-primary text-base shrink-0 mt-0.5">check_circle</span>
+                <span>{lang === "ar" ? "انقر على زر 'نسخ' بجانب العنوان/الرقم لنسخه فوراً في حافظة جهازك." : "Click 'Copy' button to copy address instantly."}</span>
               </li>
-              <li className="flex items-start gap-2">
-                <span className="material-symbols-outlined text-primary text-sm shrink-0 mt-0.5">check_circle</span>
-                <span>{lang === "ar" ? "لأي استفسار فورى، تواصل مع فريق الدعم الفني المباشر عبر واتساب." : "For instant help, contact support via WhatsApp."}</span>
+              <li className="flex items-start gap-2.5">
+                <span className="material-symbols-outlined text-primary text-base shrink-0 mt-0.5">support_agent</span>
+                <span>{lang === "ar" ? "لأي استفسار فورى، تواصل مع فريق الدعم الفني المباشر على مدار 24 ساعة." : "For instant help, contact support 24/7."}</span>
               </li>
             </ul>
           </div>
 
           {/* Support Contact Pill */}
-          <div className="glass-card rounded-2xl p-6 border border-primary/30 shadow-xl bg-primary/10 flex items-center justify-between">
+          <div className="glass-card rounded-2xl p-6 border-2 border-primary/40 shadow-xl bg-primary/10 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <span className="material-symbols-outlined text-primary text-3xl">support_agent</span>
               <div>
-                <p className="font-bold text-sm text-on-surface">{lang === "ar" ? "الدعم الفني المباشر" : "Live Technical Support"}</p>
-                <p className="text-xs text-primary">{lang === "ar" ? "متواجدون على مدار 24/7" : "Available 24/7"}</p>
+                <p className="font-extrabold text-sm text-white">{lang === "ar" ? "الدعم الفني المباشر" : "Live Technical Support"}</p>
+                <p className="text-xs text-primary font-bold">{lang === "ar" ? "متواجدون على مدار 24/7" : "Available 24/7"}</p>
               </div>
             </div>
             <Link
               href={`/${lang}/contact`}
-              className="px-4 py-2 rounded-xl bg-primary text-on-primary font-bold text-xs hover:bg-primary-container transition-all"
+              className="px-4 py-2 rounded-xl bg-primary text-on-primary font-extrabold text-xs hover:bg-primary-container transition-all shadow-md"
             >
               {lang === "ar" ? "مراسلة الدعم" : "Contact"}
             </Link>
