@@ -4,6 +4,9 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Locale } from "@/i18n/config";
+import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
+
+const PAYPAL_CLIENT_ID = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || "BAA8Rt-IgLlxgkq8MZ8oiOOqDhFqy92HBS9sxJzeYASwt8YU9Lz7GXrMAiACDFotqS5LlCxBsRISofo6n8";
 
 interface PaymentMethod {
   id: string;
@@ -307,35 +310,10 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
 
     setIsLoading(true);
 
-    // IF PAYPAL IS SELECTED -> DIRECT SECURE REDIRECT TO PAYPAL
+    // IF PAYPAL IS SELECTED -> Handled directly by PayPal Smart Buttons below
     if (activeMethod.isAutomaticPayPal) {
-      try {
-        const res = await fetch("/api/wallet/paypal/create-order", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            amount: parseFloat(depositAmount),
-            userId: userSession?.id,
-            email: userSession?.email
-          })
-        });
-
-        const data = await res.json();
-
-        if (res.ok && data.success && data.approvalUrl) {
-          // Direct redirect to PayPal's official secure payment page
-          window.location.href = data.approvalUrl;
-          return;
-        } else {
-          setErrorMessage(data.error || (lang === "ar" ? "تعذر إنشاء طلب الدفع عبر PayPal" : "Failed to create PayPal checkout"));
-          setIsLoading(false);
-          return;
-        }
-      } catch {
-        setErrorMessage(lang === "ar" ? "خطأ في الاتصال بسيرفر PayPal" : "PayPal server connection error");
-        setIsLoading(false);
-        return;
-      }
+      setIsLoading(false);
+      return;
     }
 
     // MANUAL METHODS (Vodafone Cash, Bankak, BNB, Binance)
@@ -397,7 +375,14 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-6xl relative">
+    <PayPalScriptProvider
+      options={{
+        clientId: PAYPAL_CLIENT_ID,
+        currency: "USD",
+        intent: "capture"
+      }}
+    >
+      <div className="container mx-auto px-4 py-8 max-w-6xl relative">
       {/* PAYPAL VERIFICATION OVERLAY */}
       {isVerifyingPayPal && (
         <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-xl flex items-center justify-center p-4 animate-in fade-in duration-300">
@@ -665,33 +650,130 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
               </div>
             )}
 
-            {/* Submit Button */}
-            <button
-              type="submit"
-              disabled={isLoading}
-              className={`w-full py-4 rounded-xl font-bold text-base transition-all shadow-[0_0_20px_rgba(45,212,191,0.25)] active:scale-[0.99] flex items-center justify-center gap-2 ${
-                activeMethod.isAutomaticPayPal
-                  ? "bg-yellow-500 hover:bg-yellow-400 text-black font-extrabold"
-                  : "bg-primary-container text-on-primary-container hover:bg-primary glow-primary"
-              }`}
-            >
-              {isLoading ? (
-                <>
-                  <span className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin"></span>
-                  <span>{activeMethod.isAutomaticPayPal ? (lang === "ar" ? "جاري فتح نافذة PayPal بالموقع..." : "Opening PayPal in-page...") : (lang === "ar" ? "جاري إرسال طلب الشحن..." : "Submitting request...")}</span>
-                </>
-              ) : activeMethod.isAutomaticPayPal ? (
-                <>
-                  <span className="text-xl">🅿️</span>
-                  <span>{lang === "ar" ? "فتح نافذة الدفع والتأكيد المباشر عبر PayPal ⚡" : "Open In-Page PayPal Checkout ⚡"}</span>
-                </>
-              ) : (
-                <>
-                  <span className="material-symbols-outlined">send</span>
-                  <span>{lang === "ar" ? "تأكيد وإرسال طلب الشحن" : "Submit Top-up Request"}</span>
-                </>
-              )}
-            </button>
+            {/* Submit Button / In-Page PayPal Smart Buttons */}
+            {activeMethod.isAutomaticPayPal ? (
+              <div className="space-y-3 pt-2">
+                <div className="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs flex items-center gap-2.5">
+                  <span className="material-symbols-outlined text-xl text-amber-400 shrink-0">bolt</span>
+                  <div className="space-y-0.5">
+                    <p className="font-bold text-amber-200">
+                      {lang === "ar" ? "الدفع المباشر داخل الموقع عبر PayPal ⚡" : "In-Page Direct PayPal Checkout ⚡"}
+                    </p>
+                    <p className="text-[11px] text-amber-300/80 leading-relaxed">
+                      {lang === "ar"
+                        ? `المبلغ المطلوب إيداعه: $${parseFloat(depositAmount || "10.00").toFixed(2)} USD. اضغط على زر PayPal بالأسفل للدفع الفوري داخل الموقع.`
+                        : `Top-up Amount: $${parseFloat(depositAmount || "10.00").toFixed(2)} USD. Click PayPal button below to pay directly.`}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="w-full relative z-10">
+                  <PayPalButtons
+                    key={`paypal-btn-${depositAmount || "10"}`}
+                    disabled={!depositAmount || parseFloat(depositAmount) < 1.0 || isLoading || isVerifyingPayPal}
+                    style={{
+                      layout: "vertical",
+                      color: "gold",
+                      shape: "rect",
+                      label: "pay",
+                      height: 48
+                    }}
+                    createOrder={async () => {
+                      setErrorMessage("");
+                      setSuccessMessage("");
+                      const num = parseFloat(depositAmount || "0");
+                      if (isNaN(num) || num < 1.0) {
+                        setErrorMessage(lang === "ar" ? "الحد الأدنى للإيداع هو $1.00 USD" : "Minimum deposit is $1.00 USD");
+                        throw new Error("Invalid deposit amount");
+                      }
+
+                      const res = await fetch("/api/wallet/paypal/create-order", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                          amount: num,
+                          userId: userSession?.id,
+                          email: userSession?.email
+                        })
+                      });
+
+                      const data = await res.json();
+                      if (!res.ok || !data.success || !data.orderId) {
+                        const errMsg = data.error || (lang === "ar" ? "فشل إنشاء طلب الدفع عبر PayPal" : "Failed to create PayPal order");
+                        setErrorMessage(errMsg);
+                        throw new Error(errMsg);
+                      }
+
+                      return data.orderId;
+                    }}
+                    onApprove={async (data) => {
+                      setIsVerifyingPayPal(true);
+                      try {
+                        const res = await fetch("/api/wallet/paypal/capture-order", {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({
+                            orderId: data.orderID,
+                            userId: userSession?.id,
+                            email: userSession?.email
+                          })
+                        });
+
+                        const captureData = await res.json();
+
+                        if (res.ok && captureData.success) {
+                          setSuccessMessage(
+                            lang === "ar"
+                              ? `🎉 تم الدفع واعتتماد الشحن التلقائي بمبلغ $${captureData.amount} USD بنجاح! رصيدك الجديد: $${captureData.balance}`
+                              : `🎉 Payment successful! $${captureData.amount} USD added. New balance: $${captureData.balance}`
+                          );
+
+                          if (userSession) {
+                            const updated = { ...userSession, balance: captureData.balance };
+                            localStorage.setItem("user_session", JSON.stringify(updated));
+                            setUserSession(updated);
+                            window.dispatchEvent(new Event("user_session_change"));
+                          }
+
+                          fetchRealTransactions(userSession?.id, userSession?.email);
+                        } else {
+                          setErrorMessage(captureData.error || (lang === "ar" ? "تعذر تأكيد عملية الدفع من PayPal" : "Failed to capture PayPal payment"));
+                        }
+                      } catch {
+                        setErrorMessage(lang === "ar" ? "خطأ في الاتصال أثناء تأكيد الدفع عبر PayPal" : "Connection error capturing PayPal payment");
+                      } finally {
+                        setIsVerifyingPayPal(false);
+                      }
+                    }}
+                    onError={(err) => {
+                      console.error("[PayPal Smart Buttons Error]:", err);
+                      setErrorMessage(lang === "ar" ? "حدث خطأ أثناء معالجة الدفع عبر PayPal" : "An error occurred with PayPal checkout");
+                    }}
+                    onCancel={() => {
+                      setErrorMessage(lang === "ar" ? "تم إلغاء عملية الدفع من قبلك." : "Payment was cancelled.");
+                    }}
+                  />
+                </div>
+              </div>
+            ) : (
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="w-full py-4 rounded-xl font-bold text-base transition-all shadow-[0_0_20px_rgba(45,212,191,0.25)] active:scale-[0.99] flex items-center justify-center gap-2 bg-primary-container text-on-primary-container hover:bg-primary glow-primary"
+              >
+                {isLoading ? (
+                  <>
+                    <span className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin"></span>
+                    <span>{lang === "ar" ? "جاري إرسال طلب الشحن..." : "Submitting request..."}</span>
+                  </>
+                ) : (
+                  <>
+                    <span className="material-symbols-outlined">send</span>
+                    <span>{lang === "ar" ? "تأكيد وإرسال طلب الشحن" : "Submit Top-up Request"}</span>
+                  </>
+                )}
+              </button>
+            )}
           </form>
         </div>
 
@@ -840,5 +922,6 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
         )}
       </div>
     </div>
+    </PayPalScriptProvider>
   );
 }
