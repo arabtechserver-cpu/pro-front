@@ -1,6 +1,7 @@
 import { getDictionary } from "@/i18n/get-dictionary";
 import { Locale } from "@/i18n/config";
 import Link from "next/link";
+import NewsletterSection from "@/components/NewsletterSection";
 
 async function getPosts() {
   try {
@@ -98,31 +99,7 @@ export default async function BlogPage({ params }: { params: { lang: Locale } })
       </section>
       
       {/* Newsletter Subscribe */}
-      <section className="container mx-auto max-w-4xl mt-8">
-        <div className="glass-panel p-8 rounded-3xl border border-primary/30 relative overflow-hidden flex flex-col md:flex-row items-center gap-8">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-bl-full pointer-events-none z-0"></div>
-          
-          <div className="flex-1 relative z-10 text-center md:text-start">
-            <h3 className="text-2xl font-bold text-on-surface mb-2">
-              {params.lang === "ar" ? "اشترك في نشرتنا الإخبارية" : "Subscribe to our newsletter"}
-            </h3>
-            <p className="text-on-surface-variant text-sm">
-              {params.lang === "ar" ? "احصل على أحدث الأخبار وعروض الأدوات مباشرة في بريدك الإلكتروني." : "Get the latest news and tool offers directly to your inbox."}
-            </p>
-          </div>
-          
-          <div className="w-full md:w-auto relative z-10 flex gap-2">
-            <input 
-              type="email" 
-              placeholder={params.lang === "ar" ? "البريد الإلكتروني..." : "Email address..."}
-              className="px-4 py-3 bg-surface-container border border-outline-variant/50 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all flex-1 min-w-[200px] text-on-surface"
-            />
-            <button className="btn-primary">
-              <i className="fas fa-paper-plane mr-2"></i> {params.lang === "ar" ? "اشترك" : "Subscribe"}
-            </button>
-          </div>
-        </div>
-      </section>
+      <NewsletterSection lang={params.lang} className="container mx-auto max-w-4xl mt-8" />
     </div>
   );
 }

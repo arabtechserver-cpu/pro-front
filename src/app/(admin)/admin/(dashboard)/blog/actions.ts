@@ -56,3 +56,45 @@ export async function addVideoTutorial(formData: FormData) {
   revalidatePath("/[lang]/tutorials", "page");
   redirect("/admin/blog");
 }
+
+export async function updateBlogPost(id: string, formData: FormData) {
+  const token = cookies().get('admin_token')?.value;
+  const payload = {
+    titleEn: formData.get("titleEn") as string,
+    titleAr: formData.get("titleAr") as string,
+    excerptEn: formData.get("excerptEn") as string,
+    excerptAr: formData.get("excerptAr") as string,
+    contentEn: formData.get("contentEn") as string,
+    contentAr: formData.get("contentAr") as string,
+    imageUrl: formData.get("imageUrl") as string,
+    category: formData.get("category") as string,
+  };
+
+  const res = await fetch(`https://api.arabtechproserver.tech/api/blog/posts/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+    body: JSON.stringify(payload)
+  });
+
+  if (!res.ok) {
+    const errorText = await res.text();
+    throw new Error(`Failed to update post: ${res.status} ${errorText}`);
+  }
+
+  revalidatePath("/[lang]/blog", "page");
+  revalidatePath(`/[lang]/blog/${id}`, "page");
+}
+
+export async function deleteBlogPost(id: string) {
+  const token = cookies().get('admin_token')?.value;
+  const res = await fetch(`https://api.arabtechproserver.tech/api/blog/posts/${id}`, {
+    method: 'DELETE',
+    headers: { 'Authorization': `Bearer ${token}` }
+  });
+
+  if (!res.ok) {
+    throw new Error(`Failed to delete post: ${res.status}`);
+  }
+
+  revalidatePath("/[lang]/blog", "page");
+}
