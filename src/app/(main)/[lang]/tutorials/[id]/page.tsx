@@ -108,7 +108,7 @@ export default async function TutorialDetailsPage({
                 {isRtl ? "تفاصيل الشرح" : "Tutorial Description"}
               </h3>
               
-              <div className="prose prose-invert max-w-none prose-p:text-on-surface-variant prose-p:leading-relaxed prose-headings:text-on-surface prose-a:text-primary">
+              <div className="prose prose-invert max-w-none text-slate-200 prose-p:text-slate-200 prose-p:text-base md:prose-p:text-lg prose-p:leading-relaxed prose-headings:text-white prose-a:text-primary font-sans">
                 <p>{description}</p>
                 <p>
                   {isRtl ? 

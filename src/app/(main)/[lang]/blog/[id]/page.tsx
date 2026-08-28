@@ -120,10 +120,20 @@ export default async function BlogPostPage({ params }: Props) {
         <article className="max-w-4xl mx-auto glass-card rounded-3xl p-8 md:p-12 border border-outline-variant/30 shadow-xl">
           {/* We use a prose class to style the rich text HTML content from the editor */}
           <div
-            className="prose prose-lg dark:prose-invert prose-primary max-w-none 
-              prose-headings:font-display prose-headings:font-bold prose-h2:text-3xl prose-h3:text-2xl 
-              prose-a:text-primary hover:prose-a:text-primary-container prose-a:transition-colors
-              prose-img:rounded-2xl prose-img:shadow-lg prose-img:mx-auto"
+            className="prose prose-lg prose-invert max-w-none 
+              text-slate-100 text-base md:text-lg leading-relaxed
+              prose-headings:font-display prose-headings:font-bold prose-headings:text-white
+              prose-h2:text-2xl md:prose-h2:text-3xl prose-h2:text-primary prose-h2:mt-8 prose-h2:mb-4 prose-h2:border-b prose-h2:border-outline-variant/30 prose-h2:pb-3
+              prose-h3:text-xl md:prose-h3:text-2xl prose-h3:text-white prose-h3:mt-6 prose-h3:mb-3
+              prose-h4:text-lg prose-h4:text-secondary prose-h4:font-bold
+              prose-p:text-slate-200 prose-p:leading-relaxed prose-p:my-4 prose-p:text-base md:prose-p:text-lg
+              prose-strong:text-white prose-strong:font-bold
+              prose-ul:text-slate-200 prose-ul:my-4 prose-ul:list-disc prose-ul:pr-6 prose-ul:space-y-2
+              prose-ol:text-slate-200 prose-ol:my-4 prose-ol:list-decimal prose-ol:pr-6 prose-ol:space-y-2
+              prose-li:text-slate-200 prose-li:leading-relaxed
+              prose-a:text-primary hover:prose-a:text-primary-container prose-a:transition-colors prose-a:font-bold
+              prose-img:rounded-2xl prose-img:shadow-lg prose-img:mx-auto
+              prose-table:w-full prose-table:my-6 prose-th:text-white prose-th:bg-surface-container-high prose-td:text-slate-200 prose-td:p-3 prose-th:p-3"
             dangerouslySetInnerHTML={{ __html: content }}
           />
           

@@ -39,7 +39,14 @@ export default function AdminBlog() {
       const res = await fetch("https://api.arabtechproserver.tech/api/blog/posts", { cache: "no-store" });
       if (res.ok) {
         const data = await res.json();
-        setPosts(data || []);
+        const seen = new Set();
+        const uniquePosts = (Array.isArray(data) ? data : []).filter((p: any) => {
+          const key = (p.titleAr || p.titleEn || p.id).trim().toLowerCase();
+          if (seen.has(key)) return false;
+          seen.add(key);
+          return true;
+        });
+        setPosts(uniquePosts);
       }
     } catch (err) {
       console.error("Failed to load blog posts:", err);

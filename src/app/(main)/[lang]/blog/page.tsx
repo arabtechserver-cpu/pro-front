@@ -19,7 +19,15 @@ async function getPosts() {
 export default async function BlogPage({ params }: { params: { lang: Locale } }) {
   const dict = await getDictionary(params.lang);
   
-  const posts = await getPosts();
+  const rawPosts = await getPosts();
+  // Filter out any duplicate articles
+  const seen = new Set();
+  const posts = (Array.isArray(rawPosts) ? rawPosts : []).filter((p: any) => {
+    const key = (p.titleAr || p.titleEn || p.id).trim().toLowerCase();
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
 
   return (
     <div className="flex flex-col gap-12">
