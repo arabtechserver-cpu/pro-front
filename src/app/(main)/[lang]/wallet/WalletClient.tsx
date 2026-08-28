@@ -113,9 +113,6 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
   const [successMessage, setSuccessMessage] = useState<string>("");
   const [errorMessage, setErrorMessage] = useState<string>("");
 
-  // In-Page PayPal Embedded Modal State
-  const [paypalModalUrl, setPaypalModalUrl] = useState<string | null>(null);
-  const [paypalOrderId, setPaypalOrderId] = useState<string | null>(null);
   const [isVerifyingPayPal, setIsVerifyingPayPal] = useState<boolean>(false);
 
   const [transactions, setTransactions] = useState<DBTransaction[]>([]);
@@ -177,10 +174,6 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
             ? `🎉 تم الدفع واعتتماد الشحن التلقائي بمبلغ $${data.amount} USD بنجاح! رصيدك الجديد: $${data.balance}`
             : `🎉 Payment successful! $${data.amount} USD added. New balance: $${data.balance}`
         );
-
-        // Close In-Page Modal
-        setPaypalModalUrl(null);
-        setPaypalOrderId(null);
 
         // Update Local Session Balance
         if (userObj || userSession) {
@@ -314,7 +307,7 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
 
     setIsLoading(true);
 
-    // IF PAYPAL IS SELECTED -> OPEN EMBEDDED MODAL INSIDE WEBSITE!
+    // IF PAYPAL IS SELECTED -> DIRECT SECURE REDIRECT TO PAYPAL
     if (activeMethod.isAutomaticPayPal) {
       try {
         const res = await fetch("/api/wallet/paypal/create-order", {
@@ -330,10 +323,8 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
         const data = await res.json();
 
         if (res.ok && data.success && data.approvalUrl) {
-          // OPEN EMBEDDED MODAL INSIDE WEBSITE ONLY (NO EXTERNAL POPUP WINDOW)
-          setPaypalModalUrl(data.approvalUrl);
-          setPaypalOrderId(data.orderId);
-          setIsLoading(false);
+          // Direct redirect to PayPal's official secure payment page
+          window.location.href = data.approvalUrl;
           return;
         } else {
           setErrorMessage(data.error || (lang === "ar" ? "تعذر إنشاء طلب الدفع عبر PayPal" : "Failed to create PayPal checkout"));
@@ -407,72 +398,19 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-6xl relative">
-      {/* IN-PAGE EMBEDDED PAYPAL GLASSMorphic MODAL DIALOG */}
-      {paypalModalUrl && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-xl flex items-center justify-center p-4 animate-in fade-in duration-300">
-          <div className="bg-surface-container-lowest border border-primary/40 rounded-3xl p-6 max-w-xl w-full shadow-2xl space-y-5 text-center relative overflow-hidden">
-            <div className="absolute -top-20 -right-20 w-48 h-48 bg-primary/20 rounded-full blur-3xl pointer-events-none"></div>
-
-            <div className="flex items-center justify-between pb-3 border-b border-outline-variant/20">
-              <div className="flex items-center gap-2 text-primary font-bold text-base">
-                <span className="text-2xl">🅿️</span>
-                <span>{lang === "ar" ? "نافذة الدفع المباشر داخل الموقع - PayPal" : "In-Page PayPal Direct Payment Window"}</span>
-              </div>
-              <button
-                onClick={() => {
-                  setPaypalModalUrl(null);
-                  if (paypalOrderId) handlePayPalReturnCapture(paypalOrderId, userSession);
-                }}
-                className="w-8 h-8 rounded-full bg-surface-container-high hover:bg-red-500/20 hover:text-red-400 text-on-surface-variant flex items-center justify-center font-bold text-sm transition-all"
-              >
-                ✕
-              </button>
-            </div>
-
-            <div className="p-4 rounded-2xl bg-primary/10 border border-primary/30 space-y-2">
-              <p className="text-xs font-bold text-on-surface">
-                {lang === "ar"
-                  ? `جاري شحن محفظتك بمبلغ $${parseFloat(depositAmount || "0").toFixed(2)} USD`
-                  : `Top-up Amount: $${parseFloat(depositAmount || "0").toFixed(2)} USD`}
-              </p>
-              <p className="text-[11px] text-on-surface-variant">
-                {lang === "ar"
-                  ? "نافذة الدفع المباشرة مفتوحة الآن. بمجرد إتمام الدفع، سيتم إضافة الرصيد للمحفظة فوراً!"
-                  : "PayPal window is active. Balance will be updated automatically upon payment completion."}
-              </p>
-            </div>
-
-            {/* Embedded Iframe Option inside the page layout */}
-            <div className="w-full h-[450px] rounded-2xl overflow-hidden border border-outline-variant/30 bg-white relative shadow-inner">
-              <iframe
-                src={paypalModalUrl}
-                className="w-full h-full border-none"
-                title="PayPal Embedded Checkout"
-                allow="payment"
-              />
-            </div>
-
-            <div className="flex items-center justify-between gap-3 pt-2">
-              <button
-                onClick={() => {
-                  if (paypalOrderId) handlePayPalReturnCapture(paypalOrderId, userSession);
-                }}
-                disabled={isVerifyingPayPal}
-                className="w-full py-3 rounded-xl bg-primary text-on-primary font-bold text-xs hover:bg-primary-container transition-all flex items-center justify-center gap-2"
-              >
-                {isVerifyingPayPal ? (
-                  <>
-                    <span className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></span>
-                    <span>{lang === "ar" ? "جاري التأكيد والتحقق من السحب..." : "Verifying payment..."}</span>
-                  </>
-                ) : (
-                  <>
-                    <span className="material-symbols-outlined text-base">verified</span>
-                    <span>{lang === "ar" ? "اضغط هنا فور الدفع لخصم وشحن الرصيد مباشرة" : "Click after payment to capture balance"}</span>
-                  </>
-                )}
-              </button>
-            </div>
+      {/* PAYPAL VERIFICATION OVERLAY */}
+      {isVerifyingPayPal && (
+        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-xl flex items-center justify-center p-4 animate-in fade-in duration-300">
+          <div className="bg-surface-container-lowest border border-primary/40 rounded-3xl p-8 max-w-md w-full shadow-2xl space-y-4 text-center">
+            <span className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto block"></span>
+            <h3 className="text-xl font-bold text-white">
+              {lang === "ar" ? "جاري التحقق من عملية الدفع عبر PayPal..." : "Verifying PayPal payment..."}
+            </h3>
+            <p className="text-sm text-slate-300 leading-relaxed">
+              {lang === "ar"
+                ? "يتم الآن التواصل مع خوادم PayPal للتحقق من وصول المبلغ وتأكيد الشحن الفوري في محفظتك."
+                : "Contacting PayPal servers to confirm real payment receipt and credit your wallet."}
+            </p>
           </div>
         </div>
       )}
