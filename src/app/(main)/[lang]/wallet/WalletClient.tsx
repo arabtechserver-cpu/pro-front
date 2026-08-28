@@ -207,23 +207,42 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
     setIsFetchingTx(true);
     try {
       let url = "/api/transactions";
+      const params = new URLSearchParams();
       if (userId) {
-        url += `?userId=${encodeURIComponent(userId)}`;
+        params.append("userId", userId);
       } else if (email) {
-        url += `?email=${encodeURIComponent(email)}`;
+        params.append("email", email);
+      }
+      const qs = params.toString();
+      if (qs) {
+        url += `?${qs}`;
       }
 
       const token = localStorage.getItem("user_token");
-      const res = await fetch(url, {
-        headers: token ? { "Authorization": `Bearer ${token}` } : {}
-      });
-      const data = await res.json();
+      const headers: Record<string, string> = {};
+      if (token && token !== "null" && token !== "undefined") {
+        headers["Authorization"] = `Bearer ${token}`;
+      }
 
-      if (res.ok && data.success) {
-        setTransactions(data.transactions || []);
+      const res = await fetch(url, {
+        headers,
+        credentials: "include"
+      });
+
+      if (!res.ok) {
+        setTransactions([]);
+        return;
+      }
+
+      const data = await res.json().catch(() => ({ success: false, transactions: [] }));
+      if (data.success && Array.isArray(data.transactions)) {
+        setTransactions(data.transactions);
+      } else {
+        setTransactions([]);
       }
     } catch {
       console.error("Failed to fetch real transactions from database");
+      setTransactions([]);
     } finally {
       setIsFetchingTx(false);
     }
@@ -325,12 +344,17 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
 
     try {
       const token = localStorage.getItem("user_token");
+      const headers: Record<string, string> = { 
+        "Content-Type": "application/json"
+      };
+      if (token && token !== "null" && token !== "undefined") {
+        headers["Authorization"] = `Bearer ${token}`;
+      }
+
       const res = await fetch("/api/transactions", {
         method: "POST",
-        headers: { 
-          "Content-Type": "application/json",
-          ...(token ? { "Authorization": `Bearer ${token}` } : {})
-        },
+        headers,
+        credentials: "include",
         body: JSON.stringify({
           userId: userSession?.id,
           email: userSession?.email,
@@ -342,7 +366,7 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
         })
       });
 
-      const data = await res.json();
+      const data = await res.json().catch(() => ({ success: false, error: "تعذر قراءة رد الخادم" }));
 
       if (res.ok && data.success) {
         setSuccessMessage(

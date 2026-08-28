@@ -15,9 +15,14 @@ export default function BackupsClient() {
   const fetchBackups = async () => {
     setIsLoading(true);
     try {
-      const token = localStorage.getItem("adminToken");
+      const token = localStorage.getItem("adminToken") || localStorage.getItem("user_token") || localStorage.getItem("token");
+      const headers: Record<string, string> = {};
+      if (token && token !== "null" && token !== "undefined") {
+        headers["Authorization"] = `Bearer ${token}`;
+      }
       const res = await fetch("/api/backup", {
-        headers: { Authorization: `Bearer ${token}` }
+        headers,
+        credentials: "include"
       });
       const data = await res.json();
       if (res.ok && data.success) {
@@ -34,10 +39,15 @@ export default function BackupsClient() {
     setIsActioning(true);
     setAlertMessage(null);
     try {
-      const token = localStorage.getItem("adminToken");
+      const token = localStorage.getItem("adminToken") || localStorage.getItem("user_token") || localStorage.getItem("token");
+      const headers: Record<string, string> = {};
+      if (token && token !== "null" && token !== "undefined") {
+        headers["Authorization"] = `Bearer ${token}`;
+      }
       const res = await fetch("/api/backup/create", {
         method: "POST",
-        headers: { Authorization: `Bearer ${token}` }
+        headers,
+        credentials: "include"
       });
       const data = await res.json();
       if (res.ok && data.success) {
@@ -61,13 +71,17 @@ export default function BackupsClient() {
     setIsActioning(true);
     setAlertMessage(null);
     try {
-      const token = localStorage.getItem("adminToken");
+      const token = localStorage.getItem("adminToken") || localStorage.getItem("user_token") || localStorage.getItem("token");
+      const headers: Record<string, string> = { 
+        "Content-Type": "application/json"
+      };
+      if (token && token !== "null" && token !== "undefined") {
+        headers["Authorization"] = `Bearer ${token}`;
+      }
       const res = await fetch("/api/backup/restore", {
         method: "POST",
-        headers: { 
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}` 
-        },
+        headers,
+        credentials: "include",
         body: JSON.stringify({ filename })
       });
       const data = await res.json();
@@ -89,10 +103,15 @@ export default function BackupsClient() {
     setIsActioning(true);
     setAlertMessage(null);
     try {
-      const token = localStorage.getItem("adminToken");
+      const token = localStorage.getItem("adminToken") || localStorage.getItem("user_token") || localStorage.getItem("token");
+      const headers: Record<string, string> = {};
+      if (token && token !== "null" && token !== "undefined") {
+        headers["Authorization"] = `Bearer ${token}`;
+      }
       const res = await fetch(`/api/backup/${filename}`, {
         method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` }
+        headers,
+        credentials: "include"
       });
       const data = await res.json();
       if (res.ok && data.success) {

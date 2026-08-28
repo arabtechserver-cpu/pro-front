@@ -63,13 +63,17 @@ export default function AdminBlog() {
     if (!confirm("هل تريد إضافة الـ 10 مقالات الاحترافية الافتراضية إلى الموقع الآن؟")) return;
     try {
       setLoading(true);
-      const res = await fetch("https://api.arabtechproserver.tech/api/blog/seed-defaults", {
+      const token = document.cookie.split('admin_token=')[1]?.split(';')[0]?.trim() || localStorage.getItem('adminToken') || localStorage.getItem('user_token');
+      const headers: Record<string, string> = {};
+      if (token && token !== 'null' && token !== 'undefined') {
+        headers["Authorization"] = `Bearer ${token}`;
+      }
+      const res = await fetch("/api/blog/seed-defaults", {
         method: "POST",
-        headers: {
-          "Authorization": `Bearer ${document.cookie.split('admin_token=')[1]?.split(';')[0] || ''}`
-        }
+        headers,
+        credentials: "include"
       });
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
       if (res.ok) {
         setToastMessage(data.message || "تمت إضافة المقالات بنجاح!");
         fetchPosts();

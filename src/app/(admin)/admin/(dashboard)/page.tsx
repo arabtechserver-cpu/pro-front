@@ -3,8 +3,10 @@ import { cookies } from "next/headers";
 async function getAccountInfo() {
   const token = cookies().get('admin_token')?.value;
   try {
+    const headers: Record<string, string> = {};
+    if (token) headers['Authorization'] = `Bearer ${token}`;
     const res = await fetch('https://api.arabtechproserver.tech/api/dhru/account', {
-      headers: { 'Authorization': `Bearer ${token}` },
+      headers,
       cache: 'no-store'
     });
     if (!res.ok) return { error: true, message: 'Failed to fetch Dhru account info' };

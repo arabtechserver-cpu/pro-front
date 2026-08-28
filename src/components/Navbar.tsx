@@ -93,14 +93,21 @@ export default function Navbar({ lang, dict }: NavbarProps) {
           if (parsed?.email || parsed?.id) {
             const token = localStorage.getItem("user_token");
             const queryParam = parsed.id ? `userId=${encodeURIComponent(parsed.id)}` : `email=${encodeURIComponent(parsed.email)}`;
+            const headers: Record<string, string> = {};
+            if (token && token !== "null" && token !== "undefined") {
+              headers["Authorization"] = `Bearer ${token}`;
+            }
             const res = await fetch(`/api/users/profile?${queryParam}`, {
-              headers: token ? { "Authorization": `Bearer ${token}` } : {}
+              headers,
+              credentials: "include"
             });
-            const data = await res.json();
-            if (res.ok && data.success && data.user) {
-              const freshUser = { ...parsed, ...data.user };
-              localStorage.setItem("user_session", JSON.stringify(freshUser));
-              setUserSession(freshUser);
+            if (res.ok) {
+              const data = await res.json().catch(() => null);
+              if (data && data.success && data.user) {
+                const freshUser = { ...parsed, ...data.user };
+                localStorage.setItem("user_session", JSON.stringify(freshUser));
+                setUserSession(freshUser);
+              }
             }
           }
         } catch {

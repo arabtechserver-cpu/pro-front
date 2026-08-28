@@ -159,8 +159,13 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
         if (parsed.email || parsed.id) {
           const token = localStorage.getItem("user_token");
           const queryParam = parsed.id ? `userId=${encodeURIComponent(parsed.id)}` : `email=${encodeURIComponent(parsed.email)}`;
+          const headers: Record<string, string> = {};
+          if (token && token !== "null" && token !== "undefined") {
+            headers["Authorization"] = `Bearer ${token}`;
+          }
           fetch(`/api/users/profile?${queryParam}`, {
-            headers: token ? { "Authorization": `Bearer ${token}` } : {}
+            headers,
+            credentials: "include"
           })
             .then(res => res.json())
             .then(data => {
@@ -415,12 +420,17 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
     setSubmittingOrder(true);
     try {
       const token = localStorage.getItem("user_token");
+      const headers: Record<string, string> = { 
+        "Content-Type": "application/json"
+      };
+      if (token && token !== "null" && token !== "undefined") {
+        headers["Authorization"] = `Bearer ${token}`;
+      }
+
       const res = await fetch("/api/orders", {
         method: "POST",
-        headers: { 
-          "Content-Type": "application/json",
-          ...(token ? { "Authorization": `Bearer ${token}` } : {})
-        },
+        headers,
+        credentials: "include",
         body: JSON.stringify({
           userId: userSession.id,
           email: userSession.email,
@@ -435,7 +445,7 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
         })
       });
 
-      const data = await res.json();
+      const data = await res.json().catch(() => ({ success: false, message: "تعذر قراءة رد الخادم" }));
       if (res.ok && data.success) {
         setSubmitFeedback({ type: "success", text: data.message || "تم إرسال وحفظ الطلب بنجاح!" });
         setTargetInput("");

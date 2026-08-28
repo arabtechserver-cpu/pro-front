@@ -17,9 +17,12 @@ export async function addBlogPost(formData: FormData) {
     category: formData.get("category") as string,
   };
 
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+  if (token) headers['Authorization'] = `Bearer ${token}`;
+
   const res = await fetch('https://api.arabtechproserver.tech/api/blog/post', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+    headers,
     body: JSON.stringify(payload)
   });
 
@@ -42,9 +45,12 @@ export async function addVideoTutorial(formData: FormData) {
     descriptionAr: "مضاف من لوحة التحكم"
   };
 
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+  if (token) headers['Authorization'] = `Bearer ${token}`;
+
   const res = await fetch('https://api.arabtechproserver.tech/api/blog/tutorial', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+    headers,
     body: JSON.stringify(payload)
   });
 
@@ -70,9 +76,12 @@ export async function updateBlogPost(id: string, formData: FormData) {
     category: formData.get("category") as string,
   };
 
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+  if (token) headers['Authorization'] = `Bearer ${token}`;
+
   const res = await fetch(`https://api.arabtechproserver.tech/api/blog/posts/${id}`, {
     method: 'PUT',
-    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+    headers,
     body: JSON.stringify(payload)
   });
 
@@ -87,9 +96,12 @@ export async function updateBlogPost(id: string, formData: FormData) {
 
 export async function deleteBlogPost(id: string) {
   const token = cookies().get('admin_token')?.value;
+  const headers: Record<string, string> = {};
+  if (token) headers['Authorization'] = `Bearer ${token}`;
+
   const res = await fetch(`https://api.arabtechproserver.tech/api/blog/posts/${id}`, {
     method: 'DELETE',
-    headers: { 'Authorization': `Bearer ${token}` }
+    headers
   });
 
   if (!res.ok) {

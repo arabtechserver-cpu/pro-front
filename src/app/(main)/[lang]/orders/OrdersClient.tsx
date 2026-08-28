@@ -25,8 +25,13 @@ export default function OrdersClient({ lang, dict }: { lang: string, dict: any }
         if (parsed.email || parsed.id) {
           const token = localStorage.getItem("user_token");
           const queryParam = parsed.id ? `userId=${encodeURIComponent(parsed.id)}` : `email=${encodeURIComponent(parsed.email)}`;
+          const headers: Record<string, string> = {};
+          if (token && token !== "null" && token !== "undefined") {
+            headers["Authorization"] = `Bearer ${token}`;
+          }
           fetch(`/api/users/profile?${queryParam}`, {
-            headers: token ? { "Authorization": `Bearer ${token}` } : {}
+            headers,
+            credentials: "include"
           })
             .then(res => res.json())
             .then(data => {
@@ -54,12 +59,17 @@ export default function OrdersClient({ lang, dict }: { lang: string, dict: any }
     try {
       const token = localStorage.getItem("user_token");
       const param = userSession?.id ? `userId=${encodeURIComponent(userSession.id)}` : `email=${encodeURIComponent(userSession.email)}`;
+      const headers: Record<string, string> = {};
+      if (token && token !== "null" && token !== "undefined") {
+        headers["Authorization"] = `Bearer ${token}`;
+      }
       const res = await fetch(`/api/orders?${param}`, {
-        headers: token ? { "Authorization": `Bearer ${token}` } : {}
+        headers,
+        credentials: "include"
       });
       if (res.ok) {
-        const data = await res.json();
-        if (data.orders) {
+        const data = await res.json().catch(() => ({ orders: [] }));
+        if (data.orders && Array.isArray(data.orders)) {
           setOrdersList(data.orders);
         }
       }

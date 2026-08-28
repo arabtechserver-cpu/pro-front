@@ -56,14 +56,19 @@ export default function VideosAdminPage() {
 
   const handleCreateSeries = async (e: React.FormEvent) => {
     e.preventDefault();
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('user_token') || localStorage.getItem('token') || localStorage.getItem('adminToken');
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json'
+    };
+    if (token && token !== 'null' && token !== 'undefined') {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
     try {
       const res = await fetch('/api/videos/series', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
-        },
+        headers,
+        credentials: 'include',
         body: JSON.stringify({
           titleEn: formData.titleEn,
           titleAr: formData.titleAr,
@@ -78,23 +83,30 @@ export default function VideosAdminPage() {
         alert("تم إنشاء السلسلة بنجاح!");
         fetchVideos();
       } else {
-        alert("حدث خطأ");
+        const errData = await res.json().catch(() => ({}));
+        alert(errData.error || "حدث خطأ أثناء إنشاء السلسلة");
       }
     } catch (err) {
       console.error(err);
+      alert("حدث خطأ في الاتصال بالخادم");
     }
   };
 
   const handleCreateVideo = async (e: React.FormEvent) => {
     e.preventDefault();
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('user_token') || localStorage.getItem('token') || localStorage.getItem('adminToken');
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json'
+    };
+    if (token && token !== 'null' && token !== 'undefined') {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
     try {
       const res = await fetch('/api/videos/tutorials', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
-        },
+        headers,
+        credentials: 'include',
         body: JSON.stringify({
           titleEn: formData.titleEn,
           titleAr: formData.titleAr,
@@ -111,10 +123,12 @@ export default function VideosAdminPage() {
         alert("تم رفع الفيديو بنجاح!");
         fetchVideos();
       } else {
-        alert("حدث خطأ");
+        const errData = await res.json().catch(() => ({}));
+        alert(errData.error || "حدث خطأ أثناء رفع الفيديو");
       }
     } catch (err) {
       console.error(err);
+      alert("حدث خطأ في الاتصال بالخادم");
     }
   };
 

@@ -7,8 +7,10 @@ export async function getAdminProfile() {
   if (!token) return null;
 
   try {
+    const headers: Record<string, string> = {};
+    if (token) headers['Authorization'] = `Bearer ${token}`;
     const res = await fetch('https://api.arabtechproserver.tech/api/users/profile', {
-      headers: { 'Authorization': `Bearer ${token}` },
+      headers,
       cache: 'no-store'
     });
     if (res.ok) {
@@ -26,12 +28,13 @@ export async function updateAdminCredentials(data: any) {
   if (!token) return { success: false, error: "غير مصرح لك" };
 
   try {
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json'
+    };
+    if (token) headers['Authorization'] = `Bearer ${token}`;
     const res = await fetch('https://api.arabtechproserver.tech/api/users/update-credentials', {
       method: 'POST',
-      headers: { 
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
+      headers,
       body: JSON.stringify(data)
     });
     
