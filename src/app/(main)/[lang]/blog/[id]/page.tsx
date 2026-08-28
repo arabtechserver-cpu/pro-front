@@ -11,7 +11,11 @@ type Props = {
 // Function to fetch a single blog post
 async function getPost(id: string) {
   try {
-    const res = await fetch(`https://api.arabtechproserver.tech/api/blog/posts/${id}`, {
+    let cleanId = id;
+    try {
+      cleanId = encodeURIComponent(decodeURIComponent(id).trim());
+    } catch (_) {}
+    const res = await fetch(`https://api.arabtechproserver.tech/api/blog/posts/${cleanId}`, {
       cache: "no-store", // We could use revalidate if we wanted ISR
     });
     if (!res.ok) return null;

@@ -5,7 +5,11 @@ import { notFound } from 'next/navigation';
 
 async function getTutorial(id: string) {
   try {
-    const res = await fetch(`https://api.arabtechproserver.tech/api/blog/tutorials/${id}`, {
+    let cleanId = id;
+    try {
+      cleanId = encodeURIComponent(decodeURIComponent(id).trim());
+    } catch (_) {}
+    const res = await fetch(`https://api.arabtechproserver.tech/api/blog/tutorials/${cleanId}`, {
       cache: 'no-store'
     });
     if (!res.ok) return null;
