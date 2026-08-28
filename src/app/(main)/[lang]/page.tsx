@@ -2,6 +2,7 @@ import { Metadata } from "next";
 import Link from "next/link";
 import { getDictionary } from "@/i18n/get-dictionary";
 import { Locale } from "@/i18n/config";
+import NewsletterSection from "@/components/NewsletterSection";
 
 async function getHomepageConfig() {
   try {
@@ -178,22 +179,41 @@ export default async function Home({ params }: { params: { lang: Locale } }) {
       />
       
       {/* --- Notice Bar --- */}
-      <div className="w-full bg-surface-container border-b border-outline-variant/20 mb-2 sm:mb-4 relative z-20">
-        <div className="container mx-auto px-4 flex whitespace-nowrap overflow-hidden py-2.5 sm:py-3">
-          <div className="animate-marquee flex gap-8 items-center text-xs sm:text-sm font-medium text-on-surface-variant">
-            <span className="flex items-center gap-2">
-              <i className="fas fa-bolt text-primary"></i>
-              <span>{notice1 || "تسليم فوري لمعظم الخدمات"}</span>
+      <div className="w-full bg-surface-container/90 backdrop-blur-md border-b border-outline-variant/20 mb-2 sm:mb-4 relative z-20 overflow-hidden">
+        <div className="container mx-auto px-4 flex whitespace-nowrap overflow-hidden py-2 sm:py-2.5">
+          <div className="animate-marquee hover:[animation-play-state:paused] flex gap-6 sm:gap-8 items-center text-xs sm:text-sm font-medium text-on-surface-variant cursor-pointer">
+            {/* Main Dynamic / GSM Bullet Points */}
+            <span className="flex items-center gap-2 bg-primary/10 text-primary px-3 py-1 rounded-full border border-primary/25 font-bold">
+              <i className="fas fa-bolt text-yellow-400"></i>
+              <span>{notice1 || (isAr ? "تسليم فوري وتلقائي لمعظم خدمات الـ IMEI والسيرفر على مدار 24/7" : "Instant 24/7 automated delivery for IMEI & server services")}</span>
             </span>
+
             <span className="flex items-center gap-2">
               <i className="fas fa-shield-alt text-secondary"></i>
-              <span>{notice2 || "دفع آمن + دعم موثوق على مدار الساعة"}</span>
+              <span>{notice2 || (isAr ? "دفع آمن 100% + شحن فوري للمحفظة مع ضمان استرجاع الرصيد" : "100% Secure checkout + instant wallet funding & refund protection")}</span>
             </span>
-            <a href={`https://wa.me/${whatsappNum.replace(/[^0-9]/g, '')}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-[#25D366] transition-colors">
+
+            <span className="flex items-center gap-2 text-on-surface">
+              <i className="fas fa-tools text-primary"></i>
+              <span>{isAr ? "تفعيل فوري لأقوى أدوات وبوكسات السوفت وير (UnlockTool, Chimera, Borneo, AMT)" : "Instant activation for top tools (UnlockTool, Chimera, Borneo, AMT)"}</span>
+            </span>
+
+            <span className="flex items-center gap-2">
+              <i className="fas fa-unlock text-tertiary"></i>
+              <span>{isAr ? "فك شفرات رسمي وتخطي iCloud & FRP لجميع الشبكات والموديلات" : "Official factory unlock & iCloud / FRP bypass worldwide"}</span>
+            </span>
+
+            <span className="flex items-center gap-2 text-emerald-400 font-semibold">
+              <i className="fas fa-tags"></i>
+              <span>{isAr ? "أسعار جملة وتخفيضات خاصة لأصحاب المحلات والوكلاء" : "Exclusive wholesale pricing for resellers & repair shops"}</span>
+            </span>
+
+            {/* Direct Quick Contact Links */}
+            <a href={`https://wa.me/${whatsappNum.replace(/[^0-9]/g, '')}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 bg-[#25D366]/10 text-[#25D366] px-3 py-1 rounded-full border border-[#25D366]/30 hover:bg-[#25D366]/20 transition-all font-bold">
               <i className="fab fa-whatsapp text-[#25D366]"></i>
               <span dir="ltr">WhatsApp: {whatsappNum}</span>
             </a>
-            <a href={telegramUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-[#0088cc] transition-colors">
+            <a href={telegramUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 bg-[#0088cc]/10 text-[#0088cc] px-3 py-1 rounded-full border border-[#0088cc]/30 hover:bg-[#0088cc]/20 transition-all font-bold">
               <i className="fab fa-telegram-plane text-[#0088cc]"></i>
               <span dir="ltr">Telegram: {telegramUser}</span>
             </a>
@@ -202,20 +222,37 @@ export default async function Home({ params }: { params: { lang: Locale } }) {
               <span>{emailAddr}</span>
             </a>
 
-            {/* Duplicate for infinite marquee effect */}
-            <span className="flex items-center gap-2 ml-8" aria-hidden="true">
-              <i className="fas fa-bolt text-primary"></i>
-              <span>{notice1 || "تسليم فوري لمعظم الخدمات"}</span>
+            {/* Duplicate set for seamless continuous marquee scrolling */}
+            <span className="flex items-center gap-2 bg-primary/10 text-primary px-3 py-1 rounded-full border border-primary/25 font-bold ml-6" aria-hidden="true">
+              <i className="fas fa-bolt text-yellow-400"></i>
+              <span>{notice1 || (isAr ? "تسليم فوري وتلقائي لمعظم خدمات الـ IMEI والسيرفر على مدار 24/7" : "Instant 24/7 automated delivery for IMEI & server services")}</span>
             </span>
+
             <span className="flex items-center gap-2" aria-hidden="true">
               <i className="fas fa-shield-alt text-secondary"></i>
-              <span>{notice2 || "دفع آمن + دعم موثوق على مدار الساعة"}</span>
+              <span>{notice2 || (isAr ? "دفع آمن 100% + شحن فوري للمحفظة مع ضمان استرجاع الرصيد" : "100% Secure checkout + instant wallet funding & refund protection")}</span>
             </span>
-            <a href={`https://wa.me/${whatsappNum.replace(/[^0-9]/g, '')}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-[#25D366] transition-colors" aria-hidden="true">
+
+            <span className="flex items-center gap-2 text-on-surface" aria-hidden="true">
+              <i className="fas fa-tools text-primary"></i>
+              <span>{isAr ? "تفعيل فوري لأقوى أدوات وبوكسات السوفت وير (UnlockTool, Chimera, Borneo, AMT)" : "Instant activation for top tools (UnlockTool, Chimera, Borneo, AMT)"}</span>
+            </span>
+
+            <span className="flex items-center gap-2" aria-hidden="true">
+              <i className="fas fa-unlock text-tertiary"></i>
+              <span>{isAr ? "فك شفرات رسمي وتخطي iCloud & FRP لجميع الشبكات والموديلات" : "Official factory unlock & iCloud / FRP bypass worldwide"}</span>
+            </span>
+
+            <span className="flex items-center gap-2 text-emerald-400 font-semibold" aria-hidden="true">
+              <i className="fas fa-tags"></i>
+              <span>{isAr ? "أسعار جملة وتخفيضات خاصة لأصحاب المحلات والوكلاء" : "Exclusive wholesale pricing for resellers & repair shops"}</span>
+            </span>
+
+            <a href={`https://wa.me/${whatsappNum.replace(/[^0-9]/g, '')}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 bg-[#25D366]/10 text-[#25D366] px-3 py-1 rounded-full border border-[#25D366]/30 hover:bg-[#25D366]/20 transition-all font-bold" aria-hidden="true">
               <i className="fab fa-whatsapp text-[#25D366]"></i>
               <span dir="ltr">WhatsApp: {whatsappNum}</span>
             </a>
-            <a href={telegramUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-[#0088cc] transition-colors" aria-hidden="true">
+            <a href={telegramUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 bg-[#0088cc]/10 text-[#0088cc] px-3 py-1 rounded-full border border-[#0088cc]/30 hover:bg-[#0088cc]/20 transition-all font-bold" aria-hidden="true">
               <i className="fab fa-telegram-plane text-[#0088cc]"></i>
               <span dir="ltr">Telegram: {telegramUser}</span>
             </a>
@@ -521,6 +558,9 @@ export default async function Home({ params }: { params: { lang: Locale } }) {
           </div>
         </div>
       </section>
+
+      {/* --- Real Interactive Newsletter Section --- */}
+      <NewsletterSection lang={params.lang} className="container mx-auto px-4" />
       
     </div>
   );

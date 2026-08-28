@@ -46,6 +46,9 @@ export default function AdminLayout({
           <Link href="/admin/customer-logs" className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-surface-variant transition-colors text-on-surface-variant hover:text-on-surface">
             <span className="material-symbols-outlined w-5 text-center">manage_search</span> سجل العملاء 📋
           </Link>
+          <Link href="/admin/newsletter" className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-surface-variant transition-colors text-on-surface-variant hover:text-on-surface">
+            <span className="material-symbols-outlined w-5 text-center">forward_to_inbox</span> النشرة البريدية والمشتركون ✉️
+          </Link>
           <Link href="/admin/backups" className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-surface-variant transition-colors text-on-surface-variant hover:text-on-surface">
             <span className="material-symbols-outlined w-5 text-center">backup</span> النسخ الاحتياطي 💾
           </Link>
