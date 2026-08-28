@@ -9,7 +9,7 @@ async function getTutorial(id: string) {
     try {
       cleanId = encodeURIComponent(decodeURIComponent(id).trim());
     } catch (_) {}
-    const res = await fetch(`https://api.arabtechproserver.tech/api/blog/tutorials/${cleanId}`, {
+    const res = await fetch(`https://api.arabtechproserver.tech/api/videos/tutorials/${cleanId}`, {
       cache: 'no-store'
     });
     if (!res.ok) return null;
@@ -51,9 +51,9 @@ export default async function TutorialDetailsPage({
 
   const isRtl = params.lang === 'ar';
   const title = isRtl ? tutorial.titleAr : tutorial.titleEn;
-  const description = isRtl ? 
-    "في هذا الفيديو، سنشرح لك بالتفصيل كيفية الاستفادة من هذه الأداة أو الخدمة. يرجى مشاهدة الفيديو بالكامل للحصول على أفضل نتيجة ولفهم كافة الخطوات بشكل صحيح." : 
-    "In this video, we will explain in detail how to benefit from this tool or service. Please watch the full video for the best result and to understand all steps correctly.";
+  const description = isRtl
+    ? (tutorial.descriptionAr || "في هذا الفيديو، سنشرح لك بالتفصيل كيفية الاستفادة من هذه الأداة أو الخدمة. يرجى مشاهدة الفيديو بالكامل للحصول على أفضل نتيجة ولفهم كافة الخطوات بشكل صحيح.")
+    : (tutorial.descriptionEn || "In this video, we will explain in detail how to benefit from this tool or service. Please watch the full video for the best result and to understand all steps correctly.");
 
   return (
     <div className="flex flex-col gap-10 pb-20 font-sans" dir={isRtl ? 'rtl' : 'ltr'}>

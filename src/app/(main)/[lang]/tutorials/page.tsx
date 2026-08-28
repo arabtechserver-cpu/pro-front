@@ -4,7 +4,7 @@ import Link from 'next/link';
 
 async function getTutorials() {
   try {
-    const res = await fetch('https://api.arabtechproserver.tech/api/blog/tutorials', {
+    const res = await fetch('https://api.arabtechproserver.tech/api/videos/tutorials', {
       cache: 'no-store'
     });
     if (!res.ok) return [];
