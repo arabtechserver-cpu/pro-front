@@ -1,7 +1,7 @@
-import { getDictionary } from "@/i18n/get-dictionary";
-import { Locale } from "@/i18n/config";
+import React from 'react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { Locale } from '@/i18n/config';
 
 async function getTutorial(id: string) {
   try {
@@ -15,140 +15,288 @@ async function getTutorial(id: string) {
     if (!res.ok) return null;
     return await res.json();
   } catch (error) {
-    console.error("Failed to fetch tutorial:", error);
+    console.error('Failed to fetch tutorial:', error);
     return null;
   }
 }
 
 function getEmbedUrl(url: string) {
-  if (!url) return "";
-  if (url.includes("odysee.com") && !url.includes("$/embed")) {
-    try {
-      const urlObj = new URL(url);
-      let path = urlObj.pathname.substring(1); // remove leading slash
-      if (path.includes(":")) {
-        path = path.replace(/:/g, "/");
-        return `https://odysee.com/$/embed/${path}`;
-      }
-    } catch (e) {
-      console.error(e);
-    }
+  if (!url) return '';
+  if (url.includes('youtube.com/watch?v=')) {
+    const id = url.split('v=')[1]?.split('&')[0];
+    return `https://www.youtube.com/embed/${id}`;
+  }
+  if (url.includes('youtu.be/')) {
+    const id = url.split('youtu.be/')[1]?.split('?')[0];
+    return `https://www.youtube.com/embed/${id}`;
+  }
+  if (url.includes('odysee.com') && !url.includes('$/embed')) {
+    return url.replace('odysee.com/', 'odysee.com/$/embed/');
   }
   return url;
 }
 
-export default async function TutorialDetailsPage({ 
-  params 
-}: { 
-  params: { lang: Locale, id: string } 
+export default async function TutorialDetailsPage({
+  params
+}: {
+  params: { lang: Locale; id: string };
 }) {
-  const dict = await getDictionary(params.lang);
-  const tutorial = await getTutorial(params.id);
+  const isAr = params.lang === 'ar';
+  const video = await getTutorial(params.id);
 
-  if (!tutorial) {
+  if (!video) {
     notFound();
   }
 
-  const isRtl = params.lang === 'ar';
-  const title = isRtl ? tutorial.titleAr : tutorial.titleEn;
-  const description = isRtl
-    ? (tutorial.descriptionAr || "في هذا الفيديو، سنشرح لك بالتفصيل كيفية الاستفادة من هذه الأداة أو الخدمة. يرجى مشاهدة الفيديو بالكامل للحصول على أفضل نتيجة ولفهم كافة الخطوات بشكل صحيح.")
-    : (tutorial.descriptionEn || "In this video, we will explain in detail how to benefit from this tool or service. Please watch the full video for the best result and to understand all steps correctly.");
+  const series = video.series;
+  const playlist: any[] = series?.videos || [];
+
+  // Find index in playlist
+  const currentIndex = playlist.findIndex((v: any) => v.id === video.id);
+  const prevLesson = currentIndex > 0 ? playlist[currentIndex - 1] : null;
+  const nextLesson = currentIndex >= 0 && currentIndex < playlist.length - 1 ? playlist[currentIndex + 1] : null;
+
+  // Access logic
+  const isPaidSeries = series?.isSubscriptionRequired;
+  const hasAccess = video.isFreePreview || !isPaidSeries;
+  const embedUrl = getEmbedUrl(video.videoUrl);
+
+  const title = isAr ? video.titleAr : video.titleEn;
+  const description = isAr ? video.descriptionAr : video.descriptionEn;
 
   return (
-    <div className="flex flex-col gap-10 pb-20 font-sans" dir={isRtl ? 'rtl' : 'ltr'}>
-      {/* Clean Header & Video Section */}
-      <section className="container mx-auto max-w-6xl px-4 pt-4 md:pt-8">
-        {/* Navigation & Breadcrumb-like header */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-4 md:mb-8">
-          <Link href={`/${params.lang}/tutorials`} className="group inline-flex items-center gap-2 text-on-surface-variant hover:text-primary transition-colors font-medium bg-surface-container hover:bg-surface-container-high px-3.5 py-1.5 md:px-4 md:py-2 rounded-xl border border-outline-variant/30 w-max shadow-sm text-xs md:text-sm">
-            <span className={`material-symbols-outlined text-[18px] md:text-[20px] transition-transform ${isRtl ? 'group-hover:translate-x-1' : 'group-hover:-translate-x-1'}`}>
-              {isRtl ? 'arrow_forward' : 'arrow_back'}
-            </span>
-            <span>{isRtl ? "العودة إلى الأكاديمية" : "Back to Academy"}</span>
-          </Link>
-          
-          <div className="flex items-center gap-3">
-            <span className="bg-primary/10 text-primary px-2.5 py-0.5 md:px-3 md:py-1 rounded-lg text-xs md:text-sm font-bold border border-primary/20">
-              {tutorial.category || "Tutorial"}
-            </span>
-            <span className="text-xs md:text-sm text-on-surface-variant flex items-center gap-1.5">
-              <span className="material-symbols-outlined text-[14px] md:text-[16px]">schedule</span>
-              {new Date(tutorial.createdAt).toLocaleDateString(params.lang === 'ar' ? 'ar-EG' : 'en-US')}
-            </span>
-          </div>
-        </div>
-
-        {/* Title Area - Smaller on mobile */}
-        <div className="mb-4 md:mb-8 max-w-4xl">
-          <h1 className="text-xl sm:text-2xl md:text-4xl lg:text-5xl font-display font-bold text-on-surface leading-snug md:leading-tight">
-            {title}
-          </h1>
-        </div>
-
-        {/* Video Player - Full width & Larger on mobile */}
-        <div className="glass-card rounded-xl sm:rounded-3xl overflow-hidden shadow-2xl border border-outline-variant/30 p-1 sm:p-2 md:p-3 bg-surface-container-low/50 -mx-4 sm:mx-0">
-          <div className="relative aspect-video w-full rounded-lg sm:rounded-2xl overflow-hidden bg-black shadow-inner">
-            <iframe 
-              src={getEmbedUrl(tutorial.videoUrl)} 
-              title={title}
-              className="w-full h-full border-0 absolute inset-0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-              allowFullScreen
-            ></iframe>
-          </div>
-        </div>
-      </section>
-
-      {/* Content Details Section */}
-      <section className="container mx-auto max-w-6xl px-4">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          
-          {/* Main Description */}
-          <div className="lg:col-span-2">
-            <div className="glass-card rounded-3xl p-8 border border-outline-variant/30 h-full">
-              <h3 className="text-xl font-bold text-on-surface mb-6 flex items-center gap-3 border-b border-outline-variant/20 pb-4">
-                <span className="material-symbols-outlined text-primary">description</span>
-                {isRtl ? "تفاصيل الشرح" : "Tutorial Description"}
-              </h3>
-              
-              <div className="prose prose-invert max-w-none text-slate-200 prose-p:text-slate-200 prose-p:text-base md:prose-p:text-lg prose-p:leading-relaxed prose-headings:text-white prose-a:text-primary font-sans">
-                <p>{description}</p>
-                <p>
-                  {isRtl ? 
-                    "إذا واجهتك أي صعوبة في تنفيذ الخطوات المذكورة في الفيديو، فريق الدعم الخاص بنا متاح دائمًا لتقديم المساعدة." : 
-                    "If you encounter any difficulties following the steps in the video, our support team is always available to help."}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Action / Help Sidebar */}
-          <div className="lg:col-span-1 flex flex-col gap-6">
-            {/* Need Help Card */}
-            <div className="glass-card rounded-3xl p-8 border border-primary/20 shadow-md bg-primary/5 relative overflow-hidden group hover:bg-primary/10 transition-colors">
-              <div className="absolute -top-10 -right-10 w-32 h-32 bg-primary/10 rounded-full blur-2xl group-hover:bg-primary/20 transition-colors"></div>
-              
-              <div className="relative z-10">
-                <div className="w-12 h-12 bg-primary/20 text-primary rounded-xl flex items-center justify-center mb-6 border border-primary/30">
-                  <span className="material-symbols-outlined text-2xl">support_agent</span>
-                </div>
-                <h4 className="font-bold text-on-surface mb-3 text-xl">
-                  {isRtl ? "تحتاج مساعدة إضافية؟" : "Need more help?"}
-                </h4>
-                <p className="text-sm text-on-surface-variant mb-6 leading-relaxed">
-                  {isRtl ? "يمكنك التواصل معنا مباشرة للحصول على دعم فني متخصص بشأن هذه الخدمة أو غيرها." : "You can contact us directly for specialized technical support regarding this service or others."}
-                </p>
-                <Link href={`/${params.lang}/contact`} className="flex items-center justify-center gap-2 w-full py-3 px-4 bg-primary text-on-primary font-bold rounded-xl hover:bg-primary/90 transition-all shadow-md hover:shadow-primary/25">
-                  {isRtl ? "تواصل مع الدعم" : "Contact Support"}
-                  <span className="material-symbols-outlined text-[18px]">chat</span>
+    <div className="min-h-screen bg-[#0F0F1A] text-white pt-24 pb-20 font-sans" dir={isAr ? 'rtl' : 'ltr'}>
+      <div className="container mx-auto px-4 max-w-7xl">
+        
+        {/* Top Breadcrumb Navigation */}
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-3 text-xs md:text-sm text-gray-400">
+          <div className="flex items-center gap-2 flex-wrap">
+            <Link href={`/${params.lang}/tutorials`} className="hover:text-indigo-400 transition-colors flex items-center gap-1">
+              <span className="material-symbols-outlined text-sm">school</span>
+              <span>{isAr ? 'فيديوهات الشرح والكورسات' : 'Tutorials & Courses'}</span>
+            </Link>
+            
+            {series && (
+              <>
+                <span className="material-symbols-outlined text-xs rtl:rotate-180 text-gray-600">chevron_right</span>
+                <Link href={`/${params.lang}/academy/series/${series.id}`} className="hover:text-indigo-400 transition-colors font-semibold">
+                  {isAr ? series.titleAr : series.titleEn}
                 </Link>
+              </>
+            )}
+
+            <span className="material-symbols-outlined text-xs rtl:rotate-180 text-gray-600">chevron_right</span>
+            <span className="text-gray-200 font-bold truncate max-w-xs sm:max-w-md">{title}</span>
+          </div>
+
+          <Link
+            href={`/${params.lang}/tutorials`}
+            className="bg-[#1A1A2E] hover:bg-[#22223D] text-indigo-400 hover:text-white px-3 py-1.5 rounded-xl border border-gray-800 text-xs font-bold transition-colors flex items-center gap-1"
+          >
+            <span className="material-symbols-outlined text-sm">arrow_back</span>
+            <span>{isAr ? 'العودة لجميع الشروحات' : 'Back to Tutorials'}</span>
+          </Link>
+        </div>
+
+        {/* Main Grid: Player + Details & Playlist Sidebar */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          
+          {/* Main Video & Content (8 cols on lg if playlist exists) */}
+          <div className={playlist.length > 0 ? 'lg:col-span-8 space-y-6' : 'lg:col-span-12 space-y-6'}>
+            
+            {/* Player Container */}
+            <div className="bg-[#1A1A2E] rounded-3xl overflow-hidden shadow-2xl border border-gray-800">
+              {hasAccess ? (
+                <div className="aspect-video relative w-full bg-black">
+                  <iframe 
+                    src={embedUrl}
+                    title={title}
+                    className="absolute inset-0 w-full h-full"
+                    allowFullScreen
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  />
+                </div>
+              ) : (
+                <div className="aspect-video relative w-full bg-gray-900 flex flex-col items-center justify-center p-8 text-center border-b border-gray-800">
+                  <div className="w-20 h-20 bg-amber-500/20 text-amber-400 rounded-full flex items-center justify-center mb-6">
+                    <span className="material-symbols-outlined text-4xl">lock</span>
+                  </div>
+                  <h2 className="text-2xl font-bold mb-3 text-white">
+                    {isAr ? 'هذا الدرس حصري للمشتركين في الكورس' : 'This lesson is exclusive to course subscribers'}
+                  </h2>
+                  <p className="text-gray-400 max-w-md mb-6 text-sm leading-relaxed">
+                    {isAr 
+                      ? 'اشترك في الكورس الآن لفتح جميع الدروس ومتابعة الشرح العملي بالكامل.' 
+                      : 'Enroll in this course now to unlock all lessons and follow the complete hands-on tutorial.'}
+                  </p>
+                  {series && (
+                    <div className="flex flex-wrap items-center gap-3">
+                      <Link
+                        href={`/${params.lang}/wallet`}
+                        className="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-black font-extrabold py-3 px-8 rounded-2xl transition-all shadow-lg text-sm"
+                      >
+                        {isAr ? `شراء الكورس ($${series.price || 0})` : `Buy Course ($${series.price || 0})`}
+                      </Link>
+                      <Link
+                        href={`/${params.lang}/academy/series/${series.id}`}
+                        className="bg-[#151525] hover:bg-[#22223D] text-white px-6 py-3 rounded-2xl text-sm font-bold border border-gray-800 transition-colors"
+                      >
+                        {isAr ? 'عرض منهج الكورس' : 'View Course Curriculum'}
+                      </Link>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Navigation Buttons: Previous / Next Lesson */}
+            {playlist.length > 1 && (
+              <div className="flex items-center justify-between gap-4 p-4 bg-[#1A1A2E] rounded-2xl border border-gray-800">
+                {prevLesson ? (
+                  <Link
+                    href={`/${params.lang}/tutorials/${prevLesson.id}`}
+                    className="flex items-center gap-2 text-xs font-bold text-gray-300 hover:text-indigo-400 transition-colors bg-[#151525] px-4 py-2 rounded-xl border border-gray-800"
+                  >
+                    <span className="material-symbols-outlined text-sm rtl:rotate-180">arrow_back</span>
+                    <span>{isAr ? 'الدرس السابق' : 'Previous Lesson'}</span>
+                  </Link>
+                ) : (
+                  <div />
+                )}
+
+                <span className="text-xs text-gray-500 font-semibold">
+                  {isAr ? `الدرس ${currentIndex + 1} من ${playlist.length}` : `Lesson ${currentIndex + 1} of ${playlist.length}`}
+                </span>
+
+                {nextLesson ? (
+                  <Link
+                    href={`/${params.lang}/tutorials/${nextLesson.id}`}
+                    className="flex items-center gap-2 text-xs font-bold text-gray-300 hover:text-indigo-400 transition-colors bg-[#151525] px-4 py-2 rounded-xl border border-gray-800"
+                  >
+                    <span>{isAr ? 'الدرس التالي' : 'Next Lesson'}</span>
+                    <span className="material-symbols-outlined text-sm rtl:rotate-180">arrow_forward</span>
+                  </Link>
+                ) : (
+                  <div />
+                )}
+              </div>
+            )}
+
+            {/* Video Details & Content Description */}
+            <div className="bg-[#1A1A2E] p-6 sm:p-8 rounded-3xl border border-gray-800 space-y-6">
+              <div className="flex flex-wrap items-start justify-between gap-4 pb-5 border-b border-gray-800">
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold ${video.isFreePreview ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30' : 'bg-amber-500/15 text-amber-400 border border-amber-500/30'}`}>
+                      {video.isFreePreview ? (isAr ? '🟢 معاينة مجانية' : '🟢 Free Preview') : (isAr ? '🔒 كورس مدفوع' : '🔒 Paid')}
+                    </span>
+                    {video.category && (
+                      <span className="bg-indigo-500/15 text-indigo-400 border border-indigo-500/30 px-2.5 py-0.5 rounded-full text-xs font-bold">
+                        {video.category}
+                      </span>
+                    )}
+                  </div>
+                  <h1 className="text-2xl sm:text-3xl font-extrabold text-white">
+                    {title}
+                  </h1>
+                </div>
+
+                <span className="text-xs text-gray-400 flex items-center gap-1.5 bg-[#151525] px-3 py-1.5 rounded-xl border border-gray-800">
+                  <span className="material-symbols-outlined text-sm">schedule</span>
+                  {new Date(video.createdAt).toLocaleDateString(isAr ? 'ar-EG' : 'en-US')}
+                </span>
+              </div>
+
+              {/* Lesson Text / Content */}
+              <div>
+                <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-3 flex items-center gap-2">
+                  <span className="material-symbols-outlined text-indigo-400 text-base">description</span>
+                  <span>{isAr ? 'تفاصيل ومحتوى هذا الدرس:' : 'Lesson Content & Notes:'}</span>
+                </h3>
+                <div className="text-gray-300 text-sm sm:text-base leading-relaxed whitespace-pre-line bg-[#151525]/60 p-5 rounded-2xl border border-gray-800/80">
+                  {description || (isAr ? 'لا يوجد نص أو محتوى إضافي مضاف لهذا الدرس.' : 'No additional text provided for this lesson.')}
+                </div>
               </div>
             </div>
           </div>
 
+          {/* Playlist Sidebar (4 cols on lg) */}
+          {playlist.length > 0 && (
+            <div className="lg:col-span-4 space-y-4">
+              <div className="bg-[#1A1A2E] border border-gray-800 rounded-3xl p-5 shadow-xl sticky top-28">
+                {/* Playlist Header */}
+                <div className="pb-4 mb-4 border-b border-gray-800">
+                  <div className="flex items-center justify-between gap-2 mb-1">
+                    <span className="text-xs font-bold text-indigo-400 uppercase tracking-wider flex items-center gap-1.5">
+                      <span className="material-symbols-outlined text-base">playlist_play</span>
+                      <span>{isAr ? 'قائمة دروس الكورس' : 'Course Playlist'}</span>
+                    </span>
+                    <span className="text-xs text-gray-500 font-bold">
+                      {playlist.length} {isAr ? 'دروس' : 'lessons'}
+                    </span>
+                  </div>
+                  {series && (
+                    <h3 className="font-bold text-sm text-white line-clamp-1">
+                      {isAr ? series.titleAr : series.titleEn}
+                    </h3>
+                  )}
+                </div>
+
+                {/* Playlist Lessons List */}
+                <div className="space-y-2 max-h-[600px] overflow-y-auto pr-1">
+                  {playlist.map((item: any, idx: number) => {
+                    const isCurrent = item.id === video.id;
+                    const itemTitle = isAr ? item.titleAr : item.titleEn;
+                    const itemFree = item.isFreePreview || !isPaidSeries;
+
+                    return (
+                      <Link
+                        key={item.id}
+                        href={`/${params.lang}/tutorials/${item.id}`}
+                        className={`p-3 rounded-2xl border transition-all flex items-center gap-3 group ${
+                          isCurrent
+                            ? 'bg-indigo-600/20 border-indigo-500 text-white shadow-md'
+                            : 'bg-[#151525] border-gray-800/80 hover:border-gray-700 text-gray-300 hover:text-white'
+                        }`}
+                      >
+                        {/* Number / Status Icon */}
+                        <div className={`w-8 h-8 rounded-xl flex items-center justify-center font-bold text-xs shrink-0 ${
+                          isCurrent
+                            ? 'bg-indigo-600 text-white'
+                            : itemFree
+                              ? 'bg-[#1E1E35] text-emerald-400'
+                              : 'bg-[#1E1E35] text-amber-400'
+                        }`}>
+                          {isCurrent ? (
+                            <span className="material-symbols-outlined text-sm animate-pulse">play_arrow</span>
+                          ) : (
+                            item.orderIndex || idx + 1
+                          )}
+                        </div>
+
+                        {/* Lesson Title */}
+                        <div className="flex-1 min-w-0">
+                          <h4 className="text-xs font-bold line-clamp-1">
+                            {itemTitle}
+                          </h4>
+                          <span className="text-[10px] text-gray-500 flex items-center gap-1 mt-0.5">
+                            {itemFree ? (
+                              <span className="text-emerald-400 font-semibold">{isAr ? 'معاينة مجانية' : 'Free Preview'}</span>
+                            ) : (
+                              <span className="text-amber-400 font-semibold">{isAr ? 'مقفل 🔒' : 'Locked 🔒'}</span>
+                            )}
+                          </span>
+                        </div>
+                      </Link>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          )}
+
         </div>
-      </section>
+      </div>
     </div>
   );
 }
