@@ -313,21 +313,24 @@ export default function AdminNewsletterPage() {
                   onClick={() => applyTemplate("tool")}
                   className="px-3 py-1.5 rounded-lg bg-surface-container hover:bg-primary/20 text-xs font-medium border border-outline-variant/30 transition-all flex items-center gap-1"
                 >
-                  <span>⚡ تفعيل أداة جديدة</span>
+                  <span className="material-symbols-outlined text-xs text-primary">bolt</span>
+                  <span>تفعيل أداة جديدة</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => applyTemplate("discount")}
                   className="px-3 py-1.5 rounded-lg bg-surface-container hover:bg-secondary/20 text-xs font-medium border border-outline-variant/30 transition-all flex items-center gap-1"
                 >
-                  <span>🏷️ خصم وعرض خاص</span>
+                  <span className="material-symbols-outlined text-xs text-secondary">local_offer</span>
+                  <span>خصم وعرض خاص</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => applyTemplate("server")}
                   className="px-3 py-1.5 rounded-lg bg-surface-container hover:bg-emerald-500/20 text-xs font-medium border border-outline-variant/30 transition-all flex items-center gap-1"
                 >
-                  <span>🔓 تحديث خدمات فك شفرات</span>
+                  <span className="material-symbols-outlined text-xs text-emerald-400">lock_open</span>
+                  <span>تحديث خدمات فك شفرات</span>
                 </button>
               </div>
             </div>

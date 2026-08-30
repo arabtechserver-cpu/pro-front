@@ -5,7 +5,7 @@ import Link from "next/link";
 import Script from "next/script";
 import { Locale } from "@/i18n/config";
 
-const GOOGLE_CLIENT_ID = "540676912586-vifo9ogu2gjud3d00efv1khd9r7tcajb.apps.googleusercontent.com";
+const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || "540676912586-vifo9ogu2gjud3d00efv1khd9r7tcajb.apps.googleusercontent.com";
 
 export default function LoginClient({ lang, dict }: { lang: Locale; dict: any }) {
   const [email, setEmail] = useState("");

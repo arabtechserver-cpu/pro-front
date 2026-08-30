@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 
 interface AdminTransaction {
   id: string;
@@ -16,9 +16,12 @@ interface AdminTransaction {
     fullName: string;
     email: string;
     username: string;
+    phone?: string;
     balance: number;
   };
 }
+
+const BATCH_SIZE = 25;
 
 export default function AdminWalletClient() {
   const [transactions, setTransactions] = useState<AdminTransaction[]>([]);
@@ -26,10 +29,15 @@ export default function AdminWalletClient() {
   const [actionLoadingId, setActionLoadingId] = useState<string | null>(null);
   const [alertMessage, setAlertMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
   const [viewReceiptModalImage, setViewReceiptModalImage] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+
+  // Progressive scroll loading state
+  const [visibleCount, setVisibleCount] = useState<number>(BATCH_SIZE);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
 
   const [telegramStatus, setTelegramStatus] = useState<{ connected: boolean; chatIds: string[] }>({ connected: false, chatIds: [] });
-  const [inputChatId, setInputChatId] = useState<string>("");
-  const [savingChatId, setSavingChatId] = useState<boolean>(false);
 
   const fetchTelegramStatus = async () => {
     try {
@@ -40,11 +48,6 @@ export default function AdminWalletClient() {
       }
     } catch {}
   };
-
-  useEffect(() => {
-    fetchTransactions();
-    fetchTelegramStatus();
-  }, []);
 
   const fetchTransactions = async () => {
     setIsLoading(true);
@@ -61,7 +64,16 @@ export default function AdminWalletClient() {
     }
   };
 
-  // Approve Transaction & Credit Balance in SQLite DB
+  useEffect(() => {
+    fetchTransactions();
+    fetchTelegramStatus();
+  }, []);
+
+  useEffect(() => {
+    setVisibleCount(BATCH_SIZE);
+  }, [searchQuery, statusFilter]);
+
+  // Approve Transaction & Credit Balance in DB
   const handleApprove = async (txId: string) => {
     setActionLoadingId(txId);
     setAlertMessage(null);
@@ -74,7 +86,7 @@ export default function AdminWalletClient() {
       const data = await res.json();
 
       if (res.ok && data.success) {
-        setAlertMessage({ type: "success", text: data.message || "تم اعتماد الإيداع وزيادة رصيد المحفظة للعميل بنجاح!" });
+        setAlertMessage({ type: "success", text: data.message || "تم اعتماد الإيداع وزيادة رصيد المحفظة للعميل بنجاح" });
         fetchTransactions();
       } else {
         setAlertMessage({ type: "error", text: data.error || "حدث خطأ أثناء اعتماد الطلب" });
@@ -114,15 +126,56 @@ export default function AdminWalletClient() {
   const pendingCount = transactions.filter((t) => t.status === "pending").length;
   const completedCount = transactions.filter((t) => t.status === "completed").length;
 
+  const filteredTransactions = useMemo(() => {
+    return transactions.filter((tx) => {
+      if (statusFilter !== "all" && tx.status !== statusFilter) return false;
+      if (!searchQuery.trim()) return true;
+      const q = searchQuery.toLowerCase();
+      return (
+        (tx.refNo && tx.refNo.toLowerCase().includes(q)) ||
+        (tx.method && tx.method.toLowerCase().includes(q)) ||
+        (tx.type && tx.type.toLowerCase().includes(q)) ||
+        (tx.user?.fullName && tx.user.fullName.toLowerCase().includes(q)) ||
+        (tx.user?.email && tx.user.email.toLowerCase().includes(q)) ||
+        (tx.user?.username && tx.user.username.toLowerCase().includes(q))
+      );
+    });
+  }, [transactions, searchQuery, statusFilter]);
+
+  const displayedTransactions = useMemo(() => {
+    return filteredTransactions.slice(0, visibleCount);
+  }, [filteredTransactions, visibleCount]);
+
+  const hasMore = visibleCount < filteredTransactions.length;
+
+  const handleObserver = useCallback((entries: IntersectionObserverEntry[]) => {
+    const target = entries[0];
+    if (target.isIntersecting && hasMore) {
+      setIsLoadingMore(true);
+      setTimeout(() => {
+        setVisibleCount((prev) => prev + BATCH_SIZE);
+        setIsLoadingMore(false);
+      }, 150);
+    }
+  }, [hasMore]);
+
+  useEffect(() => {
+    const option = { root: null, rootMargin: "150px", threshold: 0 };
+    const observer = new IntersectionObserver(handleObserver, option);
+    if (sentinelRef.current) observer.observe(sentinelRef.current);
+    return () => observer.disconnect();
+  }, [handleObserver]);
+
   return (
     <div className="space-y-8">
       {/* Top Banner */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 glass-card p-6 rounded-3xl border border-outline-variant/30">
         <div>
-          <h1 className="text-3xl font-display font-bold text-on-surface mb-1">
-            إدارة طلبات الشحن والمعاملات المالية 💳
+          <h1 className="text-2xl md:text-3xl font-display font-bold text-on-surface mb-1 flex items-center gap-2">
+            <span className="material-symbols-outlined text-primary text-3xl">account_balance_wallet</span>
+            <span>إدارة طلبات الشحن والمعاملات المالية</span>
           </h1>
-          <p className="text-on-surface-variant text-sm">
+          <p className="text-on-surface-variant text-xs md:text-sm">
             مراجعة وتأكيد إيداعات العملاء المباشرة ورؤية صور الإيصالات مرفقة لحظياً
           </p>
         </div>
@@ -175,14 +228,14 @@ export default function AdminWalletClient() {
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h3 className="font-bold text-sm text-on-surface">ربط واستلام إشعارات وصور الإيصالات على تلجرام 📱</h3>
+              <h3 className="font-bold text-sm text-on-surface">ربط واستلام إشعارات وصور الإيصالات على تلجرام</h3>
               {telegramStatus.connected ? (
                 <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 font-bold text-[10px] border border-emerald-500/30">
-                  🟢 متصل وتعمل الإشعارات
+                  متصل وتعمل الإشعارات
                 </span>
               ) : (
                 <span className="px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-bold text-[10px] border border-amber-500/30">
-                  🔴 غير متصل بعد
+                  غير متصل بعد
                 </span>
               )}
             </div>
@@ -221,6 +274,55 @@ export default function AdminWalletClient() {
         </div>
       )}
 
+      {/* Search & Filter */}
+      <div className="flex flex-col sm:flex-row gap-4 justify-between items-center glass-card p-4 rounded-2xl border border-outline-variant/30">
+        <div className="relative w-full sm:w-80">
+          <span className="material-symbols-outlined absolute right-3.5 top-1/2 -translate-y-1/2 text-on-surface-variant text-lg">
+            search
+          </span>
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="البحث بالعميل، الرقم المرجعي، أو الوسيلة..."
+            className="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-xl py-2.5 pr-10 pl-4 text-xs text-on-surface focus:outline-none focus:border-primary"
+          />
+        </div>
+
+        <div className="flex items-center justify-between w-full sm:w-auto gap-3">
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setStatusFilter("all")}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                statusFilter === "all" ? "bg-primary text-on-primary" : "bg-surface-container-high text-on-surface-variant"
+              }`}
+            >
+              الكل ({transactions.length})
+            </button>
+            <button
+              onClick={() => setStatusFilter("pending")}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                statusFilter === "pending" ? "bg-amber-500 text-white" : "bg-surface-container-high text-on-surface-variant"
+              }`}
+            >
+              قيد المراجعة ({pendingCount})
+            </button>
+            <button
+              onClick={() => setStatusFilter("completed")}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                statusFilter === "completed" ? "bg-emerald-500 text-white" : "bg-surface-container-high text-on-surface-variant"
+              }`}
+            >
+              المكتملة ({completedCount})
+            </button>
+          </div>
+
+          <span className="text-[11px] font-mono text-on-surface-variant hidden lg:inline">
+            عرض {displayedTransactions.length} من {filteredTransactions.length}
+          </span>
+        </div>
+      </div>
+
       {/* Transactions Data Table */}
       <div className="glass-card rounded-3xl border border-outline-variant/30 overflow-hidden shadow-xl">
         {isLoading ? (
@@ -228,11 +330,10 @@ export default function AdminWalletClient() {
             <span className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin"></span>
             <span>جاري تحميل بيانات الشحن والمعاملات من قاعدة البيانات...</span>
           </div>
-        ) : transactions.length === 0 ? (
+        ) : filteredTransactions.length === 0 ? (
           <div className="p-12 text-center text-xs text-on-surface-variant flex flex-col items-center justify-center gap-2">
             <span className="material-symbols-outlined text-4xl text-on-surface-variant">inbox</span>
-            <p className="font-bold text-sm text-on-surface">لا توجد طلبات شحن أو معاملات مسجلة حالياً</p>
-            <p className="text-xs">سيظهر أي طلب شحن يرسله العملاء مباشرة هنا في هذه اللوحة.</p>
+            <p className="font-bold text-sm text-on-surface">لا توجد طلبات شحن أو معاملات مطابقة للبحث</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -242,7 +343,7 @@ export default function AdminWalletClient() {
                   <th className="p-4 text-start">اسم العميل والبيانات</th>
                   <th className="p-4 text-start">نوع المعاملة والطريقة</th>
                   <th className="p-4 text-start">رقم المرجع / الإيصال</th>
-                  <th className="p-4 text-start">إشعارات تلجرام 📱</th>
+                  <th className="p-4 text-start">إشعارات تلجرام</th>
                   <th className="p-4 text-start">المبلغ ($ USD)</th>
                   <th className="p-4 text-start">التاريخ</th>
                   <th className="p-4 text-start">الحالة</th>
@@ -250,7 +351,7 @@ export default function AdminWalletClient() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-outline-variant/10">
-                {transactions.map((tx) => {
+                {displayedTransactions.map((tx) => {
                   const isPending = tx.status === "pending";
                   const isActioning = actionLoadingId === tx.id;
 
@@ -262,6 +363,19 @@ export default function AdminWalletClient() {
                         <div className="text-[11px] text-on-surface-variant font-mono">
                           {tx.user?.email || tx.userId}
                         </div>
+                        {tx.user?.phone && (
+                          <div className="flex items-center gap-1 mt-0.5">
+                            <span className="material-symbols-outlined text-[11px] text-emerald-400">call</span>
+                            <a
+                              href={`https://wa.me/${tx.user.phone.replace(/[^0-9]/g, "")}`}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="text-[10px] text-emerald-400 hover:underline font-mono dir-ltr"
+                            >
+                              {tx.user.phone}
+                            </a>
+                          </div>
+                        )}
                         {tx.user?.balance !== undefined && (
                           <div className="text-[10px] text-primary font-mono font-semibold mt-0.5">
                             رصيد المحفظة الحالي: ${tx.user.balance.toFixed(2)}
@@ -289,7 +403,7 @@ export default function AdminWalletClient() {
                             title="اضغط لعرض صورة الإيصال المرفوعة من العميل"
                           >
                             <span className="material-symbols-outlined text-sm">image</span>
-                            <span>عرض الإيصال 📸</span>
+                            <span>عرض الإيصال</span>
                           </button>
                         ) : (
                           <span className="px-2.5 py-1 rounded-lg bg-sky-500/10 border border-sky-500/30 text-sky-400 font-bold text-[11px] flex items-center gap-1.5 w-fit">
@@ -314,19 +428,19 @@ export default function AdminWalletClient() {
                         {tx.status === "completed" && (
                           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 font-bold text-[11px]">
                             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-                            مكتمل 🟢
+                            مكتمل
                           </span>
                         )}
                         {tx.status === "pending" && (
                           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-400 font-bold text-[11px]">
                             <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
-                            قيد المراجعة 🟡
+                            قيد المراجعة
                           </span>
                         )}
-                        {tx.status === "failed" && (
+                        {tx.status !== "completed" && tx.status !== "pending" && (
                           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-500/15 border border-red-500/30 text-red-400 font-bold text-[11px]">
                             <span className="w-1.5 h-1.5 rounded-full bg-red-400"></span>
-                            مرفوض 🔴
+                            مرفوض
                           </span>
                         )}
                       </td>
@@ -370,6 +484,20 @@ export default function AdminWalletClient() {
             </table>
           </div>
         )}
+
+        {/* Scroll Sentinel for Progressive Loading */}
+        <div ref={sentinelRef} className="py-4 text-center border-t border-outline-variant/10">
+          {hasMore ? (
+            <div className="flex items-center justify-center gap-2 text-xs text-on-surface-variant py-2">
+              <span className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></span>
+              <span>جاري تحميل المزيد مع التمرير ({displayedTransactions.length} من {filteredTransactions.length})...</span>
+            </div>
+          ) : filteredTransactions.length > 0 ? (
+            <div className="text-[11px] text-on-surface-variant/70">
+              تم عرض كافة المعاملات ({filteredTransactions.length} معاملة)
+            </div>
+          ) : null}
+        </div>
       </div>
 
       {/* VIEW RECEIPT LIGHTBOX MODAL */}
@@ -385,7 +513,7 @@ export default function AdminWalletClient() {
 
             <h3 className="font-bold text-base text-on-surface flex items-center gap-2 pt-2">
               <span className="material-symbols-outlined text-primary">image</span>
-              <span>صورة إيصال التحويل المرفقة 📸</span>
+              <span>صورة إيصال التحويل المرفقة</span>
             </h3>
 
             <div className="w-full max-h-[70vh] overflow-auto rounded-2xl border border-outline-variant/20 bg-black/50 p-2 flex items-center justify-center">

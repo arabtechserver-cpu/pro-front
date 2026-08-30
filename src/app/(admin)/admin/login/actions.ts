@@ -4,7 +4,8 @@ import { cookies } from "next/headers";
 
 export async function loginAdmin(username: string, password: string) {
   try {
-    const res = await fetch('https://api.arabtechproserver.tech/api/auth/login', {
+    const apiUrl = process.env.INTERNAL_API_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+    const res = await fetch(`${apiUrl}/api/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email: username, password })

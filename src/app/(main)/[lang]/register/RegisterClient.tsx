@@ -5,7 +5,7 @@ import Link from "next/link";
 import Script from "next/script";
 import { Locale } from "@/i18n/config";
 
-const GOOGLE_CLIENT_ID = "540676912586-vifo9ogu2gjud3d00efv1khd9r7tcajb.apps.googleusercontent.com";
+const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || "540676912586-vifo9ogu2gjud3d00efv1khd9r7tcajb.apps.googleusercontent.com";
 
 interface Country {
   code: string;
@@ -253,6 +253,7 @@ export default function RegisterClient({ lang, dict }: { lang: Locale; dict: any
   // Form input states
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -391,6 +392,10 @@ export default function RegisterClient({ lang, dict }: { lang: Locale; dict: any
       setErrorMessage(lang === "ar" ? "الرجاء إدخال بريد إلكتروني صحيح!" : "Please enter a valid email address!");
       return;
     }
+    if (!phone.trim()) {
+      setErrorMessage(lang === "ar" ? "الرجاء إدخال رقم الهاتف / الواتساب!" : "Please enter your phone/WhatsApp number!");
+      return;
+    }
     if (!username.trim()) {
       setErrorMessage(lang === "ar" ? "الرجاء إدخال اسم المستخدم!" : "Please enter a username!");
       return;
@@ -411,6 +416,11 @@ export default function RegisterClient({ lang, dict }: { lang: Locale; dict: any
     setIsLoading(true);
 
     try {
+      const rawPhone = phone.trim();
+      const formattedPhone = rawPhone.startsWith("+") 
+        ? rawPhone 
+        : `${selectedCountry.dialCode} ${rawPhone.replace(/^0+/, "")}`;
+
       const res = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -419,6 +429,7 @@ export default function RegisterClient({ lang, dict }: { lang: Locale; dict: any
           email,
           username,
           password,
+          phone: formattedPhone,
           country: selectedCountry.code
         })
       });
@@ -531,6 +542,35 @@ export default function RegisterClient({ lang, dict }: { lang: Locale; dict: any
                 spellCheck={false}
                 className="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-lg py-3 px-4 text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all placeholder:text-on-surface-variant/50 font-mono"
               />
+            </div>
+
+            {/* PHONE NUMBER FIELD WITH COUNTRY CODE PREVIEW */}
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-label-sm text-on-surface-variant uppercase tracking-wider">
+                  {dict.register.phone || (lang === "ar" ? "رقم الهاتف / الواتساب" : "Phone / WhatsApp Number")}
+                </label>
+                <span className="text-[11px] text-primary font-mono font-bold flex items-center gap-1 dir-ltr bg-primary/10 px-2 py-0.5 rounded border border-primary/20">
+                  <span>{selectedCountry.flag}</span>
+                  <span>{selectedCountry.dialCode}</span>
+                </span>
+              </div>
+              <div className="relative flex items-center">
+                <span className={`material-symbols-outlined text-base absolute ${lang === 'ar' ? 'right-3' : 'left-3'} text-on-surface-variant pointer-events-none`}>
+                  call
+                </span>
+                <input 
+                  type="tel" 
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder={dict.register.phonePlaceholder || (lang === "ar" ? "01012345678" : "01012345678")}
+                  autoComplete="tel"
+                  autoCorrect="off"
+                  autoCapitalize="off"
+                  spellCheck={false}
+                  className={`w-full bg-surface-container-lowest border border-outline-variant/30 rounded-lg py-3 ${lang === 'ar' ? 'pr-9 pl-4' : 'pl-9 pr-4'} text-on-surface font-mono focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all placeholder:text-on-surface-variant/50 placeholder:font-sans`}
+                />
+              </div>
             </div>
 
             {/* PASSWORD FIELD WITH EYE TOGGLE & GENERATOR */}

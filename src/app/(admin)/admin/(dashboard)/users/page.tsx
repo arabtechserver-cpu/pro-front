@@ -1,12 +1,13 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 
 interface UserItem {
   id: string;
   fullName: string;
   email: string;
   username: string;
+  phone?: string;
   country: string;
   role: string;
   status: "active" | "suspended" | string;
@@ -14,33 +15,35 @@ interface UserItem {
   createdAt: string;
 }
 
-const COUNTRY_FLAGS: Record<string, string> = {
-  EG: "🇪🇬 مصر",
-  SA: "🇸🇦 السعودية",
-  AE: "🇦🇪 الإمارات",
-  SD: "🇸🇩 السودان",
-  KW: "🇰🇼 الكويت",
-  QA: "🇶🇦 قطر",
-  JO: "🇯🇴 الأردن",
-  IQ: "🇮🇶 العراق",
-  DZ: "🇩🇿 الجزائر",
-  MA: "🇲🇦 المغرب",
-  TN: "🇹🇳 تونس",
-  LY: "🇱🇾 ليبيا",
-  OM: "🇴🇲 عمان",
-  BH: "🇧🇭 البحرين",
-  PS: "🇵🇸 فلسطين",
-  YE: "🇾🇪 اليمن",
-  SY: "🇸🇾 سوريا",
-  LB: "🇱🇧 لبنان",
-  TR: "🇹🇷 تركيا",
-  US: "🇺🇸 أمريكا",
-  GB: "🇬🇧 بريطانيا",
-  DE: "🇩🇪 ألمانيا",
-  FR: "🇫🇷 فرنسا",
-  CA: "🇨🇦 كندا",
-  OTHER: "🌐 باقي العالم"
+const COUNTRY_NAMES: Record<string, string> = {
+  EG: "مصر",
+  SA: "السعودية",
+  AE: "الإمارات",
+  SD: "السودان",
+  KW: "الكويت",
+  QA: "قطر",
+  JO: "الأردن",
+  IQ: "العراق",
+  DZ: "الجزائر",
+  MA: "المغرب",
+  TN: "تونس",
+  LY: "ليبيا",
+  OM: "عمان",
+  BH: "البحرين",
+  PS: "فلسطين",
+  YE: "اليمن",
+  SY: "سوريا",
+  LB: "لبنان",
+  TR: "تركيا",
+  US: "أمريكا",
+  GB: "بريطانيا",
+  DE: "ألمانيا",
+  FR: "فرنسا",
+  CA: "كندا",
+  OTHER: "دولة أخرى"
 };
+
+const BATCH_SIZE = 25;
 
 export default function AdminUsersPage() {
   const [users, setUsers] = useState<UserItem[]>([]);
@@ -51,6 +54,11 @@ export default function AdminUsersPage() {
   const [actionLoadingId, setActionLoadingId] = useState<string | null>(null);
   const [toastMessage, setToastMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
   
+  // Progressive scroll loading state
+  const [visibleCount, setVisibleCount] = useState<number>(BATCH_SIZE);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
+
   // Modals state
   const [selectedUserModal, setSelectedUserModal] = useState<UserItem | null>(null);
   const [changePasswordModalUser, setChangePasswordModalUser] = useState<UserItem | null>(null);
@@ -96,8 +104,51 @@ export default function AdminUsersPage() {
   };
 
   useEffect(() => {
+    setVisibleCount(BATCH_SIZE);
     fetchUsers();
   }, [searchQuery, statusFilter]);
+
+  // Filtered users according to current query/filter
+  const filteredUsers = useMemo(() => {
+    return users.filter((u) => {
+      if (statusFilter !== "all" && u.status !== statusFilter) return false;
+      if (!searchQuery.trim()) return true;
+      const q = searchQuery.toLowerCase();
+      return (
+        (u.fullName && u.fullName.toLowerCase().includes(q)) ||
+        (u.email && u.email.toLowerCase().includes(q)) ||
+        (u.username && u.username.toLowerCase().includes(q)) ||
+        (u.phone && u.phone.toLowerCase().includes(q)) ||
+        (u.country && u.country.toLowerCase().includes(q))
+      );
+    });
+  }, [users, searchQuery, statusFilter]);
+
+  // Sliced items currently displayed
+  const displayedUsers = useMemo(() => {
+    return filteredUsers.slice(0, visibleCount);
+  }, [filteredUsers, visibleCount]);
+
+  const hasMore = visibleCount < filteredUsers.length;
+
+  // Infinite Scroll Handler with Intersection Observer
+  const handleObserver = useCallback((entries: IntersectionObserverEntry[]) => {
+    const target = entries[0];
+    if (target.isIntersecting && hasMore) {
+      setIsLoadingMore(true);
+      setTimeout(() => {
+        setVisibleCount((prev) => prev + BATCH_SIZE);
+        setIsLoadingMore(false);
+      }, 150);
+    }
+  }, [hasMore]);
+
+  useEffect(() => {
+    const option = { root: null, rootMargin: "150px", threshold: 0 };
+    const observer = new IntersectionObserver(handleObserver, option);
+    if (sentinelRef.current) observer.observe(sentinelRef.current);
+    return () => observer.disconnect();
+  }, [handleObserver]);
 
   // Toggle user active / suspended status
   const handleToggleStatus = async (user: UserItem) => {
@@ -114,7 +165,7 @@ export default function AdminUsersPage() {
       if (res.ok) {
         setToastMessage({
           type: "success",
-          text: nextStatus === "suspended" ? `تم إيقاف حساب (${user.fullName}) بنجاح!` : `تم إعادة تفعيل حساب (${user.fullName}) بنجاح!`
+          text: nextStatus === "suspended" ? `تم إيقاف حساب (${user.fullName}) بنجاح` : `تم إعادة تفعيل حساب (${user.fullName}) بنجاح`
         });
       } else {
         setToastMessage({
@@ -143,7 +194,7 @@ export default function AdminUsersPage() {
 
   // Delete User
   const handleDeleteUser = async (user: UserItem) => {
-    if (!confirm(`هل أنت تأكد من رغبتك في حذف حساب (${user.fullName}) نهائياً؟`)) return;
+    if (!confirm(`هل أنت متأكد من رغبتك في حذف حساب (${user.fullName}) نهائياً؟`)) return;
 
     setActionLoadingId(user.id);
     try {
@@ -163,7 +214,7 @@ export default function AdminUsersPage() {
     if (!editBalanceModalUser) return;
     const val = parseFloat(balanceInputValue);
     if (isNaN(val) || val < 0) {
-      alert("الرجاء إدخال مبلغ صحيح!");
+      alert("الرجاء إدخال مبلغ صحيح");
       return;
     }
 
@@ -184,7 +235,7 @@ export default function AdminUsersPage() {
       if (res.ok && data.success) {
         setToastMessage({
           type: "success",
-          text: data.message || `تم تعديل رصيد (${editBalanceModalUser.fullName}) بنجاح! 💰`
+          text: data.message || `تم تعديل رصيد (${editBalanceModalUser.fullName}) بنجاح`
         });
 
         // Update local users table
@@ -208,7 +259,7 @@ export default function AdminUsersPage() {
   // Save new password for user
   const handleSaveNewPassword = async () => {
     if (!changePasswordModalUser || !newPassword.trim()) {
-      alert("الرجاء إدخال كلمة المرور الجديدة!");
+      alert("الرجاء إدخال كلمة المرور الجديدة");
       return;
     }
 
@@ -227,7 +278,7 @@ export default function AdminUsersPage() {
       if (res.ok && data.success) {
         setToastMessage({
           type: "success",
-          text: `تم تغيير كلمة المرور للمستخدم (${changePasswordModalUser.fullName}) بنجاح! 🔑`
+          text: `تم تغيير كلمة المرور للمستخدم (${changePasswordModalUser.fullName}) بنجاح`
         });
         setChangePasswordModalUser(null);
         setNewPassword("");
@@ -237,7 +288,7 @@ export default function AdminUsersPage() {
     } catch {
       setToastMessage({
         type: "success",
-        text: `تم تغيير كلمة المرور للمستخدم (${changePasswordModalUser.fullName}) بنجاح! 🔑`
+        text: `تم تغيير كلمة المرور للمستخدم (${changePasswordModalUser.fullName}) بنجاح`
       });
       setChangePasswordModalUser(null);
       setNewPassword("");
@@ -266,10 +317,10 @@ export default function AdminUsersPage() {
     if (/[0-9]/.test(newPassword)) score += 1;
     if (/[^A-Za-z0-9]/.test(newPassword)) score += 1;
 
-    if (score <= 1) return { percent: 25, text: "ضعيفة ⚠️", color: "bg-red-500" };
-    if (score === 2) return { percent: 50, text: "متوسطة 🟡", color: "bg-yellow-500" };
-    if (score === 3) return { percent: 75, text: "قوية 🟢", color: "bg-emerald-500" };
-    return { percent: 100, text: "قوية جداً 🔥", color: "bg-primary glow-cyan" };
+    if (score <= 1) return { percent: 25, text: "ضعيفة", color: "bg-red-500" };
+    if (score === 2) return { percent: 50, text: "متوسطة", color: "bg-amber-500" };
+    if (score === 3) return { percent: 75, text: "قوية", color: "bg-emerald-500" };
+    return { percent: 100, text: "قوية جداً", color: "bg-primary" };
   }, [newPassword]);
 
   return (
@@ -285,11 +336,12 @@ export default function AdminUsersPage() {
       {/* Header Banner */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 glass-card p-6 rounded-3xl border border-outline-variant/30">
         <div>
-          <h1 className="text-3xl font-display font-bold text-on-surface mb-1">
-            إدارة المستخدمين المسجلين 👥
+          <h1 className="text-2xl md:text-3xl font-display font-bold text-on-surface mb-1 flex items-center gap-2">
+            <span className="material-symbols-outlined text-primary text-3xl">manage_accounts</span>
+            <span>إدارة المستخدمين المسجلين</span>
           </h1>
-          <p className="text-on-surface-variant text-sm">
-            عرض وتعديل بيانات الأعضاء، تفعيل/إيقاف الحسابات، التحكم بالرصيد المالي، وتغيير كلمات المرور
+          <p className="text-on-surface-variant text-xs md:text-sm">
+            عرض وتعديل بيانات الأعضاء، تفعيل وإيقاف الحسابات، وتعديل الأرصدة وكلمات المرور
           </p>
         </div>
 
@@ -343,36 +395,42 @@ export default function AdminUsersPage() {
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="البحث بالاسم، الإيميل، أو اليوزر..."
+            placeholder="البحث بالاسم، البريد، أو اسم المستخدم..."
             className="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-xl py-2.5 pr-10 pl-4 text-xs text-on-surface focus:outline-none focus:border-primary"
           />
         </div>
 
-        <div className="flex items-center gap-2 w-full sm:w-auto">
-          <button
-            onClick={() => setStatusFilter("all")}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-              statusFilter === "all" ? "bg-primary text-on-primary" : "bg-surface-container-high text-on-surface-variant"
-            }`}
-          >
-            الكل ({stats.total})
-          </button>
-          <button
-            onClick={() => setStatusFilter("active")}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-              statusFilter === "active" ? "bg-emerald-500 text-white" : "bg-surface-container-high text-on-surface-variant"
-            }`}
-          >
-            النشطة ({stats.active})
-          </button>
-          <button
-            onClick={() => setStatusFilter("suspended")}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-              statusFilter === "suspended" ? "bg-red-500 text-white" : "bg-surface-container-high text-on-surface-variant"
-            }`}
-          >
-            الموقوفة ({stats.suspended})
-          </button>
+        <div className="flex items-center justify-between w-full sm:w-auto gap-3">
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setStatusFilter("all")}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                statusFilter === "all" ? "bg-primary text-on-primary" : "bg-surface-container-high text-on-surface-variant"
+              }`}
+            >
+              الكل ({stats.total})
+            </button>
+            <button
+              onClick={() => setStatusFilter("active")}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                statusFilter === "active" ? "bg-emerald-500 text-white" : "bg-surface-container-high text-on-surface-variant"
+              }`}
+            >
+              النشطة ({stats.active})
+            </button>
+            <button
+              onClick={() => setStatusFilter("suspended")}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                statusFilter === "suspended" ? "bg-red-500 text-white" : "bg-surface-container-high text-on-surface-variant"
+              }`}
+            >
+              الموقوفة ({stats.suspended})
+            </button>
+          </div>
+
+          <span className="text-[11px] font-mono text-on-surface-variant hidden lg:inline">
+            عرض {displayedUsers.length} من {filteredUsers.length}
+          </span>
         </div>
       </div>
 
@@ -383,7 +441,7 @@ export default function AdminUsersPage() {
             <span className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></span>
             <span>جاري تحميل قائمة المسجلين...</span>
           </div>
-        ) : users.length === 0 ? (
+        ) : filteredUsers.length === 0 ? (
           <div className="p-12 text-center text-on-surface-variant text-sm flex flex-col items-center gap-2">
             <span className="material-symbols-outlined text-4xl text-on-surface-variant/40">person_off</span>
             <span>لم يتم العثور على أي مسجلين بالبيانات المطلوبة</span>
@@ -394,7 +452,7 @@ export default function AdminUsersPage() {
               <thead className="bg-surface-container-high/60 text-on-surface-variant border-b border-outline-variant/20 uppercase tracking-wider text-[11px] font-bold">
                 <tr>
                   <th className="p-4">المستخدم</th>
-                  <th className="p-4">البريد وتفاصيل الحساب</th>
+                  <th className="p-4">البريد ورقم الهاتف</th>
                   <th className="p-4">الدولة</th>
                   <th className="p-4">الرصيد الحالي</th>
                   <th className="p-4">حالة الحساب</th>
@@ -403,7 +461,7 @@ export default function AdminUsersPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-outline-variant/10">
-                {users.map((user) => (
+                {displayedUsers.map((user) => (
                   <tr key={user.id} className="hover:bg-surface-container-high/40 transition-colors">
                     {/* User Info */}
                     <td className="p-4 font-bold text-on-surface">
@@ -418,15 +476,32 @@ export default function AdminUsersPage() {
                       </div>
                     </td>
 
-                    {/* Email */}
-                    <td className="p-4 text-on-surface-variant font-mono">
-                      {user.email}
+                    {/* Email & Phone */}
+                    <td className="p-4">
+                      <p className="text-on-surface font-mono text-xs">{user.email}</p>
+                      {user.phone ? (
+                        <div className="flex items-center gap-1.5 mt-1">
+                          <span className="material-symbols-outlined text-xs text-emerald-400">call</span>
+                          <a 
+                            href={`https://wa.me/${user.phone.replace(/[^0-9]/g, "")}`}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="font-mono text-[11px] text-emerald-400 hover:text-emerald-300 hover:underline dir-ltr flex items-center gap-1 font-bold"
+                            title="مراسلة عبر واتساب"
+                          >
+                            <span>{user.phone}</span>
+                            <span className="text-[9px] bg-emerald-500/20 text-emerald-300 px-1 py-0.2 rounded">واتساب</span>
+                          </a>
+                        </div>
+                      ) : (
+                        <span className="text-[10px] text-on-surface-variant/40 font-mono mt-0.5 block">— بدون هاتف —</span>
+                      )}
                     </td>
 
                     {/* Country */}
                     <td className="p-4 text-on-surface">
                       <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-surface-container-high border border-outline-variant/20 text-xs font-semibold">
-                        {COUNTRY_FLAGS[user.country] || `🌐 ${user.country}`}
+                        {COUNTRY_NAMES[user.country] || user.country || "غير محدد"}
                       </span>
                     </td>
 
@@ -439,13 +514,13 @@ export default function AdminUsersPage() {
                     <td className="p-4">
                       {user.status === "active" ? (
                         <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 font-bold text-[11px]">
-                          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                          نشط 🟢
+                          <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
+                          نشط
                         </span>
                       ) : (
                         <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-500/15 border border-red-500/30 text-red-400 font-bold text-[11px]">
                           <span className="w-2 h-2 rounded-full bg-red-400"></span>
-                          موقوف 🔴
+                          موقوف
                         </span>
                       )}
                     </td>
@@ -533,6 +608,20 @@ export default function AdminUsersPage() {
             </table>
           </div>
         )}
+
+        {/* Scroll Sentinel for Progressive Loading */}
+        <div ref={sentinelRef} className="py-4 text-center border-t border-outline-variant/10">
+          {hasMore ? (
+            <div className="flex items-center justify-center gap-2 text-xs text-on-surface-variant py-2">
+              <span className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></span>
+              <span>جاري تحميل المزيد مع التمرير ({displayedUsers.length} من {filteredUsers.length})...</span>
+            </div>
+          ) : filteredUsers.length > 0 ? (
+            <div className="text-[11px] text-on-surface-variant/70">
+              تم عرض كافة النتائج ({filteredUsers.length} مستخدم)
+            </div>
+          ) : null}
+        </div>
       </div>
 
       {/* EDIT BALANCE MODAL DIALOG */}
@@ -545,7 +634,7 @@ export default function AdminUsersPage() {
                   <span className="material-symbols-outlined text-xl">account_balance_wallet</span>
                 </div>
                 <div>
-                  <h3 className="font-bold text-base text-on-surface">تعديل رصيد العميل 💰</h3>
+                  <h3 className="font-bold text-base text-on-surface">تعديل رصيد العميل</h3>
                   <p className="text-xs text-primary font-mono">@{editBalanceModalUser.username} ({editBalanceModalUser.fullName})</p>
                 </div>
               </div>
@@ -571,7 +660,7 @@ export default function AdminUsersPage() {
                 onClick={() => setBalanceActionType("set")}
                 className={`py-2 rounded-lg transition-all ${balanceActionType === "set" ? "bg-primary text-on-primary shadow" : "text-on-surface-variant hover:text-on-surface"}`}
               >
-                تحديد رصيد دقيق 🎯
+                تحديد رصيد دقيق
               </button>
               <button
                 type="button"
@@ -620,7 +709,7 @@ export default function AdminUsersPage() {
                 ) : (
                   <span className="material-symbols-outlined text-sm">save</span>
                 )}
-                <span>تأكيد وحفظ الرصيد بالداتا بيز</span>
+                <span>تأكيد وحفظ الرصيد</span>
               </button>
 
               <button
@@ -666,7 +755,7 @@ export default function AdminUsersPage() {
                   className="text-xs font-bold text-primary hover:underline flex items-center gap-1"
                 >
                   <span className="material-symbols-outlined text-sm">casino</span>
-                  <span>توليد باسبورد معقد تلقائياً</span>
+                  <span>توليد تلقائي</span>
                 </button>
               </div>
 
@@ -717,7 +806,7 @@ export default function AdminUsersPage() {
                 ) : (
                   <span className="material-symbols-outlined text-sm">save</span>
                 )}
-                <span>حفظ كلمة المرور بالداتا بيز</span>
+                <span>حفظ كلمة المرور</span>
               </button>
 
               <button
@@ -757,7 +846,27 @@ export default function AdminUsersPage() {
             <div className="grid grid-cols-2 gap-4 text-xs">
               <div className="p-3 rounded-xl bg-surface-container-high border border-outline-variant/20">
                 <p className="text-[10px] text-on-surface-variant font-bold">البريد الإلكتروني</p>
-                <p className="font-mono text-on-surface mt-1 truncate">{selectedUserModal.email}</p>
+                <p className="font-mono text-on-surface mt-1 truncate select-all">{selectedUserModal.email}</p>
+              </div>
+
+              <div className="p-3 rounded-xl bg-surface-container-high border border-outline-variant/20">
+                <p className="text-[10px] text-on-surface-variant font-bold">رقم الهاتف / الواتساب</p>
+                {selectedUserModal.phone ? (
+                  <div className="flex items-center justify-between gap-1 mt-1">
+                    <span className="font-mono font-bold text-emerald-400 dir-ltr select-all truncate">{selectedUserModal.phone}</span>
+                    <a
+                      href={`https://wa.me/${selectedUserModal.phone.replace(/[^0-9]/g, "")}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="px-2 py-0.5 rounded bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 font-bold text-[10px] flex items-center gap-1 transition-all"
+                    >
+                      <span className="material-symbols-outlined text-xs">chat</span>
+                      <span>واتساب</span>
+                    </a>
+                  </div>
+                ) : (
+                  <p className="text-on-surface-variant/40 mt-1 font-mono">غير مسجل</p>
+                )}
               </div>
 
               <div className="p-3 rounded-xl bg-surface-container-high border border-outline-variant/20">
@@ -767,12 +876,17 @@ export default function AdminUsersPage() {
 
               <div className="p-3 rounded-xl bg-surface-container-high border border-outline-variant/20">
                 <p className="text-[10px] text-on-surface-variant font-bold">الدولة المسجلة</p>
-                <p className="font-bold text-on-surface mt-1">{COUNTRY_FLAGS[selectedUserModal.country] || selectedUserModal.country}</p>
+                <p className="font-bold text-on-surface mt-1">{COUNTRY_NAMES[selectedUserModal.country] || selectedUserModal.country || "غير محدد"}</p>
               </div>
 
-              <div className="p-3 rounded-xl bg-surface-container-high border border-outline-variant/20">
-                <p className="text-[10px] text-on-surface-variant font-bold">تاريخ التسجيل</p>
-                <p className="font-mono text-on-surface-variant mt-1">{new Date(selectedUserModal.createdAt).toLocaleDateString("ar-EG")}</p>
+              <div className="col-span-2 p-3 rounded-xl bg-surface-container-high border border-outline-variant/20 flex items-center justify-between">
+                <div>
+                  <p className="text-[10px] text-on-surface-variant font-bold">تاريخ إنشاء الحساب</p>
+                  <p className="font-mono text-on-surface-variant mt-0.5">{new Date(selectedUserModal.createdAt).toLocaleDateString("ar-EG", { year: "numeric", month: "long", day: "numeric", hour: "2-digit", minute: "2-digit" })}</p>
+                </div>
+                <span className={`px-3 py-1 rounded-full text-xs font-bold ${selectedUserModal.status === "active" ? "bg-emerald-500/15 text-emerald-400 border border-emerald-500/30" : "bg-red-500/15 text-red-400 border border-red-500/30"}`}>
+                  {selectedUserModal.status === "active" ? "حساب نشط" : "حساب موقوف"}
+                </span>
               </div>
             </div>
 

@@ -4,7 +4,7 @@ const nextConfig = {
   output: 'standalone',
   experimental: {
     serverActions: {
-      bodySizeLimit: '2mb',
+      bodySizeLimit: '150mb',
     },
   },
   images: {
@@ -16,10 +16,11 @@ const nextConfig = {
     ],
   },
   async rewrites() {
+    const backendUrl = process.env.INTERNAL_API_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
     return [
       {
         source: '/api/:path*',
-        destination: 'https://api.arabtechproserver.tech/api/:path*', // Proxy to Backend
+        destination: `${backendUrl}/api/:path*`, // Proxy to Backend
       },
     ];
   },

@@ -15,6 +15,7 @@ interface UserSession {
   fullName: string;
   username: string;
   email: string;
+  phone?: string;
   country?: string;
   balance?: number;
   role?: string;
@@ -175,39 +176,8 @@ export default function Navbar({ lang, dict }: NavbarProps) {
 
   return (
     <>
-      {/* Top Main Portal Announcement Banner */}
-      <div className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-primary/20 via-surface-container-high to-secondary/20 border-b border-primary/30 py-1.5 px-4 text-center backdrop-blur-xl shadow-md">
-        <div className="container mx-auto flex items-center justify-between gap-2 text-xs font-bold text-on-surface">
-          <div className="flex items-center gap-2 mx-auto sm:mx-0">
-            <span className="material-symbols-outlined text-primary text-sm animate-pulse">language</span>
-            <span>
-              {lang === "ar"
-                ? "مرحباً بكم! زوروا موقعنا الرئيسي:"
-                : "Welcome! Visit our official main portal:"}
-            </span>
-            <a
-              href="https://arab-tech1.online/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-primary hover:underline dir-ltr font-mono font-bold"
-            >
-              https://arab-tech1.online/
-            </a>
-          </div>
-
-          <a
-            href="https://arab-tech1.online/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary text-on-primary font-bold text-[11px] hover:bg-primary-container transition-all shadow-sm active:scale-95"
-          >
-            <span>{lang === "ar" ? "زيارة الموقع الرئيسي" : "Visit Main Portal"}</span>
-          </a>
-        </div>
-      </div>
-
       <header 
-        className={`fixed top-[33px] left-0 right-0 z-40 transition-all duration-300 ${
+        className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${
           isScrolled 
             ? "bg-surface/85 backdrop-blur-xl border-b border-outline-variant/30 shadow-[0_4px_30px_rgba(0,0,0,0.3)] py-1" 
             : "bg-transparent py-2"

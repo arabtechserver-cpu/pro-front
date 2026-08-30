@@ -69,6 +69,8 @@
     "subtitle": "Join the global network of GSM professionals. Get instant access to unlocking services and server credits.",
     "fullName": "Full Name",
     "email": "Email Address",
+    "phone": "Phone / WhatsApp Number",
+    "phonePlaceholder": "e.g. 01012345678",
     "password": "Password",
     "username": "Username",
     "country": "Country",

@@ -39,7 +39,7 @@ export default function AnalyticsClient() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 glass-card p-6 rounded-3xl border border-outline-variant/30">
         <div>
           <h1 className="text-3xl font-display font-bold text-on-surface mb-1">
-            إحصائيات النظام 📊
+            إحصائيات النظام
           </h1>
           <p className="text-on-surface-variant text-sm">
             نظرة عامة على أداء المنصة خلال {days} يوماً الماضية
