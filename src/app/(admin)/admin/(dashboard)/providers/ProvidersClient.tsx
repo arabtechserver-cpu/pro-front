@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import { useState, useEffect, useRef, useCallback, useDeferredValue, useMemo } from "react";
 import Link from "next/link";
 
 interface Provider {
@@ -120,6 +120,7 @@ export default function ProvidersClient() {
   const [providerServices, setProviderServices] = useState<any[]>([]);
   const [loadingServices, setLoadingServices] = useState(false);
   const [serviceSearch, setServiceSearch] = useState("");
+  const deferredServiceSearch = useDeferredValue(serviceSearch);
   const [packageFilter, setPackageFilter] = useState<"all" | "active" | "hidden">("all");
   const [selectedGroupNames, setSelectedGroupNames] = useState<string[]>([]);
   const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({});
@@ -400,9 +401,9 @@ export default function ProvidersClient() {
       list = list.filter((g) => g.isAllHidden);
     }
 
-    if (!serviceSearch.trim()) return list;
+    if (!deferredServiceSearch.trim()) return list;
 
-    const q = serviceSearch.trim().toLowerCase();
+    const q = deferredServiceSearch.trim().toLowerCase();
     return list
       .map((g) => {
         const matchesGroupName = g.groupName.toLowerCase().includes(q);
@@ -424,7 +425,7 @@ export default function ProvidersClient() {
         return null;
       })
       .filter((g): g is NonNullable<typeof g> => g !== null);
-  }, [groupedPackages, serviceSearch, packageFilter]);
+  }, [deferredServiceSearch, groupedPackages, packageFilter]);
 
   const totalFilteredServicesCount = useMemo(() => {
     return filteredGroups.reduce((acc, g) => acc + g.services.length, 0);

@@ -1,13 +1,16 @@
 "use client";
 
-import { useState, useEffect, useMemo, useRef, useCallback } from "react";
+import { useState, useDeferredValue, useEffect, useMemo, useRef, useCallback } from "react";
 import { getServiceRequiredFields } from "../providers/ProvidersClient";
+import { takeInitialGroups } from "../../../../../lib/service-list-window";
 
 export default function ServicesPage() {
   const [categories, setCategories] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const deferredSearchQuery = useDeferredValue(searchQuery);
+  const [visiblePackageCounts, setVisiblePackageCounts] = useState<Record<string, number>>({});
   const [toastMessage, setToastMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
   
   // State to manage expanded packages (groupNames)
@@ -308,11 +311,11 @@ export default function ServicesPage() {
       }));
     }
 
-    if (!searchQuery.trim()) {
+    if (!deferredSearchQuery.trim()) {
       return result.filter((cat) => (cat.services || []).length > 0);
     }
 
-    const query = searchQuery.trim().toLowerCase();
+    const query = deferredSearchQuery.trim().toLowerCase();
     return result
       .map((cat) => {
         const matchingServices = (cat.services || []).filter(
@@ -324,7 +327,7 @@ export default function ServicesPage() {
         return { ...cat, services: matchingServices };
       })
       .filter((cat) => cat.services.length > 0);
-  }, [categories, searchQuery, filterType]);
+  }, [categories, deferredSearchQuery, filterType]);
 
   const totalServicesCount = useMemo(() => {
     return categories.reduce((total, cat) => total + (cat.services || []).length, 0);
@@ -920,6 +923,10 @@ export default function ServicesPage() {
           <div className="space-y-8">
             {filteredCategories.map((category: any, idx: number) => {
               const groupedServices = getGroupedServices(category.services);
+              const groupEntries = Object.entries(groupedServices) as [string, any[]][];
+              const categoryKey = String(category.id || idx);
+              const visiblePackageCount = visiblePackageCounts[categoryKey] || 16;
+              const visibleGroupEntries: [string, any[]][] = takeInitialGroups(groupEntries, visiblePackageCount);
 
               return (
                 <div key={category.id || idx} className="bg-surface-container border border-outline-variant/30 rounded-3xl p-6 md:p-8 shadow-sm">
@@ -941,8 +948,7 @@ export default function ServicesPage() {
                   </div>
 
                   <div className="space-y-6">
-                    {Object.keys(groupedServices).map((groupName, groupIdx) => {
-                      const packageServices = groupedServices[groupName];
+                    {visibleGroupEntries.map(([groupName, packageServices], groupIdx) => {
                       const packageKey = `${category.id}-${groupName}`;
                       const actionKey = `pkg-${category.id}-${groupName}`;
                       const isExpanded = expandedPackages[packageKey] || false;
@@ -1152,6 +1158,15 @@ export default function ServicesPage() {
                         </div>
                       );
                     })}
+                    {groupEntries.length > visiblePackageCount && (
+                      <button
+                        type="button"
+                        onClick={() => setVisiblePackageCounts((prev) => ({ ...prev, [categoryKey]: visiblePackageCount + 16 }))}
+                        className="w-full py-3 rounded-xl border border-dashed border-primary/40 text-primary text-xs font-bold hover:bg-primary/10 transition-colors"
+                      >
+                        عرض 16 باقة إضافية ({groupEntries.length - visiblePackageCount} متبقية)
+                      </button>
+                    )}
                   </div>
                 </div>
               );
