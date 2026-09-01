@@ -1,50 +1,44 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 /**
- * Smart catch-all API proxy with multi-URL fallback.
+ * Smart catch-all API proxy with working URL caching.
  *
- * For Dokploy / Docker setups where containers are on the same Docker network,
- * set INTERNAL_API_URL to the backend container's internal address.
+ * The public domain (arabtechproserver.tech) is NOT reachable from inside
+ * the Docker container due to hairpin NAT — so we only try internal hostnames.
  *
- * How to find the backend internal hostname in Dokploy:
- *   Go to backend service → Network tab → copy the "Container Name" or "Internal Hostname"
- *   It usually looks like: http://<appName>.<projectName>:5000
- *   Example: http://backend.pro-b-i0r2xu:5000
+ * INTERNAL_API_URL takes priority. If not set (or set to localhost), we try
+ * known Dokploy service names automatically.
  *
- * Set in Dokploy → Frontend service → Environment Variables:
- *   INTERNAL_API_URL=http://<backend-container-name>:5000
+ * Once a working URL is found, it's cached in memory for the container lifetime
+ * to avoid repeated failures and log spam.
  */
 
+// Cache the working backend URL after first successful connection
+let cachedBackendUrl: string | null = null;
+
 function getCandidateUrls(): string[] {
+  // If we already found a working URL, use it immediately — no fallback needed
+  if (cachedBackendUrl) return [cachedBackendUrl];
+
   const candidates: string[] = [];
-
   const internal = process.env.INTERNAL_API_URL;
-  const pub = process.env.NEXT_PUBLIC_API_URL;
-  // Dokploy: services in same project communicate via service name (container name)
-  // These are the exact service names from this Dokploy project:
-  const dockerCandidates = [
-    'http://pro-b-i0r2xu:5000',   // backend service name in Dokploy
-    'http://backend:5000',
-    'http://pro-back:5000',
-    'http://api:5000',
-  ];
+  const isLocalhost = (url: string) => /localhost|127\.0\.0\.1|::1/.test(url);
 
-  const isLocalhost = (url: string) =>
-    /localhost|127\.0\.0\.1|::1/.test(url);
-
-  // 1. INTERNAL_API_URL (skip if it's localhost)
+  // 1. INTERNAL_API_URL (only if it's not localhost)
   if (internal && !isLocalhost(internal)) {
     candidates.push(internal);
   }
 
-  // 2. NEXT_PUBLIC_API_URL (skip if localhost)
-  if (pub && !isLocalhost(pub) && !candidates.includes(pub)) {
-    candidates.push(pub);
-  }
-
-  // 3. Try common Docker internal hostnames (fast fail, containers on same network)
-  for (const dc of dockerCandidates) {
-    if (!candidates.includes(dc)) candidates.push(dc);
+  // 2. Known Dokploy service names (internal Docker network)
+  //    NOTE: Do NOT add the public domain here — it's unreachable from inside Docker (hairpin NAT)
+  const dokployNames = [
+    'http://pro-b-i0r2xu:5000',  // Confirmed working backend service name
+    'http://backend:5000',
+    'http://pro-back:5000',
+    'http://api:5000',
+  ];
+  for (const name of dokployNames) {
+    if (!candidates.includes(name)) candidates.push(name);
   }
 
   return candidates;
@@ -56,7 +50,7 @@ async function proxyRequest(
   body: ArrayBuffer | undefined
 ): Promise<Response> {
   const forwardHeaders = new Headers();
-  const headersToCopy = ['content-type', 'authorization', 'accept', 'accept-language', 'x-forwarded-for'];
+  const headersToCopy = ['content-type', 'authorization', 'accept', 'accept-language'];
   headersToCopy.forEach(h => {
     const val = request.headers.get(h);
     if (val) forwardHeaders.set(h, val);
@@ -67,7 +61,7 @@ async function proxyRequest(
     headers: forwardHeaders,
     body,
     redirect: 'manual',
-    signal: AbortSignal.timeout(5000), // 5s per attempt - fast fail
+    signal: AbortSignal.timeout(5000),
   });
 }
 
@@ -77,14 +71,18 @@ async function handler(
 ) {
   const path = params.path.join('/');
   const search = request.nextUrl.search;
-  const candidates = getCandidateUrls();
 
+  // Skip telemetry/analytics routes — they are external and not our backend
+  if (path.startsWith('telemetry') || path.startsWith('_next')) {
+    return NextResponse.json({ ok: false }, { status: 404 });
+  }
+
+  const candidates = getCandidateUrls();
   const body = ['GET', 'HEAD'].includes(request.method)
     ? undefined
     : await request.arrayBuffer();
 
   let lastError: unknown;
-  let lastDetail = '';
 
   for (const baseUrl of candidates) {
     const targetUrl = `${baseUrl}/api/${path}${search}`;
@@ -98,39 +96,40 @@ async function handler(
         }
       });
 
-      const responseBody = await res.arrayBuffer();
-      // Log successful backend URL for debugging
-      if (baseUrl !== candidates[0]) {
-        console.log(`[API Proxy] ✅ Connected via fallback: ${baseUrl}`);
+      // ✅ Cache this URL for future requests (avoids repeated fallback attempts)
+      if (!cachedBackendUrl) {
+        cachedBackendUrl = baseUrl;
+        console.log(`[API Proxy] ✅ Backend found at: ${baseUrl} — caching for future requests`);
       }
+
+      const responseBody = await res.arrayBuffer();
       return new NextResponse(responseBody, {
         status: res.status,
         headers: responseHeaders,
       });
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : String(err);
-      // Only log non-ECONNREFUSED errors verbosely to reduce noise
-      if (!msg.includes('ECONNREFUSED') && !msg.includes('ENOTFOUND')) {
-        console.warn(`[API Proxy] Error reaching ${targetUrl}: ${msg}`);
-      }
       lastError = err;
-      lastDetail = msg;
+      // Only log failures when we're NOT using the cached URL (i.e., during discovery)
+      if (!cachedBackendUrl) {
+        const msg = err instanceof Error ? err.message : String(err);
+        if (!msg.includes('ECONNREFUSED') && !msg.includes('ENOTFOUND')) {
+          console.warn(`[API Proxy] ⚠️ ${baseUrl} failed: ${msg}`);
+        }
+      }
     }
   }
 
-  // All candidates failed — log once with full details
-  console.error(
-    `[API Proxy] ❌ All ${candidates.length} backend URLs failed.\n` +
-    `  Tried: ${candidates.join(', ')}\n` +
-    `  Last error: ${lastDetail}\n` +
-    `  → Set INTERNAL_API_URL in Dokploy frontend env vars to backend internal hostname`
-  );
+  // If cached URL failed (backend restarted?), clear cache and let next request retry
+  if (cachedBackendUrl) {
+    console.warn(`[API Proxy] ⚠️ Cached backend ${cachedBackendUrl} is down — resetting cache`);
+    cachedBackendUrl = null;
+  }
 
+  console.error(`[API Proxy] ❌ All backend URLs failed for /api/${path}`);
   return NextResponse.json(
     {
       error: 'Backend unavailable',
-      hint: 'Set INTERNAL_API_URL=http://<backend-container-name>:5000 in Dokploy frontend environment variables',
-      tried: candidates,
+      hint: 'Set INTERNAL_API_URL=http://pro-b-i0r2xu:5000 in Dokploy frontend env vars',
     },
     { status: 502 }
   );
