@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 
 const TURNSTILE_SITE_KEY =
-  process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || "0x4AAAAAAEGa8uvGDLwzrReL";
+  process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || "0x4AAAAAAEjTl6tGMYdu0R-z";
 
 interface CloudflareTurnstileProps {
   onVerify: (token: string) => void;
