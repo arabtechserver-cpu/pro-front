@@ -20,10 +20,11 @@ function getCandidateUrls(): string[] {
 
   const internal = process.env.INTERNAL_API_URL;
   const pub = process.env.NEXT_PUBLIC_API_URL;
-  // Dokploy common Docker internal hostname patterns to try automatically
+  // Dokploy: services in same project communicate via service name (container name)
+  // These are the exact service names from this Dokploy project:
   const dockerCandidates = [
+    'http://pro-b-i0r2xu:5000',   // backend service name in Dokploy
     'http://backend:5000',
-    'http://pro-b-i0r2xu:5000',
     'http://pro-back:5000',
     'http://api:5000',
   ];
