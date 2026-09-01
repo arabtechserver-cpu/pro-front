@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from 'react';
+import { getUserAuthToken } from "../lib/client-auth-token";
 
 interface Message {
   role: 'user' | 'assistant';
@@ -108,7 +109,7 @@ export default function AiChatWidget() {
     setIsLoading(true);
 
     try {
-      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+      const token = typeof window !== 'undefined' ? getUserAuthToken(localStorage) : null;
       const headers: Record<string, string> = { 'Content-Type': 'application/json' };
       if (token) {
         headers['Authorization'] = `Bearer ${token}`;
@@ -117,6 +118,7 @@ export default function AiChatWidget() {
       const res = await fetch('/api/ai/chat', {
         method: 'POST',
         headers,
+        credentials: 'include',
         body: JSON.stringify({
           message: query,
           history: messages.map(m => ({ role: m.role, content: m.content }))
