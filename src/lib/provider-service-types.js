@@ -1,7 +1,7 @@
 const VALID_SERVICE_TYPES = ["imei", "server", "remote"];
 
 function getProviderServiceType(service) {
-  const directType = String(service?.service_type || "").toLowerCase();
+  const directType = String(service?.api_service_type || service?.service_type || "").toLowerCase();
   if (VALID_SERVICE_TYPES.includes(directType)) return directType;
 
   const categoryName = String(

@@ -122,14 +122,9 @@ export default function ProvidersClient() {
 
   // Sync Options Modal
   const [syncModalProvider, setSyncModalProvider] = useState<Provider | null>(null);
-  const [syncConfig, setSyncConfig] = useState<{
-    markup_percent: number;
-    exchange_rate: number;
-    service_types: ProviderServiceType[];
-  }>({
+  const [syncConfig, setSyncConfig] = useState({
     markup_percent: 0,
-    exchange_rate: 1,
-    service_types: ["imei", "server", "remote"]
+    exchange_rate: 1
   });
 
   // Browse Services Modal State
@@ -329,26 +324,12 @@ export default function ProvidersClient() {
     setSyncModalProvider(provider);
     setSyncConfig({
       markup_percent: 0,
-      exchange_rate: 1,
-      service_types: ["imei", "server", "remote"]
+      exchange_rate: 1
     });
-  };
-
-  const toggleSyncServiceType = (serviceType: ProviderServiceType) => {
-    setSyncConfig((current) => ({
-      ...current,
-      service_types: current.service_types.includes(serviceType)
-        ? current.service_types.filter((type) => type !== serviceType)
-        : [...current.service_types, serviceType]
-    }));
   };
 
   const executeSync = async () => {
     if (!syncModalProvider) return;
-    if (syncConfig.service_types.length === 0) {
-      showToast("اختر قسمًا واحدًا على الأقل: IMEI أو Server أو Remote", "error");
-      return;
-    }
     const p = syncModalProvider;
     setSyncingProviderId(p.id);
     setSyncModalProvider(null);
@@ -976,50 +957,13 @@ export default function ProvidersClient() {
 
             <div className="space-y-4 text-xs">
               <div className="p-3 bg-primary/10 border border-primary/20 rounded-xl text-on-surface-variant leading-relaxed">
-                سيتم سحب الأقسام التي تحددها فقط مع خدماتها وحقولها المطلوبة، مع الحفاظ على التخصيصات الحالية.
+                سيتم جلب قوائم IMEI وServer وRemote تلقائياً، ثم اعتماد النوع المرسل داخل بيانات كل خدمة وحفظه للفلترة والتنفيذ الصحيح.
                 <br /><br />
                 <span className="font-bold text-amber-500">تنبيه هام:</span> يرجى التأكد من إضافة عناوين IP السيرفر الخاص بك في إعدادات API لدى المزود (WhiteList IP) قبل المزامنة لتجنب رفض الاتصال:
                 <div className="mt-1 flex flex-col gap-1">
                   <code className="bg-surface-container-highest px-1.5 py-0.5 rounded text-primary text-[11px] text-left dir-ltr w-fit">186.240.155.152</code>
                   <code className="bg-surface-container-highest px-1.5 py-0.5 rounded text-primary text-[11px] text-left dir-ltr w-fit">2c0f:fc89:5e:8063:b178:82be:2580:b934</code>
                 </div>
-              </div>
-
-              <div>
-                <label className="block font-bold text-on-surface-variant mb-2">
-                  اختر الأقسام التي تريد جلبها من المزود:
-                </label>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                  {([
-                    { type: "imei", label: "IMEI", icon: "fingerprint" },
-                    { type: "server", label: "Server", icon: "dns" },
-                    { type: "remote", label: "Remote", icon: "settings_remote" }
-                  ] as const).map((option) => {
-                    const checked = syncConfig.service_types.includes(option.type);
-                    return (
-                      <label
-                        key={option.type}
-                        className={`p-3 rounded-xl border cursor-pointer transition-all flex items-center gap-2.5 select-none ${
-                          checked
-                            ? "bg-primary/15 border-primary/40 text-primary"
-                            : "bg-surface-container-lowest border-outline-variant/30 text-on-surface-variant"
-                        }`}
-                      >
-                        <input
-                          type="checkbox"
-                          checked={checked}
-                          onChange={() => toggleSyncServiceType(option.type)}
-                          className="w-4 h-4 accent-primary"
-                        />
-                        <span className="material-symbols-outlined text-base">{option.icon}</span>
-                        <span className="font-bold">{option.label}</span>
-                      </label>
-                    );
-                  })}
-                </div>
-                {syncConfig.service_types.length === 0 && (
-                  <p className="mt-2 text-[11px] font-bold text-red-400">يجب اختيار قسم واحد على الأقل قبل المزامنة.</p>
-                )}
               </div>
 
               <div>
@@ -1055,8 +999,7 @@ export default function ProvidersClient() {
               <button
                 type="button"
                 onClick={executeSync}
-                disabled={syncConfig.service_types.length === 0}
-                className="flex-1 bg-gradient-to-r from-primary to-secondary text-on-primary py-3 rounded-xl font-bold text-xs transition-all shadow-md flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed"
+                className="flex-1 bg-gradient-to-r from-primary to-secondary text-on-primary py-3 rounded-xl font-bold text-xs transition-all shadow-md flex items-center justify-center gap-2"
               >
                 <span className="material-symbols-outlined text-sm">play_arrow</span>
                 <span>بدء المزامنة الآن</span>
