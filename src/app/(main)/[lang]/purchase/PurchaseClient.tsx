@@ -3,6 +3,7 @@
 import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import { shouldShowDefaultImeiField } from "../../../../lib/purchase-service-fields";
 
 function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
   const searchParams = useSearchParams();
@@ -16,6 +17,8 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
   const [loadingServices, setLoadingServices] = useState<boolean>(true);
   const [selectedCategoryId, setSelectedCategoryId] = useState<string>("");
   const [selectedServiceId, setSelectedServiceId] = useState<string>(initialServiceId || "");
+  const [serviceDetailsById, setServiceDetailsById] = useState<Record<string, any>>({});
+  const [loadedServiceDetails, setLoadedServiceDetails] = useState<Record<string, boolean>>({});
 
   // Order Submission Form Fields
   const [targetInput, setTargetInput] = useState<string>("");
@@ -195,7 +198,7 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
     const fetchServices = async () => {
       setLoadingServices(true);
       try {
-        const res = await fetch("/api/dhru/services");
+        const res = await fetch("/api/dhru/services?view=pricing");
         if (res.ok) {
           const data = await res.json();
           if (Array.isArray(data)) {
@@ -211,6 +214,33 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
 
     fetchServices();
   }, []);
+
+  // Fetch only the selected service's heavy fields instead of loading them for every service.
+  useEffect(() => {
+    if (!selectedServiceId || loadedServiceDetails[selectedServiceId]) return;
+
+    let active = true;
+    fetch(`/api/dhru/services/${encodeURIComponent(selectedServiceId)}`)
+      .then((res) => {
+        if (!res.ok) throw new Error("Failed to fetch service details");
+        return res.json();
+      })
+      .then((service) => {
+        if (active) {
+          setServiceDetailsById((prev) => ({ ...prev, [selectedServiceId]: service }));
+        }
+      })
+      .catch((err) => console.error("Failed to fetch selected service details:", err))
+      .finally(() => {
+        if (active) {
+          setLoadedServiceDetails((prev) => ({ ...prev, [selectedServiceId]: true }));
+        }
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [loadedServiceDetails, selectedServiceId]);
 
   // 3. Auto Sync Category & Service Selection from Query Param (serviceId)
   useEffect(() => {
@@ -245,6 +275,7 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
   let selectedCategory = categoriesList.find(c => c.id === selectedCategoryId);
   let availableServices = selectedCategory?.services || [];
   let selectedService = availableServices.find((s: any) => s.id === selectedServiceId);
+  const selectedServiceDetails = selectedServiceId ? serviceDetailsById[selectedServiceId] : null;
 
   // If selectedServiceId is in a different category, auto-find & sync
   if (!selectedService && selectedServiceId) {
@@ -264,24 +295,23 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
     availableServices = selectedCategory?.services || [];
   }
 
+  if (!selectedCategory && selectedServiceDetails?.dhruCategory) {
+    selectedCategory = selectedServiceDetails.dhruCategory;
+  }
+
   if (!selectedService && availableServices.length > 0) {
     selectedService = availableServices[0];
   }
 
-  // Check if service requires an IMEI — بناءً على بيانات API المزود أولاً
+  if (selectedServiceDetails) {
+    selectedService = { ...(selectedService || {}), ...selectedServiceDetails };
+  }
+
+  const selectedServiceDetailsLoaded = !selectedServiceId || Boolean(loadedServiceDetails[selectedServiceId]);
   const providerFieldsForImei = getProviderCustomFields(selectedService);
-  const providerHasPrimaryImeiField = providerFieldsForImei
-    ? Object.entries(providerFieldsForImei).some(([k, fieldObj]: [string, any]) => {
-        return isPrimaryImeiProviderField(k, fieldObj);
-      })
-    : false;
-  // يظهر IMEI الافتراضي فقط لو الخدمة نفسها هي خدمة IMEI بحتة
-  // ولم يرسل الـ API حقل IMEI مخصص
-  const isImeiService = !providerHasPrimaryImeiField && (
-    selectedService?.requiresImei === true ||
-    selectedService?.requiresImei === "1" ||
-    selectedCategory?.name === "IMEI Service" ||
-    selectedCategory?.name?.toLowerCase().includes("imei")
+  const isImeiService = selectedServiceDetailsLoaded && shouldShowDefaultImeiField(
+    selectedCategory?.name || selectedServiceDetails?.dhruCategory?.name,
+    providerFieldsForImei
   );
 
   // هل الخدمة تدعم الكمية (qty) — بناءً على API فقط
@@ -788,6 +818,15 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
 
           {/* PROVIDER REQUIRED CUSTOM FIELDS VS STANDARD INPUT — يتحكم فيها API المزود تلقائياً */}
           {(() => {
+            if (selectedServiceId && !selectedServiceDetailsLoaded) {
+              return (
+                <div className="flex items-center gap-2 rounded-xl border border-outline-variant/30 bg-surface-container-high/30 p-4 text-xs text-on-surface-variant">
+                  <span className="material-symbols-outlined animate-spin text-base text-primary">sync</span>
+                  <span>{lang === 'ar' ? 'جاري تحميل حقول الطلب المطلوبة...' : 'Loading required order fields...'}</span>
+                </div>
+              );
+            }
+
             const providerFields = getProviderCustomFields(selectedService);
             const hasCustomFields = Boolean(providerFields && Object.keys(providerFields).length > 0);
 

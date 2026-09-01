@@ -1,5 +1,9 @@
 const assert = require("assert");
-const { categoryMatchesFilter, sortDisplayGroups } = require("./src/lib/pricing-groups.js");
+const {
+  categoryMatchesFilter,
+  createInitialCollapsedGroups,
+  sortDisplayGroups
+} = require("./src/lib/pricing-groups.js");
 
 assert.equal(categoryMatchesFilter("IMEI Service", "imei"), true);
 assert.equal(categoryMatchesFilter("Server Service", "server"), true);
@@ -12,5 +16,10 @@ const sorted = sortDisplayGroups([
   { categoryName: "IMEI Service", groupName: "Alpha" }
 ]);
 assert.deepEqual(sorted.map((group) => group.groupName), ["Alpha", "Apple", "Zebra"]);
+
+assert.deepEqual(
+  createInitialCollapsedGroups(sorted),
+  { Alpha: false, Apple: true, Zebra: true }
+);
 
 console.log("pricing groups tests passed");

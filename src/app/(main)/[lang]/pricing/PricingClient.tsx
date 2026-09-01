@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo, useRef, useDeferredValue } from "react";
-import { categoryMatchesFilter, sortDisplayGroups } from "../../../../lib/pricing-groups";
+import { categoryMatchesFilter, createInitialCollapsedGroups, sortDisplayGroups } from "../../../../lib/pricing-groups";
 import Link from "next/link";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 
@@ -241,10 +241,10 @@ export default function PricingClient({ lang, dict }: { lang: string, dict: any 
     window.history.pushState({}, "", pathname);
   };
 
-  const toggleGroupCollapse = (groupName: string) => {
+  const toggleGroupCollapse = (groupName: string, currentCollapsed: boolean) => {
     setCollapsedGroups(prev => ({
       ...prev,
-      [groupName]: !prev[groupName]
+      [groupName]: !currentCollapsed
     }));
   };
 
@@ -314,6 +314,11 @@ export default function PricingClient({ lang, dict }: { lang: string, dict: any 
     });
     return sortDisplayGroups(list) as DisplayGroup[];
   }, [filteredCategories, deferredSearch, lang]);
+
+  const defaultCollapsedGroups = useMemo(
+    () => createInitialCollapsedGroups(allDisplayGroups),
+    [allDisplayGroups]
+  );
 
   // Total matching services count
   const totalMatchingServices = useMemo(() => {
@@ -683,7 +688,7 @@ export default function PricingClient({ lang, dict }: { lang: string, dict: any 
                   {categorySection.groups.map((groupItem, idx) => {
                     const groupName = groupItem.groupName;
                     const groupServicesList = groupItem.services;
-                    const isCollapsed = !!collapsedGroups[groupName];
+                    const isCollapsed = collapsedGroups[groupName] ?? defaultCollapsedGroups[groupName] ?? true;
 
                     return (
                       <div 
@@ -731,7 +736,7 @@ export default function PricingClient({ lang, dict }: { lang: string, dict: any 
 
                             {/* Expand / Collapse Icon */}
                             <button
-                              onClick={(e) => { e.stopPropagation(); toggleGroupCollapse(groupName); }}
+                              onClick={(e) => { e.stopPropagation(); toggleGroupCollapse(groupName, isCollapsed); }}
                               className="w-8 h-8 rounded-lg bg-surface-container border border-outline-variant/30 flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-colors"
                             >
                               <span className="material-symbols-outlined text-xl transition-transform duration-300" style={{ transform: isCollapsed ? 'rotate(0deg)' : 'rotate(180deg)' }}>

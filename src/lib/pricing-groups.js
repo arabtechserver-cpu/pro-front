@@ -9,4 +9,11 @@ function sortDisplayGroups(groups) {
   );
 }
 
-module.exports = { categoryMatchesFilter, sortDisplayGroups };
+function createInitialCollapsedGroups(groups) {
+  return groups.reduce((collapsed, group, index) => {
+    collapsed[group.groupName] = index !== 0;
+    return collapsed;
+  }, {});
+}
+
+module.exports = { categoryMatchesFilter, createInitialCollapsedGroups, sortDisplayGroups };
