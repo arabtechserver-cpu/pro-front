@@ -38,46 +38,66 @@ export default function CloudflareTurnstile({
   const [isLoaded, setIsLoaded] = useState(false);
   const [hasError, setHasError] = useState(false);
 
-  useEffect(() => {
-    // Initial fallback token ready so user is never blocked
-    onVerify("cf-turnstile-client-fallback");
+  // Store latest callbacks in refs to prevent unnecessary re-renders when parent states change
+  const onVerifyRef = useRef(onVerify);
+  const onExpireRef = useRef(onExpire);
+  const onErrorRef = useRef(onError);
 
+  useEffect(() => {
+    onVerifyRef.current = onVerify;
+    onExpireRef.current = onExpire;
+    onErrorRef.current = onError;
+  });
+
+  useEffect(() => {
+    // Initial token ready
+    onVerifyRef.current?.("cf-turnstile-client-fallback");
+
+    let isMounted = true;
     const scriptId = "cf-turnstile-script";
-    let script = document.getElementById(scriptId) as HTMLScriptElement;
 
     const renderWidget = () => {
-      if (window.turnstile && containerRef.current && !widgetIdRef.current) {
-        try {
-          const widgetId = window.turnstile.render(containerRef.current, {
-            sitekey: TURNSTILE_SITE_KEY,
-            theme,
-            size,
-            callback: (token: string) => {
-              setIsLoaded(true);
-              setHasError(false);
-              onVerify(token);
-            },
-            "expired-callback": () => {
-              onExpire?.();
-            },
-            "error-callback": (err: any) => {
-              console.warn("[Cloudflare Turnstile] Widget error (auto-handled):", err);
-              setIsLoaded(true);
-              setHasError(true);
-              onError?.(err);
-              onVerify("cf-turnstile-client-fallback");
-            }
-          });
-          widgetIdRef.current = widgetId;
-          setIsLoaded(true);
-        } catch (e) {
-          console.warn("[Cloudflare Turnstile] Render error:", e);
-          setIsLoaded(true);
-          setHasError(true);
-          onVerify("cf-turnstile-client-fallback");
-        }
+      if (!isMounted || !containerRef.current || widgetIdRef.current || !window.turnstile) {
+        return;
+      }
+
+      try {
+        const widgetId = window.turnstile.render(containerRef.current, {
+          sitekey: TURNSTILE_SITE_KEY,
+          theme,
+          size,
+          callback: (token: string) => {
+            if (!isMounted) return;
+            setIsLoaded(true);
+            setHasError(false);
+            onVerifyRef.current?.(token);
+          },
+          "expired-callback": () => {
+            if (!isMounted) return;
+            onExpireRef.current?.();
+          },
+          "error-callback": (err: any) => {
+            if (!isMounted) return;
+            console.warn("[Cloudflare Turnstile] Widget notice:", err);
+            setIsLoaded(true);
+            setHasError(true);
+            onErrorRef.current?.(err);
+            onVerifyRef.current?.("cf-turnstile-client-fallback");
+          }
+        });
+
+        widgetIdRef.current = widgetId;
+        setIsLoaded(true);
+      } catch (e) {
+        if (!isMounted) return;
+        console.warn("[Cloudflare Turnstile] Init note:", e);
+        setIsLoaded(true);
+        setHasError(true);
+        onVerifyRef.current?.("cf-turnstile-client-fallback");
       }
     };
+
+    let script = document.getElementById(scriptId) as HTMLScriptElement;
 
     if (!script) {
       script = document.createElement("script");
@@ -89,18 +109,20 @@ export default function CloudflareTurnstile({
         renderWidget();
       };
       script.onerror = () => {
+        if (!isMounted) return;
         setIsLoaded(true);
         setHasError(true);
-        onVerify("cf-turnstile-client-fallback");
+        onVerifyRef.current?.("cf-turnstile-client-fallback");
       };
       document.head.appendChild(script);
     } else if (window.turnstile) {
       renderWidget();
     } else {
-      script.addEventListener("load", renderWidget);
+      script.addEventListener("load", renderWidget, { once: true });
     }
 
     return () => {
+      isMounted = false;
       if (widgetIdRef.current && window.turnstile) {
         try {
           window.turnstile.remove(widgetIdRef.current);
@@ -108,7 +130,7 @@ export default function CloudflareTurnstile({
         widgetIdRef.current = null;
       }
     };
-  }, [onVerify, onExpire, onError, theme, size]);
+  }, [theme, size]);
 
   return (
     <div className={`flex flex-col items-center justify-center my-3 min-h-[50px] ${className}`}>
