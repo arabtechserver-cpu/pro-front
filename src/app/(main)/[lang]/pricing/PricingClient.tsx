@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo, useRef, useDeferredValue } from "react";
+import { categoryMatchesFilter, sortDisplayGroups } from "../../../../lib/pricing-groups";
 import Link from "next/link";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 
@@ -210,7 +211,7 @@ export default function PricingClient({ lang, dict }: { lang: string, dict: any 
   useEffect(() => {
     async function fetchServices() {
       try {
-        const res = await fetch("/api/dhru/services");
+        const res = await fetch("/api/dhru/services?view=pricing");
         if (!res.ok) throw new Error("Failed to fetch");
         const data = await res.json();
         setServices(data);
@@ -293,9 +294,7 @@ export default function PricingClient({ lang, dict }: { lang: string, dict: any 
   // Filter categories
   const filteredCategories = useMemo(() => {
     let cats = Array.isArray(services) ? services : [];
-    if (selectedCategory !== "all") {
-      cats = cats.filter((c: any) => c.name?.toLowerCase().includes(selectedCategory));
-    }
+    cats = cats.filter((c: any) => categoryMatchesFilter(c.name, selectedCategory));
     return cats;
   }, [services, selectedCategory]);
 
@@ -313,7 +312,7 @@ export default function PricingClient({ lang, dict }: { lang: string, dict: any 
         });
       });
     });
-    return list;
+    return sortDisplayGroups(list) as DisplayGroup[];
   }, [filteredCategories, deferredSearch, lang]);
 
   // Total matching services count
