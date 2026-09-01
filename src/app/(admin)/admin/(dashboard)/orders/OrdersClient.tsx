@@ -79,18 +79,37 @@ export default function OrdersClient() {
   const fetchOrders = async () => {
     setLoading(true);
     try {
+      const userToken = typeof window !== "undefined" ? localStorage.getItem("user_token") : null;
       const res = await fetch("/api/orders", {
-        headers: { "Cache-Control": "no-cache" }
+        headers: {
+          "Cache-Control": "no-cache",
+          ...(userToken ? { Authorization: `Bearer ${userToken}` } : {})
+        }
       });
-      const data = await res.json();
-      if (res.ok && data.success) {
+
+      if (!res.ok) {
+        setOrders([]);
+        return;
+      }
+
+      const text = await res.text();
+      let data: any = null;
+      try {
+        data = JSON.parse(text);
+      } catch {
+        setOrders([]);
+        return;
+      }
+
+      if (data && data.success) {
         setOrders(data.orders || []);
       } else if (Array.isArray(data)) {
         setOrders(data);
+      } else {
+        setOrders([]);
       }
     } catch (err) {
       console.error("Failed to fetch orders:", err);
-      showToast("فشل جلب سجل الطلبات", "error");
     } finally {
       setLoading(false);
     }
