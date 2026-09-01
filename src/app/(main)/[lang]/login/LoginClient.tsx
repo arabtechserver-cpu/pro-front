@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import Script from "next/script";
 import { Locale } from "@/i18n/config";
+import CloudflareTurnstile from "@/components/CloudflareTurnstile";
 
 const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || "540676912586-vifo9ogu2gjud3d00efv1khd9r7tcajb.apps.googleusercontent.com";
 
@@ -14,6 +15,7 @@ export default function LoginClient({ lang, dict }: { lang: Locale; dict: any })
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+  const [turnstileToken, setTurnstileToken] = useState("");
 
   // FORGOT PASSWORD MODAL STATE
   const [forgotModalOpen, setForgotModalOpen] = useState(false);
@@ -110,7 +112,7 @@ export default function LoginClient({ lang, dict }: { lang: Locale; dict: any })
       const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password })
+        body: JSON.stringify({ email, password, "cf-turnstile-response": turnstileToken })
       });
 
       const data = await res.json();
@@ -355,6 +357,9 @@ export default function LoginClient({ lang, dict }: { lang: Locale; dict: any })
               <span>{lang === "ar" ? "نسيت كلمة المرور؟" : "Forgot Password?"}</span>
             </button>
           </div>
+
+          {/* Cloudflare Turnstile CAPTCHA Protection */}
+          <CloudflareTurnstile onVerify={(token) => setTurnstileToken(token)} />
 
           <button 
             type="submit" 

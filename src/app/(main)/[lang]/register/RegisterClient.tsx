@@ -5,6 +5,7 @@ import Link from "next/link";
 import Script from "next/script";
 import { Locale } from "@/i18n/config";
 import TermsModal from "@/components/TermsModal";
+import CloudflareTurnstile from "@/components/CloudflareTurnstile";
 
 const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || "540676912586-vifo9ogu2gjud3d00efv1khd9r7tcajb.apps.googleusercontent.com";
 
@@ -268,6 +269,7 @@ export default function RegisterClient({ lang, dict }: { lang: Locale; dict: any
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+  const [turnstileToken, setTurnstileToken] = useState("");
 
   const handleGoogleCallback = useCallback(async (response: any) => {
     if (!response.credential) return;
@@ -433,7 +435,8 @@ export default function RegisterClient({ lang, dict }: { lang: Locale; dict: any
           username,
           password,
           phone: formattedPhone,
-          country: selectedCountry.code
+          country: selectedCountry.code,
+          "cf-turnstile-response": turnstileToken
         })
       });
 
@@ -808,6 +811,11 @@ export default function RegisterClient({ lang, dict }: { lang: Locale; dict: any
                 </button>.
               </label>
             </div>
+          </div>
+
+          {/* Cloudflare Turnstile CAPTCHA Protection */}
+          <div className="col-span-1 md:col-span-2">
+            <CloudflareTurnstile onVerify={(token) => setTurnstileToken(token)} />
           </div>
 
           {/* FAST DIRECT SUBMIT BUTTON */}

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { loginAdmin } from "./actions";
+import CloudflareTurnstile from "@/components/CloudflareTurnstile";
 
 export default function AdminLogin() {
   const [username, setUsername] = useState("");
@@ -10,6 +11,7 @@ export default function AdminLogin() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState("");
   const router = useRouter();
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -86,6 +88,8 @@ export default function AdminLogin() {
             </div>
           </div>
           
+          <CloudflareTurnstile onVerify={(token) => setTurnstileToken(token)} />
+
           <button 
             type="submit" 
             disabled={loading}
