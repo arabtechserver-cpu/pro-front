@@ -929,6 +929,8 @@ export default function ProvidersClient() {
             <div className="space-y-4 text-xs">
               <div className="p-3 bg-primary/10 border border-primary/20 rounded-xl text-on-surface-variant leading-relaxed">
                 سيتم سحب كافة الأقسام والخدمات والحقول المطلوبة تلقائياً من المزود مع الحفاظ على التخصيصات.
+                <br /><br />
+                <span className="font-bold text-amber-500">تنبيه هام:</span> يرجى التأكد من إضافة عنوان IP السيرفر الخاص بك <code className="bg-surface-container-highest px-1 py-0.5 rounded text-primary text-xs">186.240.155.152</code> في إعدادات API لدى المزود (WhiteList IP) قبل المزامنة لتجنب رفض الاتصال.
               </div>
 
               <div>
