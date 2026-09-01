@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo, useRef, useCallback } from "react";
+import { getOrderFieldRows, getOrderServiceTypeLabel } from "../../../../../lib/order-details";
 
 interface OrderItem {
   id: string;
@@ -17,7 +18,9 @@ interface OrderItem {
   apiOrderId?: string | null;
   createdAt: string;
   serviceDhruId?: string | null;
+  providerServiceId?: string | null;
   serviceCategory?: string | null;
+  serviceType?: "imei" | "server" | "remote" | "unknown";
   groupName?: string | null;
   provider?: {
     id: string;
@@ -26,6 +29,15 @@ interface OrderItem {
     type?: string;
   } | null;
   customFields?: Record<string, string> | null;
+  fieldDetails?: {
+    id: string;
+    providerFieldId: string;
+    label: string;
+    type: string;
+    required: boolean;
+    value: string;
+    missing: boolean;
+  }[];
   events?: {
     time: string;
     action: string;
@@ -178,6 +190,8 @@ export default function OrdersClient() {
     if (sentinelRef.current) observer.observe(sentinelRef.current);
     return () => observer.disconnect();
   }, [handleObserver]);
+
+  const selectedOrderFields = selectedOrder ? getOrderFieldRows(selectedOrder) : [];
 
   // Dispatch to Provider API
   const handleDispatchProvider = async (order: OrderItem) => {
@@ -638,10 +652,11 @@ export default function OrdersClient() {
                           {/* View Full Details & Timeline */}
                           <button
                             onClick={() => setSelectedOrder(order)}
-                            className="p-1.5 rounded-xl bg-surface-container-high hover:bg-surface-container-highest text-on-surface-variant hover:text-on-surface border border-outline-variant/20 transition-all"
+                            className="px-3 py-1.5 rounded-xl bg-surface-container-high hover:bg-surface-container-highest text-on-surface-variant hover:text-on-surface border border-outline-variant/20 transition-all flex items-center gap-1 text-[11px] font-bold"
                             title="عرض تفاصيل وسجل أحداث الطلب"
                           >
                             <span className="material-symbols-outlined text-xs">visibility</span>
+                            <span>تفاصيل</span>
                           </button>
                         </div>
                       </td>
@@ -820,7 +835,7 @@ export default function OrdersClient() {
       {/* FULL ORDER DETAILS & EVENT TIMELINE MODAL */}
       {selectedOrder && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/80 backdrop-blur-md animate-in fade-in">
-          <div className="bg-surface-container w-full max-w-2xl rounded-3xl p-6 sm:p-8 border border-outline-variant/30 shadow-2xl relative overflow-hidden space-y-5 max-h-[90vh] flex flex-col">
+          <div className="bg-surface-container w-full max-w-4xl rounded-3xl p-5 sm:p-7 border border-outline-variant/30 shadow-2xl relative overflow-hidden space-y-5 max-h-[92vh] flex flex-col">
             {/* Top Bar */}
             <div className="flex items-center justify-between pb-3 border-b border-outline-variant/20">
               <div className="flex items-center gap-3">
@@ -846,6 +861,28 @@ export default function OrdersClient() {
 
             {/* Modal Body Scroll */}
             <div className="overflow-y-auto flex-1 space-y-4 text-xs pr-1">
+              {/* Order Summary */}
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5">
+                <div className="p-3 rounded-2xl bg-primary/10 border border-primary/20">
+                  <div className="text-[10px] font-bold text-on-surface-variant mb-1">رقم الطلب</div>
+                  <div className="font-mono font-bold text-primary">#{selectedOrder.id.slice(-6)}</div>
+                </div>
+                <div className="p-3 rounded-2xl bg-surface-container-high border border-outline-variant/20">
+                  <div className="text-[10px] font-bold text-on-surface-variant mb-1">الكمية</div>
+                  <div className="font-mono font-bold text-on-surface">{selectedOrder.quantity || 1}</div>
+                </div>
+                <div className="p-3 rounded-2xl bg-surface-container-high border border-outline-variant/20">
+                  <div className="text-[10px] font-bold text-on-surface-variant mb-1">إجمالي البيع</div>
+                  <div className="font-mono font-bold text-emerald-400">${(selectedOrder.price || 0).toFixed(2)} USD</div>
+                </div>
+                <div className="p-3 rounded-2xl bg-surface-container-high border border-outline-variant/20">
+                  <div className="text-[10px] font-bold text-on-surface-variant mb-1">تاريخ الطلب</div>
+                  <div className="font-bold text-on-surface">
+                    {new Date(selectedOrder.createdAt).toLocaleString("ar-EG")}
+                  </div>
+                </div>
+              </div>
+
               {/* Customer Info Card */}
               <div className="p-4 rounded-2xl bg-surface-container-high border border-outline-variant/20 space-y-2">
                 <div className="font-bold text-primary flex items-center gap-1.5">
@@ -888,17 +925,39 @@ export default function OrdersClient() {
                   <span>بيانات الخدمة وسيرفر المزود:</span>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-on-surface">
+                  <div className="sm:col-span-2">
+                    <span className="text-on-surface-variant">اسم الخدمة: </span>
+                    <span className="font-bold">{selectedOrder.serviceName}</span>
+                  </div>
+                  <div className="sm:col-span-2">
+                    <span className="text-on-surface-variant">الباقة / المجموعة: </span>
+                    <span className="font-bold text-secondary">{selectedOrder.groupName || "غير محددة"}</span>
+                  </div>
+                  <div>
+                    <span className="text-on-surface-variant">نوع الخدمة الحقيقي: </span>
+                    <span className="inline-flex px-2 py-0.5 rounded-md bg-primary/10 border border-primary/20 text-primary font-bold">
+                      {getOrderServiceTypeLabel(selectedOrder.serviceType)}
+                    </span>
+                  </div>
                   <div>
                     <span className="text-on-surface-variant">سيرفر المزود: </span>
                     <span className="font-bold">{selectedOrder.provider?.name || "سيرفر محلي / يدوي"}</span>
                   </div>
                   <div>
-                    <span className="text-on-surface-variant">نوع النظام: </span>
+                    <span className="text-on-surface-variant">بروتوكول المزود: </span>
                     <span className="font-mono text-primary font-bold">{selectedOrder.provider?.type || "Dhru Fusion"}</span>
                   </div>
                   <div>
-                    <span className="text-on-surface-variant">رقم الخدمة لدى المزود (ID): </span>
-                    <span className="font-mono font-bold">{selectedOrder.serviceDhruId || "N/A"}</span>
+                    <span className="text-on-surface-variant">رقم الخدمة الحقيقي لدى المزود: </span>
+                    <span className="font-mono font-bold text-primary">#{selectedOrder.providerServiceId || "N/A"}</span>
+                  </div>
+                  <div className="sm:col-span-2">
+                    <span className="text-on-surface-variant">معرف الخدمة الداخلي: </span>
+                    <span className="font-mono text-[11px] break-all">{selectedOrder.serviceId}</span>
+                  </div>
+                  <div className="sm:col-span-2">
+                    <span className="text-on-surface-variant">المعرف المربوط بالمزود: </span>
+                    <span className="font-mono text-[11px] break-all">{selectedOrder.serviceDhruId || "N/A"}</span>
                   </div>
                   <div>
                     <span className="text-on-surface-variant">رقم الطلب المرجعي (API Order ID): </span>
@@ -917,28 +976,70 @@ export default function OrdersClient() {
                 </div>
               </div>
 
-              {/* Target Input & Custom Fields */}
+              {/* Target Input & Required Fields */}
               <div className="p-4 rounded-2xl bg-surface-container-high border border-outline-variant/20 space-y-2">
                 <div className="font-bold text-primary flex items-center gap-1.5">
                   <span className="material-symbols-outlined text-sm">input</span>
-                  <span>المدخلات والحقول المخصصة للطلب:</span>
+                  <span>الحقول المطلوبة والبيانات التي كتبها العميل:</span>
                 </div>
 
-                <div className="p-2.5 rounded-xl bg-surface-container-lowest border border-outline-variant/20 font-mono text-primary font-bold dir-ltr text-right">
-                  {selectedOrder.targetInput}
+                <div className="p-3 rounded-xl bg-surface-container-lowest border border-outline-variant/20">
+                  <div className="text-[10px] text-on-surface-variant font-bold mb-1">ملخص البيانات المحفوظة في الطلب</div>
+                  <div className="font-mono text-primary font-bold dir-ltr text-left break-all">
+                    {selectedOrder.targetInput || "لا توجد بيانات"}
+                  </div>
                 </div>
 
-                {selectedOrder.customFields && Object.keys(selectedOrder.customFields).length > 0 && (
-                  <div className="space-y-1.5 pt-2">
-                    <div className="text-[11px] font-bold text-on-surface-variant">الحقول المخصصة الإضافية:</div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                      {Object.entries(selectedOrder.customFields).map(([k, v]) => (
-                        <div key={k} className="p-2 rounded-xl bg-surface-container-lowest border border-outline-variant/15">
-                          <div className="text-[10px] text-on-surface-variant">{k}:</div>
-                          <div className="font-mono text-on-surface font-bold dir-ltr">{String(v)}</div>
-                        </div>
-                      ))}
-                    </div>
+                {selectedOrderFields.length > 0 ? (
+                  <div className="overflow-x-auto pt-2">
+                    <table className="w-full min-w-[680px] border-separate border-spacing-y-2">
+                      <thead>
+                        <tr className="text-[10px] text-on-surface-variant">
+                          <th className="px-3 text-right">اسم الحقل</th>
+                          <th className="px-3 text-right">Field ID عند المزود</th>
+                          <th className="px-3 text-right">المعرف الداخلي</th>
+                          <th className="px-3 text-right">الحالة</th>
+                          <th className="px-3 text-right">القيمة المكتوبة</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {selectedOrderFields.map((field: any) => (
+                          <tr
+                            key={`${field.id}-${field.providerFieldId}`}
+                            className={field.missing ? "bg-red-500/10" : "bg-surface-container-lowest"}
+                          >
+                            <td className="p-3 rounded-r-xl font-bold text-on-surface">{field.label}</td>
+                            <td className="p-3 font-mono text-primary font-bold dir-ltr text-left">{field.providerFieldId}</td>
+                            <td className="p-3 font-mono text-on-surface-variant dir-ltr text-left">{field.id}</td>
+                            <td className="p-3">
+                              <span className={`px-2 py-0.5 rounded-md border text-[10px] font-bold ${
+                                field.missing
+                                  ? "bg-red-500/15 border-red-500/30 text-red-400"
+                                  : field.required
+                                  ? "bg-amber-500/15 border-amber-500/30 text-amber-400"
+                                  : "bg-emerald-500/10 border-emerald-500/20 text-emerald-400"
+                              }`}>
+                                {field.missing ? "إجباري وناقص" : field.required ? "إجباري ومكتمل" : "اختياري"}
+                              </span>
+                            </td>
+                            <td className={`p-3 rounded-l-xl font-mono font-bold dir-ltr text-left break-all ${field.missing ? "text-red-400" : "text-on-surface"}`}>
+                              {field.value || "لم يكتب العميل قيمة"}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <div className="p-3 rounded-xl border border-dashed border-outline-variant/30 text-on-surface-variant text-center">
+                    هذه الخدمة لا تحتوي على حقول مخصصة مسجلة لدى المزود.
+                  </div>
+                )}
+
+                {selectedOrder.rawNotes && (
+                  <div className="p-3 rounded-xl bg-surface-container-lowest border border-outline-variant/20">
+                    <div className="text-[10px] text-on-surface-variant font-bold mb-1">ملاحظات العميل</div>
+                    <div className="text-on-surface whitespace-pre-wrap">{selectedOrder.rawNotes}</div>
                   </div>
                 )}
               </div>
