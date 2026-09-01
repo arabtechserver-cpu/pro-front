@@ -76,7 +76,7 @@ export default function LoginClient({ lang, dict }: { lang: Locale; dict: any })
         (window as any).google.accounts.id.renderButton(btnContainer, {
           theme: "outline",
           size: "large",
-          width: "100%",
+          width: 360,
           text: "continue_with",
           shape: "pill",
           locale: lang === "ar" ? "ar" : "en",

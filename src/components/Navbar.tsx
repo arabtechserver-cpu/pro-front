@@ -19,6 +19,17 @@ interface UserSession {
   country?: string;
   balance?: number;
   role?: string;
+  membershipTierId?: string | null;
+  membershipTier?: {
+    id: string;
+    name: string;
+    nameAr?: string;
+    discountPercentage: number;
+    badgeColor?: string;
+    minDeposit?: number;
+  } | null;
+  customDiscount?: number;
+  effectiveDiscount?: number;
 }
 
 interface CurrencyInfo {
@@ -235,11 +246,6 @@ export default function Navbar({ lang, dict }: NavbarProps) {
                     <span className="material-symbols-outlined text-tertiary text-base">cast</span>
                     {dict.remoteService}
                   </Link>
-                  <div className="h-px bg-outline-variant/20 my-1"></div>
-                  <a href="https://arab-tech1.online/api-docs" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2.5 px-4 py-3 rounded-xl text-xs font-bold text-primary hover:bg-primary/10 transition-all">
-                    <span className="material-symbols-outlined text-primary text-base">api</span>
-                    {lang === "ar" ? "توثيق API" : "API Docs"}
-                  </a>
                 </div>
               </div>
 
@@ -347,6 +353,27 @@ export default function Navbar({ lang, dict }: NavbarProps) {
                       <p className="font-bold text-sm text-on-surface">{userSession.fullName}</p>
                       <p className="text-xs text-primary font-mono">@{userSession.username}</p>
                       <p className="text-[11px] text-on-surface-variant truncate">{userSession.email}</p>
+                      
+                      {/* Membership & Discount Badge */}
+                      <div className="mt-2 pt-2 border-t border-primary/20 flex items-center justify-between">
+                        <span 
+                          className="text-[10px] font-bold px-2 py-0.5 rounded-md text-white flex items-center gap-1 shadow-sm"
+                          style={{ backgroundColor: userSession.membershipTier?.badgeColor || "#2dd4bf" }}
+                        >
+                          <span className="material-symbols-outlined text-xs">workspace_premium</span>
+                          <span>{userSession.membershipTier?.nameAr || userSession.membershipTier?.name || (lang === "ar" ? "عضوية أساسية" : "Standard")}</span>
+                        </span>
+                        
+                        {(userSession.effectiveDiscount || (userSession.membershipTier?.discountPercentage || 0) > 0 || (userSession.customDiscount || 0) > 0) ? (
+                          <span className="text-[11px] font-extrabold text-emerald-400 font-mono">
+                            {lang === "ar" ? `خصم ${userSession.effectiveDiscount || userSession.membershipTier?.discountPercentage || userSession.customDiscount}%` : `${userSession.effectiveDiscount || userSession.membershipTier?.discountPercentage || userSession.customDiscount}% OFF`}
+                          </span>
+                        ) : (
+                          <span className="text-[10px] text-on-surface-variant font-medium">
+                            {lang === "ar" ? "سعر موحد" : "Standard"}
+                          </span>
+                        )}
+                      </div>
                     </div>
 
                     {/* Wallet Balance Card */}
@@ -385,19 +412,17 @@ export default function Navbar({ lang, dict }: NavbarProps) {
                         className="flex items-center gap-2.5 p-2.5 rounded-xl text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-all"
                       >
                         <span className="material-symbols-outlined text-secondary text-base">receipt_long</span>
-                        <span>{lang === "ar" ? "طلباتي وسجل الخدمات" : "My Orders & Portfolio"}</span>
+                        <span>{lang === "ar" ? "طلباتي وسجل الخدمات" : "My Orders & Services"}</span>
                       </Link>
 
-                      <a 
-                        href="https://arab-tech1.online/api-docs"
-                        target="_blank"
-                        rel="noopener noreferrer"
+                      <Link 
+                        href={`/${lang}/orders`}
                         onClick={() => setUserDropdownOpen(false)}
-                        className="flex items-center gap-2.5 p-2.5 rounded-xl text-primary font-bold hover:bg-primary/10 transition-all"
+                        className="flex items-center gap-2.5 p-2.5 rounded-xl text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-all"
                       >
-                        <span className="material-symbols-outlined text-primary text-base">api</span>
-                        <span>{lang === "ar" ? "توثيق الـ API المباشر" : "API Documentation"}</span>
-                      </a>
+                        <span className="material-symbols-outlined text-tertiary text-base">history</span>
+                        <span>{lang === "ar" ? "متابعة الطلبات المباشرة" : "Track Live Orders"}</span>
+                      </Link>
 
                       {userSession.role === "admin" && (
                         <Link 

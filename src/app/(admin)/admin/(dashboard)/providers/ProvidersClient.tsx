@@ -15,44 +15,58 @@ interface Provider {
   currency: string;
   lastSyncAt?: string | null;
   servicesCount: number;
+  mappingRules?: string | null;
   createdAt: string;
 }
 
-export function getServiceRequiredFields(service: any): { label: string; type?: string; required?: boolean }[] {
-  const fields: { label: string; type?: string; required?: boolean }[] = [];
+export function getServiceRequiredFields(service: any): { label: string; type?: string; required?: boolean; options?: string[] }[] {
+  const fields: { label: string; type?: string; required?: boolean; options?: string[] }[] = [];
 
-  if (service.requiresCustom) {
+  const raw = service.fields ?? service.requiresCustom ?? service.customFields;
+  if (raw) {
     try {
-      const parsed = typeof service.requiresCustom === "string" ? JSON.parse(service.requiresCustom) : service.requiresCustom;
+      const parsed = typeof raw === "string" ? JSON.parse(raw) : raw;
       if (Array.isArray(parsed)) {
         parsed.forEach((f: any) => {
+          if (f.adminonly) return;
           const name = f.fieldname || f.reqid || f.name || f.label || "حقل مخصص";
+          const rawOpts = f.options || f.fieldoptions || f.FIELDOPTIONS;
+          let opts: string[] = [];
+          if (Array.isArray(rawOpts)) opts = rawOpts.map((o: any) => String(o?.value || o || "").trim()).filter(Boolean);
+          else if (typeof rawOpts === "string" && rawOpts.trim()) opts = rawOpts.split(/[\r\n,|]+/).map(s => s.trim()).filter(Boolean);
+
           fields.push({
-            label: name.replace(/^custom_/, "").trim(),
-            type: f.fieldtype || "text",
-            required: f.required === "1" || f.required === true
+            label: String(name).replace(/^custom_/, "").trim(),
+            type: opts.length > 0 ? "select" : (f.fieldtype || f.type || "text"),
+            required: f.required === "1" || f.required === true || f.required === "on",
+            options: opts
           });
         });
       } else if (typeof parsed === "object" && parsed !== null) {
         Object.entries(parsed).forEach(([key, val]: [string, any]) => {
-          const name = val.fieldname || val.reqid || key;
+          if (val.adminonly) return;
+          const name = val.fieldname || val.reqid || val.label || key;
+          const rawOpts = val.options || val.fieldoptions || val.FIELDOPTIONS;
+          let opts: string[] = [];
+          if (Array.isArray(rawOpts)) opts = rawOpts.map((o: any) => String(o?.value || o || "").trim()).filter(Boolean);
+          else if (typeof rawOpts === "string" && rawOpts.trim()) opts = rawOpts.split(/[\r\n,|]+/).map(s => s.trim()).filter(Boolean);
+
           fields.push({
-            label: name.replace(/^custom_/, "").trim(),
-            type: val.fieldtype || "text",
-            required: val.required === "1" || val.required === true
+            label: String(name).replace(/^custom_/, "").trim(),
+            type: opts.length > 0 ? "select" : (val.fieldtype || val.type || "text"),
+            required: val.required === "1" || val.required === true || val.required === "on",
+            options: opts
           });
         });
       }
-    } catch (e) {
-      // Ignore parse error
-    }
+    } catch (e) {}
   }
 
   // If no custom fields were found, infer standard requirements from category and name
   if (fields.length === 0) {
-    const cat = service.category?.name || "";
+    const cat = service.category?.name || service.category_name || "";
     const name = (service.name || "").toLowerCase();
-    const grp = (service.groupName || "").toLowerCase();
+    const grp = (service.groupName || service.group_name || "").toLowerCase();
 
     if (cat.includes("IMEI") || name.includes("imei") || name.includes("sn") || grp.includes("imei") || name.includes("check")) {
       fields.push({ label: "IMEI / Serial Number", type: "number", required: true });
@@ -82,15 +96,24 @@ export default function ProvidersClient() {
     username: "",
     apiKey: "",
     type: "dhru",
-    isActive: true
+    isActive: true,
+    mappingRules: ""
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Test Connection in Modal
+  const [isTestingConnection, setIsTestingConnection] = useState(false);
+  const [testResult, setTestResult] = useState<{ success: boolean; message: string; balance?: number; currency?: string } | null>(null);
 
   // Action Loading States
   const [refreshingBalanceId, setRefreshingBalanceId] = useState<string | null>(null);
   const [syncingProviderId, setSyncingProviderId] = useState<string | null>(null);
   const [deleteModalProvider, setDeleteModalProvider] = useState<Provider | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+
+  // Sync Options Modal
+  const [syncModalProvider, setSyncModalProvider] = useState<Provider | null>(null);
+  const [syncConfig, setSyncConfig] = useState({ markup_percent: 0, exchange_rate: 1 });
 
   // Browse Services Modal State
   const [browseProvider, setBrowseProvider] = useState<Provider | null>(null);
@@ -140,8 +163,10 @@ export default function ProvidersClient() {
       username: "",
       apiKey: "",
       type: "dhru",
-      isActive: true
+      isActive: true,
+      mappingRules: ""
     });
+    setTestResult(null);
     setIsModalOpen(true);
   };
 
@@ -153,9 +178,55 @@ export default function ProvidersClient() {
       username: provider.username || "",
       apiKey: provider.apiKey,
       type: provider.type || "dhru",
-      isActive: provider.isActive !== false
+      isActive: provider.isActive !== false,
+      mappingRules: provider.mappingRules || ""
     });
+    setTestResult(null);
     setIsModalOpen(true);
+  };
+
+  const handleTestConnection = async () => {
+    if (!formData.apiUrl || !formData.apiKey) {
+      showToast("يرجى إدخال رابط ومفتاح الـ API لاختبار الاتصال", "error");
+      return;
+    }
+
+    setIsTestingConnection(true);
+    setTestResult(null);
+
+    try {
+      const res = await fetch("/api/providers/test-connection", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          apiUrl: formData.apiUrl,
+          username: formData.username,
+          apiKey: formData.apiKey
+        })
+      });
+
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setTestResult({
+          success: true,
+          message: data.message || `الاتصال ناجح! الرصيد: ${data.balance} ${data.currency}`,
+          balance: data.balance,
+          currency: data.currency
+        });
+      } else {
+        setTestResult({
+          success: false,
+          message: data.error || "فشل الاتصال بالمزود"
+        });
+      }
+    } catch {
+      setTestResult({
+        success: false,
+        message: "تعذر الاتصال بالسيرفر لإجراء الاختبار"
+      });
+    } finally {
+      setIsTestingConnection(false);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -235,18 +306,29 @@ export default function ProvidersClient() {
     }
   };
 
-  const handleSyncProviderServices = async (provider: Provider) => {
-    setSyncingProviderId(provider.id);
+  const openSyncModal = (provider: Provider) => {
+    setSyncModalProvider(provider);
+    setSyncConfig({ markup_percent: 0, exchange_rate: 1 });
+  };
+
+  const executeSync = async () => {
+    if (!syncModalProvider) return;
+    const p = syncModalProvider;
+    setSyncingProviderId(p.id);
+    setSyncModalProvider(null);
+
     try {
-      const res = await fetch(`/api/providers/${provider.id}/sync`, {
-        method: "POST"
+      const res = await fetch(`/api/providers/${p.id}/sync`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(syncConfig)
       });
       const data = await res.json();
       if (res.ok && data.success) {
-        showToast(data.message || `تمت المزامنة بنجاح! تم جلب ${data.count} خدمة.`);
+        showToast(data.message || `تمت المزامنة بنجاح! تم جلب وتحديث ${data.count} خدمة.`);
         await fetchProviders();
-        if (browseProvider && browseProvider.id === provider.id) {
-          await handleBrowseServices(provider);
+        if (browseProvider && browseProvider.id === p.id) {
+          await handleBrowseServices(p);
         }
       } else {
         showToast(data.error || "فشلت المزامنة من المزود", "error");
@@ -326,7 +408,13 @@ export default function ProvidersClient() {
         const matchesGroupName = g.groupName.toLowerCase().includes(q);
         if (matchesGroupName) return g;
 
-        const matchingServices = g.services.filter((s) => s.name.toLowerCase().includes(q));
+        const matchingServices = g.services.filter((s) => {
+          const nameMatch = s.name.toLowerCase().includes(q) || s.originalName?.toLowerCase().includes(q);
+          const customFields = getServiceRequiredFields(s);
+          const fieldMatch = customFields.some(f => f.label.toLowerCase().includes(q));
+          return nameMatch || fieldMatch;
+        });
+
         if (matchingServices.length > 0) {
           return {
             ...g,
@@ -478,8 +566,8 @@ export default function ProvidersClient() {
       {/* Toast Notification */}
       {toastMessage && (
         <div
-          className={`fixed bottom-8 left-8 z-50 px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-3 animate-in fade-in slide-in-from-bottom-4 text-surface font-bold ${
-            toastMessage.type === "success" ? "bg-primary" : "bg-error"
+          className={`fixed bottom-8 left-8 z-50 px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-3 animate-in fade-in slide-in-from-bottom-4 text-white font-bold ${
+            toastMessage.type === "success" ? "bg-emerald-600 border border-emerald-400/40" : "bg-red-600 border border-red-400/40"
           }`}
         >
           <span className="material-symbols-outlined text-2xl">
@@ -492,12 +580,12 @@ export default function ProvidersClient() {
       {/* Header Section */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-outline-variant/20 pb-6">
         <div>
-          <h1 className="text-2xl md:text-3xl font-display font-bold text-on-surface flex items-center gap-2">
+          <h1 className="text-2xl md:text-3xl font-display font-bold text-on-surface flex items-center gap-2.5">
             <span className="material-symbols-outlined text-primary text-3xl">dns</span>
-            <span>ربط سيرفرات الـ API</span>
+            <span>إدارة ومزودي الـ API (Providers)</span>
           </h1>
           <p className="text-on-surface-variant text-xs md:text-sm mt-1">
-            إدارة السيرفرات ومفاتيح الربط الآلي لتنفيذ طلبات وتفعيلات متجرك تلقائياً.
+            إضافة وإدارة سيرفرات المزودين لربط المنتجات وسحب الخدمات وتنفيذ طلبات العملاء تلقائياً.
           </p>
         </div>
 
@@ -506,7 +594,7 @@ export default function ProvidersClient() {
           className="px-5 py-3 rounded-2xl bg-gradient-to-r from-primary to-secondary text-on-primary text-sm font-bold shadow-lg hover:shadow-primary/30 transition-all flex items-center justify-center gap-2 active:scale-95"
         >
           <span className="material-symbols-outlined text-xl">add_circle</span>
-          <span>إضافة سيرفر جديد</span>
+          <span>إضافة مزود جديد</span>
         </button>
       </div>
 
@@ -527,7 +615,7 @@ export default function ProvidersClient() {
             onClick={openAddModal}
             className="px-5 py-2.5 rounded-xl bg-primary text-on-primary font-bold text-xs shadow-md"
           >
-            إضافة سيرفر جديد
+            إضافة مزود جديد
           </button>
         </div>
       ) : (
@@ -624,7 +712,7 @@ export default function ProvidersClient() {
                     </button>
 
                     <button
-                      onClick={() => handleSyncProviderServices(provider)}
+                      onClick={() => openSyncModal(provider)}
                       disabled={isSyncing}
                       className="px-4 py-2 rounded-xl bg-gradient-to-r from-primary to-secondary text-on-primary text-xs font-bold transition-all flex items-center gap-1.5 shadow-md hover:shadow-lg disabled:opacity-50"
                     >
@@ -650,7 +738,7 @@ export default function ProvidersClient() {
                 <span className="material-symbols-outlined text-primary">
                   {editingProvider ? "edit_square" : "add_box"}
                 </span>
-                <span>{editingProvider ? "تعديل بيانات السيرفر" : "إضافة سيرفر مزود جديد"}</span>
+                <span>{editingProvider ? "تعديل بيانات المزود" : "إضافة مزود API جديد"}</span>
               </h3>
               <button
                 type="button"
@@ -663,7 +751,7 @@ export default function ProvidersClient() {
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-xs font-bold text-on-surface-variant mb-1.5">اسم السيرفر / المزود:</label>
+                <label className="block text-xs font-bold text-on-surface-variant mb-1.5">اسم المزود:</label>
                 <input
                   type="text"
                   required
@@ -729,6 +817,58 @@ export default function ProvidersClient() {
                 </select>
               </div>
 
+              {formData.type === "dynamic" && (
+                <div>
+                  <label className="block text-xs font-bold text-primary mb-1.5">
+                    إعدادات الربط الديناميكي (JSON Mapping Rules):
+                  </label>
+                  <textarea
+                    rows={4}
+                    placeholder='{"sync_endpoint": "/services", "map_array_path": "data"}'
+                    value={formData.mappingRules}
+                    onChange={(e) => setFormData({ ...formData, mappingRules: e.target.value })}
+                    className="w-full px-4 py-3 bg-surface-container-lowest border border-primary/40 rounded-xl focus:border-primary outline-none text-xs font-mono text-on-surface text-left dir-ltr transition-all"
+                  />
+                </div>
+              )}
+
+              {/* TEST CONNECTION BUTTON & STATUS */}
+              <div className="p-3.5 rounded-2xl bg-surface-container-lowest border border-outline-variant/20 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-on-surface-variant flex items-center gap-1.5">
+                    <span className="material-symbols-outlined text-sm text-primary">network_ping</span>
+                    <span>اختبار الاتصال بالسيرفر</span>
+                  </span>
+
+                  <button
+                    type="button"
+                    onClick={handleTestConnection}
+                    disabled={isTestingConnection || !formData.apiUrl || !formData.apiKey}
+                    className="px-3.5 py-1.5 rounded-xl bg-primary/10 hover:bg-primary/20 text-primary text-xs font-bold transition-all flex items-center gap-1.5 disabled:opacity-50 border border-primary/30"
+                  >
+                    <span className={`material-symbols-outlined text-sm ${isTestingConnection ? "animate-spin" : ""}`}>
+                      {isTestingConnection ? "refresh" : "sensors"}
+                    </span>
+                    <span>{isTestingConnection ? "جاري الاختبار..." : "فحص الاتصال والرصيد"}</span>
+                  </button>
+                </div>
+
+                {testResult && (
+                  <div
+                    className={`p-3 rounded-xl text-xs font-bold flex items-center gap-2 ${
+                      testResult.success
+                        ? "bg-emerald-500/10 border border-emerald-500/30 text-emerald-400"
+                        : "bg-red-500/10 border border-red-500/30 text-red-400"
+                    }`}
+                  >
+                    <span className="material-symbols-outlined text-base">
+                      {testResult.success ? "check_circle" : "error"}
+                    </span>
+                    <span>{testResult.message}</span>
+                  </div>
+                )}
+              </div>
+
               <div className="flex items-center gap-3 p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
                 <input
                   id="providerActiveToggle"
@@ -753,7 +893,7 @@ export default function ProvidersClient() {
                   ) : (
                     <span className="material-symbols-outlined text-sm">save</span>
                   )}
-                  <span>حفظ بيانات السيرفر</span>
+                  <span>حفظ بيانات المزود</span>
                 </button>
                 <button
                   type="button"
@@ -768,6 +908,79 @@ export default function ProvidersClient() {
         </div>
       )}
 
+      {/* SYNC CONFIG MODAL */}
+      {syncModalProvider && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-in fade-in">
+          <div className="bg-surface-container border border-outline-variant/30 rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl space-y-5">
+            <div className="flex items-center justify-between pb-3 border-b border-outline-variant/20">
+              <h3 className="text-lg font-bold text-on-surface flex items-center gap-2">
+                <span className="material-symbols-outlined text-primary">sync</span>
+                <span>مزامنة خدمات: {syncModalProvider.name}</span>
+              </h3>
+              <button
+                type="button"
+                onClick={() => setSyncModalProvider(null)}
+                className="w-8 h-8 rounded-full bg-surface-variant flex items-center justify-center text-on-surface-variant hover:text-on-surface"
+              >
+                <span className="material-symbols-outlined text-sm">close</span>
+              </button>
+            </div>
+
+            <div className="space-y-4 text-xs">
+              <div className="p-3 bg-primary/10 border border-primary/20 rounded-xl text-on-surface-variant leading-relaxed">
+                سيتم سحب كافة الأقسام والخدمات والحقول المطلوبة تلقائياً من المزود مع الحفاظ على التخصيصات.
+              </div>
+
+              <div>
+                <label className="block font-bold text-on-surface-variant mb-1.5">
+                  نسبة هامش الربح المضافة على التكلفة (%):
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  step="0.5"
+                  value={syncConfig.markup_percent}
+                  onChange={(e) => setSyncConfig({ ...syncConfig, markup_percent: parseFloat(e.target.value) || 0 })}
+                  className="w-full px-4 py-2.5 bg-surface-container-lowest border border-outline-variant/40 rounded-xl focus:border-primary outline-none font-bold text-on-surface text-left dir-ltr"
+                />
+              </div>
+
+              <div>
+                <label className="block font-bold text-on-surface-variant mb-1.5">
+                  معامل تحويل العملة (Exchange Rate):
+                </label>
+                <input
+                  type="number"
+                  min="0.001"
+                  step="0.01"
+                  value={syncConfig.exchange_rate}
+                  onChange={(e) => setSyncConfig({ ...syncConfig, exchange_rate: parseFloat(e.target.value) || 1 })}
+                  className="w-full px-4 py-2.5 bg-surface-container-lowest border border-outline-variant/40 rounded-xl focus:border-primary outline-none font-bold text-on-surface text-left dir-ltr"
+                />
+              </div>
+            </div>
+
+            <div className="flex gap-3 pt-2">
+              <button
+                type="button"
+                onClick={executeSync}
+                className="flex-1 bg-gradient-to-r from-primary to-secondary text-on-primary py-3 rounded-xl font-bold text-xs transition-all shadow-md flex items-center justify-center gap-2"
+              >
+                <span className="material-symbols-outlined text-sm">play_arrow</span>
+                <span>بدء المزامنة الآن</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setSyncModalProvider(null)}
+                className="px-5 bg-surface-variant text-on-surface-variant hover:text-on-surface py-3 rounded-xl font-bold text-xs"
+              >
+                إلغاء
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* DELETE MODAL */}
       {deleteModalProvider && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-in fade-in">
@@ -777,13 +990,13 @@ export default function ProvidersClient() {
                 <span className="material-symbols-outlined text-3xl">delete_forever</span>
               </div>
               <div>
-                <h3 className="text-xl font-bold text-on-surface">حذف السيرفر</h3>
+                <h3 className="text-xl font-bold text-on-surface">حذف المزود</h3>
                 <p className="text-xs text-red-400 font-semibold">{deleteModalProvider.name}</p>
               </div>
             </div>
 
             <p className="text-xs text-on-surface-variant leading-relaxed">
-              هل أنت متأكد من رغبتك في إزالة هذا السيرفر من قائمة الربط؟ لن يتم إرسال طلبات جديدة إليه بعد الحذف.
+              هل أنت متأكد من رغبتك في إزالة هذا المزود من قائمة الربط؟ لن يتم إرسال طلبات جديدة إليه بعد الحذف.
             </p>
 
             <div className="flex gap-3 pt-2">
@@ -824,7 +1037,7 @@ export default function ProvidersClient() {
                 </div>
                 <div>
                   <h3 className="text-lg font-bold text-on-surface flex items-center gap-2">
-                    <span>خدمات وباقات السيرفر:</span>
+                    <span>خدمات وباقات المزود:</span>
                     <span className="text-primary font-display">{browseProvider.name}</span>
                   </h3>
                   <p className="text-xs text-on-surface-variant">
@@ -851,10 +1064,21 @@ export default function ProvidersClient() {
                   onClick={() => handleToggleAllServices(true)}
                   disabled={isPerformingBulkAction || loadingServices}
                   className="px-3.5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold transition-all flex items-center gap-1.5 shadow-sm disabled:opacity-50"
-                  title="تفعيل وإظهار كافة خدمات وباقات هذا السيرفر للعملاء في المتجر"
+                  title="تفعيل وإظهار كافة خدمات وباقات هذا المزود للعملاء في المتجر"
                 >
                   <span className="material-symbols-outlined text-sm">visibility</span>
                   <span>إظهار وتفعيل كل الخدمات للعملاء</span>
+                </button>
+
+                {/* Hide All Button */}
+                <button
+                  type="button"
+                  onClick={() => handleToggleAllServices(false)}
+                  disabled={isPerformingBulkAction || loadingServices}
+                  className="px-3 py-2 rounded-xl bg-surface-container-high hover:bg-surface-container-highest text-on-surface-variant hover:text-on-surface font-bold transition-all flex items-center gap-1 border border-outline-variant/20 disabled:opacity-50"
+                >
+                  <span className="material-symbols-outlined text-sm">visibility_off</span>
+                  <span>إخفاء الكل</span>
                 </button>
 
                 {/* Show Selected Packages Button */}
@@ -886,14 +1110,14 @@ export default function ProvidersClient() {
               <div className="flex items-center gap-2">
                 <button
                   type="button"
-                  onClick={() => handleSyncProviderServices(browseProvider)}
+                  onClick={() => openSyncModal(browseProvider)}
                   disabled={syncingProviderId === browseProvider.id}
                   className="px-3 py-1.5 rounded-xl bg-surface-container-high hover:bg-surface-container-highest text-on-surface font-bold transition-all flex items-center gap-1 border border-outline-variant/30 disabled:opacity-50 text-[11px]"
                 >
                   <span className={`material-symbols-outlined text-xs text-primary ${syncingProviderId === browseProvider.id ? "animate-spin" : ""}`}>
                     sync
                   </span>
-                  <span>تحديث الخدمات من المزود</span>
+                  <span>مزامنة من المزود</span>
                 </button>
               </div>
             </div>
@@ -978,7 +1202,7 @@ export default function ProvidersClient() {
               {loadingServices ? (
                 <div className="p-16 text-center text-on-surface-variant text-xs flex flex-col items-center gap-3">
                   <span className="w-8 h-8 border-3 border-primary border-t-transparent rounded-full animate-spin"></span>
-                  <span>جاري تنظيم وجلب باقات وخدمات السيرفر...</span>
+                  <span>جاري تنظيم وجلب باقات وخدمات المزود...</span>
                 </div>
               ) : filteredGroups.length === 0 ? (
                 <div className="p-16 text-center text-on-surface-variant text-xs space-y-3">
@@ -1111,9 +1335,15 @@ export default function ProvidersClient() {
                                         <span
                                           key={rfIdx}
                                           className="text-[10px] px-2 py-0.5 rounded-lg bg-surface-container-high border border-primary/30 text-primary font-bold flex items-center gap-1 shadow-2xs font-mono"
+                                          title={rf.options && rf.options.length > 0 ? `خيارات: ${rf.options.join(" | ")}` : rf.label}
                                         >
                                           <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
                                           <span>{rf.label}</span>
+                                          {rf.options && rf.options.length > 0 && (
+                                            <span className="text-[9px] bg-primary/20 text-primary px-1 rounded">
+                                              {rf.options.length} خيارات
+                                            </span>
+                                          )}
                                         </span>
                                       ))}
                                     </div>

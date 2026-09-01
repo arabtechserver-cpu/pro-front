@@ -6,11 +6,13 @@ import { usePathname } from "next/navigation";
 const NAV_ITEMS = [
   { href: "/admin", label: "ملخص الإحصائيات", icon: "dashboard" },
   { href: "/admin/homepage", label: "التحكم بالصفحة الرئيسية", icon: "space_dashboard" },
+  { href: "/admin/memberships", label: "إدارة العضويات والخصومات VIP", icon: "card_membership" },
   { href: "/admin/users", label: "إدارة المستخدمين المسجلين", icon: "manage_accounts" },
   { href: "/admin/orders", label: "الطلبات", icon: "shopping_cart" },
   { href: "/admin/services", label: "الخدمات والأقسام", icon: "category" },
   { href: "/admin/providers", label: "ربط سيرفرات الـ API", icon: "dns" },
   { href: "/admin/wallet", label: "إدارة المحفظة وطلبات الشحن", icon: "account_balance_wallet" },
+  { href: "/admin/currencies", label: "أسعار العملات والجنيه السوداني", icon: "currency_exchange" },
   { href: "/admin/blog", label: "المدونة", icon: "article" },
   { href: "/admin/videos", label: "الأكاديمية والفيديوهات", icon: "video_library" },
   { href: "/admin/analytics", label: "الإحصائيات", icon: "bar_chart" },

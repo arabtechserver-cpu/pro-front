@@ -4,19 +4,38 @@ import { Locale } from "@/i18n/config";
 import PricingClient from "./PricingClient";
 import { Metadata } from "next";
 
-export async function generateMetadata({ params }: { params: { lang: Locale } }): Promise<Metadata> {
+export async function generateMetadata({ 
+  params, 
+  searchParams 
+}: { 
+  params: { lang: Locale }; 
+  searchParams?: { [key: string]: string | string[] | undefined };
+}): Promise<Metadata> {
   const isAr = params.lang === "ar";
-  const title = isAr ? "قائمة الأسعار والخدمات | عرب تك برو سيرفر" : "Services & Price List | Arab Tech Pro Server";
-  const description = isAr
-    ? "تصفح قائمة أسعار جميع خدمات فك الشفرات، تخطي حسابات جوجل FRP و iCloud، وتنشيط الدونجلات والبوكسات بأفضل الأسعار وأعلى سرعة تسليم."
-    : "Browse our complete catalog and price list for phone unlocking, FRP & iCloud bypass, and tool activations.";
+  const rawSection = searchParams?.section || searchParams?.group || searchParams?.cat || searchParams?.search;
+  const section = typeof rawSection === "string" ? rawSection : undefined;
+
+  const title = section 
+    ? (isAr ? `${section} - أسعار وخدمات | عرب تك برو سيرفر` : `${section} - Services & Price List | Arab Tech Pro Server`)
+    : (isAr ? "قائمة الأسعار والخدمات | عرب تك برو سيرفر" : "Services & Price List | Arab Tech Pro Server");
+
+  const description = section
+    ? (isAr 
+        ? `تصفح أسعار وخدمات قسم "${section}" المتاحة على منصة عرب تك برو سيرفر مع التسليم الفوري وأقوى الخصومات.` 
+        : `Explore ${section} services and real-time live prices on Arab Tech Pro Server with instant 24/7 delivery.`)
+    : (isAr
+        ? "تصفح قائمة أسعار جميع خدمات فك الشفرات، تخطي حسابات جوجل FRP و iCloud، وتنشيط الدونجلات والبوكسات بأفضل الأسعار وأعلى سرعة تسليم."
+        : "Browse our complete catalog and price list for phone unlocking, FRP & iCloud bypass, and tool activations.");
+
+  const currentUrl = `https://arabtechproserver.tech/${params.lang}/pricing${section ? `?section=${encodeURIComponent(section)}` : ''}`;
+
   return {
     title,
     description,
     openGraph: {
       title,
       description,
-      url: `https://arabtechproserver.tech/${params.lang}/pricing`,
+      url: currentUrl,
       images: [{ url: "https://arabtechproserver.tech/images/og-image.png" }],
     },
     twitter: {

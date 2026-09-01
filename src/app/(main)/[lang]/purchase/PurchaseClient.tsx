@@ -26,6 +26,15 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
   const [submitFeedback, setSubmitFeedback] = useState<{ type: "success" | "error"; text: string } | null>(null);
   const [showServiceInfo, setShowServiceInfo] = useState<boolean>(false);
 
+  // Success Confirmation Modal Data
+  const [successOrderModalData, setSuccessOrderModalData] = useState<{
+    orderId: string;
+    serviceName: string;
+    targetInput: string;
+    price: number;
+    newBalance: number;
+  } | null>(null);
+
   /**
    * يقرأ حقول المزود من بنيتين مختلفتين:
    * 1. Array (النظام الجديد): [{id, label, type, options, required, description}]
@@ -447,9 +456,21 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
 
       const data = await res.json().catch(() => ({ success: false, message: "تعذر قراءة رد الخادم" }));
       if (res.ok && data.success) {
-        setSubmitFeedback({ type: "success", text: data.message || "تم إرسال وحفظ الطلب بنجاح!" });
+        const orderId = data.order?.id ? data.order.id.slice(-6).toUpperCase() : "NEW";
+        const newBal = data.newBalance !== undefined ? data.newBalance : Math.max(0, userBalance - totalPrice);
+
+        setSubmitFeedback({ type: "success", text: data.message || "تم استلام وتأكيد طلبك بنجاح!" });
+        setSuccessOrderModalData({
+          orderId,
+          serviceName: selectedService.name,
+          targetInput: payloadTarget,
+          price: totalPrice,
+          newBalance: newBal
+        });
+
         setTargetInput("");
         setNotes("");
+        setCustomFieldValues({});
         
         if (data.newBalance !== undefined) {
           setUserBalance(data.newBalance);
@@ -467,8 +488,72 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
   };
 
   return (
-    <div className="flex flex-col gap-8 pb-16 max-w-4xl mx-auto" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
+    <div className="flex flex-col gap-8 pb-16 max-w-4xl mx-auto relative" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
       
+      {/* CELEBRATION ORDER SUCCESS MODAL */}
+      {successOrderModalData && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-xl animate-in fade-in duration-300">
+          <div className="glass-card w-full max-w-lg rounded-3xl p-6 sm:p-8 border border-emerald-500/50 shadow-2xl relative overflow-hidden space-y-6 text-center bg-surface-container-low">
+            <div className="w-20 h-20 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 flex items-center justify-center mx-auto shadow-xl ring-8 ring-emerald-500/10">
+              <span className="material-symbols-outlined text-4xl animate-bounce">check_circle</span>
+            </div>
+
+            <div className="space-y-1.5">
+              <h3 className="text-2xl font-bold text-white font-display">
+                {lang === 'ar' ? '🎉 تم استلام وتأكيد طلبك بنجاح!' : '🎉 Order Placed Successfully!'}
+              </h3>
+              <p className="text-xs text-on-surface-variant leading-relaxed">
+                {lang === 'ar'
+                  ? 'طلبك الآن قيد المراجعة والمعالجة من قبل الإدارة، وسيتم تسليم النتيجة فور إتمامها.'
+                  : 'Your order is currently pending review & processing. Result will be delivered upon completion.'}
+              </p>
+            </div>
+
+            {/* Details Summary Card */}
+            <div className="p-4 rounded-2xl bg-surface-container-lowest border border-outline-variant/30 text-xs space-y-2.5 text-right font-sans">
+              <div className="flex justify-between items-center pb-2 border-b border-outline-variant/15">
+                <span className="text-on-surface-variant font-bold">رقم الطلب:</span>
+                <span className="font-mono font-bold text-primary text-sm">#{successOrderModalData.orderId}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-on-surface-variant font-bold">الخدمة:</span>
+                <span className="font-bold text-on-surface truncate max-w-[220px]">{successOrderModalData.serviceName}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-on-surface-variant font-bold">البيانات / IMEI:</span>
+                <span className="font-mono font-bold text-primary dir-ltr">{successOrderModalData.targetInput}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-on-surface-variant font-bold">المبلغ المخصوم:</span>
+                <span className="font-mono font-bold text-emerald-400">${successOrderModalData.price.toFixed(2)} USD</span>
+              </div>
+              <div className="flex justify-between items-center pt-2 border-t border-outline-variant/15">
+                <span className="text-on-surface-variant font-bold">رصيد محفظتك الجديد:</span>
+                <span className="font-mono font-bold text-primary text-sm">${successOrderModalData.newBalance.toFixed(2)} USD</span>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex flex-col sm:flex-row gap-3 pt-2">
+              <Link
+                href={`/${lang}/orders`}
+                className="flex-1 bg-gradient-to-r from-emerald-500 to-teal-600 text-black py-3.5 rounded-2xl font-bold text-xs shadow-lg hover:shadow-emerald-500/30 transition-all flex items-center justify-center gap-2 active:scale-95"
+              >
+                <span className="material-symbols-outlined text-base">receipt_long</span>
+                <span>{lang === 'ar' ? 'الانتقال لسجل طلباتي 📜' : 'View in My Orders 📜'}</span>
+              </Link>
+              <button
+                type="button"
+                onClick={() => setSuccessOrderModalData(null)}
+                className="px-6 bg-surface-container-high hover:bg-surface-container-highest text-on-surface py-3.5 rounded-2xl font-bold text-xs border border-outline-variant/30 transition-all active:scale-95"
+              >
+                {lang === 'ar' ? '➕ طلب خدمة أخرى' : '➕ Order Another Service'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* PAGE HEADER */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-outline-variant/20 pb-5">
         <div>

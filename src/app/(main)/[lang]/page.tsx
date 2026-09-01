@@ -3,6 +3,7 @@ import Link from "next/link";
 import { getDictionary } from "@/i18n/get-dictionary";
 import { Locale } from "@/i18n/config";
 import NewsletterSection from "@/components/NewsletterSection";
+import CampaignSlider from "@/components/CampaignSlider";
 
 async function getHomepageConfig() {
   try {
@@ -95,7 +96,7 @@ export default async function Home({ params }: { params: { lang: Locale } }) {
   const telegramUrl = hp?.noticeBar?.telegram
     ? (hp.noticeBar.telegram.startsWith("http") ? hp.noticeBar.telegram : `https://t.me/${hp.noticeBar.telegram.replace(/^@/, '')}`)
     : "https://t.me/ARABTECHSUPPURT2";
-  const emailAddr = hp?.noticeBar?.email || "eslamgsm1774@gmail.com";
+  const emailAddr = (hp?.noticeBar?.email && hp.noticeBar.email !== "eslamgsm1774@gmail.com") ? hp.noticeBar.email : "arabtechserver@gmail.com";
 
   const liveTag = isAr ? hp?.heroSection?.liveTagAr : hp?.heroSection?.liveTagEn;
   const eyebrow = isAr ? hp?.heroSection?.eyebrowAr : hp?.heroSection?.eyebrowEn;
@@ -147,17 +148,7 @@ export default async function Home({ params }: { params: { lang: Locale } }) {
   const feat3Title = isAr ? hp?.featureRibbon?.feat3TitleAr : hp?.featureRibbon?.feat3TitleEn;
   const feat3Desc = isAr ? hp?.featureRibbon?.feat3DescAr : hp?.featureRibbon?.feat3DescEn;
 
-  const promo1Tag = isAr ? hp?.campaigns?.promo1TagAr : hp?.campaigns?.promo1TagEn;
-  const promo1Title = isAr ? hp?.campaigns?.promo1TitleAr : hp?.campaigns?.promo1TitleEn;
-  const promo1Desc = isAr ? hp?.campaigns?.promo1DescAr : hp?.campaigns?.promo1DescEn;
-  const promo1Img = hp?.campaigns?.promo1Image || "/images/promo_samsung.png";
-  const promo1Url = formatUrl(hp?.campaigns?.promo1Url, "/pricing");
-
-  const promo2Tag = isAr ? hp?.campaigns?.promo2TagAr : hp?.campaigns?.promo2TagEn;
-  const promo2Title = isAr ? hp?.campaigns?.promo2TitleAr : hp?.campaigns?.promo2TitleEn;
-  const promo2Desc = isAr ? hp?.campaigns?.promo2DescAr : hp?.campaigns?.promo2DescEn;
-  const promo2Img = hp?.campaigns?.promo2Image || "/images/promo_chimera.png";
-  const promo2Url = formatUrl(hp?.campaigns?.promo2Url, "/pricing");
+  const campaigns = Array.isArray(hp?.campaigns) ? hp.campaigns : [];
 
   return (
     <div className="flex flex-col gap-10 sm:gap-16 lg:gap-20 pb-12 sm:pb-20 overflow-x-hidden">
@@ -178,88 +169,93 @@ export default async function Home({ params }: { params: { lang: Locale } }) {
         }}
       />
       
-      {/* --- Notice Bar --- */}
+      {/* --- Continuous Seamless Notice Bar --- */}
       <div className="w-full bg-surface-container/90 backdrop-blur-md border-b border-outline-variant/20 mb-2 sm:mb-4 relative z-20 overflow-hidden">
-        <div className="container mx-auto px-4 flex whitespace-nowrap overflow-hidden py-2 sm:py-2.5">
-          <div className="animate-marquee hover:[animation-play-state:paused] flex gap-6 sm:gap-8 items-center text-xs sm:text-sm font-medium text-on-surface-variant cursor-pointer">
-            {/* Main Dynamic / GSM Bullet Points */}
-            <span className="flex items-center gap-2 bg-primary/10 text-primary px-3 py-1 rounded-full border border-primary/25 font-bold">
-              <i className="fas fa-bolt text-yellow-400"></i>
-              <span>{notice1 || (isAr ? "تسليم فوري وتلقائي لمعظم خدمات الـ IMEI والسيرفر على مدار 24/7" : "Instant 24/7 automated delivery for IMEI & server services")}</span>
-            </span>
+        <div className="w-full flex whitespace-nowrap overflow-hidden py-2 sm:py-2.5" dir="ltr">
+          <div className="flex w-max animate-marquee hover:[animation-play-state:paused] cursor-pointer select-none text-xs sm:text-sm font-medium text-on-surface-variant">
+            
+            {/* Track 1 */}
+            <div className="flex shrink-0 items-center gap-6 sm:gap-8 px-4">
+              <span className="flex items-center gap-2 bg-primary/10 text-primary px-3 py-1 rounded-full border border-primary/25 font-bold shrink-0">
+                <i className="fas fa-bolt text-yellow-400"></i>
+                <span>{notice1 || (isAr ? "تسليم فوري وتلقائي لمعظم خدمات الـ IMEI والسيرفر على مدار 24/7" : "Instant 24/7 automated delivery for IMEI & server services")}</span>
+              </span>
 
-            <span className="flex items-center gap-2">
-              <i className="fas fa-shield-alt text-secondary"></i>
-              <span>{notice2 || (isAr ? "دفع آمن 100% + شحن فوري للمحفظة مع ضمان استرجاع الرصيد" : "100% Secure checkout + instant wallet funding & refund protection")}</span>
-            </span>
+              <span className="flex items-center gap-2 shrink-0">
+                <i className="fas fa-shield-alt text-secondary"></i>
+                <span>{notice2 || (isAr ? "دفع آمن 100% + شحن فوري للمحفظة مع ضمان استرجاع الرصيد" : "100% Secure checkout + instant wallet funding & refund protection")}</span>
+              </span>
 
-            <span className="flex items-center gap-2 text-on-surface">
-              <i className="fas fa-tools text-primary"></i>
-              <span>{isAr ? "تفعيل فوري لأقوى أدوات وبوكسات السوفت وير (UnlockTool, Chimera, Borneo, AMT)" : "Instant activation for top tools (UnlockTool, Chimera, Borneo, AMT)"}</span>
-            </span>
+              <span className="flex items-center gap-2 text-on-surface shrink-0">
+                <i className="fas fa-tools text-primary"></i>
+                <span>{isAr ? "تفعيل فوري لأقوى أدوات وبوكسات السوفت وير (UnlockTool, Chimera, Borneo, AMT)" : "Instant activation for top tools (UnlockTool, Chimera, Borneo, AMT)"}</span>
+              </span>
 
-            <span className="flex items-center gap-2">
-              <i className="fas fa-unlock text-tertiary"></i>
-              <span>{isAr ? "فك شفرات رسمي وتخطي iCloud & FRP لجميع الشبكات والموديلات" : "Official factory unlock & iCloud / FRP bypass worldwide"}</span>
-            </span>
+              <span className="flex items-center gap-2 shrink-0">
+                <i className="fas fa-unlock text-tertiary"></i>
+                <span>{isAr ? "فك شفرات رسمي وتخطي iCloud & FRP لجميع الشبكات والموديلات" : "Official factory unlock & iCloud / FRP bypass worldwide"}</span>
+              </span>
 
-            <span className="flex items-center gap-2 text-emerald-400 font-semibold">
-              <i className="fas fa-tags"></i>
-              <span>{isAr ? "أسعار جملة وتخفيضات خاصة لأصحاب المحلات والوكلاء" : "Exclusive wholesale pricing for resellers & repair shops"}</span>
-            </span>
+              <span className="flex items-center gap-2 text-emerald-400 font-semibold shrink-0">
+                <i className="fas fa-tags"></i>
+                <span>{isAr ? "أسعار جملة وتخفيضات خاصة لأصحاب المحلات والوكلاء" : "Exclusive wholesale pricing for resellers & repair shops"}</span>
+              </span>
 
-            {/* Direct Quick Contact Links */}
-            <a href={`https://wa.me/${whatsappNum.replace(/[^0-9]/g, '')}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 bg-[#25D366]/10 text-[#25D366] px-3 py-1 rounded-full border border-[#25D366]/30 hover:bg-[#25D366]/20 transition-all font-bold">
-              <i className="fab fa-whatsapp text-[#25D366]"></i>
-              <span dir="ltr">WhatsApp: {whatsappNum}</span>
-            </a>
-            <a href={telegramUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 bg-[#0088cc]/10 text-[#0088cc] px-3 py-1 rounded-full border border-[#0088cc]/30 hover:bg-[#0088cc]/20 transition-all font-bold">
-              <i className="fab fa-telegram-plane text-[#0088cc]"></i>
-              <span dir="ltr">Telegram: {telegramUser}</span>
-            </a>
-            <a href={`mailto:${emailAddr}`} className="flex items-center gap-2 hover:text-tertiary transition-colors">
-              <i className="fas fa-envelope text-tertiary"></i>
-              <span>{emailAddr}</span>
-            </a>
+              <a href={`https://wa.me/${whatsappNum.replace(/[^0-9]/g, '')}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 bg-[#25D366]/10 text-[#25D366] px-3 py-1 rounded-full border border-[#25D366]/30 hover:bg-[#25D366]/20 transition-all font-bold shrink-0">
+                <i className="fab fa-whatsapp text-[#25D366]"></i>
+                <span>WhatsApp: {whatsappNum}</span>
+              </a>
+              <a href={telegramUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 bg-[#0088cc]/10 text-[#0088cc] px-3 py-1 rounded-full border border-[#0088cc]/30 hover:bg-[#0088cc]/20 transition-all font-bold shrink-0">
+                <i className="fab fa-telegram-plane text-[#0088cc]"></i>
+                <span>Telegram: {telegramUser}</span>
+              </a>
+              <a href={`mailto:${emailAddr}`} className="flex items-center gap-2 hover:text-tertiary transition-colors shrink-0">
+                <i className="fas fa-envelope text-tertiary"></i>
+                <span>{emailAddr}</span>
+              </a>
+            </div>
 
-            {/* Duplicate set for seamless continuous marquee scrolling */}
-            <span className="flex items-center gap-2 bg-primary/10 text-primary px-3 py-1 rounded-full border border-primary/25 font-bold ml-6" aria-hidden="true">
-              <i className="fas fa-bolt text-yellow-400"></i>
-              <span>{notice1 || (isAr ? "تسليم فوري وتلقائي لمعظم خدمات الـ IMEI والسيرفر على مدار 24/7" : "Instant 24/7 automated delivery for IMEI & server services")}</span>
-            </span>
+            {/* Track 2 (Exact Seamless Clone) */}
+            <div className="flex shrink-0 items-center gap-6 sm:gap-8 px-4" aria-hidden="true">
+              <span className="flex items-center gap-2 bg-primary/10 text-primary px-3 py-1 rounded-full border border-primary/25 font-bold shrink-0">
+                <i className="fas fa-bolt text-yellow-400"></i>
+                <span>{notice1 || (isAr ? "تسليم فوري وتلقائي لمعظم خدمات الـ IMEI والسيرفر على مدار 24/7" : "Instant 24/7 automated delivery for IMEI & server services")}</span>
+              </span>
 
-            <span className="flex items-center gap-2" aria-hidden="true">
-              <i className="fas fa-shield-alt text-secondary"></i>
-              <span>{notice2 || (isAr ? "دفع آمن 100% + شحن فوري للمحفظة مع ضمان استرجاع الرصيد" : "100% Secure checkout + instant wallet funding & refund protection")}</span>
-            </span>
+              <span className="flex items-center gap-2 shrink-0">
+                <i className="fas fa-shield-alt text-secondary"></i>
+                <span>{notice2 || (isAr ? "دفع آمن 100% + شحن فوري للمحفظة مع ضمان استرجاع الرصيد" : "100% Secure checkout + instant wallet funding & refund protection")}</span>
+              </span>
 
-            <span className="flex items-center gap-2 text-on-surface" aria-hidden="true">
-              <i className="fas fa-tools text-primary"></i>
-              <span>{isAr ? "تفعيل فوري لأقوى أدوات وبوكسات السوفت وير (UnlockTool, Chimera, Borneo, AMT)" : "Instant activation for top tools (UnlockTool, Chimera, Borneo, AMT)"}</span>
-            </span>
+              <span className="flex items-center gap-2 text-on-surface shrink-0">
+                <i className="fas fa-tools text-primary"></i>
+                <span>{isAr ? "تفعيل فوري لأقوى أدوات وبوكسات السوفت وير (UnlockTool, Chimera, Borneo, AMT)" : "Instant activation for top tools (UnlockTool, Chimera, Borneo, AMT)"}</span>
+              </span>
 
-            <span className="flex items-center gap-2" aria-hidden="true">
-              <i className="fas fa-unlock text-tertiary"></i>
-              <span>{isAr ? "فك شفرات رسمي وتخطي iCloud & FRP لجميع الشبكات والموديلات" : "Official factory unlock & iCloud / FRP bypass worldwide"}</span>
-            </span>
+              <span className="flex items-center gap-2 shrink-0">
+                <i className="fas fa-unlock text-tertiary"></i>
+                <span>{isAr ? "فك شفرات رسمي وتخطي iCloud & FRP لجميع الشبكات والموديلات" : "Official factory unlock & iCloud / FRP bypass worldwide"}</span>
+              </span>
 
-            <span className="flex items-center gap-2 text-emerald-400 font-semibold" aria-hidden="true">
-              <i className="fas fa-tags"></i>
-              <span>{isAr ? "أسعار جملة وتخفيضات خاصة لأصحاب المحلات والوكلاء" : "Exclusive wholesale pricing for resellers & repair shops"}</span>
-            </span>
+              <span className="flex items-center gap-2 text-emerald-400 font-semibold shrink-0">
+                <i className="fas fa-tags"></i>
+                <span>{isAr ? "أسعار جملة وتخفيضات خاصة لأصحاب المحلات والوكلاء" : "Exclusive wholesale pricing for resellers & repair shops"}</span>
+              </span>
 
-            <a href={`https://wa.me/${whatsappNum.replace(/[^0-9]/g, '')}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 bg-[#25D366]/10 text-[#25D366] px-3 py-1 rounded-full border border-[#25D366]/30 hover:bg-[#25D366]/20 transition-all font-bold" aria-hidden="true">
-              <i className="fab fa-whatsapp text-[#25D366]"></i>
-              <span dir="ltr">WhatsApp: {whatsappNum}</span>
-            </a>
-            <a href={telegramUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 bg-[#0088cc]/10 text-[#0088cc] px-3 py-1 rounded-full border border-[#0088cc]/30 hover:bg-[#0088cc]/20 transition-all font-bold" aria-hidden="true">
-              <i className="fab fa-telegram-plane text-[#0088cc]"></i>
-              <span dir="ltr">Telegram: {telegramUser}</span>
-            </a>
-            <a href={`mailto:${emailAddr}`} className="flex items-center gap-2 hover:text-tertiary transition-colors" aria-hidden="true">
-              <i className="fas fa-envelope text-tertiary"></i>
-              <span>{emailAddr}</span>
-            </a>
+              <a href={`https://wa.me/${whatsappNum.replace(/[^0-9]/g, '')}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 bg-[#25D366]/10 text-[#25D366] px-3 py-1 rounded-full border border-[#25D366]/30 hover:bg-[#25D366]/20 transition-all font-bold shrink-0">
+                <i className="fab fa-whatsapp text-[#25D366]"></i>
+                <span>WhatsApp: {whatsappNum}</span>
+              </a>
+              <a href={telegramUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 bg-[#0088cc]/10 text-[#0088cc] px-3 py-1 rounded-full border border-[#0088cc]/30 hover:bg-[#0088cc]/20 transition-all font-bold shrink-0">
+                <i className="fab fa-telegram-plane text-[#0088cc]"></i>
+                <span>Telegram: {telegramUser}</span>
+              </a>
+              <a href={`mailto:${emailAddr}`} className="flex items-center gap-2 hover:text-tertiary transition-colors shrink-0">
+                <i className="fas fa-envelope text-tertiary"></i>
+                <span>{emailAddr}</span>
+              </a>
+            </div>
+
           </div>
         </div>
       </div>
@@ -467,19 +463,24 @@ export default async function Home({ params }: { params: { lang: Locale } }) {
           </span>
         </div>
 
-        <div className="flex whitespace-nowrap">
-          <div className="animate-marquee flex gap-8 sm:gap-12 items-center text-base sm:text-xl font-bold text-on-surface opacity-80">
-            {(hp?.toolMarquee || ["Chimera", "UnlockTool", "Borneo", "iRemoval Pro", "DFT Pro", "MobileSea Tool", "AMT", "Phoenix", "Cheetah", "FKey"]).map((tool: string, idx: number) => (
-              <span key={idx} className="flex items-center gap-3 text-primary">
-                <i className="fas fa-tools"></i> {tool}
-              </span>
-            ))}
-            {/* Repeat for seamless loop */}
-            {(hp?.toolMarquee || ["Chimera", "UnlockTool", "Borneo", "iRemoval Pro", "DFT Pro", "MobileSea Tool", "AMT", "Phoenix", "Cheetah", "FKey"]).map((tool: string, idx: number) => (
-              <span key={`repeat-${idx}`} className="flex items-center gap-3 text-primary" aria-hidden="true">
-                <i className="fas fa-tools"></i> {tool}
-              </span>
-            ))}
+        <div className="w-full flex whitespace-nowrap overflow-hidden" dir="ltr">
+          <div className="flex w-max animate-marquee hover:[animation-play-state:paused] cursor-pointer select-none">
+            <div className="flex shrink-0 items-center gap-8 sm:gap-12 px-6 text-base sm:text-xl font-bold text-on-surface opacity-80">
+              {(hp?.toolMarquee || ["Chimera", "UnlockTool", "Borneo", "iRemoval Pro", "DFT Pro", "MobileSea Tool", "AMT", "Phoenix", "Cheetah", "FKey"]).map((tool: string, idx: number) => (
+                <span key={idx} className="flex items-center gap-3 text-primary shrink-0">
+                  <i className="fas fa-tools"></i> {tool}
+                </span>
+              ))}
+            </div>
+
+            {/* Repeat exact clone for continuous seamless loop */}
+            <div className="flex shrink-0 items-center gap-8 sm:gap-12 px-6 text-base sm:text-xl font-bold text-on-surface opacity-80" aria-hidden="true">
+              {(hp?.toolMarquee || ["Chimera", "UnlockTool", "Borneo", "iRemoval Pro", "DFT Pro", "MobileSea Tool", "AMT", "Phoenix", "Cheetah", "FKey"]).map((tool: string, idx: number) => (
+                <span key={`repeat-${idx}`} className="flex items-center gap-3 text-primary shrink-0">
+                  <i className="fas fa-tools"></i> {tool}
+                </span>
+              ))}
+            </div>
           </div>
         </div>
       </section>
@@ -522,40 +523,14 @@ export default async function Home({ params }: { params: { lang: Locale } }) {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-          {/* Promo 1 */}
-          <div className="glass-card rounded-2xl sm:rounded-3xl overflow-hidden relative group h-[240px] sm:h-[300px] border border-outline-variant/30">
-            <div 
-              className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
-              style={{ backgroundImage: `url('${promo1Img}')` }}
-            ></div>
-            <div className="absolute inset-0 bg-gradient-to-t from-[#0c1324]/90 via-[#0c1324]/40 to-transparent opacity-60"></div>
-            <div className="absolute bottom-4 sm:bottom-6 left-4 sm:left-6 right-4 sm:right-6">
-              <span className="bg-primary/20 text-primary px-2.5 py-0.5 rounded-full text-[10px] sm:text-xs uppercase font-bold tracking-wider mb-2 sm:mb-3 inline-block backdrop-blur-sm border border-primary/30">
-                {promo1Tag || "Hot Offer"}
-              </span>
-              <h3 className="font-bold text-xl sm:text-2xl text-white mb-1 sm:mb-2">{promo1Title || "Samsung FRP Remove"}</h3>
-              <p className="text-white/70 text-xs sm:text-sm mb-3 sm:mb-4">{promo1Desc || "Instant via IMEI. Support all models."}</p>
-              <Link href={promo1Url} className="text-primary text-xs sm:text-sm font-bold hover:text-white transition-colors flex items-center gap-2">View details <i className="fas fa-arrow-right text-xs"></i></Link>
+        <div className="w-full">
+          {campaigns.length > 0 ? (
+            <CampaignSlider campaigns={campaigns} lang={params.lang} />
+          ) : (
+            <div className="glass-card rounded-2xl sm:rounded-3xl p-8 border border-outline-variant/30 text-center text-on-surface-variant">
+              {isAr ? "لا توجد عروض حالية." : "No active campaigns at the moment."}
             </div>
-          </div>
-
-          {/* Promo 2 */}
-          <div className="glass-card rounded-2xl sm:rounded-3xl overflow-hidden relative group h-[240px] sm:h-[300px] border border-outline-variant/30">
-            <div 
-              className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
-              style={{ backgroundImage: `url('${promo2Img}')` }}
-            ></div>
-            <div className="absolute inset-0 bg-gradient-to-t from-[#0c1324]/90 via-[#0c1324]/40 to-transparent opacity-60"></div>
-            <div className="absolute bottom-4 sm:bottom-6 left-4 sm:left-6 right-4 sm:right-6">
-              <span className="bg-secondary/20 text-secondary px-2.5 py-0.5 rounded-full text-[10px] sm:text-xs uppercase font-bold tracking-wider mb-2 sm:mb-3 inline-block backdrop-blur-sm border border-secondary/30">
-                {promo2Tag || "Official Reseller"}
-              </span>
-              <h3 className="font-bold text-xl sm:text-2xl text-white mb-1 sm:mb-2">{promo2Title || "Chimera Tool"}</h3>
-              <p className="text-white/70 text-xs sm:text-sm mb-3 sm:mb-4">{promo2Desc || "Activations and credits available instantly."}</p>
-              <Link href={promo2Url} className="text-secondary text-xs sm:text-sm font-bold hover:text-white transition-colors flex items-center gap-2">View details <i className="fas fa-arrow-right text-xs"></i></Link>
-            </div>
-          </div>
+          )}
         </div>
       </section>
 

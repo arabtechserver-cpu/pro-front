@@ -6,6 +6,8 @@ import Footer from "@/components/Footer";
 import { getDictionary } from "@/i18n/get-dictionary";
 import { Locale } from "@/i18n/config";
 import AnalyticsTracker from "@/components/AnalyticsTracker";
+import AiChatWidget from "@/components/AiChatWidget";
+import ContactFloatingButton from "@/components/ContactFloatingButton";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const jakarta = Plus_Jakarta_Sans({ subsets: ["latin"], variable: "--font-jakarta" });
@@ -98,10 +100,9 @@ export async function generateMetadata({ params }: { params: { lang: string } })
       icon: [
         { url: "/favicon.ico", sizes: "any" },
         { url: "/images/logo_en.png", type: "image/png" },
-        { url: "/icon.png", type: "image/png" },
       ],
       shortcut: "/favicon.ico",
-      apple: "/apple-icon.png",
+      apple: "/images/logo_en.png",
     },
     verification: {
       google: "N34n3oI-P5elZmLFHgFqp_BK93EijixhnIHEj_2oGnI",
@@ -193,6 +194,12 @@ export default async function RootLayout({
         </main>
 
         <Footer lang={lang} dict={dict.footer} />
+
+        {/* Floating Animated Contact Channels Mascot */}
+        <ContactFloatingButton lang={lang} />
+
+        {/* Arab Tech Pro AI Chatbot Assistant */}
+        <AiChatWidget />
       </body>
     </html>
   );

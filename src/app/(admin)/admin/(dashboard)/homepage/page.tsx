@@ -145,6 +145,40 @@ export default function AdminHomepageManager() {
     }));
   };
 
+  const updateCampaignField = (index: number, field: string, value: any) => {
+    setConfig((prev: any) => {
+      const campaigns = Array.isArray(prev.campaigns) ? [...prev.campaigns] : [];
+      if (!campaigns[index]) return prev;
+      campaigns[index] = { ...campaigns[index], [field]: value };
+      return { ...prev, campaigns };
+    });
+  };
+
+  const addCampaign = () => {
+    setConfig((prev: any) => {
+      const campaigns = Array.isArray(prev.campaigns) ? [...prev.campaigns] : [];
+      campaigns.push({
+        tagEn: "New Offer",
+        tagAr: "عرض جديد",
+        titleEn: "Campaign Title",
+        titleAr: "عنوان الإعلان",
+        descEn: "Campaign Description",
+        descAr: "وصف الإعلان",
+        image: "",
+        url: "/pricing"
+      });
+      return { ...prev, campaigns };
+    });
+  };
+
+  const removeCampaign = (index: number) => {
+    setConfig((prev: any) => {
+      const campaigns = Array.isArray(prev.campaigns) ? [...prev.campaigns] : [];
+      campaigns.splice(index, 1);
+      return { ...prev, campaigns };
+    });
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-[400px]">
@@ -739,111 +773,113 @@ export default function AdminHomepageManager() {
       {/* --- TAB 6: CAMPAIGN OFFERS --- */}
       {activeTab === "campaigns" && (
         <div className="glass-card rounded-3xl p-6 md:p-8 border border-outline-variant/30 flex flex-col gap-6">
-          <div className="border-b border-outline-variant/20 pb-3">
-            <h2 className="text-xl font-bold text-primary flex items-center gap-2">
-              <span className="material-symbols-outlined">local_fire_department</span>
-              6. بنرات ورابط وصور العروض الرسمية (Campaign Offers & Images)
-            </h2>
+          <div className="border-b border-outline-variant/20 pb-3 flex justify-between items-center">
+            <div>
+              <h2 className="text-xl font-bold text-primary flex items-center gap-2">
+                <span className="material-symbols-outlined">local_fire_department</span>
+                6. العروض الديناميكية (Campaign Slider)
+              </h2>
+              <p className="text-xs text-on-surface-variant mt-1">يمكنك إضافة عدد غير محدود من العروض وسيتم عرضها في شريط متحرك (Slider) بالصفحة الرئيسية.</p>
+            </div>
+            <button onClick={addCampaign} className="btn-primary text-sm px-4 py-2 flex items-center gap-2 rounded-xl">
+              <span className="material-symbols-outlined text-sm">add</span> إضافة إعلان جديد
+            </button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Promo 1 */}
-            <div className="p-5 bg-surface-container-low rounded-2xl border border-outline-variant/20 flex flex-col gap-4">
-              <h3 className="font-bold text-primary text-sm">العرض الأول (مثال: سامسونج FRP)</h3>
+          <div className="grid grid-cols-1 gap-6">
+            {Array.isArray(config.campaigns) && config.campaigns.map((camp: any, idx: number) => (
+              <div key={idx} className="p-5 bg-surface-container-low rounded-2xl border border-outline-variant/20 flex flex-col gap-4 relative">
+                <div className="flex justify-between items-center mb-2">
+                  <h3 className="font-bold text-primary text-lg flex items-center gap-2">
+                    <span className="bg-primary/20 px-2 py-0.5 rounded text-xs">#{idx + 1}</span> {camp.titleAr || "إعلان جديد"}
+                  </h3>
+                  <button onClick={() => removeCampaign(idx)} className="text-error hover:bg-error/10 p-2 rounded-full transition-colors flex items-center justify-center">
+                    <span className="material-symbols-outlined">delete</span>
+                  </button>
+                </div>
 
-              <ImagePickerInput
-                label="صورة بنر العرض الأول (Promo 1 Image)"
-                value={config.campaigns?.promo1Image || ""}
-                onChange={(newUrl) => updateSectionField("campaigns", "promo1Image", newUrl)}
-              />
+                <ImagePickerInput
+                  label={`صورة الإعلان رقم ${idx + 1}`}
+                  value={camp.image || ""}
+                  onChange={(newUrl) => updateCampaignField(idx, "image", newUrl)}
+                />
 
-              <div className="flex flex-col gap-1">
-                <label className="text-[10px] text-on-surface-variant uppercase font-bold">الشارة العلوي (Tag)</label>
-                <input
-                  type="text"
-                  value={config.campaigns?.promo1TagAr || ""}
-                  onChange={(e) => updateSectionField("campaigns", "promo1TagAr", e.target.value)}
-                  className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-2 text-sm"
-                />
-              </div>
-              <div className="flex flex-col gap-1">
-                <label className="text-[10px] text-on-surface-variant uppercase font-bold">العنوان الرئيس</label>
-                <input
-                  type="text"
-                  value={config.campaigns?.promo1TitleAr || ""}
-                  onChange={(e) => updateSectionField("campaigns", "promo1TitleAr", e.target.value)}
-                  className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-2 text-sm font-bold"
-                />
-              </div>
-              <div className="flex flex-col gap-1">
-                <label className="text-[10px] text-on-surface-variant uppercase font-bold">الوصف</label>
-                <input
-                  type="text"
-                  value={config.campaigns?.promo1DescAr || ""}
-                  onChange={(e) => updateSectionField("campaigns", "promo1DescAr", e.target.value)}
-                  className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-2 text-xs text-on-surface-variant"
-                />
-              </div>
-              <div className="flex flex-col gap-1">
-                <label className="text-[10px] text-primary uppercase font-bold">رابط توجيه العرض (Offer Link URL)</label>
-                <input
-                  type="text"
-                  placeholder="/pricing"
-                  value={config.campaigns?.promo1Url || "/pricing"}
-                  onChange={(e) => updateSectionField("campaigns", "promo1Url", e.target.value)}
-                  className="bg-surface-container-lowest border border-primary/40 rounded-xl p-2 text-xs font-mono text-primary"
-                />
-              </div>
-            </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="flex flex-col gap-1">
+                    <label className="text-[10px] text-on-surface-variant uppercase font-bold">الشارة العلوي (Tag - بالعربية)</label>
+                    <input
+                      type="text"
+                      value={camp.tagAr || ""}
+                      onChange={(e) => updateCampaignField(idx, "tagAr", e.target.value)}
+                      className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-2 text-sm"
+                    />
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <label className="text-[10px] text-on-surface-variant uppercase font-bold">الشارة العلوي (Tag - بالإنجليزية)</label>
+                    <input
+                      type="text"
+                      value={camp.tagEn || ""}
+                      onChange={(e) => updateCampaignField(idx, "tagEn", e.target.value)}
+                      className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-2 text-sm"
+                    />
+                  </div>
 
-            {/* Promo 2 */}
-            <div className="p-5 bg-surface-container-low rounded-2xl border border-outline-variant/20 flex flex-col gap-4">
-              <h3 className="font-bold text-secondary text-sm">العرض الثاني (مثال: أداة شيميرا Chimera)</h3>
+                  <div className="flex flex-col gap-1">
+                    <label className="text-[10px] text-on-surface-variant uppercase font-bold">العنوان (Title - بالعربية)</label>
+                    <input
+                      type="text"
+                      value={camp.titleAr || ""}
+                      onChange={(e) => updateCampaignField(idx, "titleAr", e.target.value)}
+                      className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-2 text-sm font-bold"
+                    />
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <label className="text-[10px] text-on-surface-variant uppercase font-bold">العنوان (Title - بالإنجليزية)</label>
+                    <input
+                      type="text"
+                      value={camp.titleEn || ""}
+                      onChange={(e) => updateCampaignField(idx, "titleEn", e.target.value)}
+                      className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-2 text-sm font-bold"
+                    />
+                  </div>
 
-              <ImagePickerInput
-                label="صورة بنر العرض الثاني (Promo 2 Image)"
-                value={config.campaigns?.promo2Image || ""}
-                onChange={(newUrl) => updateSectionField("campaigns", "promo2Image", newUrl)}
-              />
+                  <div className="flex flex-col gap-1">
+                    <label className="text-[10px] text-on-surface-variant uppercase font-bold">الوصف (Desc - بالعربية)</label>
+                    <input
+                      type="text"
+                      value={camp.descAr || ""}
+                      onChange={(e) => updateCampaignField(idx, "descAr", e.target.value)}
+                      className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-2 text-xs text-on-surface-variant"
+                    />
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <label className="text-[10px] text-on-surface-variant uppercase font-bold">الوصف (Desc - بالإنجليزية)</label>
+                    <input
+                      type="text"
+                      value={camp.descEn || ""}
+                      onChange={(e) => updateCampaignField(idx, "descEn", e.target.value)}
+                      className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-2 text-xs text-on-surface-variant"
+                    />
+                  </div>
 
-              <div className="flex flex-col gap-1">
-                <label className="text-[10px] text-on-surface-variant uppercase font-bold">الشارة العلوي (Tag)</label>
-                <input
-                  type="text"
-                  value={config.campaigns?.promo2TagAr || ""}
-                  onChange={(e) => updateSectionField("campaigns", "promo2TagAr", e.target.value)}
-                  className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-2 text-sm"
-                />
+                  <div className="flex flex-col gap-1 md:col-span-2">
+                    <label className="text-[10px] text-primary uppercase font-bold">رابط توجيه العرض (URL)</label>
+                    <input
+                      type="text"
+                      placeholder="/pricing"
+                      value={camp.url || "/pricing"}
+                      onChange={(e) => updateCampaignField(idx, "url", e.target.value)}
+                      className="bg-surface-container-lowest border border-primary/40 rounded-xl p-2 text-xs font-mono text-primary"
+                    />
+                  </div>
+                </div>
               </div>
-              <div className="flex flex-col gap-1">
-                <label className="text-[10px] text-on-surface-variant uppercase font-bold">العنوان الرئيس</label>
-                <input
-                  type="text"
-                  value={config.campaigns?.promo2TitleAr || ""}
-                  onChange={(e) => updateSectionField("campaigns", "promo2TitleAr", e.target.value)}
-                  className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-2 text-sm font-bold"
-                />
+            ))}
+            {(!config.campaigns || config.campaigns.length === 0) && (
+              <div className="text-center p-8 border border-dashed border-outline-variant/50 rounded-2xl text-on-surface-variant">
+                لا توجد إعلانات حالياً. اضغط على "إضافة إعلان جديد" للبدء.
               </div>
-              <div className="flex flex-col gap-1">
-                <label className="text-[10px] text-on-surface-variant uppercase font-bold">الوصف</label>
-                <input
-                  type="text"
-                  value={config.campaigns?.promo2DescAr || ""}
-                  onChange={(e) => updateSectionField("campaigns", "promo2DescAr", e.target.value)}
-                  className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-2 text-xs text-on-surface-variant"
-                />
-              </div>
-              <div className="flex flex-col gap-1">
-                <label className="text-[10px] text-secondary uppercase font-bold">رابط توجيه العرض (Offer Link URL)</label>
-                <input
-                  type="text"
-                  placeholder="/pricing"
-                  value={config.campaigns?.promo2Url || "/pricing"}
-                  onChange={(e) => updateSectionField("campaigns", "promo2Url", e.target.value)}
-                  className="bg-surface-container-lowest border border-secondary/40 rounded-xl p-2 text-xs font-mono text-secondary"
-                />
-              </div>
-            </div>
+            )}
           </div>
         </div>
       )}

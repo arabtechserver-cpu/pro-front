@@ -17,10 +17,29 @@ function getServicePriceInfo(service: any) {
   return { priceNum, isFree, isZeroCost };
 }
 
-function RenderPriceBadge({ service, lang }: { service: any; lang: string }) {
+function RenderPriceBadge({ service, lang, discountPercent = 0 }: { service: any; lang: string; discountPercent?: number }) {
   const { priceNum, isFree, isZeroCost } = getServicePriceInfo(service);
 
   if (priceNum > 0) {
+    if (discountPercent > 0) {
+      const discountedPrice = Number((priceNum * (1 - discountPercent / 100)).toFixed(2));
+      return (
+        <div className="flex flex-col items-start sm:items-end">
+          <div className="flex items-center gap-1.5">
+            <span className="text-xs text-on-surface-variant line-through font-mono opacity-50">
+              ${priceNum.toFixed(2)}
+            </span>
+            <span className="font-price-display text-emerald-400 glow-cyan font-bold text-base">
+              ${discountedPrice.toFixed(2)}
+            </span>
+          </div>
+          <span className="text-[10px] text-emerald-400 font-bold font-mono">
+            {lang === 'ar' ? `-${discountPercent}% خصم VIP` : `-${discountPercent}% VIP`}
+          </span>
+        </div>
+      );
+    }
+
     return (
       <span className="font-price-display text-primary glow-cyan font-bold text-base mt-0.5">
         ${priceNum.toFixed(2)}
@@ -43,7 +62,7 @@ function RenderPriceBadge({ service, lang }: { service: any; lang: string }) {
   );
 }
 
-function ServicesListRenderer({ servicesList, lang, dict }: { servicesList: any[], lang: string, dict: any }) {
+function ServicesListRenderer({ servicesList, lang, dict, discountPercent = 0 }: { servicesList: any[], lang: string, dict: any, discountPercent?: number }) {
   const [limit, setLimit] = useState(40);
   const displayedServices = servicesList.length > 50 ? servicesList.slice(0, limit) : servicesList;
   const hasMore = servicesList.length > displayedServices.length;
@@ -63,7 +82,7 @@ function ServicesListRenderer({ servicesList, lang, dict }: { servicesList: any[
                   <span className="material-symbols-outlined text-xs text-primary">schedule</span>
                   {service.time || "1-24 Hours"}
                 </span>
-                <RenderPriceBadge service={service} lang={lang} />
+                <RenderPriceBadge service={service} lang={lang} discountPercent={discountPercent} />
               </div>
               <Link 
                 href={`/${lang}/purchase?serviceId=${service.id}`}
@@ -98,7 +117,7 @@ function ServicesListRenderer({ servicesList, lang, dict }: { servicesList: any[
                 </td>
                 <td className="py-4 px-6 text-on-surface-variant text-sm whitespace-nowrap">{service.time || "1-24 Hours"}</td>
                 <td className={`py-4 px-6 ${lang === 'ar' ? 'text-left' : 'text-right'}`}>
-                  <RenderPriceBadge service={service} lang={lang} />
+                  <RenderPriceBadge service={service} lang={lang} discountPercent={discountPercent} />
                 </td>
                 <td className="py-4 px-6 text-center">
                   <Link 
@@ -141,6 +160,7 @@ export default function PricingClient({ lang, dict }: { lang: string, dict: any 
   const [services, setServices] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [userSession, setUserSession] = useState<any>(null);
 
   const [searchQuery, setSearchQuery] = useState("");
   const deferredSearch = useDeferredValue(searchQuery);
@@ -158,11 +178,32 @@ export default function PricingClient({ lang, dict }: { lang: string, dict: any 
   const router = useRouter();
   const pathname = usePathname();
 
-  // Read initial ?section= from URL
+  // Load user session from local storage
   useEffect(() => {
-    const sectionParam = searchParams.get("section") || searchParams.get("group");
+    try {
+      const saved = localStorage.getItem("user_session");
+      if (saved) {
+        setUserSession(JSON.parse(saved));
+      }
+    } catch {}
+  }, []);
+
+  const discountPercent = useMemo(() => {
+    if (!userSession) return 0;
+    return Math.max(
+      userSession.effectiveDiscount || 0,
+      userSession.membershipTier?.discountPercentage || 0,
+      userSession.customDiscount || 0
+    );
+  }, [userSession]);
+
+  // Read initial ?section= / ?group= / ?search= from URL
+  useEffect(() => {
+    const sectionParam = searchParams.get("section") || searchParams.get("group") || searchParams.get("cat") || searchParams.get("search");
     if (sectionParam) {
       setActiveSection(sectionParam);
+    } else {
+      setActiveSection(null);
     }
   }, [searchParams]);
 
@@ -318,21 +359,92 @@ export default function PricingClient({ lang, dict }: { lang: string, dict: any 
     return () => observer.disconnect();
   }, [visibleGroupCount, allDisplayGroups.length]);
 
-  // Standalone Single Section Data
+  // Standalone Single Section Data with Smart Resilient Match
   const singleSectionData = useMemo(() => {
-    if (!activeSection || !services) return null;
+    if (!activeSection || !services || !Array.isArray(services)) return null;
+    const target = activeSection.trim().toLowerCase();
+
+    // 1. Direct or Case-Insensitive Exact Group Match
     for (const cat of services) {
-      const grouped = getGroupedServices(cat.services);
-      if (grouped[activeSection]) {
+      if (!cat.services) continue;
+      const allActive = cat.services.filter((s: any) => s.isActive);
+      const exactServices = allActive.filter((s: any) => {
+        const gn = (s.groupName || "").trim().toLowerCase();
+        return gn === target;
+      });
+      if (exactServices.length > 0) {
         return {
-          groupName: activeSection,
+          groupName: exactServices[0].groupName,
           categoryName: cat.name,
-          servicesList: grouped[activeSection]
+          servicesList: exactServices
         };
       }
     }
-    return null;
-  }, [activeSection, services, deferredSearch]);
+
+    // 2. Partial Group Name Match (e.g., "Xiaomi Remove Mi Account" within "Xiaomi Remove Mi Account [Instant]")
+    for (const cat of services) {
+      if (!cat.services) continue;
+      const allActive = cat.services.filter((s: any) => s.isActive);
+      const partialServices = allActive.filter((s: any) => {
+        const gn = (s.groupName || "").toLowerCase();
+        return gn.includes(target) || target.includes(gn);
+      });
+      if (partialServices.length > 0) {
+        return {
+          groupName: partialServices[0].groupName || activeSection,
+          categoryName: cat.name,
+          servicesList: partialServices
+        };
+      }
+    }
+
+    // 3. Category Name Match (e.g., "IMEI Services" or "server")
+    for (const cat of services) {
+      if (!cat.services) continue;
+      const catName = (cat.name || "").toLowerCase();
+      if (catName.includes(target) || target.includes(catName)) {
+        const allActive = cat.services.filter((s: any) => s.isActive);
+        if (allActive.length > 0) {
+          return {
+            groupName: cat.name,
+            categoryName: cat.name,
+            servicesList: allActive
+          };
+        }
+      }
+    }
+
+    // 4. Keyword / Service Name Search Match across all categories
+    const matchingServices: any[] = [];
+    let matchedCatName = "";
+    for (const cat of services) {
+      if (!cat.services) continue;
+      cat.services.filter((s: any) => s.isActive).forEach((s: any) => {
+        const nameMatch = s.name?.toLowerCase().includes(target);
+        const groupMatch = s.groupName?.toLowerCase().includes(target);
+        const idMatch = s.dhruId && String(s.dhruId) === target;
+        if (nameMatch || groupMatch || idMatch) {
+          matchingServices.push(s);
+          if (!matchedCatName) matchedCatName = cat.name;
+        }
+      });
+    }
+
+    if (matchingServices.length > 0) {
+      return {
+        groupName: activeSection,
+        categoryName: matchedCatName || (lang === "ar" ? "خدمات مطابقة" : "Matching Services"),
+        servicesList: matchingServices
+      };
+    }
+
+    // Fallback: If section specified but no matching services found, show empty container with clear message
+    return {
+      groupName: activeSection,
+      categoryName: lang === "ar" ? "خدمات" : "Services",
+      servicesList: []
+    };
+  }, [activeSection, services, lang]);
 
   if (loading) {
     return (
@@ -422,12 +534,58 @@ export default function PricingClient({ lang, dict }: { lang: string, dict: any 
             </div>
 
             {/* Render Services */}
-            <ServicesListRenderer servicesList={singleSectionData.servicesList} lang={lang} dict={dict} />
+            {singleSectionData.servicesList.length === 0 ? (
+              <div className="p-10 text-center flex flex-col items-center gap-3 text-on-surface-variant">
+                <span className="material-symbols-outlined text-5xl text-primary/40">search_off</span>
+                <p className="font-bold text-base text-on-surface">
+                  {lang === 'ar' ? `لم يتم العثور على خدمات نشطة مطابقة لقسم "${singleSectionData.groupName}" حالياً` : `No active services found in section "${singleSectionData.groupName}" currently`}
+                </p>
+                <p className="text-xs text-on-surface-variant max-w-md">
+                  {lang === 'ar' ? 'قد يكون تم تحديث اسم القسم أو نقل الخدمات. يمكنك استعراض كافة الأقسام المتاحة أو استخدام البحث.' : 'The section may have been renamed or moved. You can browse all sections or use the search bar.'}
+                </p>
+                <button onClick={closeSingleSection} className="btn-primary mt-3 py-2.5 px-6 text-xs sm:text-sm rounded-xl font-bold">
+                  {lang === 'ar' ? 'استعراض كافة الأقسام والخدمات' : 'Browse All Services'}
+                </button>
+              </div>
+            ) : (
+              <ServicesListRenderer servicesList={singleSectionData.servicesList} lang={lang} dict={dict} discountPercent={discountPercent} />
+            )}
           </div>
         </div>
       ) : (
         /* --- ALL CATEGORIES LIST VIEW MODE --- */
         <>
+          {/* VIP Membership Active Banner */}
+          {discountPercent > 0 && (
+            <div className="p-4 sm:p-5 rounded-3xl bg-gradient-to-r from-emerald-500/15 via-primary/20 to-emerald-500/15 border border-emerald-500/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xl backdrop-blur-md animate-in fade-in duration-300">
+              <div className="flex items-center gap-3.5">
+                <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center border border-emerald-500/30 shrink-0 shadow-md">
+                  <span className="material-symbols-outlined text-2xl">workspace_premium</span>
+                </div>
+                <div>
+                  <h3 className="font-bold text-sm sm:text-base text-on-surface flex items-center gap-2">
+                    <span>{lang === 'ar' ? `مرحباً بك! لديك "${userSession?.membershipTier?.nameAr || userSession?.membershipTier?.name || 'عضوية VIP'}"` : `Welcome! You have "${userSession?.membershipTier?.name || 'VIP Membership'}"`}</span>
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40">
+                      VIP
+                    </span>
+                  </h3>
+                  <p className="text-xs text-on-surface-variant mt-0.5">
+                    {lang === 'ar' 
+                      ? `تم تفعيل خصم ${discountPercent}% تلقائياً على كافة أسعار الخدمات المعروضة أدناه.` 
+                      : `A ${discountPercent}% discount is automatically applied to all service prices below.`}
+                  </p>
+                </div>
+              </div>
+
+              <div className="px-4 py-2 rounded-2xl bg-surface-container-high/80 border border-emerald-500/30 flex items-center gap-2">
+                <span className="text-xs text-on-surface-variant font-medium">{lang === 'ar' ? 'نسبة الخصم:' : 'Active Discount:'}</span>
+                <span className="text-base font-extrabold text-emerald-400 font-mono">
+                  🔥 -{discountPercent}%
+                </span>
+              </div>
+            </div>
+          )}
+
           {/* Filters and Controls Header */}
           <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
             <div className="flex flex-col md:flex-row gap-4 flex-1">
@@ -587,7 +745,7 @@ export default function PricingClient({ lang, dict }: { lang: string, dict: any 
                         {/* Services Body */}
                         {!isCollapsed && (
                           <div className="animate-in fade-in duration-300">
-                            <ServicesListRenderer servicesList={groupServicesList} lang={lang} dict={dict} />
+                            <ServicesListRenderer servicesList={groupServicesList} lang={lang} dict={dict} discountPercent={discountPercent} />
                           </div>
                         )}
                       </div>

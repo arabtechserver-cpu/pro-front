@@ -1,11 +1,13 @@
 import type { Locale } from './config';
+import ar from './dictionaries/ar.json';
+import en from './dictionaries/en.json';
 
-// We enumerate all dictionaries here for better webpack/turbopack support
-const dictionaries = {
-  en: () => import('./dictionaries/en.json').then((module) => module.default),
-  ar: () => import('./dictionaries/ar.json').then((module) => module.default),
+const dictionaries: Record<string, any> = {
+  en,
+  ar,
 };
 
 export const getDictionary = async (locale: Locale) => {
-  return dictionaries[locale]?.() ?? dictionaries.ar();
+  return dictionaries[locale] || dictionaries.ar;
 };
+

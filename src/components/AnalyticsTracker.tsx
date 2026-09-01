@@ -21,23 +21,29 @@ export default function AnalyticsTracker() {
 
     const trackEvent = async () => {
       try {
-        await fetch("/api/analytics/events", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
+        const payload = JSON.stringify({
+          eventName: "page_view",
+          sessionId,
+          path: pathname,
+          metadata: {
+            timestamp: new Date().toISOString(),
+            userAgent: typeof navigator !== "undefined" ? navigator.userAgent : "",
           },
-          body: JSON.stringify({
-            eventName: "page_view",
-            sessionId,
-            path: pathname,
-            metadata: {
-              timestamp: new Date().toISOString(),
-              userAgent: navigator.userAgent,
-            },
-          }),
         });
+
+        // Use sendBeacon if available, otherwise fetch with silent catch
+        if (typeof navigator !== "undefined" && navigator.sendBeacon) {
+          const blob = new Blob([payload], { type: "application/json" });
+          navigator.sendBeacon("/api/telemetry/events", blob);
+        } else {
+          fetch("/api/telemetry/events", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: payload,
+          }).catch(() => {});
+        }
       } catch (err) {
-        // Silently ignore if blocked by browser ad blocker / client extensions
+        // Silently ignore
       }
     };
 

@@ -4,6 +4,7 @@ import { useState, useMemo, useEffect, useCallback } from "react";
 import Link from "next/link";
 import Script from "next/script";
 import { Locale } from "@/i18n/config";
+import TermsModal from "@/components/TermsModal";
 
 const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || "540676912586-vifo9ogu2gjud3d00efv1khd9r7tcajb.apps.googleusercontent.com";
 
@@ -258,6 +259,8 @@ export default function RegisterClient({ lang, dict }: { lang: Locale; dict: any
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [termsAgreed, setTermsAgreed] = useState(false);
+  const [termsModalOpen, setTermsModalOpen] = useState(false);
+  const [termsModalTab, setTermsModalTab] = useState<"terms" | "refund">("terms");
 
   // Visibility & Loading states
   const [showPassword, setShowPassword] = useState(false);
@@ -315,7 +318,7 @@ export default function RegisterClient({ lang, dict }: { lang: Locale; dict: any
         (window as any).google.accounts.id.renderButton(btnContainer, {
           theme: "outline",
           size: "large",
-          width: "100%",
+          width: 360,
           text: "signup_with",
           shape: "pill",
           locale: lang === "ar" ? "ar" : "en",
@@ -776,10 +779,33 @@ export default function RegisterClient({ lang, dict }: { lang: Locale; dict: any
                 id="terms" 
                 checked={termsAgreed}
                 onChange={(e) => setTermsAgreed(e.target.checked)}
-                className="mt-1 w-4 h-4 rounded border-outline-variant/50 bg-surface-container-lowest text-primary focus:ring-primary/50" 
+                className="mt-1 w-4 h-4 rounded border-outline-variant/50 bg-surface-container-lowest text-primary focus:ring-primary/50 cursor-pointer" 
               />
-              <label htmlFor="terms" className="text-sm text-on-surface-variant cursor-pointer">
-                {dict.register.agree} <Link href="#" className="text-primary hover:underline">{dict.register.tos}</Link> {dict.register.and} <Link href="#" className="text-primary hover:underline">{dict.register.privacy}</Link>.
+              <label htmlFor="terms" className="text-sm text-on-surface-variant cursor-pointer select-none">
+                {dict.register.agree}{" "}
+                <button
+                  type="button"
+                  onClick={() => { setTermsModalTab("terms"); setTermsModalOpen(true); }}
+                  className="text-primary font-bold hover:underline"
+                >
+                  {dict.register.tos}
+                </button>{" "}
+                {dict.register.and}{" "}
+                <button
+                  type="button"
+                  onClick={() => { setTermsModalTab("terms"); setTermsModalOpen(true); }}
+                  className="text-primary font-bold hover:underline"
+                >
+                  {dict.register.privacy}
+                </button>{" "}
+                و{" "}
+                <button
+                  type="button"
+                  onClick={() => { setTermsModalTab("refund"); setTermsModalOpen(true); }}
+                  className="text-amber-400 font-bold hover:underline"
+                >
+                  {lang === "ar" ? "سياسة الاسترجاع والضمان" : "Refund Policy"}
+                </button>.
               </label>
             </div>
           </div>
@@ -807,6 +833,14 @@ export default function RegisterClient({ lang, dict }: { lang: Locale; dict: any
           {dict.register.hasAccount} <Link href={`/${lang}/login`} className="text-primary hover:text-primary-container font-semibold transition-colors">{dict.register.signIn}</Link>
         </div>
       </div>
+
+      {/* Terms & Refund Policy Modal */}
+      <TermsModal
+        isOpen={termsModalOpen}
+        onClose={() => setTermsModalOpen(false)}
+        lang={lang}
+        defaultTab={termsModalTab}
+      />
     </div>
   );
 }
