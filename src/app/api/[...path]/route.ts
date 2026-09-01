@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getBackendCandidates } from "../../../lib/api-proxy-candidates";
 
 /**
  * Smart catch-all API proxy with working URL caching.
@@ -15,34 +16,6 @@ import { NextRequest, NextResponse } from 'next/server';
 
 // Cache the working backend URL after first successful connection
 let cachedBackendUrl: string | null = null;
-
-function getCandidateUrls(): string[] {
-  // If we already found a working URL, use it immediately — no fallback needed
-  if (cachedBackendUrl) return [cachedBackendUrl];
-
-  const candidates: string[] = [];
-  const internal = process.env.INTERNAL_API_URL;
-  const isLocalhost = (url: string) => /localhost|127\.0\.0\.1|::1/.test(url);
-
-  // 1. INTERNAL_API_URL (only if it's not localhost)
-  if (internal && !isLocalhost(internal)) {
-    candidates.push(internal);
-  }
-
-  // 2. Known Dokploy service names (internal Docker network)
-  //    NOTE: Do NOT add the public domain here — it's unreachable from inside Docker (hairpin NAT)
-  const dokployNames = [
-    'http://pro-b-i0r2xu:5000',  // Confirmed working backend service name
-    'http://backend:5000',
-    'http://pro-back:5000',
-    'http://api:5000',
-  ];
-  for (const name of dokployNames) {
-    if (!candidates.includes(name)) candidates.push(name);
-  }
-
-  return candidates;
-}
 
 async function proxyRequest(
   request: NextRequest,
@@ -89,7 +62,7 @@ async function handler(
     return NextResponse.json({ ok: false }, { status: 404 });
   }
 
-  const candidates = getCandidateUrls();
+  const candidates = getBackendCandidates(cachedBackendUrl, process.env.INTERNAL_API_URL);
   const body = ['GET', 'HEAD'].includes(request.method)
     ? undefined
     : await request.arrayBuffer();
@@ -108,8 +81,8 @@ async function handler(
         }
       });
 
-      // ✅ Cache this URL for future requests (avoids repeated fallback attempts)
-      if (!cachedBackendUrl) {
+      // Cache the recovered URL as well, so the next request skips a stale target.
+      if (cachedBackendUrl !== baseUrl) {
         cachedBackendUrl = baseUrl;
         console.log(`[API Proxy] ✅ Backend found at: ${baseUrl} — caching for future requests`);
       }
@@ -121,12 +94,9 @@ async function handler(
       });
     } catch (err: unknown) {
       lastError = err;
-      // Only log failures when we're NOT using the cached URL (i.e., during discovery)
-      if (!cachedBackendUrl) {
-        const msg = err instanceof Error ? err.message : String(err);
-        if (!msg.includes('ECONNREFUSED') && !msg.includes('ENOTFOUND')) {
-          console.warn(`[API Proxy] ⚠️ ${baseUrl} failed: ${msg}`);
-        }
+      const msg = err instanceof Error ? err.message : String(err);
+      if (!msg.includes('ECONNREFUSED') && !msg.includes('ENOTFOUND')) {
+        console.warn(`[API Proxy] ⚠️ ${baseUrl} failed: ${msg}`);
       }
     }
   }
