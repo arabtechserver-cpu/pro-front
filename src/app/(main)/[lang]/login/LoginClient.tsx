@@ -318,7 +318,7 @@ export default function LoginClient({ lang, dict }: { lang: Locale; dict: any })
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder={dict.login.passwordPlaceholder}
-                autoComplete="new-password"
+                autoComplete="current-password"
                 autoCorrect="off"
                 autoCapitalize="off"
                 spellCheck={false}

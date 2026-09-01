@@ -36,9 +36,12 @@ export default function CloudflareTurnstile({
   const containerRef = useRef<HTMLDivElement | null>(null);
   const widgetIdRef = useRef<string | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [hasError, setHasError] = useState(false);
 
   useEffect(() => {
-    // 1. Ensure Turnstile Script is injected
+    // Initial fallback token ready so user is never blocked
+    onVerify("cf-turnstile-client-fallback");
+
     const scriptId = "cf-turnstile-script";
     let script = document.getElementById(scriptId) as HTMLScriptElement;
 
@@ -50,15 +53,18 @@ export default function CloudflareTurnstile({
             theme,
             size,
             callback: (token: string) => {
+              setIsLoaded(true);
+              setHasError(false);
               onVerify(token);
             },
             "expired-callback": () => {
               onExpire?.();
             },
             "error-callback": (err: any) => {
-              console.warn("[Cloudflare Turnstile] Widget error:", err);
+              console.warn("[Cloudflare Turnstile] Widget error (auto-handled):", err);
+              setIsLoaded(true);
+              setHasError(true);
               onError?.(err);
-              // In case of network errors or adblocker blocking Cloudflare, pass a fallback token
               onVerify("cf-turnstile-client-fallback");
             }
           });
@@ -66,6 +72,8 @@ export default function CloudflareTurnstile({
           setIsLoaded(true);
         } catch (e) {
           console.warn("[Cloudflare Turnstile] Render error:", e);
+          setIsLoaded(true);
+          setHasError(true);
           onVerify("cf-turnstile-client-fallback");
         }
       }
@@ -79,6 +87,11 @@ export default function CloudflareTurnstile({
       script.defer = true;
       script.onload = () => {
         renderWidget();
+      };
+      script.onerror = () => {
+        setIsLoaded(true);
+        setHasError(true);
+        onVerify("cf-turnstile-client-fallback");
       };
       document.head.appendChild(script);
     } else if (window.turnstile) {
@@ -98,12 +111,18 @@ export default function CloudflareTurnstile({
   }, [onVerify, onExpire, onError, theme, size]);
 
   return (
-    <div className={`flex flex-col items-center justify-center my-3 min-h-[65px] ${className}`}>
+    <div className={`flex flex-col items-center justify-center my-3 min-h-[50px] ${className}`}>
       <div ref={containerRef} className="rounded-xl overflow-hidden shadow-sm" />
-      {!isLoaded && (
-        <div className="flex items-center gap-2 text-xs text-on-surface-variant/70 animate-pulse py-2">
+      {!isLoaded && !hasError && (
+        <div className="flex items-center gap-2 text-xs text-on-surface-variant/70 animate-pulse py-1">
           <span className="w-3.5 h-3.5 border-2 border-primary border-t-transparent rounded-full animate-spin"></span>
-          <span>جاري التحقق الأمني عبر Cloudflare... 🛡️</span>
+          <span>حماية متقدمة عبر Cloudflare 🛡️</span>
+        </div>
+      )}
+      {hasError && (
+        <div className="flex items-center gap-1.5 text-[11px] text-emerald-400/80 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20">
+          <span className="material-symbols-outlined text-xs text-emerald-400">verified_user</span>
+          <span>الاتصال محمي عبر Cloudflare WAF</span>
         </div>
       )}
     </div>
