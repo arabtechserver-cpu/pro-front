@@ -2,6 +2,15 @@
 
 import { useState, useEffect, useRef, useCallback, useDeferredValue, useMemo } from "react";
 import Link from "next/link";
+import {
+  filterProviderServicesByType,
+  getProviderServiceType,
+  getProviderServiceTypeCounts,
+  getProviderServiceTypeLabel
+} from "../../../../../lib/provider-service-types";
+
+type ProviderServiceType = "imei" | "server" | "remote";
+type ProviderServiceTypeFilter = "all" | ProviderServiceType;
 
 interface Provider {
   id: string;
@@ -113,7 +122,15 @@ export default function ProvidersClient() {
 
   // Sync Options Modal
   const [syncModalProvider, setSyncModalProvider] = useState<Provider | null>(null);
-  const [syncConfig, setSyncConfig] = useState({ markup_percent: 0, exchange_rate: 1 });
+  const [syncConfig, setSyncConfig] = useState<{
+    markup_percent: number;
+    exchange_rate: number;
+    service_types: ProviderServiceType[];
+  }>({
+    markup_percent: 0,
+    exchange_rate: 1,
+    service_types: ["imei", "server", "remote"]
+  });
 
   // Browse Services Modal State
   const [browseProvider, setBrowseProvider] = useState<Provider | null>(null);
@@ -122,6 +139,7 @@ export default function ProvidersClient() {
   const [serviceSearch, setServiceSearch] = useState("");
   const deferredServiceSearch = useDeferredValue(serviceSearch);
   const [packageFilter, setPackageFilter] = useState<"all" | "active" | "hidden">("all");
+  const [serviceTypeFilter, setServiceTypeFilter] = useState<ProviderServiceTypeFilter>("all");
   const [selectedGroupNames, setSelectedGroupNames] = useState<string[]>([]);
   const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({});
   const [isPerformingBulkAction, setIsPerformingBulkAction] = useState(false);
@@ -309,11 +327,28 @@ export default function ProvidersClient() {
 
   const openSyncModal = (provider: Provider) => {
     setSyncModalProvider(provider);
-    setSyncConfig({ markup_percent: 0, exchange_rate: 1 });
+    setSyncConfig({
+      markup_percent: 0,
+      exchange_rate: 1,
+      service_types: ["imei", "server", "remote"]
+    });
+  };
+
+  const toggleSyncServiceType = (serviceType: ProviderServiceType) => {
+    setSyncConfig((current) => ({
+      ...current,
+      service_types: current.service_types.includes(serviceType)
+        ? current.service_types.filter((type) => type !== serviceType)
+        : [...current.service_types, serviceType]
+    }));
   };
 
   const executeSync = async () => {
     if (!syncModalProvider) return;
+    if (syncConfig.service_types.length === 0) {
+      showToast("اختر قسمًا واحدًا على الأقل: IMEI أو Server أو Remote", "error");
+      return;
+    }
     const p = syncModalProvider;
     setSyncingProviderId(p.id);
     setSyncModalProvider(null);
@@ -347,6 +382,7 @@ export default function ProvidersClient() {
     setServiceSearch("");
     setSelectedGroupNames([]);
     setExpandedGroups({});
+    setServiceTypeFilter("all");
     setVisibleGroupsLimit(25);
     try {
       const res = await fetch(`/api/providers/${provider.id}/services`);
@@ -363,10 +399,20 @@ export default function ProvidersClient() {
     }
   };
 
+  const serviceTypeCounts = useMemo(
+    () => getProviderServiceTypeCounts(providerServices),
+    [providerServices]
+  );
+
+  const typeFilteredProviderServices = useMemo(
+    () => filterProviderServicesByType(providerServices, serviceTypeFilter),
+    [providerServices, serviceTypeFilter]
+  );
+
   // Group services by groupName (Package)
   const groupedPackages = useMemo(() => {
     const map: Record<string, any[]> = {};
-    for (const s of providerServices) {
+    for (const s of typeFilteredProviderServices) {
       const g = s.groupName || "باقة عامة";
       if (!map[g]) map[g] = [];
       map[g].push(s);
@@ -380,6 +426,7 @@ export default function ProvidersClient() {
       return {
         groupName,
         services,
+        serviceTypes: Array.from(new Set(services.map((service) => getProviderServiceType(service)))),
         total: services.length,
         activeCount,
         isAllActive,
@@ -389,7 +436,7 @@ export default function ProvidersClient() {
 
     groupsArray.sort((a, b) => a.groupName.localeCompare(b.groupName, "ar"));
     return groupsArray;
-  }, [providerServices]);
+  }, [typeFilteredProviderServices]);
 
   // Filter groups according to search and status filter
   const filteredGroups = useMemo(() => {
@@ -929,13 +976,50 @@ export default function ProvidersClient() {
 
             <div className="space-y-4 text-xs">
               <div className="p-3 bg-primary/10 border border-primary/20 rounded-xl text-on-surface-variant leading-relaxed">
-                سيتم سحب كافة الأقسام والخدمات والحقول المطلوبة تلقائياً من المزود مع الحفاظ على التخصيصات.
+                سيتم سحب الأقسام التي تحددها فقط مع خدماتها وحقولها المطلوبة، مع الحفاظ على التخصيصات الحالية.
                 <br /><br />
                 <span className="font-bold text-amber-500">تنبيه هام:</span> يرجى التأكد من إضافة عناوين IP السيرفر الخاص بك في إعدادات API لدى المزود (WhiteList IP) قبل المزامنة لتجنب رفض الاتصال:
                 <div className="mt-1 flex flex-col gap-1">
                   <code className="bg-surface-container-highest px-1.5 py-0.5 rounded text-primary text-[11px] text-left dir-ltr w-fit">186.240.155.152</code>
                   <code className="bg-surface-container-highest px-1.5 py-0.5 rounded text-primary text-[11px] text-left dir-ltr w-fit">2c0f:fc89:5e:8063:b178:82be:2580:b934</code>
                 </div>
+              </div>
+
+              <div>
+                <label className="block font-bold text-on-surface-variant mb-2">
+                  اختر الأقسام التي تريد جلبها من المزود:
+                </label>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                  {([
+                    { type: "imei", label: "IMEI", icon: "fingerprint" },
+                    { type: "server", label: "Server", icon: "dns" },
+                    { type: "remote", label: "Remote", icon: "settings_remote" }
+                  ] as const).map((option) => {
+                    const checked = syncConfig.service_types.includes(option.type);
+                    return (
+                      <label
+                        key={option.type}
+                        className={`p-3 rounded-xl border cursor-pointer transition-all flex items-center gap-2.5 select-none ${
+                          checked
+                            ? "bg-primary/15 border-primary/40 text-primary"
+                            : "bg-surface-container-lowest border-outline-variant/30 text-on-surface-variant"
+                        }`}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={checked}
+                          onChange={() => toggleSyncServiceType(option.type)}
+                          className="w-4 h-4 accent-primary"
+                        />
+                        <span className="material-symbols-outlined text-base">{option.icon}</span>
+                        <span className="font-bold">{option.label}</span>
+                      </label>
+                    );
+                  })}
+                </div>
+                {syncConfig.service_types.length === 0 && (
+                  <p className="mt-2 text-[11px] font-bold text-red-400">يجب اختيار قسم واحد على الأقل قبل المزامنة.</p>
+                )}
               </div>
 
               <div>
@@ -971,7 +1055,8 @@ export default function ProvidersClient() {
               <button
                 type="button"
                 onClick={executeSync}
-                className="flex-1 bg-gradient-to-r from-primary to-secondary text-on-primary py-3 rounded-xl font-bold text-xs transition-all shadow-md flex items-center justify-center gap-2"
+                disabled={syncConfig.service_types.length === 0}
+                className="flex-1 bg-gradient-to-r from-primary to-secondary text-on-primary py-3 rounded-xl font-bold text-xs transition-all shadow-md flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 <span className="material-symbols-outlined text-sm">play_arrow</span>
                 <span>بدء المزامنة الآن</span>
@@ -1129,6 +1214,40 @@ export default function ProvidersClient() {
               </div>
             </div>
 
+            {/* Real Provider Service Type Filters */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 p-2 rounded-2xl bg-surface-container-lowest border border-outline-variant/20">
+              {([
+                { type: "all", label: "كل الأقسام", count: serviceTypeCounts.all, icon: "apps" },
+                { type: "imei", label: "IMEI", count: serviceTypeCounts.imei, icon: "fingerprint" },
+                { type: "server", label: "Server", count: serviceTypeCounts.server, icon: "dns" },
+                { type: "remote", label: "Remote", count: serviceTypeCounts.remote, icon: "settings_remote" }
+              ] as const).map((option) => (
+                <button
+                  key={option.type}
+                  type="button"
+                  onClick={() => {
+                    setServiceTypeFilter(option.type);
+                    setSelectedGroupNames([]);
+                    setExpandedGroups({});
+                    setVisibleGroupsLimit(25);
+                  }}
+                  className={`px-3 py-2.5 rounded-xl border text-xs font-bold transition-all flex items-center justify-center gap-2 ${
+                    serviceTypeFilter === option.type
+                      ? "bg-primary text-on-primary border-primary shadow"
+                      : "bg-surface-container-high border-outline-variant/20 text-on-surface-variant hover:text-on-surface hover:border-primary/30"
+                  }`}
+                >
+                  <span className="material-symbols-outlined text-sm">{option.icon}</span>
+                  <span>{option.label}</span>
+                  <span className={`font-mono px-1.5 py-0.5 rounded-md ${
+                    serviceTypeFilter === option.type ? "bg-black/15" : "bg-surface-container-highest"
+                  }`}>
+                    {option.count}
+                  </span>
+                </button>
+              ))}
+            </div>
+
             {/* Search & Filter Tabs */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               {/* Search Box */}
@@ -1245,6 +1364,14 @@ export default function ProvidersClient() {
                             <div className="cursor-pointer" onClick={() => toggleGroupExpand(group.groupName)}>
                               <div className="font-bold text-on-surface text-xs sm:text-sm flex items-center gap-2 flex-wrap">
                                 <span>{group.groupName}</span>
+                                {group.serviceTypes.map((serviceType: string) => (
+                                  <span
+                                    key={serviceType}
+                                    className="text-[9px] px-2 py-0.5 rounded-md bg-primary/10 text-primary border border-primary/20 font-mono"
+                                  >
+                                    {getProviderServiceTypeLabel(serviceType)}
+                                  </span>
+                                ))}
                                 {group.isAllHidden ? (
                                   <span className="text-[10px] px-2 py-0.5 rounded-md bg-red-500/15 text-red-400 font-bold border border-red-500/20">
                                     مخفية عن المتجر
@@ -1315,6 +1442,9 @@ export default function ProvidersClient() {
                                   <div className="space-y-1.5 flex-1">
                                     <div className="font-bold text-on-surface text-xs flex items-center gap-2 flex-wrap">
                                       <span>{srv.name}</span>
+                                      <span className="text-[9px] px-2 py-0.5 rounded-md bg-primary/10 text-primary border border-primary/20 font-mono">
+                                        {getProviderServiceTypeLabel(getProviderServiceType(srv))}
+                                      </span>
                                       {!srv.isActive && (
                                         <span className="text-[10px] bg-red-500/15 text-red-400 px-1.5 py-0.2 rounded font-semibold">
                                           مخفية
