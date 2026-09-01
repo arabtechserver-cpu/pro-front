@@ -50,7 +50,18 @@ async function proxyRequest(
   body: ArrayBuffer | undefined
 ): Promise<Response> {
   const forwardHeaders = new Headers();
-  const headersToCopy = ['content-type', 'authorization', 'accept', 'accept-language'];
+
+  // Forward all authentication & session headers — including cookies (admin_token lives here)
+  const headersToCopy = [
+    'content-type',
+    'authorization',
+    'cookie',          // ← Critical: admin_token is an httpOnly cookie
+    'accept',
+    'accept-language',
+    'x-admin-token',
+    'x-user-token',
+    'x-forwarded-for',
+  ];
   headersToCopy.forEach(h => {
     const val = request.headers.get(h);
     if (val) forwardHeaders.set(h, val);
@@ -61,9 +72,10 @@ async function proxyRequest(
     headers: forwardHeaders,
     body,
     redirect: 'manual',
-    signal: AbortSignal.timeout(5000),
+    signal: AbortSignal.timeout(8000),
   });
 }
+
 
 async function handler(
   request: NextRequest,
