@@ -123,6 +123,7 @@ export default function ProvidersClient() {
 
   // Sync Options Modal
   const [syncModalProvider, setSyncModalProvider] = useState<Provider | null>(null);
+  const [syncMode, setSyncMode] = useState<"all"|"selected">("all");
   const [syncConfig, setSyncConfig] = useState({
     markup_percent: 0,
     exchange_rate: 1
@@ -322,8 +323,9 @@ export default function ProvidersClient() {
     }
   };
 
-  const openSyncModal = (provider: Provider) => {
+  const openSyncModal = (provider: Provider, mode: "all"|"selected" = "all") => {
     setSyncModalProvider(provider);
+    setSyncMode(mode);
     setSyncConfig({
       markup_percent: 0,
       exchange_rate: 1
@@ -337,10 +339,21 @@ export default function ProvidersClient() {
     setSyncModalProvider(null);
 
     try {
-      const res = await fetch(`/api/providers/${p.id}/sync`, {
+            let endpoint = `/api/providers/${p.id}/sync`;
+      let bodyData: any = syncConfig;
+
+      if (syncMode === "selected") {
+        endpoint = `/api/providers/${p.id}/import-services`;
+        bodyData = {
+          ...syncConfig,
+          services: providerServices.filter(s => selectedGroupNames.includes(s.groupName))
+        };
+      }
+
+      const res = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(syncConfig)
+        body: JSON.stringify(bodyData)
       });
       const data = await res.json();
       if (res.ok && data.success) {
@@ -1119,51 +1132,74 @@ export default function ProvidersClient() {
             {/* Quick Bulk Actions Toolbar */}
             <div className="flex flex-wrap items-center justify-between gap-2.5 p-3 rounded-2xl bg-surface-container-lowest border border-outline-variant/20 text-xs">
               <div className="flex items-center gap-2 flex-wrap">
-                {/* Make All Visible Button */}
-                <button
-                  type="button"
-                  onClick={() => handleToggleAllServices(true)}
-                  disabled={isPerformingBulkAction || loadingServices || serviceLoadSource !== "stored"}
-                  className="px-3.5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold transition-all flex items-center gap-1.5 shadow-sm disabled:opacity-50"
-                  title="تفعيل وإظهار كافة خدمات وباقات هذا المزود للعملاء في المتجر"
-                >
-                  <span className="material-symbols-outlined text-sm">visibility</span>
-                  <span>إظهار وتفعيل كل الخدمات للعملاء</span>
-                </button>
+                {serviceLoadSource === "stored" && (
+                  <>
+                    {/* Make All Visible Button */}
+                    <button
+                      type="button"
+                      onClick={() => handleToggleAllServices(true)}
+                      disabled={isPerformingBulkAction || loadingServices}
+                      className="px-3.5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold transition-all flex items-center gap-1.5 shadow-sm disabled:opacity-50"
+                      title="تفعيل وإظهار كافة خدمات وباقات هذا المزود للعملاء في المتجر"
+                    >
+                      <span className="material-symbols-outlined text-sm">visibility</span>
+                      <span>إظهار وتفعيل كل الخدمات للعملاء</span>
+                    </button>
 
-                {/* Hide All Button */}
-                <button
-                  type="button"
-                  onClick={() => handleToggleAllServices(false)}
-                  disabled={isPerformingBulkAction || loadingServices || serviceLoadSource !== "stored"}
-                  className="px-3 py-2 rounded-xl bg-surface-container-high hover:bg-surface-container-highest text-on-surface-variant hover:text-on-surface font-bold transition-all flex items-center gap-1 border border-outline-variant/20 disabled:opacity-50"
-                >
-                  <span className="material-symbols-outlined text-sm">visibility_off</span>
-                  <span>إخفاء الكل</span>
-                </button>
+                    {/* Hide All Button */}
+                    <button
+                      type="button"
+                      onClick={() => handleToggleAllServices(false)}
+                      disabled={isPerformingBulkAction || loadingServices}
+                      className="px-3 py-2 rounded-xl bg-surface-container-high hover:bg-surface-container-highest text-on-surface-variant hover:text-on-surface font-bold transition-all flex items-center gap-1 border border-outline-variant/20 disabled:opacity-50"
+                    >
+                      <span className="material-symbols-outlined text-sm">visibility_off</span>
+                      <span>إخفاء الكل</span>
+                    </button>
+                  </>
+                )}
+                {serviceLoadSource !== "stored" && (
+                  <div className="flex items-center gap-2 text-primary bg-primary/10 px-3 py-1.5 rounded-xl font-bold">
+                    <span className="material-symbols-outlined text-sm">info</span>
+                    <span>حدد الباقات التي تريد استيرادها أو انقر على استيراد بجانب كل باقة.</span>
+                  </div>
+                )}
 
                 {/* Show Selected Packages Button */}
                 {selectedGroupNames.length > 0 && (
                   <>
-                    <button
-                      type="button"
-                      onClick={() => handleBulkToggleSelectedPackages(true)}
-                      disabled={isPerformingBulkAction || serviceLoadSource !== "stored"}
-                      className="px-3.5 py-2 rounded-xl bg-primary hover:bg-primary/90 text-on-primary font-bold transition-all flex items-center gap-1.5 shadow-sm"
-                    >
-                      <span className="material-symbols-outlined text-sm">check_box</span>
-                      <span>إظهار الباقات المحددة ({selectedGroupNames.length})</span>
-                    </button>
+                    {serviceLoadSource === "stored" ? (
+                      <>
+                        <button
+                          type="button"
+                          onClick={() => handleBulkToggleSelectedPackages(true)}
+                          disabled={isPerformingBulkAction}
+                          className="px-3.5 py-2 rounded-xl bg-primary hover:bg-primary/90 text-on-primary font-bold transition-all flex items-center gap-1.5 shadow-sm"
+                        >
+                          <span className="material-symbols-outlined text-sm">check_box</span>
+                          <span>إظهار الباقات المحددة ({selectedGroupNames.length})</span>
+                        </button>
 
-                    <button
-                      type="button"
-                      onClick={() => handleBulkToggleSelectedPackages(false)}
-                      disabled={isPerformingBulkAction || serviceLoadSource !== "stored"}
-                      className="px-3.5 py-2 rounded-xl bg-red-500/15 hover:bg-red-500/25 text-red-400 border border-red-500/30 font-bold transition-all flex items-center gap-1.5"
-                    >
-                      <span className="material-symbols-outlined text-sm">visibility_off</span>
-                      <span>إخفاء المحددة ({selectedGroupNames.length})</span>
-                    </button>
+                        <button
+                          type="button"
+                          onClick={() => handleBulkToggleSelectedPackages(false)}
+                          disabled={isPerformingBulkAction}
+                          className="px-3.5 py-2 rounded-xl bg-red-500/15 hover:bg-red-500/25 text-red-400 border border-red-500/30 font-bold transition-all flex items-center gap-1.5"
+                        >
+                          <span className="material-symbols-outlined text-sm">visibility_off</span>
+                          <span>إخفاء الباقات المحددة ({selectedGroupNames.length})</span>
+                        </button>
+                      </>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => openSyncModal(browseProvider, "selected")}
+                        className="px-3.5 py-2 rounded-xl bg-sky-500 hover:bg-sky-600 text-white font-bold transition-all flex items-center gap-1.5 shadow-sm"
+                      >
+                        <span className="material-symbols-outlined text-sm">cloud_download</span>
+                        <span>استيراد الباقات المحددة ({selectedGroupNames.length})</span>
+                      </button>
+                    )}
                   </>
                 )}
               </div>
@@ -1300,9 +1336,8 @@ export default function ProvidersClient() {
               <div className="flex items-center justify-between px-2 text-xs text-on-surface-variant">
                 <label className="flex items-center gap-2 cursor-pointer font-bold select-none">
                   <input
-                    type="checkbox"
-                    disabled={serviceLoadSource !== "stored"}
-                    checked={selectedGroupNames.length > 0 && selectedGroupNames.length === filteredGroups.length}
+                      type="checkbox"
+                      checked={selectedGroupNames.length > 0 && selectedGroupNames.length === filteredGroups.length}
                     onChange={handleSelectAllGroups}
                     className="w-4 h-4 accent-primary cursor-pointer"
                   />
@@ -1346,9 +1381,8 @@ export default function ProvidersClient() {
                         <div className="p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-surface-container-high/40 border-b border-outline-variant/15">
                           <div className="flex items-center gap-3">
                             <input
-                              type="checkbox"
-                              disabled={serviceLoadSource !== "stored"}
-                              checked={isSelected}
+                                type="checkbox"
+                                checked={isSelected}
                               onChange={() => toggleGroupSelection(group.groupName)}
                               className="w-4 h-4 accent-primary cursor-pointer shrink-0"
                             />
@@ -1480,21 +1514,38 @@ export default function ProvidersClient() {
                                   </div>
 
                                   <div className="flex items-center gap-3 self-end sm:self-center">
-                                    <button
-                                      type="button"
-                                      disabled={serviceLoadSource !== "stored"}
-                                      onClick={() => handleToggleSingleService(srv)}
-                                      className={`w-8 h-8 rounded-xl flex items-center justify-center transition-all disabled:opacity-40 disabled:cursor-not-allowed ${
-                                        srv.isActive
-                                          ? "bg-emerald-500/10 text-emerald-400 hover:bg-red-500/10 hover:text-red-400 border border-emerald-500/20"
-                                          : "bg-red-500/10 text-red-400 hover:bg-emerald-500/10 hover:text-emerald-400 border border-red-500/20"
-                                      }`}
-                                      title={srv.isActive ? "إخفاء عن المتجر" : "إظهار في المتجر"}
-                                    >
-                                      <span className="material-symbols-outlined text-xs">
-                                        {srv.isActive ? "visibility" : "visibility_off"}
-                                      </span>
-                                    </button>
+                                    {serviceLoadSource !== "stored" ? (
+                                      <button
+                                        type="button"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          showToast("يرجى استيراد الباقة أولاً لتتمكن من تفعيل أو إخفاء خدماتها.", "error");
+                                        }}
+                                        className="w-8 h-8 rounded-xl flex items-center justify-center transition-all bg-surface-container-high text-on-surface-variant hover:text-on-surface border border-outline-variant/20"
+                                        title="يجب استيراد الباقة أولاً"
+                                      >
+                                        <span className="material-symbols-outlined text-xs">info</span>
+                                      </button>
+                                    ) : (
+                                      <button
+                                        type="button"
+                                        disabled={isPerformingBulkAction}
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          handleToggleSingleService(srv);
+                                        }}
+                                        className={`w-8 h-8 rounded-xl flex items-center justify-center transition-all disabled:opacity-40 disabled:cursor-not-allowed ${
+                                          srv.isActive
+                                            ? "bg-emerald-500/10 text-emerald-400 hover:bg-red-500/10 hover:text-red-400 border border-emerald-500/20"
+                                            : "bg-red-500/10 text-red-400 hover:bg-emerald-500/10 hover:text-emerald-400 border border-red-500/20"
+                                        }`}
+                                        title={srv.isActive ? "إخفاء عن المتجر" : "إظهار في المتجر"}
+                                      >
+                                        <span className="material-symbols-outlined text-xs">
+                                          {srv.isActive ? "visibility" : "visibility_off"}
+                                        </span>
+                                      </button>
+                                    )}
                                   </div>
                                 </div>
                               );
