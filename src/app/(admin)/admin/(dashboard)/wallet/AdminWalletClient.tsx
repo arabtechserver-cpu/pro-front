@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect, useMemo, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, useDeferredValue } from "react";
+import { buildAdminTransactionsUrl, mergeTransactionPages } from "../../../../../lib/admin-wallet-pagination";
 
 interface AdminTransaction {
   id: string;
@@ -9,7 +10,7 @@ interface AdminTransaction {
   amount: number;
   method: string;
   refNo: string;
-  receiptImage?: string;
+  hasReceipt?: boolean;
   status: "completed" | "pending" | "failed" | string;
   createdAt: string;
   user?: {
@@ -30,12 +31,18 @@ export default function AdminWalletClient() {
   const [alertMessage, setAlertMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
   const [viewReceiptModalImage, setViewReceiptModalImage] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const deferredSearchQuery = useDeferredValue(searchQuery);
   const [statusFilter, setStatusFilter] = useState("all");
-
-  // Progressive scroll loading state
-  const [visibleCount, setVisibleCount] = useState<number>(BATCH_SIZE);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [nextCursor, setNextCursor] = useState<string | null>(null);
+  const [hasMore, setHasMore] = useState(false);
+  const [filteredTotal, setFilteredTotal] = useState(0);
+  const [summary, setSummary] = useState({ total: 0, pending: 0, completed: 0 });
+  const [receiptLoadingId, setReceiptLoadingId] = useState<string | null>(null);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
+  const requestSequenceRef = useRef(0);
+  const resetLoadingRef = useRef(false);
+  const loadingMoreRef = useRef(false);
 
   const [telegramStatus, setTelegramStatus] = useState<{ connected: boolean; chatIds: string[] }>({ connected: false, chatIds: [] });
 
@@ -49,29 +56,58 @@ export default function AdminWalletClient() {
     } catch {}
   };
 
-  const fetchTransactions = async () => {
-    setIsLoading(true);
+  const fetchTransactions = useCallback(async ({ reset = true, cursor = null }: { reset?: boolean; cursor?: string | null } = {}) => {
+    if (!reset && (resetLoadingRef.current || loadingMoreRef.current)) return;
+
+    const requestId = ++requestSequenceRef.current;
+    if (reset) {
+      resetLoadingRef.current = true;
+      loadingMoreRef.current = false;
+      setIsLoading(true);
+      setHasMore(false);
+      setNextCursor(null);
+    } else {
+      loadingMoreRef.current = true;
+      setIsLoadingMore(true);
+    }
+
     try {
-      const res = await fetch("/api/transactions");
+      const url = buildAdminTransactionsUrl({
+        limit: BATCH_SIZE,
+        status: statusFilter,
+        search: deferredSearchQuery,
+        cursor: reset ? null : cursor
+      });
+      const res = await fetch(url);
       const data = await res.json();
+      if (requestId !== requestSequenceRef.current) return;
+
       if (res.ok && data.success) {
-        setTransactions(data.transactions || []);
+        setTransactions((current) => mergeTransactionPages(current, data.transactions || [], reset));
+        setSummary(data.summary || { total: 0, pending: 0, completed: 0 });
+        setFilteredTotal(data.pagination?.filteredTotal || 0);
+        setHasMore(Boolean(data.pagination?.hasMore));
+        setNextCursor(data.pagination?.nextCursor || null);
       }
     } catch {
       console.error("Failed to fetch transactions for admin dashboard");
     } finally {
-      setIsLoading(false);
+      if (requestId === requestSequenceRef.current) {
+        setIsLoading(false);
+        setIsLoadingMore(false);
+        if (reset) resetLoadingRef.current = false;
+        else loadingMoreRef.current = false;
+      }
     }
-  };
+  }, [deferredSearchQuery, statusFilter]);
 
   useEffect(() => {
-    fetchTransactions();
     fetchTelegramStatus();
   }, []);
 
   useEffect(() => {
-    setVisibleCount(BATCH_SIZE);
-  }, [searchQuery, statusFilter]);
+    fetchTransactions({ reset: true });
+  }, [fetchTransactions]);
 
   // Approve Transaction & Credit Balance in DB
   const handleApprove = async (txId: string) => {
@@ -87,7 +123,7 @@ export default function AdminWalletClient() {
 
       if (res.ok && data.success) {
         setAlertMessage({ type: "success", text: data.message || "تم اعتماد الإيداع وزيادة رصيد المحفظة للعميل بنجاح" });
-        fetchTransactions();
+        fetchTransactions({ reset: true });
       } else {
         setAlertMessage({ type: "error", text: data.error || "حدث خطأ أثناء اعتماد الطلب" });
       }
@@ -112,7 +148,7 @@ export default function AdminWalletClient() {
 
       if (res.ok && data.success) {
         setAlertMessage({ type: "success", text: "تم رفض طلب الشحن" });
-        fetchTransactions();
+        fetchTransactions({ reset: true });
       } else {
         setAlertMessage({ type: "error", text: data.error || "حدث خطأ أثناء رفض الطلب" });
       }
@@ -123,41 +159,33 @@ export default function AdminWalletClient() {
     }
   };
 
-  const pendingCount = transactions.filter((t) => t.status === "pending").length;
-  const completedCount = transactions.filter((t) => t.status === "completed").length;
+  const pendingCount = summary.pending;
+  const completedCount = summary.completed;
 
-  const filteredTransactions = useMemo(() => {
-    return transactions.filter((tx) => {
-      if (statusFilter !== "all" && tx.status !== statusFilter) return false;
-      if (!searchQuery.trim()) return true;
-      const q = searchQuery.toLowerCase();
-      return (
-        (tx.refNo && tx.refNo.toLowerCase().includes(q)) ||
-        (tx.method && tx.method.toLowerCase().includes(q)) ||
-        (tx.type && tx.type.toLowerCase().includes(q)) ||
-        (tx.user?.fullName && tx.user.fullName.toLowerCase().includes(q)) ||
-        (tx.user?.email && tx.user.email.toLowerCase().includes(q)) ||
-        (tx.user?.username && tx.user.username.toLowerCase().includes(q))
-      );
-    });
-  }, [transactions, searchQuery, statusFilter]);
-
-  const displayedTransactions = useMemo(() => {
-    return filteredTransactions.slice(0, visibleCount);
-  }, [filteredTransactions, visibleCount]);
-
-  const hasMore = visibleCount < filteredTransactions.length;
+  const handleViewReceipt = async (transactionId: string) => {
+    setReceiptLoadingId(transactionId);
+    setAlertMessage(null);
+    try {
+      const res = await fetch(`/api/transactions/${transactionId}/receipt`);
+      const data = await res.json();
+      if (res.ok && data.success && data.receiptImage) {
+        setViewReceiptModalImage(data.receiptImage);
+      } else {
+        setAlertMessage({ type: "error", text: data.error || "تعذر تحميل صورة الإيصال" });
+      }
+    } catch {
+      setAlertMessage({ type: "error", text: "تعذر الاتصال بالسيرفر لتحميل صورة الإيصال" });
+    } finally {
+      setReceiptLoadingId(null);
+    }
+  };
 
   const handleObserver = useCallback((entries: IntersectionObserverEntry[]) => {
     const target = entries[0];
-    if (target.isIntersecting && hasMore) {
-      setIsLoadingMore(true);
-      setTimeout(() => {
-        setVisibleCount((prev) => prev + BATCH_SIZE);
-        setIsLoadingMore(false);
-      }, 150);
+    if (target.isIntersecting && hasMore && nextCursor && !isLoading && !isLoadingMore) {
+      fetchTransactions({ reset: false, cursor: nextCursor });
     }
-  }, [hasMore]);
+  }, [fetchTransactions, hasMore, isLoading, isLoadingMore, nextCursor]);
 
   useEffect(() => {
     const option = { root: null, rootMargin: "150px", threshold: 0 };
@@ -182,7 +210,7 @@ export default function AdminWalletClient() {
 
         <div className="flex items-center gap-3">
           <button
-            onClick={fetchTransactions}
+            onClick={() => fetchTransactions({ reset: true })}
             className="px-4 py-2 rounded-xl bg-surface-container-high border border-outline-variant/30 hover:border-primary/50 text-xs font-bold text-on-surface flex items-center gap-2 transition-all shadow-sm"
           >
             <span className={`material-symbols-outlined text-sm text-primary ${isLoading ? "animate-spin" : ""}`}>
@@ -198,7 +226,7 @@ export default function AdminWalletClient() {
         <div className="p-5 rounded-2xl bg-surface-container-low border border-outline-variant/20 flex items-center justify-between">
           <div>
             <p className="text-xs font-bold text-on-surface-variant">إجمالي المعاملات</p>
-            <p className="text-2xl font-bold text-on-surface font-mono mt-1">{transactions.length}</p>
+            <p className="text-2xl font-bold text-on-surface font-mono mt-1">{summary.total}</p>
           </div>
           <span className="material-symbols-outlined text-primary text-3xl">receipt_long</span>
         </div>
@@ -297,7 +325,7 @@ export default function AdminWalletClient() {
                 statusFilter === "all" ? "bg-primary text-on-primary" : "bg-surface-container-high text-on-surface-variant"
               }`}
             >
-              الكل ({transactions.length})
+              الكل ({summary.total})
             </button>
             <button
               onClick={() => setStatusFilter("pending")}
@@ -318,7 +346,7 @@ export default function AdminWalletClient() {
           </div>
 
           <span className="text-[11px] font-mono text-on-surface-variant hidden lg:inline">
-            عرض {displayedTransactions.length} من {filteredTransactions.length}
+            عرض {transactions.length} من {filteredTotal}
           </span>
         </div>
       </div>
@@ -330,7 +358,7 @@ export default function AdminWalletClient() {
             <span className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin"></span>
             <span>جاري تحميل بيانات الشحن والمعاملات من قاعدة البيانات...</span>
           </div>
-        ) : filteredTransactions.length === 0 ? (
+        ) : transactions.length === 0 ? (
           <div className="p-12 text-center text-xs text-on-surface-variant flex flex-col items-center justify-center gap-2">
             <span className="material-symbols-outlined text-4xl text-on-surface-variant">inbox</span>
             <p className="font-bold text-sm text-on-surface">لا توجد طلبات شحن أو معاملات مطابقة للبحث</p>
@@ -351,7 +379,7 @@ export default function AdminWalletClient() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-outline-variant/10">
-                {displayedTransactions.map((tx) => {
+                {transactions.map((tx) => {
                   const isPending = tx.status === "pending";
                   const isActioning = actionLoadingId === tx.id;
 
@@ -396,14 +424,19 @@ export default function AdminWalletClient() {
 
                       {/* Telegram Direct Delivery & Receipt Image */}
                       <td className="p-4">
-                        {tx.receiptImage ? (
+                        {tx.hasReceipt ? (
                           <button
-                            onClick={() => setViewReceiptModalImage(tx.receiptImage!)}
+                            onClick={() => handleViewReceipt(tx.id)}
+                            disabled={receiptLoadingId === tx.id}
                             className="px-2.5 py-1 rounded-lg bg-primary/15 hover:bg-primary/25 border border-primary/30 text-primary font-bold text-[11px] flex items-center gap-1.5 w-fit transition-all shadow-sm"
                             title="اضغط لعرض صورة الإيصال المرفوعة من العميل"
                           >
-                            <span className="material-symbols-outlined text-sm">image</span>
-                            <span>عرض الإيصال</span>
+                            {receiptLoadingId === tx.id ? (
+                              <span className="w-3.5 h-3.5 border-2 border-primary border-t-transparent rounded-full animate-spin"></span>
+                            ) : (
+                              <span className="material-symbols-outlined text-sm">image</span>
+                            )}
+                            <span>{receiptLoadingId === tx.id ? "جاري التحميل" : "عرض الإيصال"}</span>
                           </button>
                         ) : (
                           <span className="px-2.5 py-1 rounded-lg bg-sky-500/10 border border-sky-500/30 text-sky-400 font-bold text-[11px] flex items-center gap-1.5 w-fit">
@@ -490,11 +523,11 @@ export default function AdminWalletClient() {
           {hasMore ? (
             <div className="flex items-center justify-center gap-2 text-xs text-on-surface-variant py-2">
               <span className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></span>
-              <span>جاري تحميل المزيد مع التمرير ({displayedTransactions.length} من {filteredTransactions.length})...</span>
+              <span>جاري تحميل المزيد مع التمرير ({transactions.length} من {filteredTotal})...</span>
             </div>
-          ) : filteredTransactions.length > 0 ? (
+          ) : transactions.length > 0 ? (
             <div className="text-[11px] text-on-surface-variant/70">
-              تم عرض كافة المعاملات ({filteredTransactions.length} معاملة)
+              تم عرض كافة المعاملات المطابقة ({filteredTotal} معاملة)
             </div>
           ) : null}
         </div>
