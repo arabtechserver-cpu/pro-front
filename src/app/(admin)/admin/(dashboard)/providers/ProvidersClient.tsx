@@ -1421,23 +1421,38 @@ export default function ProvidersClient() {
                           </div>
 
                           <div className="flex items-center gap-2 self-end sm:self-center">
-                            {/* Package Visibility Toggle Button */}
-                            <button
-                              type="button"
-                              disabled={serviceLoadSource !== "stored"}
-                              onClick={() => handleToggleSinglePackage(group.groupName, !group.isAllActive)}
-                              className={`px-3 py-1.5 rounded-xl font-bold text-xs transition-all flex items-center gap-1 border disabled:opacity-40 disabled:cursor-not-allowed ${
-                                group.isAllActive
-                                  ? "bg-red-500/10 text-red-400 hover:bg-red-500/20 border-red-500/20"
-                                  : "bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 border-emerald-500/20"
-                              }`}
-                              title={group.isAllActive ? "إخفاء كل خدمات هذه الباقة عن المتجر" : "إظهار كل خدمات هذه الباقة للعملاء"}
-                            >
-                              <span className="material-symbols-outlined text-xs">
-                                {group.isAllActive ? "visibility_off" : "visibility"}
-                              </span>
-                              <span>{group.isAllActive ? "إخفاء الباقة" : "إظهار الباقة"}</span>
-                            </button>
+                            {/* Package Visibility / Import Toggle Button */}
+                            {serviceLoadSource !== "stored" ? (
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setSelectedGroupNames([group.groupName]);
+                                  openSyncModal(browseProvider, "selected");
+                                }}
+                                className="px-3 py-1.5 rounded-xl font-bold text-xs transition-all flex items-center gap-1 border bg-sky-500/10 text-sky-500 hover:bg-sky-500/20 border-sky-500/20"
+                                title="استيراد وتفعيل هذه الباقة"
+                              >
+                                <span className="material-symbols-outlined text-xs">cloud_download</span>
+                                <span>استيراد الباقة</span>
+                              </button>
+                            ) : (
+                              <button
+                                type="button"
+                                onClick={() => handleToggleSinglePackage(group.groupName, !group.isAllActive)}
+                                className={`px-3 py-1.5 rounded-xl font-bold text-xs transition-all flex items-center gap-1 border disabled:opacity-40 disabled:cursor-not-allowed ${
+                                  group.isAllActive
+                                    ? "bg-red-500/10 text-red-400 hover:bg-red-500/20 border-red-500/20"
+                                    : "bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 border-emerald-500/20"
+                                }`}
+                                title={group.isAllActive ? "إخفاء كل خدمات هذه الباقة عن المتجر" : "إظهار كل خدمات هذه الباقة للعملاء"}
+                              >
+                                <span className="material-symbols-outlined text-xs">
+                                  {group.isAllActive ? "visibility_off" : "visibility"}
+                                </span>
+                                <span>{group.isAllActive ? "إخفاء الباقة" : "إظهار الباقة"}</span>
+                              </button>
+                            )}
 
                             {/* Expand / Collapse Button */}
                             <button
