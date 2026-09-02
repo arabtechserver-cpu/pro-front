@@ -346,7 +346,7 @@ export default function ProvidersClient() {
         endpoint = `/api/providers/${p.id}/import-services`;
         bodyData = {
           ...syncConfig,
-          services: providerServices.filter(s => selectedGroupNames.includes(s.groupName))
+          services: providerServices.filter(s => selectedGroupNames.includes(s.groupName || s.group_name || "باقة عامة"))
         };
       }
 
@@ -416,7 +416,7 @@ export default function ProvidersClient() {
   const groupedPackages = useMemo(() => {
     const map: Record<string, any[]> = {};
     for (const s of typeFilteredProviderServices) {
-      const g = s.groupName || "باقة عامة";
+      const g = s.groupName || s.group_name || "باقة عامة";
       if (!map[g]) map[g] = [];
       map[g].push(s);
     }
