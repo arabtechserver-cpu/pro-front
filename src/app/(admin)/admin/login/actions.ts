@@ -26,7 +26,8 @@ export async function loginAdmin(username: string, password: string) {
         const data = await res.json();
 
         if (data.success && data.user && ["admin", "super_admin"].includes(data.user.role)) {
-          cookies().set({
+          const cookieStore = await cookies();
+          cookieStore.set({
             name: "admin_token",
             value: data.token,
             httpOnly: true,
@@ -49,5 +50,6 @@ export async function loginAdmin(username: string, password: string) {
 }
 
 export async function logoutAdmin() {
-  cookies().delete("admin_token");
+  const cookieStore = await cookies();
+  cookieStore.delete("admin_token");
 }

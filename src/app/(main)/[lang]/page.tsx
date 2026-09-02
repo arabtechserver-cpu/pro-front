@@ -19,7 +19,8 @@ async function getHomepageConfig() {
   return null;
 }
 
-export async function generateMetadata({ params }: { params: { lang: Locale } }): Promise<Metadata> {
+export async function generateMetadata(props: { params: Promise<{ lang: Locale }> }): Promise<Metadata> {
+  const params = await props.params;
   const isAr = params.lang === "ar";
   const title = isAr
     ? "عرب تك برو سيرفر | Arab Tech Pro Server - أفضل منصة لفك الهواتف وخدمات IMEI"
@@ -69,7 +70,8 @@ export async function generateMetadata({ params }: { params: { lang: Locale } })
   };
 }
 
-export default async function Home({ params }: { params: { lang: Locale } }) {
+export default async function Home(props: { params: Promise<{ lang: Locale }> }) {
+  const params = await props.params;
   const dict = await getDictionary(params.lang);
   const hp = await getHomepageConfig();
 
@@ -103,7 +105,7 @@ export default async function Home({ params }: { params: { lang: Locale } }) {
   const title1 = isAr ? hp?.heroSection?.title1Ar : hp?.heroSection?.title1En;
   const title2 = isAr ? hp?.heroSection?.title2Ar : hp?.heroSection?.title2En;
   const lead = isAr ? hp?.heroSection?.leadAr : hp?.heroSection?.leadEn;
-  
+
   const btnBrowse = isAr ? hp?.heroSection?.btnBrowseAr : hp?.heroSection?.btnBrowseEn;
   const btnBrowseUrl = formatUrl(hp?.heroSection?.btnBrowseUrl, "/pricing");
 
@@ -168,7 +170,7 @@ export default async function Home({ params }: { params: { lang: Locale } }) {
           })
         }}
       />
-      
+
       {/* --- Continuous Seamless Notice Bar --- */}
       <div className="w-full bg-surface-container/90 backdrop-blur-md border-b border-outline-variant/20 mb-2 sm:mb-4 relative z-20 overflow-hidden">
         <div className="w-full flex whitespace-nowrap overflow-hidden py-2 sm:py-2.5" dir="ltr">
@@ -536,7 +538,7 @@ export default async function Home({ params }: { params: { lang: Locale } }) {
 
       {/* --- Real Interactive Newsletter Section --- */}
       <NewsletterSection lang={params.lang} className="container mx-auto px-4" />
-      
+
     </div>
   );
 }

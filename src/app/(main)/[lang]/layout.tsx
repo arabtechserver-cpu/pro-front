@@ -13,7 +13,8 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const jakarta = Plus_Jakarta_Sans({ subsets: ["latin"], variable: "--font-jakarta" });
 const jetbrains = JetBrains_Mono({ subsets: ["latin"], variable: "--font-jetbrains" });
 
-export async function generateMetadata({ params }: { params: { lang: string } }): Promise<Metadata> {
+export async function generateMetadata(props: { params: Promise<{ lang: string }> }): Promise<Metadata> {
+  const params = await props.params;
   const isAr = params.lang === "ar";
   const siteTitle = isAr ? "عرب تك برو سيرفر | Arab Tech Pro Server" : "Arab Tech Pro Server | GSM & Remote Unlock Services";
   const siteDesc = isAr
@@ -110,13 +111,18 @@ export async function generateMetadata({ params }: { params: { lang: string } })
   };
 }
 
-export default async function RootLayout({
-  children,
-  params,
-}: Readonly<{
-  children: React.ReactNode;
-  params: { lang: string };
-}>) {
+export default async function RootLayout(
+  props: Readonly<{
+    children: React.ReactNode;
+    params: { lang: string };
+  }>
+) {
+  const params = await props.params;
+
+  const {
+    children
+  } = props;
+
   const lang = params.lang as Locale;
   const dict = await getDictionary(lang);
   const dir = lang === "ar" ? "rtl" : "ltr";

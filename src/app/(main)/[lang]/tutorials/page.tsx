@@ -58,7 +58,8 @@ async function getAllVideos(): Promise<VideoLesson[]> {
   }
 }
 
-export default async function TutorialsPage({ params }: { params: { lang: Locale } }) {
+export default async function TutorialsPage(props: { params: Promise<{ lang: Locale }> }) {
+  const params = await props.params;
   const isAr = params.lang === 'ar';
   const [seriesList, allVideos] = await Promise.all([
     getSeries(),

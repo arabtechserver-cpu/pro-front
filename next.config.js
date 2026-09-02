@@ -4,18 +4,17 @@ const nextConfig = {
   output: 'standalone',
   experimental: {
     serverActions: {
-      bodySizeLimit: '150mb',
+      bodySizeLimit: '10mb',
     },
   },
   images: {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: '**',
+        hostname: 'api.arabtechproserver.tech',
       },
     ],
   },
 };
 
 module.exports = nextConfig;
-

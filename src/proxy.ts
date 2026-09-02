@@ -5,7 +5,7 @@ import { match as matchLocale } from '@formatjs/intl-localematcher';
 import Negotiator from 'negotiator';
 import { jwtVerify } from 'jose';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your_super_strong_secret_key_here';
+const JWT_SECRET = process.env.JWT_SECRET;
 
 function getLocale(request: NextRequest): string | undefined {
   const negotiatorHeaders: Record<string, string> = {};
@@ -13,20 +13,18 @@ function getLocale(request: NextRequest): string | undefined {
 
   // @ts-ignore locales are readonly
   const locales: string[] = i18n.locales;
-  
-  let languages = new Negotiator({ headers: negotiatorHeaders }).languages();
-  
+  const languages = new Negotiator({ headers: negotiatorHeaders }).languages();
+
   try {
     return matchLocale(languages, locales, i18n.defaultLocale);
-  } catch (e) {
+  } catch {
     return i18n.defaultLocale;
   }
 }
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
-  // Ignore static SEO files, favicon, public assets, and API
   if (
     pathname === '/sitemap.xml' ||
     pathname === '/robots.txt' ||
@@ -41,53 +39,35 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Protect Admin Routes
   if (pathname.startsWith('/admin')) {
-    if (pathname === '/admin/login') {
-      return NextResponse.next();
-    }
-    
+    if (pathname === '/admin/login') return NextResponse.next();
+
     const token = request.cookies.get('admin_token')?.value;
-    if (!token) {
-      return NextResponse.redirect(new URL('/admin/login', request.url));
-    }
-    
-    // Verify JWT using jose
-    if (!JWT_SECRET) {
-      console.error('JWT_SECRET is missing in environment variables');
+    if (!token || !JWT_SECRET || JWT_SECRET.length < 32) {
       return NextResponse.redirect(new URL('/admin/login', request.url));
     }
 
     try {
-      const secretKey = new TextEncoder().encode(JWT_SECRET);
-      await jwtVerify(token, secretKey);
+      await jwtVerify(token, new TextEncoder().encode(JWT_SECRET));
       return NextResponse.next();
-    } catch (err) {
-      console.error('Invalid admin_token provided', err);
+    } catch {
       return NextResponse.redirect(new URL('/admin/login', request.url));
     }
   }
 
-  // Check if there is any supported locale in the pathname
   const pathnameIsMissingLocale = i18n.locales.every(
     (locale) => !pathname.startsWith(`/${locale}/`) && pathname !== `/${locale}`
   );
 
-  // Handle locale routing
   if (pathnameIsMissingLocale) {
     const locale = getLocale(request);
-    // For root path, rewrite directly so OpenGraph preview crawlers (WhatsApp, Facebook, Telegram) get status 200 with meta tags
     if (pathname === '' || pathname === '/') {
       return NextResponse.rewrite(new URL(`/${locale}`, request.url));
     }
-    return NextResponse.redirect(
-      new URL(`/${locale}${pathname.startsWith('/') ? '' : '/'}${pathname}`, request.url)
-    );
+    return NextResponse.redirect(new URL(`/${locale}${pathname.startsWith('/') ? '' : '/'}${pathname}`, request.url));
   }
 }
 
 export const config = {
-  // Matcher ignoring `/_next/`, `/api/`, `/images/`, `/sitemap.xml`, `/robots.txt`, etc.
   matcher: ['/((?!api|_next/static|_next/image|images|uploads|sitemap.xml|robots.txt|favicon.ico|icon.png|apple-icon.png).*)'],
 };
-

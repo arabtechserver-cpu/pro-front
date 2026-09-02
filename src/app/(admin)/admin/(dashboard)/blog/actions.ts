@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 
 export async function addBlogPost(formData: FormData) {
-  const token = cookies().get('admin_token')?.value;
+  const token = (await cookies()).get('admin_token')?.value;
   const payload = {
     titleEn: formData.get("titleEn") as string,
     titleAr: formData.get("titleAr") as string,
@@ -36,7 +36,7 @@ export async function addBlogPost(formData: FormData) {
 }
 
 export async function addVideoTutorial(formData: FormData) {
-  const token = cookies().get('admin_token')?.value;
+  const token = (await cookies()).get('admin_token')?.value;
   const payload = {
     titleEn: formData.get("titleEn") as string,
     titleAr: formData.get("titleAr") as string,
@@ -64,7 +64,7 @@ export async function addVideoTutorial(formData: FormData) {
 }
 
 export async function updateBlogPost(id: string, formData: FormData) {
-  const token = cookies().get('admin_token')?.value;
+  const token = (await cookies()).get('admin_token')?.value;
   const payload = {
     titleEn: formData.get("titleEn") as string,
     titleAr: formData.get("titleAr") as string,
@@ -95,7 +95,7 @@ export async function updateBlogPost(id: string, formData: FormData) {
 }
 
 export async function deleteBlogPost(id: string) {
-  const token = cookies().get('admin_token')?.value;
+  const token = (await cookies()).get('admin_token')?.value;
   const headers: Record<string, string> = {};
   if (token) headers['Authorization'] = `Bearer ${token}`;
 

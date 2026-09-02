@@ -1,14 +1,20 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, use } from "react";
 import { useRouter } from "next/navigation";
 import { buildApiActivationPayload } from "../../../../lib/api-activation";
 
-export default function ApiDeveloperPage({ params: { lang } }: { params: { lang: string } }) {
+export default function ApiDeveloperPage(props: { params: Promise<{ lang: string }> }) {
+  const params = use(props.params);
+
+  const {
+    lang
+  } = params;
+
   const router = useRouter();
   const [userSession, setUserSession] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  
+
   const [siteName, setSiteName] = useState("");
   const [siteUrl, setSiteUrl] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);

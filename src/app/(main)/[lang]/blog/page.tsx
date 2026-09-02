@@ -16,9 +16,10 @@ async function getPosts() {
   }
 }
 
-export default async function BlogPage({ params }: { params: { lang: Locale } }) {
+export default async function BlogPage(props: { params: Promise<{ lang: Locale }> }) {
+  const params = await props.params;
   const dict = await getDictionary(params.lang);
-  
+
   const rawPosts = await getPosts();
   // Filter out any duplicate articles
   const seen = new Set();

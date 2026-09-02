@@ -36,11 +36,12 @@ function getEmbedUrl(url: string) {
   return url;
 }
 
-export default async function TutorialDetailsPage({
-  params
-}: {
-  params: { lang: Locale; id: string };
-}) {
+export default async function TutorialDetailsPage(
+  props: {
+    params: Promise<{ lang: Locale; id: string }>;
+  }
+) {
+  const params = await props.params;
   const isAr = params.lang === 'ar';
   const video = await getTutorial(params.id);
 

@@ -4,8 +4,8 @@ import PurchaseClient from "./PurchaseClient";
 import { Metadata, ResolvingMetadata } from "next";
 
 type Props = {
-  params: { lang: Locale };
-  searchParams: { serviceId?: string };
+  params: Promise<{ lang: Locale }>;
+  searchParams: Promise<{ serviceId?: string }>;
 };
 
 // Function to fetch single service for dynamic SEO Metadata
@@ -22,10 +22,9 @@ async function getServiceDetails(serviceId: string) {
   }
 }
 
-export async function generateMetadata(
-  { params, searchParams }: Props,
-  parent: ResolvingMetadata
-): Promise<Metadata> {
+export async function generateMetadata(props: Props, parent: ResolvingMetadata): Promise<Metadata> {
+  const searchParams = await props.searchParams;
+  const params = await props.params;
   const isAr = params.lang === "ar";
   const serviceId = searchParams.serviceId;
 
@@ -109,7 +108,8 @@ export async function generateMetadata(
   };
 }
 
-export default async function Purchase({ params }: { params: { lang: Locale } }) {
+export default async function Purchase(props: { params: Promise<{ lang: Locale }> }) {
+  const params = await props.params;
   const dict = await getDictionary(params.lang);
 
   return (

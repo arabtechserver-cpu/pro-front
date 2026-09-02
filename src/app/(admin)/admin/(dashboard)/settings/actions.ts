@@ -3,7 +3,7 @@
 import { cookies } from "next/headers";
 
 export async function getAdminProfile() {
-  const token = cookies().get('admin_token')?.value;
+  const token = (await cookies()).get('admin_token')?.value;
   if (!token) return null;
 
   try {
@@ -24,7 +24,7 @@ export async function getAdminProfile() {
 }
 
 export async function updateAdminCredentials(data: any) {
-  const token = cookies().get('admin_token')?.value;
+  const token = (await cookies()).get('admin_token')?.value;
   if (!token) return { success: false, error: "غير مصرح لك" };
 
   try {

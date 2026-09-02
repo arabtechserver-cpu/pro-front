@@ -3,12 +3,18 @@ import { getDictionary } from "@/i18n/get-dictionary";
 import Link from "next/link";
 
 interface PageProps {
-  params: {
+  params: Promise<{
     lang: Locale;
-  };
+  }>;
 }
 
-export default async function TermsPage({ params: { lang } }: PageProps) {
+export default async function TermsPage(props: PageProps) {
+  const params = await props.params;
+
+  const {
+    lang
+  } = params;
+
   const dict = await getDictionary(lang);
 
   return (

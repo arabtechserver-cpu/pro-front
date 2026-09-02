@@ -146,7 +146,7 @@ export default function AiChatWidget() {
     }
   };
 
-  // Helper to render Markdown-like text safely with interactive button links
+  // Render AI output as text only. The model response is untrusted content.
   const renderMessageContent = (content: string) => {
     if (!content) return null;
 
@@ -162,50 +162,14 @@ export default function AiChatWidget() {
         return <hr key={idx} className="border-t border-outline-variant/30 my-2" />;
       }
 
-      // Collect link buttons into placeholder tokens to prevent regex collision and nested tags
-      const linkMap: { id: string; html: string }[] = [];
-      let tempLine = line;
-
-      // 1. Convert Markdown links [Title](URL)
-      tempLine = tempLine.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, (_, label, url) => {
-        const token = `___LINK_TOKEN_${linkMap.length}___`;
-        linkMap.push({
-          id: token,
-          html: `<a href="${url}" target="_blank" rel="noreferrer" class="inline-flex items-center gap-1.5 px-3 py-1 my-1 bg-primary/20 hover:bg-primary text-cyan-300 hover:text-white border border-primary/40 rounded-xl font-bold text-xs transition-all shadow-sm active:scale-95 no-underline"><span>${label}</span> <span class="text-[10px]">↗</span></a>`
-        });
-        return token;
-      });
-
-      // 2. Convert Raw Standalone URLs (https://...)
-      tempLine = tempLine.replace(/(https?:\/\/[^\s<"'>]+)/g, (url) => {
-        const token = `___LINK_TOKEN_${linkMap.length}___`;
-        let displayLabel = 'زيارة الرابط';
-        if (url.includes('wa.me')) displayLabel = '📱 محادثة واتساب الدعم';
-        else if (url.includes('t.me')) displayLabel = '💬 تيليجرام الدعم الفني';
-        else if (url.includes('arabtechproserver.tech/pricing')) displayLabel = '🛒 صفحة الأسعار والطلب';
-        else if (url.includes('arabtechproserver.tech')) displayLabel = '🌐 الموقع الرسمي';
-
-        linkMap.push({
-          id: token,
-          html: `<a href="${url}" target="_blank" rel="noreferrer" class="inline-flex items-center gap-1.5 px-3 py-1 my-1 bg-primary/20 hover:bg-primary text-cyan-300 hover:text-white border border-primary/40 rounded-xl font-bold text-xs transition-all shadow-sm active:scale-95 no-underline"><span>${displayLabel}</span> <span class="text-[10px]">↗</span></a>`
-        });
-        return token;
-      });
-
-      // 3. Bold text formatting (**text**)
-      tempLine = tempLine.replace(/\*\*([^*]+)\*\*/g, '<strong class="text-white font-bold">$1</strong>');
-
-      // 4. Restore Link Buttons
-      for (const item of linkMap) {
-        tempLine = tempLine.split(item.id).join(item.html);
-      }
+      const text = line.replace(/^#{1,3}\s/, '').replace(/^[-•*]\s/, '').replace(/^\d+\.\s/, '');
 
       // Bullet / List Item
       if (/^[-•*]\s/.test(line)) {
         return (
           <div key={idx} className="flex items-start gap-2 my-1.5 pr-1">
             <span className="text-primary mt-1.5 text-[8px]">●</span>
-            <div className="flex-1 text-sm leading-relaxed" dangerouslySetInnerHTML={{ __html: tempLine.replace(/^[-•*]\s/, '') }} />
+            <div className="flex-1 text-sm leading-relaxed whitespace-pre-wrap">{text}</div>
           </div>
         );
       }
@@ -216,24 +180,24 @@ export default function AiChatWidget() {
         return (
           <div key={idx} className="flex items-start gap-2 my-1.5 pr-1">
             <span className="text-primary font-bold text-xs bg-primary/10 px-1.5 py-0.5 rounded-full">{num}</span>
-            <div className="flex-1 text-sm leading-relaxed" dangerouslySetInnerHTML={{ __html: tempLine.replace(/^\d+\.\s/, '') }} />
+            <div className="flex-1 text-sm leading-relaxed whitespace-pre-wrap">{text}</div>
           </div>
         );
       }
 
       // Headings
       if (line.startsWith('### ')) {
-        return <h5 key={idx} className="font-bold text-sm text-primary mt-3 mb-1" dangerouslySetInnerHTML={{ __html: tempLine.replace('### ', '') }} />;
+        return <h5 key={idx} className="font-bold text-sm text-primary mt-3 mb-1">{text}</h5>;
       }
       if (line.startsWith('## ')) {
-        return <h4 key={idx} className="font-bold text-base text-cyan-400 mt-3 mb-1.5" dangerouslySetInnerHTML={{ __html: tempLine.replace('## ', '') }} />;
+        return <h4 key={idx} className="font-bold text-base text-cyan-400 mt-3 mb-1.5">{text}</h4>;
       }
       if (line.startsWith('# ')) {
-        return <h3 key={idx} className="font-extrabold text-lg text-white mt-4 mb-2" dangerouslySetInnerHTML={{ __html: tempLine.replace('# ', '') }} />;
+        return <h3 key={idx} className="font-extrabold text-lg text-white mt-4 mb-2">{text}</h3>;
       }
 
       return (
-        <p key={idx} className="my-1.5 text-sm leading-relaxed text-on-surface" dangerouslySetInnerHTML={{ __html: tempLine }} />
+        <p key={idx} className="my-1.5 text-sm leading-relaxed text-on-surface whitespace-pre-wrap">{text}</p>
       );
     });
   };

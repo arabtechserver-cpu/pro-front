@@ -788,10 +788,9 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
                       </span>
                     </button>
                     {showServiceInfo && (
-                      <div 
-                        className="mt-2.5 p-3 rounded-xl bg-surface-container-lowest border border-outline-variant/30 text-xs text-on-surface-variant leading-relaxed max-h-56 overflow-y-auto whitespace-pre-wrap"
-                        dangerouslySetInnerHTML={{ __html: selectedService.info }}
-                      />
+                      <div className="mt-2.5 p-3 rounded-xl bg-surface-container-lowest border border-outline-variant/30 text-xs text-on-surface-variant leading-relaxed max-h-56 overflow-y-auto whitespace-pre-wrap">
+                        {selectedService.info}
+                      </div>
                     )}
                   </div>
                 )}

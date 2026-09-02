@@ -5,7 +5,7 @@ import { Metadata, ResolvingMetadata } from "next";
 
 // Define the type for the props received by the page and generateMetadata
 type Props = {
-  params: { lang: Locale; id: string };
+  params: Promise<{ lang: Locale; id: string }>;
 };
 
 // Function to fetch a single blog post
@@ -27,10 +27,8 @@ async function getPost(id: string) {
 }
 
 // Generate dynamic SEO Metadata
-export async function generateMetadata(
-  { params }: Props,
-  parent: ResolvingMetadata
-): Promise<Metadata> {
+export async function generateMetadata(props: Props, parent: ResolvingMetadata): Promise<Metadata> {
+  const params = await props.params;
   const post = await getPost(params.id);
 
   if (!post) {
@@ -41,7 +39,7 @@ export async function generateMetadata(
 
   const title = params.lang === "ar" ? post.titleAr : post.titleEn;
   const description = params.lang === "ar" ? post.excerptAr : post.excerptEn;
-  
+
   // Set up SEO properties
   return {
     title: title,
@@ -62,7 +60,8 @@ export async function generateMetadata(
 }
 
 // Main Page Component
-export default async function BlogPostPage({ params }: Props) {
+export default async function BlogPostPage(props: Props) {
+  const params = await props.params;
   const dict = await getDictionary(params.lang);
   const post = await getPost(params.id);
 
@@ -122,7 +121,6 @@ export default async function BlogPostPage({ params }: Props) {
       {/* Article Content */}
       <main className="container mx-auto px-4">
         <article className="max-w-4xl mx-auto glass-card rounded-3xl p-8 md:p-12 border border-outline-variant/30 shadow-xl">
-          {/* We use a prose class to style the rich text HTML content from the editor */}
           <div
             className="prose prose-lg prose-invert max-w-none 
               text-slate-100 text-base md:text-lg leading-relaxed
@@ -139,8 +137,9 @@ export default async function BlogPostPage({ params }: Props) {
               [&_.btn-primary]:!text-[#0c1324] [&_.btn-primary]:!no-underline [&_.btn-primary]:!font-black [&_a.btn-primary]:!text-[#0c1324] [&_a.btn-primary]:!no-underline
               prose-img:rounded-2xl prose-img:shadow-lg prose-img:mx-auto
               prose-table:w-full prose-table:my-6 prose-th:text-white prose-th:bg-surface-container-high prose-td:text-slate-200 prose-td:p-3 prose-th:p-3"
-            dangerouslySetInnerHTML={{ __html: content }}
-          />
+          >
+            {content}
+          </div>
           
           <div className="mt-16 pt-8 border-t border-outline-variant/20">
             <Link

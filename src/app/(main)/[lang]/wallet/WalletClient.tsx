@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { Locale } from "@/i18n/config";
 import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
 
-const PAYPAL_CLIENT_ID = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || "BAA8Rt-IgLlxgkq8MZ8oiOOqDhFqy92HBS9sxJzeYASwt8YU9Lz7GXrMAiACDFotqS5LlCxBsRISofo6n8";
+const PAYPAL_CLIENT_ID = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || "";
 
 interface PaymentMethod {
   id: string;
@@ -252,13 +252,15 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
     setIsLoading(true);
     setIsVerifyingPayPal(true);
     try {
+      const token = localStorage.getItem("user_token");
       const res = await fetch("/api/wallet/paypal/capture-order", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {})
+        },
         body: JSON.stringify({
-          orderId,
-          userId: userObj?.id || userSession?.id,
-          email: userObj?.email || userSession?.email
+          orderId
         })
       });
 
@@ -881,13 +883,15 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
                           throw new Error("Invalid deposit amount");
                         }
 
+                        const token = localStorage.getItem("user_token");
                         const res = await fetch("/api/wallet/paypal/create-order", {
                           method: "POST",
-                          headers: { "Content-Type": "application/json" },
+                          headers: {
+                            "Content-Type": "application/json",
+                            ...(token ? { Authorization: `Bearer ${token}` } : {})
+                          },
                           body: JSON.stringify({
-                            amount: num,
-                            userId: userSession?.id,
-                            email: userSession?.email
+                            amount: num
                           })
                         });
 

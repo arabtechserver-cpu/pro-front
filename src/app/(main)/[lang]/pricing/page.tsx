@@ -4,13 +4,14 @@ import { Locale } from "@/i18n/config";
 import PricingClient from "./PricingClient";
 import { Metadata } from "next";
 
-export async function generateMetadata({ 
-  params, 
-  searchParams 
-}: { 
-  params: { lang: Locale }; 
-  searchParams?: { [key: string]: string | string[] | undefined };
-}): Promise<Metadata> {
+export async function generateMetadata(
+  props: {
+    params: Promise<{ lang: Locale }>;
+    searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
+  }
+): Promise<Metadata> {
+  const searchParams = await props.searchParams;
+  const params = await props.params;
   const isAr = params.lang === "ar";
   const rawSection = searchParams?.section || searchParams?.group || searchParams?.cat || searchParams?.search;
   const section = typeof rawSection === "string" ? rawSection : undefined;
@@ -47,7 +48,8 @@ export async function generateMetadata({
   };
 }
 
-export default async function Pricing({ params }: { params: { lang: Locale } }) {
+export default async function Pricing(props: { params: Promise<{ lang: Locale }> }) {
+  const params = await props.params;
   const dict = await getDictionary(params.lang);
 
   return (

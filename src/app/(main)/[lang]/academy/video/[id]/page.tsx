@@ -28,7 +28,8 @@ function getEmbedUrl(url: string) {
   return url;
 }
 
-export default async function VideoPage({ params }: { params: { lang: string; id: string } }) {
+export default async function VideoPage(props: { params: Promise<{ lang: string; id: string }> }) {
+  const params = await props.params;
   const isAr = params.lang === 'ar';
   const video = await getVideo(params.id);
 
@@ -38,7 +39,7 @@ export default async function VideoPage({ params }: { params: { lang: string; id
 
   const series = video.series;
   const playlist: any[] = series?.videos || [];
-  
+
   // Find current index in playlist
   const currentIndex = playlist.findIndex((v: any) => v.id === video.id);
   const prevLesson = currentIndex > 0 ? playlist[currentIndex - 1] : null;

@@ -42,11 +42,12 @@ async function getSeriesDetail(id: string): Promise<VideoSeriesDetail | null> {
   }
 }
 
-export default async function SeriesDetailPage({
-  params
-}: {
-  params: { lang: Locale; id: string };
-}) {
+export default async function SeriesDetailPage(
+  props: {
+    params: Promise<{ lang: Locale; id: string }>;
+  }
+) {
+  const params = await props.params;
   const isAr = params.lang === 'ar';
   const series = await getSeriesDetail(params.id);
 

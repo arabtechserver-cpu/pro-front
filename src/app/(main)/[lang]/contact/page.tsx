@@ -2,7 +2,8 @@ import Link from "next/link";
 import { getDictionary } from "@/i18n/get-dictionary";
 import { Locale } from "@/i18n/config";
 
-export default async function Contact({ params }: { params: { lang: Locale } }) {
+export default async function Contact(props: { params: Promise<{ lang: Locale }> }) {
+  const params = await props.params;
   const dict = await getDictionary(params.lang);
 
   return (
