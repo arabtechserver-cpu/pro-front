@@ -52,9 +52,10 @@ async function proxyRequest(
 
 async function handler(
   request: NextRequest,
-  { params }: { params: { path: string[] } }
+  { params }: { params: Promise<{ path: string[] }> }
 ) {
-  const path = params.path.join('/');
+  const resolvedParams = await params;
+  const path = resolvedParams.path.join('/');
   const search = request.nextUrl.search;
 
   // Skip telemetry/analytics routes — they are external and not our backend
