@@ -894,6 +894,7 @@ export default function AdminUsersPage() {
                 إلغاء
               </button>
             </div>
+          </div>
         </div>
       )}
 
