@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Locale } from "@/i18n/config";
 import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
+import { cleanHtmlToText } from "@/utils/cleanHtml";
 
 const PAYPAL_CLIENT_ID = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || "";
 
@@ -697,8 +698,8 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
                     </button>
                   </div>
 
-                  <p className="text-xs text-slate-200 leading-relaxed font-medium">
-                    ℹ️ {activeMethod.instructionsAr}
+                  <p className="text-xs text-slate-200 leading-relaxed font-medium whitespace-pre-wrap block">
+                    ℹ️ {cleanHtmlToText(activeMethod.instructionsAr)}
                   </p>
                 </div>
               )}
@@ -732,8 +733,8 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
                     </code>
                   </div>
 
-                  <p className="text-xs text-slate-200 leading-relaxed font-medium">
-                    ℹ️ {lang === "ar" ? activeMethod.instructionsAr : activeMethod.instructionsEn}
+                  <p className="text-xs text-slate-200 leading-relaxed font-medium whitespace-pre-wrap block">
+                    ℹ️ {cleanHtmlToText(lang === "ar" ? activeMethod.instructionsAr : activeMethod.instructionsEn)}
                   </p>
                 </div>
               )}

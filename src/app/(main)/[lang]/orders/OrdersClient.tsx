@@ -2,6 +2,9 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { toast } from "react-hot-toast";
+import Image from "next/image";
+import { cleanHtmlToText } from "@/utils/cleanHtml";
 
 export default function OrdersClient({ lang, dict }: { lang: string, dict: any }) {
   const [userSession, setUserSession] = useState<any>(null);
@@ -298,12 +301,12 @@ export default function OrdersClient({ lang, dict }: { lang: string, dict: any }
                       <td className="p-4 text-start font-mono text-xs">
                         {ord.reply ? (
                           <div className="flex items-center gap-2">
-                            <span className="bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-bold px-3 py-1 rounded-xl text-xs select-all dir-ltr glow-cyan">
-                              {ord.reply}
+                            <span className="bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-bold px-3 py-1 rounded-xl text-xs select-all dir-ltr glow-cyan whitespace-pre-wrap block">
+                              {cleanHtmlToText(ord.reply)}
                             </span>
                             <button
                               onClick={() => {
-                                navigator.clipboard.writeText(ord.reply);
+                                navigator.clipboard.writeText(cleanHtmlToText(ord.reply));
                                 alert(lang === 'ar' ? 'تم نسخ الكود/النتيجة بنجاح 📋' : 'Code copied to clipboard!');
                               }}
                               className="p-1 text-on-surface-variant hover:text-primary transition-colors"

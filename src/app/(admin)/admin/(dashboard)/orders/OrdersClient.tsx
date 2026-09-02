@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { getOrderFieldRows, getOrderServiceTypeLabel } from "../../../../../lib/order-details";
+import { cleanHtmlToText } from "@/utils/cleanHtml";
 
 interface OrderItem {
   id: string;
@@ -1078,8 +1079,8 @@ export default function OrdersClient() {
                       <span>نسخ</span>
                     </button>
                   </div>
-                  <p className="font-mono text-emerald-300 font-bold bg-black/50 p-3 rounded-xl whitespace-pre-wrap dir-ltr text-start">
-                    {selectedOrder.reply}
+                  <p className="font-mono text-emerald-300 font-bold bg-black/50 p-3 rounded-xl whitespace-pre-wrap dir-ltr text-start block">
+                    {cleanHtmlToText(selectedOrder.reply)}
                   </p>
                 </div>
               )}

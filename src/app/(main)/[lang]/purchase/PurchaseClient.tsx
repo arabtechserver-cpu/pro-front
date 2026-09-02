@@ -4,6 +4,7 @@ import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { shouldShowDefaultImeiField } from "../../../../lib/purchase-service-fields";
+import { cleanHtmlToText } from "@/utils/cleanHtml";
 
 function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
   const searchParams = useSearchParams();
@@ -788,8 +789,8 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
                       </span>
                     </button>
                     {showServiceInfo && (
-                      <div className="mt-2.5 p-3 rounded-xl bg-surface-container-lowest border border-outline-variant/30 text-xs text-on-surface-variant leading-relaxed max-h-56 overflow-y-auto whitespace-pre-wrap">
-                        {selectedService.info}
+                      <div className="mt-2.5 p-3 rounded-xl bg-surface-container-lowest border border-outline-variant/30 text-xs text-on-surface-variant leading-relaxed max-h-56 overflow-y-auto whitespace-pre-wrap block">
+                        {cleanHtmlToText(selectedService.info)}
                       </div>
                     )}
                   </div>
@@ -891,9 +892,9 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
                                   ))}
                                 </select>
                                 {fieldDesc && (
-                                  <p className="text-[11px] text-on-surface-variant/80 flex items-center gap-1 mt-0.5">
+                                  <p className="text-[11px] text-on-surface-variant/80 flex items-center gap-1 mt-0.5 whitespace-pre-wrap">
                                     <span className="material-symbols-outlined text-xs text-primary">info</span>
-                                    <span>{fieldDesc}</span>
+                                    <span>{cleanHtmlToText(fieldDesc)}</span>
                                   </p>
                                 )}
                               </div>
@@ -917,9 +918,9 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
                                   required={isRequired}
                                 />
                                 {fieldDesc && (
-                                  <p className="text-[11px] text-on-surface-variant/80 flex items-center gap-1 mt-0.5">
+                                  <p className="text-[11px] text-on-surface-variant/80 flex items-center gap-1 mt-0.5 whitespace-pre-wrap">
                                     <span className="material-symbols-outlined text-xs text-primary">info</span>
-                                    <span>{fieldDesc}</span>
+                                    <span>{cleanHtmlToText(fieldDesc)}</span>
                                   </p>
                                 )}
                               </div>
@@ -942,9 +943,9 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
                                 required={isRequired}
                               />
                               {fieldDesc && (
-                                <p className="text-[11px] text-on-surface-variant/80 flex items-center gap-1 mt-0.5">
+                                <p className="text-[11px] text-on-surface-variant/80 flex items-center gap-1 mt-0.5 whitespace-pre-wrap">
                                   <span className="material-symbols-outlined text-xs text-primary">info</span>
-                                  <span>{fieldDesc}</span>
+                                  <span>{cleanHtmlToText(fieldDesc)}</span>
                                 </p>
                               )}
                             </div>
