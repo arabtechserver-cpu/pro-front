@@ -90,9 +90,10 @@ export default function AdminApiUsersPage() {
       const params = new URLSearchParams();
       if (searchQuery) params.append("q", searchQuery);
       if (statusFilter !== "all") params.append("status", statusFilter);
+      params.append("apiOnly", "true");
 
       const queryString = params.toString();
-      const endpoint = queryString ? `/api/users?${queryString}` : "/api/users";
+      const endpoint = `/api/users?${queryString}`;
 
       const res = await fetch(endpoint, {
         headers: {
