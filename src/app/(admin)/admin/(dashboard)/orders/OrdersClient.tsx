@@ -22,6 +22,7 @@ interface OrderItem {
   serviceCategory?: string | null;
   serviceType?: "imei" | "server" | "remote" | "unknown";
   groupName?: string | null;
+  source?: string;
   provider?: {
     id: string;
     name: string;
@@ -489,13 +490,26 @@ export default function OrdersClient() {
 
                   return (
                     <tr key={order.id} className="hover:bg-surface-container-high/40 transition-colors">
-                      {/* Order ID */}
+                      {/* Order ID & Source */}
                       <td className="p-4 font-mono font-bold text-on-surface text-xs">
-                        <div className="flex items-center gap-1.5">
-                          <span className="text-primary font-bold">#{order.id ? order.id.slice(-6) : "N/A"}</span>
-                          {order.apiOrderId && (
-                            <span className="text-[10px] bg-primary/10 text-primary px-1.5 py-0.5 rounded font-mono" title="رقم الطلب الخارجي لدى المزود">
-                              API #{order.apiOrderId}
+                        <div className="flex flex-col gap-1.5 items-start">
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-primary font-bold">#{order.id ? order.id.slice(-6) : "N/A"}</span>
+                            {order.apiOrderId && (
+                              <span className="text-[10px] bg-primary/10 text-primary px-1.5 py-0.5 rounded font-mono" title="رقم الطلب الخارجي لدى المزود">
+                                API #{order.apiOrderId}
+                              </span>
+                            )}
+                          </div>
+                          {order.source === "api" ? (
+                            <span className="text-[9px] px-1.5 py-0.5 rounded border border-purple-500/30 bg-purple-500/10 text-purple-400 uppercase tracking-wider flex items-center gap-1">
+                              <span className="material-symbols-outlined text-[10px]">api</span>
+                              طلب API
+                            </span>
+                          ) : (
+                            <span className="text-[9px] px-1.5 py-0.5 rounded border border-blue-500/30 bg-blue-500/10 text-blue-400 uppercase tracking-wider flex items-center gap-1">
+                              <span className="material-symbols-outlined text-[10px]">public</span>
+                              الموقع
                             </span>
                           )}
                         </div>

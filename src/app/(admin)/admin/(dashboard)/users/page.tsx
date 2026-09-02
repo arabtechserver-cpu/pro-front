@@ -13,6 +13,11 @@ interface UserItem {
   status: "active" | "suspended" | string;
   balance: number;
   createdAt: string;
+  apiEnabled?: boolean;
+  apiSiteName?: string | null;
+  apiSiteUrl?: string | null;
+  apiMargin?: number;
+  apiKey?: string | null;
 }
 
 const COUNTRY_NAMES: Record<string, string> = {
@@ -71,6 +76,12 @@ export default function AdminUsersPage() {
   const [balanceInputValue, setBalanceInputValue] = useState<string>("");
   const [balanceActionType, setBalanceActionType] = useState<"set" | "add" | "subtract">("set");
   const [isSavingBalance, setIsSavingBalance] = useState(false);
+
+  // API Settings Modal State
+  const [apiSettingsModalUser, setApiSettingsModalUser] = useState<UserItem | null>(null);
+  const [apiEnabled, setApiEnabled] = useState(false);
+  const [apiMargin, setApiMargin] = useState<string>("0");
+  const [isSavingApiSettings, setIsSavingApiSettings] = useState(false);
 
   // Fetch users from backend API
   const fetchUsers = async () => {
@@ -252,6 +263,56 @@ export default function AdminUsersPage() {
       alert("تعذر الاتصال بالسيرفر لتعديل الرصيد");
     } finally {
       setIsSavingBalance(false);
+      setTimeout(() => setToastMessage(null), 3000);
+    }
+  };
+
+  // Save API Settings Handler
+  const handleSaveApiSettings = async () => {
+    if (!apiSettingsModalUser) return;
+    const marginVal = parseFloat(apiMargin);
+    if (isNaN(marginVal)) {
+      alert("الرجاء إدخال نسبة ربح صحيحة");
+      return;
+    }
+
+    setIsSavingApiSettings(true);
+    try {
+      const res = await fetch("/api/users/update-api-settings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId: apiSettingsModalUser.id,
+          apiEnabled: apiEnabled,
+          apiMargin: marginVal
+        })
+      });
+
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setToastMessage({
+          type: "success",
+          text: data.message || `تم تحديث إعدادات API للمستخدم بنجاح`
+        });
+
+        // Update local users table
+        setUsers((prev) =>
+          prev.map((u) => (u.id === apiSettingsModalUser.id ? { 
+            ...u, 
+            apiEnabled: data.user.apiEnabled, 
+            apiMargin: data.user.apiMargin,
+            apiKey: data.user.apiKey
+          } : u))
+        );
+
+        setApiSettingsModalUser(null);
+      } else {
+        alert(data.error || "حدث خطأ أثناء تحديث الإعدادات");
+      }
+    } catch {
+      alert("تعذر الاتصال بالسيرفر لتحديث الإعدادات");
+    } finally {
+      setIsSavingApiSettings(false);
       setTimeout(() => setToastMessage(null), 3000);
     }
   };
@@ -583,6 +644,23 @@ export default function AdminUsersPage() {
                           <span className="hidden xl:inline">الباسورد</span>
                         </button>
 
+                        {/* API SETTINGS BUTTON */}
+                        <button
+                          onClick={() => {
+                            setApiSettingsModalUser(user);
+                            setApiEnabled(user.apiEnabled || false);
+                            setApiMargin(user.apiMargin !== undefined ? user.apiMargin.toString() : "0");
+                          }}
+                          className="p-1.5 rounded-lg bg-purple-500/10 hover:bg-purple-500/20 text-purple-400 border border-purple-500/20 transition-all flex items-center gap-1 font-bold text-xs relative"
+                          title="إعدادات الـ API"
+                        >
+                          {user.apiSiteName && !user.apiEnabled && (
+                            <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+                          )}
+                          <span className="material-symbols-outlined text-sm">api</span>
+                          <span className="hidden xl:inline">API</span>
+                        </button>
+
                         {/* View Details */}
                         <button
                           onClick={() => setSelectedUserModal(user)}
@@ -811,6 +889,111 @@ export default function AdminUsersPage() {
 
               <button
                 onClick={() => setChangePasswordModalUser(null)}
+                className="px-4 py-3 rounded-xl bg-surface-container-high text-on-surface-variant font-bold text-xs hover:bg-surface-container-highest transition-all"
+              >
+                إلغاء
+              </button>
+            </div>
+        </div>
+      )}
+
+      {/* API SETTINGS MODAL DIALOG */}
+      {apiSettingsModalUser && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md animate-in fade-in duration-200">
+          <div className="glass-card w-full max-w-md rounded-2xl p-6 border border-purple-500/30 shadow-2xl relative overflow-hidden space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-outline-variant/20">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-purple-500/20 text-purple-400 flex items-center justify-center">
+                  <span className="material-symbols-outlined text-xl">api</span>
+                </div>
+                <div>
+                  <h3 className="font-bold text-base text-on-surface">إعدادات الـ API</h3>
+                  <p className="text-xs text-primary font-mono">@{apiSettingsModalUser.username} ({apiSettingsModalUser.fullName})</p>
+                </div>
+              </div>
+
+              <button
+                onClick={() => setApiSettingsModalUser(null)}
+                className="w-8 h-8 rounded-full bg-surface-container-high hover:bg-surface-container-highest text-on-surface-variant flex items-center justify-center font-bold text-sm"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              {apiSettingsModalUser.apiSiteName ? (
+                <div className="p-3 rounded-xl bg-surface-container-high border border-outline-variant/20 space-y-2">
+                  <p className="text-xs font-bold text-amber-400 mb-2">طلب ربط API جديد / حالي</p>
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-on-surface-variant font-bold">اسم الموقع:</span>
+                    <span className="text-on-surface font-mono">{apiSettingsModalUser.apiSiteName}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-on-surface-variant font-bold">رابط الموقع:</span>
+                    <a href={apiSettingsModalUser.apiSiteUrl!} target="_blank" rel="noreferrer" className="text-primary hover:underline font-mono dir-ltr truncate max-w-[200px]">{apiSettingsModalUser.apiSiteUrl}</a>
+                  </div>
+                </div>
+              ) : (
+                <div className="p-3 rounded-xl bg-surface-container-lowest border border-outline-variant/20 text-center text-on-surface-variant text-xs">
+                  لم يقم هذا المستخدم بتقديم طلب لربط الـ API حتى الآن.
+                </div>
+              )}
+
+              {/* Toggle API Status */}
+              <div className="flex items-center justify-between p-3 rounded-xl bg-surface-container-high border border-outline-variant/20">
+                <div>
+                  <label className="text-sm font-bold text-on-surface">تفعيل الـ API</label>
+                  <p className="text-[10px] text-on-surface-variant">السماح للمستخدم بالطلب عبر الـ API</p>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input 
+                    type="checkbox" 
+                    className="sr-only peer"
+                    checked={apiEnabled}
+                    onChange={(e) => setApiEnabled(e.target.checked)}
+                  />
+                  <div className="w-11 h-6 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-500"></div>
+                </label>
+              </div>
+
+              {/* API Margin Input */}
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-on-surface-variant block">
+                  ربح الـ API (بـ %):
+                </label>
+                <div className="relative">
+                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 font-bold text-primary">%</span>
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={apiMargin}
+                    onChange={(e) => setApiMargin(e.target.value)}
+                    placeholder="0.00"
+                    className="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-xl py-2.5 pl-8 pr-4 text-on-surface font-mono font-bold text-sm focus:outline-none focus:border-purple-400"
+                  />
+                </div>
+                <p className="text-[10px] text-on-surface-variant leading-relaxed">
+                  هذه النسبة سيتم إضافتها أو خصمها (إذا كانت بالسالب) كنسبة مئوية من التكلفة الأساسية للخدمة عند الطلب عبر الـ API.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3 pt-2">
+              <button
+                onClick={handleSaveApiSettings}
+                disabled={isSavingApiSettings}
+                className="flex-1 bg-purple-500 text-white py-3 rounded-xl font-bold text-xs hover:bg-purple-600 transition-all flex items-center justify-center gap-2 shadow-md active:scale-95 disabled:opacity-50"
+              >
+                {isSavingApiSettings ? (
+                  <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                ) : (
+                  <span className="material-symbols-outlined text-sm">save</span>
+                )}
+                <span>حفظ إعدادات الـ API</span>
+              </button>
+
+              <button
+                onClick={() => setApiSettingsModalUser(null)}
                 className="px-4 py-3 rounded-xl bg-surface-container-high text-on-surface-variant font-bold text-xs hover:bg-surface-container-highest transition-all"
               >
                 إلغاء

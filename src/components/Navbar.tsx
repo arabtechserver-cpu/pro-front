@@ -424,6 +424,15 @@ export default function Navbar({ lang, dict }: NavbarProps) {
                         <span>{lang === "ar" ? "متابعة الطلبات المباشرة" : "Track Live Orders"}</span>
                       </Link>
 
+                      <Link 
+                        href={`/${lang}/api-developer`}
+                        onClick={() => setUserDropdownOpen(false)}
+                        className="flex items-center gap-2.5 p-2.5 rounded-xl text-on-surface-variant hover:text-purple-400 hover:bg-surface-container-high transition-all"
+                      >
+                        <span className="material-symbols-outlined text-purple-400 text-base">api</span>
+                        <span>{lang === "ar" ? "ربط الـ API" : "API Developer"}</span>
+                      </Link>
+
                       {userSession.role === "admin" && (
                         <Link 
                           href="/admin"
@@ -538,6 +547,17 @@ export default function Navbar({ lang, dict }: NavbarProps) {
             >
               <span className="material-symbols-outlined text-lg">receipt_long</span>
               <span>{lang === "ar" ? "الطلبات" : "My Orders"}</span>
+            </Link>
+
+            <Link 
+              href={`/${lang}/api-developer`} 
+              onClick={() => setMobileMenuOpen(false)} 
+              className={`flex items-center gap-3 p-3.5 rounded-xl font-medium text-sm transition-all ${
+                isActive("/api-developer") ? "bg-purple-500/15 text-purple-400 font-bold" : "text-on-surface hover:bg-surface-container-high"
+              }`}
+            >
+              <span className="material-symbols-outlined text-lg text-purple-400">api</span>
+              <span>{lang === "ar" ? "ربط الـ API" : "API Developer"}</span>
             </Link>
 
             <Link 
