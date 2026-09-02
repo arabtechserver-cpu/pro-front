@@ -8,6 +8,7 @@ import {
   getProviderServiceTypeCounts,
   getProviderServiceTypeLabel
 } from "../../../../../lib/provider-service-types";
+import { loadProviderServicesForBrowse } from "../../../../../lib/provider-service-browse";
 
 type ProviderServiceType = "imei" | "server" | "remote";
 type ProviderServiceTypeFilter = "all" | ProviderServiceType;
@@ -131,6 +132,7 @@ export default function ProvidersClient() {
   const [browseProvider, setBrowseProvider] = useState<Provider | null>(null);
   const [providerServices, setProviderServices] = useState<any[]>([]);
   const [loadingServices, setLoadingServices] = useState(false);
+  const [serviceLoadSource, setServiceLoadSource] = useState<"stored" | "remote" | null>(null);
   const [serviceSearch, setServiceSearch] = useState("");
   const deferredServiceSearch = useDeferredValue(serviceSearch);
   const [packageFilter, setPackageFilter] = useState<"all" | "active" | "hidden">("all");
@@ -360,21 +362,28 @@ export default function ProvidersClient() {
   const handleBrowseServices = async (provider: Provider) => {
     setBrowseProvider(provider);
     setLoadingServices(true);
+    setServiceLoadSource(null);
     setServiceSearch("");
+    setPackageFilter("all");
     setSelectedGroupNames([]);
     setExpandedGroups({});
     setServiceTypeFilter("all");
     setVisibleGroupsLimit(25);
     try {
-      const res = await fetch(`/api/providers/${provider.id}/services`);
-      const data = await res.json();
-      if (res.ok && data.success) {
-        setProviderServices(data.services || []);
-      } else {
-        setProviderServices([]);
-      }
-    } catch {
+      const result = await loadProviderServicesForBrowse(provider.id, async (url: string) => {
+        const res = await fetch(url, { cache: "no-store" });
+        const data = await res.json().catch(() => ({}));
+        return { ok: res.ok, data };
+      });
+      setProviderServices(result.services);
+      setServiceLoadSource(result.source);
+      setProviders((current) => current.map((item) => (
+        item.id === provider.id ? { ...item, servicesCount: result.services.length } : item
+      )));
+    } catch (error) {
       setProviderServices([]);
+      setServiceLoadSource(null);
+      showToast(error instanceof Error ? error.message : "فشل جلب خدمات المزود", "error");
     } finally {
       setLoadingServices(false);
     }
@@ -401,8 +410,9 @@ export default function ProvidersClient() {
 
     const groupsArray = Object.entries(map).map(([groupName, services]) => {
       const activeCount = services.filter((s) => s.isActive).length;
-      const isAllActive = activeCount === services.length;
-      const isAllHidden = activeCount === 0;
+      const isStoredData = serviceLoadSource === "stored";
+      const isAllActive = isStoredData && activeCount === services.length;
+      const isAllHidden = isStoredData && activeCount === 0;
 
       return {
         groupName,
@@ -417,7 +427,7 @@ export default function ProvidersClient() {
 
     groupsArray.sort((a, b) => a.groupName.localeCompare(b.groupName, "ar"));
     return groupsArray;
-  }, [typeFilteredProviderServices]);
+  }, [serviceLoadSource, typeFilteredProviderServices]);
 
   // Filter groups according to search and status filter
   const filteredGroups = useMemo(() => {
@@ -480,6 +490,10 @@ export default function ProvidersClient() {
   // Toggle single package visibility
   const handleToggleSinglePackage = async (groupName: string, nextActive: boolean) => {
     if (!browseProvider) return;
+    if (serviceLoadSource !== "stored") {
+      showToast("هذه معاينة مباشرة. قم بالمزامنة أولاً لحفظ الباقة والتحكم في ظهورها.", "error");
+      return;
+    }
     try {
       const res = await fetch(`/api/providers/${browseProvider.id}/toggle-packages`, {
         method: "POST",
@@ -503,6 +517,10 @@ export default function ProvidersClient() {
   // Bulk toggle for selected packages
   const handleBulkToggleSelectedPackages = async (nextActive: boolean) => {
     if (!browseProvider || selectedGroupNames.length === 0) return;
+    if (serviceLoadSource !== "stored") {
+      showToast("قم بالمزامنة أولاً قبل تعديل الباقات.", "error");
+      return;
+    }
     setIsPerformingBulkAction(true);
     try {
       const res = await fetch(`/api/providers/${browseProvider.id}/toggle-packages`, {
@@ -530,6 +548,10 @@ export default function ProvidersClient() {
   // Make ALL services of this provider visible or hidden
   const handleToggleAllServices = async (nextActive: boolean) => {
     if (!browseProvider) return;
+    if (serviceLoadSource !== "stored") {
+      showToast("قم بالمزامنة أولاً قبل تفعيل أو إخفاء الخدمات.", "error");
+      return;
+    }
     setIsPerformingBulkAction(true);
     try {
       const res = await fetch(`/api/providers/${browseProvider.id}/toggle-all`, {
@@ -554,6 +576,10 @@ export default function ProvidersClient() {
   // Toggle single service visibility
   const handleToggleSingleService = async (service: any) => {
     if (!browseProvider) return;
+    if (serviceLoadSource !== "stored") {
+      showToast("هذه الخدمة معروضة مباشرة من المزود. قم بالمزامنة أولاً للتحكم بها.", "error");
+      return;
+    }
     const nextActive = !service.isActive;
     try {
       const res = await fetch(`/api/providers/${browseProvider.id}/toggle-service`, {
@@ -1097,7 +1123,7 @@ export default function ProvidersClient() {
                 <button
                   type="button"
                   onClick={() => handleToggleAllServices(true)}
-                  disabled={isPerformingBulkAction || loadingServices}
+                  disabled={isPerformingBulkAction || loadingServices || serviceLoadSource !== "stored"}
                   className="px-3.5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold transition-all flex items-center gap-1.5 shadow-sm disabled:opacity-50"
                   title="تفعيل وإظهار كافة خدمات وباقات هذا المزود للعملاء في المتجر"
                 >
@@ -1109,7 +1135,7 @@ export default function ProvidersClient() {
                 <button
                   type="button"
                   onClick={() => handleToggleAllServices(false)}
-                  disabled={isPerformingBulkAction || loadingServices}
+                  disabled={isPerformingBulkAction || loadingServices || serviceLoadSource !== "stored"}
                   className="px-3 py-2 rounded-xl bg-surface-container-high hover:bg-surface-container-highest text-on-surface-variant hover:text-on-surface font-bold transition-all flex items-center gap-1 border border-outline-variant/20 disabled:opacity-50"
                 >
                   <span className="material-symbols-outlined text-sm">visibility_off</span>
@@ -1122,7 +1148,7 @@ export default function ProvidersClient() {
                     <button
                       type="button"
                       onClick={() => handleBulkToggleSelectedPackages(true)}
-                      disabled={isPerformingBulkAction}
+                      disabled={isPerformingBulkAction || serviceLoadSource !== "stored"}
                       className="px-3.5 py-2 rounded-xl bg-primary hover:bg-primary/90 text-on-primary font-bold transition-all flex items-center gap-1.5 shadow-sm"
                     >
                       <span className="material-symbols-outlined text-sm">check_box</span>
@@ -1132,7 +1158,7 @@ export default function ProvidersClient() {
                     <button
                       type="button"
                       onClick={() => handleBulkToggleSelectedPackages(false)}
-                      disabled={isPerformingBulkAction}
+                      disabled={isPerformingBulkAction || serviceLoadSource !== "stored"}
                       className="px-3.5 py-2 rounded-xl bg-red-500/15 hover:bg-red-500/25 text-red-400 border border-red-500/30 font-bold transition-all flex items-center gap-1.5"
                     >
                       <span className="material-symbols-outlined text-sm">visibility_off</span>
@@ -1156,6 +1182,27 @@ export default function ProvidersClient() {
                 </button>
               </div>
             </div>
+
+            {serviceLoadSource === "remote" && (
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-2xl bg-sky-500/10 border border-sky-500/30 text-xs">
+                <div className="flex items-start gap-2 text-sky-300">
+                  <span className="material-symbols-outlined text-lg shrink-0">cloud_download</span>
+                  <div>
+                    <p className="font-bold text-sky-300">معاينة مباشرة من المزود</p>
+                    <p className="text-[11px] text-on-surface-variant mt-0.5">
+                      ظهرت الخدمات بدون مزامنة. للموافقة عليها والتحكم في إظهارها بالمتجر اضغط مزامنة من المزود.
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => openSyncModal(browseProvider)}
+                  className="px-3 py-2 rounded-xl bg-sky-500 text-white font-bold whitespace-nowrap hover:bg-sky-600 transition-all"
+                >
+                  مزامنة وحفظ الخدمات
+                </button>
+              </div>
+            )}
 
             {/* Real Provider Service Type Filters */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 p-2 rounded-2xl bg-surface-container-lowest border border-outline-variant/20">
@@ -1254,6 +1301,7 @@ export default function ProvidersClient() {
                 <label className="flex items-center gap-2 cursor-pointer font-bold select-none">
                   <input
                     type="checkbox"
+                    disabled={serviceLoadSource !== "stored"}
                     checked={selectedGroupNames.length > 0 && selectedGroupNames.length === filteredGroups.length}
                     onChange={handleSelectAllGroups}
                     className="w-4 h-4 accent-primary cursor-pointer"
@@ -1299,6 +1347,7 @@ export default function ProvidersClient() {
                           <div className="flex items-center gap-3">
                             <input
                               type="checkbox"
+                              disabled={serviceLoadSource !== "stored"}
                               checked={isSelected}
                               onChange={() => toggleGroupSelection(group.groupName)}
                               className="w-4 h-4 accent-primary cursor-pointer shrink-0"
@@ -1341,8 +1390,9 @@ export default function ProvidersClient() {
                             {/* Package Visibility Toggle Button */}
                             <button
                               type="button"
+                              disabled={serviceLoadSource !== "stored"}
                               onClick={() => handleToggleSinglePackage(group.groupName, !group.isAllActive)}
-                              className={`px-3 py-1.5 rounded-xl font-bold text-xs transition-all flex items-center gap-1 border ${
+                              className={`px-3 py-1.5 rounded-xl font-bold text-xs transition-all flex items-center gap-1 border disabled:opacity-40 disabled:cursor-not-allowed ${
                                 group.isAllActive
                                   ? "bg-red-500/10 text-red-400 hover:bg-red-500/20 border-red-500/20"
                                   : "bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 border-emerald-500/20"
@@ -1432,8 +1482,9 @@ export default function ProvidersClient() {
                                   <div className="flex items-center gap-3 self-end sm:self-center">
                                     <button
                                       type="button"
+                                      disabled={serviceLoadSource !== "stored"}
                                       onClick={() => handleToggleSingleService(srv)}
-                                      className={`w-8 h-8 rounded-xl flex items-center justify-center transition-all ${
+                                      className={`w-8 h-8 rounded-xl flex items-center justify-center transition-all disabled:opacity-40 disabled:cursor-not-allowed ${
                                         srv.isActive
                                           ? "bg-emerald-500/10 text-emerald-400 hover:bg-red-500/10 hover:text-red-400 border border-emerald-500/20"
                                           : "bg-red-500/10 text-red-400 hover:bg-emerald-500/10 hover:text-emerald-400 border border-red-500/20"
