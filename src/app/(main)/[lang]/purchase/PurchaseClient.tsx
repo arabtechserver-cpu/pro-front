@@ -444,7 +444,14 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
       rawImeiStr = targetInput.trim();
       payloadTarget = targetInput.trim();
     } else {
-      payloadTarget = targetInput.trim() || (lang === 'ar' ? 'طلب فوري' : 'Instant Order');
+      if (!targetInput.trim()) {
+        setSubmitFeedback({ 
+          type: "error", 
+          text: lang === 'ar' ? 'يرجى إدخال البيانات المطلوبة (رقم الـ IMEI / الحساب)' : 'Please enter the target data (IMEI / Account).' 
+        });
+        return;
+      }
+      payloadTarget = targetInput.trim();
     }
 
     if (!hasEnoughBalance) {
@@ -963,20 +970,21 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
               <div className="space-y-3">
                 <div className="flex flex-col gap-2">
                   <label className="text-xs font-bold text-on-surface-variant uppercase tracking-wider flex items-center justify-between">
-                    <span>{lang === 'ar' ? 'بيانات الحساب / المعرف المستهدف (اسم المستخدم، البريد، أو السيريال)' : 'Target Account / Username / Email / Serial'}</span>
-                    <span className="text-on-surface-variant text-[11px] font-normal">{lang === 'ar' ? '(اختياري/حسب نوع الخدمة)' : '(Optional)'}</span>
+                    <span>{lang === 'ar' ? 'رقم الـ IMEI / بيانات الحساب المستهدف' : 'Target IMEI / Account Data'}</span>
+                    <span className="text-primary text-[11px] font-normal">{lang === 'ar' ? '* إجباري' : '* Required'}</span>
                   </label>
                   <input
                     type="text"
+                    required
                     value={targetInput}
                     onChange={(e) => setTargetInput(e.target.value)}
-                    placeholder={lang === 'ar' ? 'أدخل اسم المستخدم أو الإيميل أو المعرف المستهدف للخدمة...' : 'Enter target username, email or device ID...'}
+                    placeholder={lang === 'ar' ? 'أدخل رقم الـ IMEI أو الإيميل أو المعرف المستهدف للخدمة...' : 'Enter target IMEI, email or device ID...'}
                     className="w-full bg-surface-container-lowest border border-outline-variant/40 rounded-xl py-3.5 px-4 text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all font-mono text-sm dir-ltr"
                   />
                 </div>
                 <p className="text-[11px] text-primary/90 flex items-center gap-1.5 px-1">
                   <span className="material-symbols-outlined text-xs">verified</span>
-                  <span>{lang === 'ar' ? 'إذا كانت الخدمة تتطلب ربط حساب أو تفعيل، يرجى كتابة اسم الحساب أعلاه.' : 'If this service requires account binding, enter the account details above.'}</span>
+                  <span>{lang === 'ar' ? 'يرجى كتابة رقم الـ IMEI أو اسم الحساب المطلوب لهذه الخدمة بشكل صحيح.' : 'Please enter the required IMEI or account details for this service correctly.'}</span>
                 </p>
               </div>
             );
