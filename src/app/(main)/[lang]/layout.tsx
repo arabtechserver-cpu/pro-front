@@ -10,6 +10,7 @@ import AiChatWidget from "@/components/AiChatWidget";
 import ContactFloatingButton from "@/components/ContactFloatingButton";
 import FloatingSideDock from "@/components/FloatingSideDock";
 import AosInit from "@/components/AosInit";
+import CyberMouseBackground from "@/components/CyberMouseBackground";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const jakarta = Plus_Jakarta_Sans({ subsets: ["latin"], variable: "--font-jakarta" });
@@ -194,11 +195,8 @@ export default async function RootLayout(
       <body className={`${inter.variable} ${jakarta.variable} ${jetbrains.variable} bg-background text-on-surface antialiased min-h-screen flex flex-col relative`}>
         <AosInit />
         <AnalyticsTracker />
-        {/* Background Gradients */}
-        <div className="fixed inset-0 z-[-1] pointer-events-none">
-          <div className="absolute top-0 left-0 w-full h-[50vh] bg-gradient-to-b from-primary/5 to-transparent"></div>
-          <div className="absolute bottom-0 right-0 w-[50vw] h-[50vh] bg-gradient-to-tl from-secondary/5 to-transparent"></div>
-        </div>
+        {/* Global Interactive Mouse Glow & Full-Page Vertical Cyber Light Beams */}
+        <CyberMouseBackground />
 
         <Navbar lang={lang} dict={dict.nav} />
         
