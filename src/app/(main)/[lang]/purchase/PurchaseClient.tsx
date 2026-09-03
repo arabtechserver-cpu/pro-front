@@ -423,24 +423,10 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
         payloadTarget = customString || targetInput.trim() || (lang === 'ar' ? 'طلب فوري' : 'Instant Order');
       }
     } else if (isImeiService) {
-      if (!targetInput.trim()) {
-        setSubmitFeedback({ 
-          type: "error", 
-          text: lang === 'ar' ? 'يرجى إدخال رقم الـ IMEI أو Serial الخاص بالجهاز' : 'Please enter the target IMEI/Serial number.' 
-        });
-        return;
-      }
       rawImeiStr = targetInput.trim();
-      payloadTarget = targetInput.trim();
+      payloadTarget = targetInput.trim() || (lang === 'ar' ? 'بدون بيانات' : 'No Data');
     } else {
-      if (!targetInput.trim()) {
-        setSubmitFeedback({ 
-          type: "error", 
-          text: lang === 'ar' ? 'يرجى إدخال البيانات المطلوبة (رقم الـ IMEI / الحساب)' : 'Please enter the target data (IMEI / Account).' 
-        });
-        return;
-      }
-      payloadTarget = targetInput.trim();
+      payloadTarget = targetInput.trim() || (lang === 'ar' ? 'بدون بيانات' : 'No Data');
     }
 
     if (!hasEnoughBalance) {
@@ -834,7 +820,7 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
                     <div className="flex flex-col gap-2">
                       <label className="text-xs font-bold text-on-surface-variant uppercase tracking-wider flex items-center justify-between">
                         <span>{lang === 'ar' ? 'رقم الـ IMEI / الرقم التسلسلي' : 'Target IMEI / Serial Number'}</span>
-                        <span className="text-primary text-[11px] font-normal">{lang === 'ar' ? '* إجباري' : '* Required'}</span>
+                        <span className="text-primary/70 text-[11px] font-normal">{lang === 'ar' ? '(اختياري)' : '(Optional)'}</span>
                       </label>
                       <input
                         type="text"
@@ -842,7 +828,6 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
                         onChange={(e) => setTargetInput(e.target.value)}
                         placeholder={lang === 'ar' ? 'أدخل رقم الـ IMEI الخاص بالجهاز (15 رقم) أو Serial...' : 'Enter 15-digit IMEI or device Serial number...'}
                         className="w-full bg-surface-container-lowest border border-outline-variant/40 rounded-xl py-3.5 px-4 text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all font-mono text-sm dir-ltr"
-                        required
                       />
                     </div>
                   )}
@@ -960,11 +945,10 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
                 <div className="flex flex-col gap-2">
                   <label className="text-xs font-bold text-on-surface-variant uppercase tracking-wider flex items-center justify-between">
                     <span>{lang === 'ar' ? 'رقم الـ IMEI / بيانات الحساب المستهدف' : 'Target IMEI / Account Data'}</span>
-                    <span className="text-primary text-[11px] font-normal">{lang === 'ar' ? '* إجباري' : '* Required'}</span>
+                    <span className="text-primary/70 text-[11px] font-normal">{lang === 'ar' ? '(اختياري)' : '(Optional)'}</span>
                   </label>
                   <input
                     type="text"
-                    required
                     value={targetInput}
                     onChange={(e) => setTargetInput(e.target.value)}
                     placeholder={lang === 'ar' ? 'أدخل رقم الـ IMEI أو الإيميل أو المعرف المستهدف للخدمة...' : 'Enter target IMEI, email or device ID...'}
