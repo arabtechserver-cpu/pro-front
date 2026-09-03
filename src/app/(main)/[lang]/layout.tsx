@@ -9,6 +9,7 @@ import AnalyticsTracker from "@/components/AnalyticsTracker";
 import AiChatWidget from "@/components/AiChatWidget";
 import ContactFloatingButton from "@/components/ContactFloatingButton";
 import FloatingSideDock from "@/components/FloatingSideDock";
+import AosInit from "@/components/AosInit";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const jakarta = Plus_Jakarta_Sans({ subsets: ["latin"], variable: "--font-jakarta" });
@@ -180,6 +181,7 @@ export default async function RootLayout(
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=block" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossOrigin="anonymous" referrerPolicy="no-referrer" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdWebsite) }}
@@ -190,6 +192,7 @@ export default async function RootLayout(
         />
       </head>
       <body className={`${inter.variable} ${jakarta.variable} ${jetbrains.variable} bg-background text-on-surface antialiased min-h-screen flex flex-col relative`}>
+        <AosInit />
         <AnalyticsTracker />
         {/* Background Gradients */}
         <div className="fixed inset-0 z-[-1] pointer-events-none">

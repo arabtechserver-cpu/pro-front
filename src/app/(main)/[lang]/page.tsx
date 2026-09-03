@@ -4,7 +4,13 @@ import { getDictionary } from "@/i18n/get-dictionary";
 import { Locale } from "@/i18n/config";
 import NewsletterSection from "@/components/NewsletterSection";
 import CampaignSlider from "@/components/CampaignSlider";
-import LiveMetricsSection from "@/components/LiveMetricsSection";
+import HexagonalFeatures from "@/components/HexagonalFeatures";
+import PackagesSlider from "@/components/PackagesSlider";
+import FaqSection from "@/components/FaqSection";
+import SupportCtaSection from "@/components/SupportCtaSection";
+import AmrrHeroSection from "@/components/AmrrHeroSection";
+import AmrrStatsSection from "@/components/AmrrStatsSection";
+import AmrrCountersSection from "@/components/AmrrCountersSection";
 
 async function getHomepageConfig() {
   try {
@@ -263,136 +269,25 @@ export default async function Home(props: { params: Promise<{ lang: Locale }> })
         </div>
       </div>
 
-      {/* --- Portal Showcase (Hero) --- */}
-      <section className="relative container mx-auto px-4 overflow-hidden">
-        {/* Orbs Background */}
-        <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-[280px] sm:w-[600px] h-[280px] sm:h-[600px] bg-primary/10 rounded-full blur-[80px] sm:blur-[100px] -z-10 pointer-events-none"></div>
-        <div className="absolute top-1/3 right-1/4 -translate-y-1/2 w-[250px] sm:w-[500px] h-[250px] sm:h-[500px] bg-secondary/10 rounded-full blur-[80px] sm:blur-[100px] -z-10 pointer-events-none"></div>
+      {/* --- Amrr Split-Screen Asymmetric Hero --- */}
+      <div className="container mx-auto px-4">
+        <AmrrHeroSection lang={params.lang} />
+      </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 relative z-10">
-          
-          {/* Main Launch Card */}
-          <article className="lg:col-span-8 glass-card rounded-2xl sm:rounded-3xl p-5 sm:p-8 lg:p-12 border border-outline-variant/30 flex flex-col md:flex-row gap-6 sm:gap-8 shadow-2xl items-center relative overflow-hidden group">
-            <div 
-              className="absolute inset-0 bg-cover bg-center opacity-50 group-hover:opacity-75 transition-opacity duration-700 pointer-events-none" 
-              style={{ backgroundImage: `url('${hp?.heroSection?.heroImage || "/images/promo_hero.png"}')` }}
-            ></div>
-            <div className="absolute inset-0 bg-surface-container/30 backdrop-blur-[1px] pointer-events-none"></div>
-            <div className="absolute top-0 right-0 w-48 sm:w-64 h-48 sm:h-64 bg-primary/10 rounded-bl-full pointer-events-none z-0"></div>
-            
-            <div className="flex-1 flex flex-col items-start z-10 w-full">
-              <p className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs sm:text-sm font-medium mb-4 sm:mb-6">
-                <span className="bg-error/20 text-error px-2 py-1 rounded-full flex items-center gap-1.5 border border-error/30 animate-pulse text-xs">
-                  <span className="w-1.5 h-1.5 rounded-full bg-error"></span>
-                  {liveTag || (isAr ? "البوابة المباشرة" : "Live service portal")}
-                </span>
-                <span className="text-on-surface-variant uppercase tracking-wider font-label-sm text-[10px] sm:text-xs">
-                  {eyebrow || (isAr ? "خدمات فك احترافية" : "Built for GSM professionals")}
-                </span>
-              </p>
-              
-              <h1 className="font-display-lg text-2xl sm:text-4xl lg:text-6xl font-bold tracking-tight text-on-surface mb-4 sm:mb-6 leading-tight">
-                <span className="block text-on-surface-variant">{title1 || (isAr ? "كل ما تحتاجه" : "The complete")}</span>
-                <span className="text-primary glow-cyan">{title2 || (isAr ? "لإدارة أعمال الـ GSM" : "GSM service portal.")}</span>
-              </h1>
-              
-              <p className="text-sm sm:text-lg text-on-surface-variant mb-6 sm:mb-8 max-w-md">
-                {lead || (isAr ? "افتح، تجاوز، وقم بتفعيل الخدمات فوراً مع منصتنا المؤتمتة عبر الـ API." : "Unlock, activate, fund, and track every GSM job from one verified workspace.")}
-              </p>
-              
-              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-6 sm:mb-8 w-full sm:w-auto">
-                <Link href={btnBrowseUrl} className="btn-primary group w-full sm:w-auto text-center justify-center">
-                  <i className="fas fa-bolt mr-2 group-hover:text-yellow-400 transition-colors"></i> {btnBrowse || (isAr ? "عرض كافة الخدمات" : "Browse services")}
-                </Link>
-                <Link href={btnJoinUrl} className="btn-secondary group w-full sm:w-auto text-center justify-center">
-                  <i className="fas fa-user-plus mr-2 group-hover:text-primary transition-colors"></i> {btnJoin || (isAr ? "انضم للشبكة مجاناً" : "Join free")}
-                </Link>
-              </div>
-              
-              <div className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-6 text-xs sm:text-sm text-on-surface-variant font-medium">
-                <span className="flex items-center gap-2"><i className="fas fa-check-circle text-primary"></i> {badge1 || (isAr ? "وقت تسليم حقيقي" : "Clear ETAs")}</span>
-                <span className="flex items-center gap-2"><i className="fas fa-shield-alt text-primary"></i> {badge2 || (isAr ? "مدفوعات آمنة" : "Secure checkout")}</span>
-                <span className="flex items-center gap-2"><i className="fas fa-headset text-primary"></i> {badge3 || (isAr ? "دعم على مدار الساعة" : "Direct support")}</span>
-              </div>
-            </div>
+      {/* --- Ready to Unlock & Live Performance Metrics (Amrr Match) --- */}
+      <div className="container mx-auto px-4">
+        <AmrrStatsSection lang={params.lang} />
+      </div>
 
-            {/* Preview UI Element */}
-            <div className="hidden md:block w-full max-w-sm relative z-10 perspective-1000">
-               <div className="glass-panel p-4 rounded-xl border border-outline-variant/20 shadow-2xl transform rotate-y-[-10deg] rotate-x-[5deg]">
-                 <div className="flex items-center justify-between mb-4 pb-2 border-b border-outline-variant/20">
-                   <span className="font-bold text-sm text-on-surface">Order Desk</span>
-                   <span className="text-xs text-primary flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span> Online</span>
-                 </div>
-                 
-                 <div className="flex justify-between items-center bg-surface-container rounded p-2 mb-4">
-                   <div className="flex flex-col items-center">
-                     <i className="fas fa-fingerprint text-primary mb-1"></i>
-                     <span className="text-[10px] text-on-surface-variant uppercase">IMEI</span>
-                   </div>
-                   <div className="flex flex-col items-center">
-                     <i className="fas fa-server text-secondary mb-1"></i>
-                     <span className="text-[10px] text-on-surface-variant uppercase">Server</span>
-                   </div>
-                   <div className="flex flex-col items-center">
-                     <i className="fas fa-wallet text-tertiary mb-1"></i>
-                     <span className="text-[10px] text-on-surface-variant uppercase">Wallet</span>
-                   </div>
-                 </div>
-
-                 <div className="flex flex-col gap-2">
-                    <div className="bg-surface-container-highest p-2 rounded text-xs flex justify-between items-center border border-outline-variant/10">
-                      <div className="flex items-center gap-2"><i className="fab fa-apple text-on-surface-variant"></i> <span>Device unlock</span></div>
-                      <span className="text-secondary bg-secondary/10 px-1.5 rounded text-[10px]">Processing</span>
-                    </div>
-                    <div className="bg-surface-container-highest p-2 rounded text-xs flex justify-between items-center border border-outline-variant/10">
-                      <div className="flex items-center gap-2"><i className="fas fa-key text-on-surface-variant"></i> <span>Tool activation</span></div>
-                      <span className="text-primary bg-primary/10 px-1.5 rounded text-[10px]">Ready</span>
-                    </div>
-                 </div>
-               </div>
-            </div>
-          </article>
-
-          {/* Promos Sidebar */}
-          <div className="lg:col-span-4 flex flex-col gap-4 sm:gap-6">
-            <Link href={featUrl} className="flex-1 min-h-[160px] glass-card rounded-2xl sm:rounded-3xl p-5 sm:p-6 border border-outline-variant/30 relative overflow-hidden group block">
-              <div 
-                className="absolute inset-0 bg-cover bg-center opacity-75 group-hover:opacity-90 transition-opacity duration-500" 
-                style={{ backgroundImage: `url('${featImg}')` }}
-              ></div>
-              <div className="absolute inset-0 bg-gradient-to-t from-[#0c1324]/90 via-[#0c1324]/30 to-transparent"></div>
-              <div className="relative z-10 h-full flex flex-col justify-end">
-                <span className="bg-primary/20 text-primary px-2 py-0.5 rounded text-[10px] uppercase font-bold tracking-wider w-max mb-2 border border-primary/30 flex items-center gap-1">
-                  <i className="fas fa-bolt"></i> Featured Now
-                </span>
-                <h3 className="font-bold text-lg sm:text-xl text-on-surface">{featTitle || "Borneo Schematics"}</h3>
-                <p className="text-xs sm:text-sm text-on-surface-variant mt-0.5">{featSub || "Official reseller promotion"}</p>
-              </div>
-            </Link>
-
-            <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" className="glass-card rounded-2xl sm:rounded-3xl p-5 sm:p-6 border border-[#25D366]/30 bg-[#25D366]/5 hover:bg-[#25D366]/10 transition-colors flex items-center gap-4 group">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#25D366]/20 flex items-center justify-center text-[#25D366] text-xl sm:text-2xl group-hover:scale-110 transition-transform shrink-0">
-                <i className="fab fa-whatsapp"></i>
-              </div>
-              <div className="flex flex-col">
-                <span className="text-[10px] text-on-surface-variant uppercase tracking-wider">{isAr ? "دعم موثوق ومباشر" : "Direct human support"}</span>
-                <strong className="text-sm sm:text-base text-on-surface">{supportTitle || (isAr ? "هل تحتاج مساعدة سريعة؟" : "Need a fast answer?")}</strong>
-                <span className="text-xs sm:text-sm text-primary flex items-center gap-2 group-hover:gap-3 transition-all font-semibold">
-                  {supportBtn || (isAr ? "تحدث مع الدعم الفني" : "Chat with Support")} <i className="fas fa-arrow-right text-[10px]"></i>
-                </span>
-              </div>
-            </a>
-          </div>
-        </div>
-      </section>
-
-      {/* --- Live Performance Metrics & Quick Action (Screenshot Feature) --- */}
-      <LiveMetricsSection lang={params.lang} />
+      {/* --- Smart Unlock & Animated Counters (Amrr Match) --- */}
+      <div className="container mx-auto px-4">
+        <AmrrCountersSection lang={params.lang} />
+      </div>
 
       {/* --- Service Lanes --- */}
       <section className="container mx-auto px-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-          <Link href={imeiUrl} className="glass-card p-5 sm:p-6 rounded-xl sm:rounded-2xl border border-outline-variant/30 hover:border-primary/50 group transition-all relative overflow-hidden flex flex-col gap-3 sm:gap-4">
+          <Link href={imeiUrl} data-aos="fade-up" data-aos-delay="100" className="glass-card p-5 sm:p-6 rounded-xl sm:rounded-2xl border border-outline-variant/30 hover:border-primary/50 group transition-all relative overflow-hidden flex flex-col gap-3 sm:gap-4">
             <div 
               className="absolute inset-0 bg-cover bg-center opacity-50 group-hover:opacity-80 transition-opacity duration-500 z-0 pointer-events-none" 
               style={{ backgroundImage: "url('/images/promo_imei.png')" }}
@@ -408,7 +303,7 @@ export default async function Home(props: { params: Promise<{ lang: Locale }> })
             <i className="fas fa-arrow-right text-primary absolute bottom-5 sm:bottom-6 right-5 sm:right-6 opacity-0 group-hover:opacity-100 transform translate-x-[-10px] group-hover:translate-x-0 transition-all"></i>
           </Link>
 
-          <Link href={serverUrl} className="glass-card p-5 sm:p-6 rounded-xl sm:rounded-2xl border border-outline-variant/30 hover:border-secondary/50 group transition-all relative overflow-hidden flex flex-col gap-3 sm:gap-4">
+          <Link href={serverUrl} data-aos="fade-up" data-aos-delay="200" className="glass-card p-5 sm:p-6 rounded-xl sm:rounded-2xl border border-outline-variant/30 hover:border-secondary/50 group transition-all relative overflow-hidden flex flex-col gap-3 sm:gap-4">
             <div 
               className="absolute inset-0 bg-cover bg-center opacity-50 group-hover:opacity-80 transition-opacity duration-500 z-0 pointer-events-none" 
               style={{ backgroundImage: "url('/images/promo_server.png')" }}
@@ -424,7 +319,7 @@ export default async function Home(props: { params: Promise<{ lang: Locale }> })
             <i className="fas fa-arrow-right text-secondary absolute bottom-5 sm:bottom-6 right-5 sm:right-6 opacity-0 group-hover:opacity-100 transform translate-x-[-10px] group-hover:translate-x-0 transition-all"></i>
           </Link>
 
-          <Link href={remoteUrl} className="glass-card p-5 sm:p-6 rounded-xl sm:rounded-2xl border border-outline-variant/30 hover:border-tertiary/50 group transition-all relative overflow-hidden flex flex-col gap-3 sm:gap-4">
+          <Link href={remoteUrl} data-aos="fade-up" data-aos-delay="300" className="glass-card p-5 sm:p-6 rounded-xl sm:rounded-2xl border border-outline-variant/30 hover:border-tertiary/50 group transition-all relative overflow-hidden flex flex-col gap-3 sm:gap-4">
             <div 
               className="absolute inset-0 bg-cover bg-center opacity-50 group-hover:opacity-80 transition-opacity duration-500 z-0 pointer-events-none" 
               style={{ backgroundImage: "url('/images/promo_remote.png')" }}
@@ -440,7 +335,7 @@ export default async function Home(props: { params: Promise<{ lang: Locale }> })
             <i className="fas fa-arrow-right text-tertiary absolute bottom-5 sm:bottom-6 right-5 sm:right-6 opacity-0 group-hover:opacity-100 transform translate-x-[-10px] group-hover:translate-x-0 transition-all"></i>
           </Link>
 
-          <Link href={storeUrl} className="glass-card p-5 sm:p-6 rounded-xl sm:rounded-2xl border border-outline-variant/30 hover:border-primary/50 group transition-all relative overflow-hidden flex flex-col gap-3 sm:gap-4">
+          <Link href={storeUrl} data-aos="fade-up" data-aos-delay="400" className="glass-card p-5 sm:p-6 rounded-xl sm:rounded-2xl border border-outline-variant/30 hover:border-primary/50 group transition-all relative overflow-hidden flex flex-col gap-3 sm:gap-4">
             <div 
               className="absolute inset-0 bg-cover bg-center opacity-50 group-hover:opacity-80 transition-opacity duration-500 z-0 pointer-events-none" 
               style={{ backgroundImage: "url('/images/promo_store.png')" }}
@@ -459,7 +354,7 @@ export default async function Home(props: { params: Promise<{ lang: Locale }> })
       </section>
 
       {/* --- Tool Marquee --- */}
-      <section className="border-y border-outline-variant/20 bg-surface-container-lowest/50 py-6 sm:py-8 overflow-hidden relative">
+      <section data-aos="fade-up" className="border-y border-outline-variant/20 bg-surface-container-lowest/50 py-6 sm:py-8 overflow-hidden relative">
         <div className="absolute top-0 left-0 w-16 sm:w-32 h-full bg-gradient-to-r from-background to-transparent z-10 pointer-events-none"></div>
         <div className="absolute top-0 right-0 w-16 sm:w-32 h-full bg-gradient-to-l from-background to-transparent z-10 pointer-events-none"></div>
         
@@ -492,7 +387,7 @@ export default async function Home(props: { params: Promise<{ lang: Locale }> })
       </section>
 
       {/* --- Feature Ribbon --- */}
-      <section className="container mx-auto px-4">
+      <section data-aos="fade-up" className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 divide-y md:divide-y-0 md:divide-x md:rtl:divide-x-reverse divide-outline-variant/20 glass-panel rounded-2xl sm:rounded-3xl p-5 sm:p-8 border border-outline-variant/30">
           <div className="flex flex-col items-center text-center p-3 sm:p-4">
             <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-surface-container flex items-center justify-center text-primary text-xl sm:text-2xl mb-3 sm:mb-4 border border-outline-variant/50">
@@ -518,8 +413,14 @@ export default async function Home(props: { params: Promise<{ lang: Locale }> })
         </div>
       </section>
 
+      {/* --- Hexagonal Features Grid (amrr-unlocker match) --- */}
+      <HexagonalFeatures lang={params.lang} />
+
+      {/* --- Continuous 2-Card Automatic Packages Slider (User Requested) --- */}
+      <PackagesSlider lang={params.lang} />
+
       {/* --- Campaign Stage (Promotions) --- */}
-      <section className="container mx-auto px-4 relative">
+      <section data-aos="fade-up" className="container mx-auto px-4 relative">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-6 sm:mb-8 gap-4">
           <div>
             <span className="text-primary text-xs sm:text-sm font-bold uppercase tracking-wider flex items-center gap-2 mb-2">
@@ -540,8 +441,21 @@ export default async function Home(props: { params: Promise<{ lang: Locale }> })
         </div>
       </section>
 
+      {/* --- Frequently Asked Questions (amrr-unlocker match) --- */}
+      <FaqSection lang={params.lang} />
+
+      {/* --- Support CTA / Need Help Section (amrr-unlocker match) --- */}
+      <SupportCtaSection
+        lang={params.lang}
+        whatsappNum={whatsappNum}
+        telegramUrl={telegramUrl}
+        emailAddr={emailAddr}
+      />
+
       {/* --- Real Interactive Newsletter Section --- */}
-      <NewsletterSection lang={params.lang} className="container mx-auto px-4" />
+      <div data-aos="fade-up">
+        <NewsletterSection lang={params.lang} className="container mx-auto px-4" />
+      </div>
 
     </div>
   );
