@@ -263,7 +263,7 @@ export default function PackagesSlider({ lang }: PackagesSliderProps) {
         </div>
 
         {/* The 2-Card Visible Slider Container */}
-        <div className="relative overflow-hidden">
+        <div className="relative pt-6 pb-2">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 transition-all duration-500">
             {visibleItems.map((pkg, idx) => (
               <div
@@ -276,8 +276,8 @@ export default function PackagesSlider({ lang }: PackagesSliderProps) {
               >
                 {/* Popular / Promo Badge */}
                 {(pkg.badgeAr || pkg.badgeEn) && (
-                  <div className="absolute -top-3.5 right-6 sm:right-8 bg-gradient-to-r from-primary to-cyan-400 text-slate-950 text-xs font-black px-4 py-1.5 rounded-full shadow-lg flex items-center gap-1.5 uppercase tracking-wide">
-                    <i className="fas fa-crown text-amber-900"></i>
+                  <div className="absolute -top-3.5 right-6 sm:right-8 rtl:right-auto rtl:left-6 sm:rtl:left-8 z-30 bg-gradient-to-r from-primary via-cyan-300 to-emerald-400 text-slate-950 text-xs font-black px-4 py-1.5 rounded-full shadow-xl flex items-center gap-1.5 uppercase tracking-wide border border-white/20 whitespace-nowrap pointer-events-none">
+                    <i className="fas fa-crown text-amber-950"></i>
                     <span>{isAr ? pkg.badgeAr : pkg.badgeEn}</span>
                   </div>
                 )}
