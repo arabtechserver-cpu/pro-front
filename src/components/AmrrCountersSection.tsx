@@ -67,7 +67,7 @@ export default function AmrrCountersSection({ lang }: AmrrCountersSectionProps) 
 
       <div className="relative z-10 grid md:grid-cols-2 gap-8 lg:gap-12 items-center">
         {/* Left Side: Headline and Badges */}
-        <div data-aos="fade-right" data-aos-duration="800">
+        <div data-aos="fade-right" data-aos-duration="800" suppressHydrationWarning>
           <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black mb-4 leading-snug">
             <span>{isAr ? "مرحباً بك في " : "Welcome to "}</span>
             <span className="bg-emerald-400 text-slate-950 px-3 py-0.5 rounded-lg shadow inline-block">
@@ -118,6 +118,7 @@ export default function AmrrCountersSection({ lang }: AmrrCountersSectionProps) 
             className="bg-slate-800/70 hover:bg-slate-800 p-5 sm:p-6 rounded-2xl border border-slate-700/70 shadow-lg transition-all duration-300 hover:border-emerald-500/50 flex items-center gap-5"
             data-aos="fade-left"
             data-aos-delay="100"
+            suppressHydrationWarning
           >
             <div className="w-14 h-14 rounded-2xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-2xl shrink-0">
               <i className="fas fa-mobile-alt"></i>
@@ -136,6 +137,7 @@ export default function AmrrCountersSection({ lang }: AmrrCountersSectionProps) 
             className="bg-slate-800/70 hover:bg-slate-800 p-5 sm:p-6 rounded-2xl border border-slate-700/70 shadow-lg transition-all duration-300 hover:border-cyan-500/50 flex items-center gap-5"
             data-aos="fade-left"
             data-aos-delay="200"
+            suppressHydrationWarning
           >
             <div className="w-14 h-14 rounded-2xl bg-cyan-500/20 text-cyan-400 flex items-center justify-center text-2xl shrink-0">
               <i className="fas fa-cog"></i>
@@ -154,6 +156,7 @@ export default function AmrrCountersSection({ lang }: AmrrCountersSectionProps) 
             className="bg-slate-800/70 hover:bg-slate-800 p-5 sm:p-6 rounded-2xl border border-slate-700/70 shadow-lg transition-all duration-300 hover:border-purple-500/50 flex items-center gap-5"
             data-aos="fade-left"
             data-aos-delay="300"
+            suppressHydrationWarning
           >
             <div className="w-14 h-14 rounded-2xl bg-purple-500/20 text-purple-400 flex items-center justify-center text-2xl shrink-0">
               <i className="fas fa-user-clock"></i>

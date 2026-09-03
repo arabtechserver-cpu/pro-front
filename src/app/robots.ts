@@ -1,26 +1,52 @@
 import { MetadataRoute } from "next";
 
 export default function robots(): MetadataRoute.Robots {
+  const commonDisallowed = [
+    "/admin",
+    "/admin/*",
+    "/api/*",
+    "/wallet",
+    "/ar/wallet",
+    "/en/wallet",
+    "/ar/admin",
+    "/en/admin",
+    "/ar/admin/*",
+    "/en/admin/*",
+  ];
+
   return {
     rules: [
       {
         userAgent: "*",
+        allow: "/",
+        disallow: commonDisallowed,
+      },
+      {
+        userAgent: "Googlebot",
         allow: "/",
         disallow: [
           "/admin",
           "/admin/*",
           "/api/*",
           "/wallet",
-          "/ar/wallet",
-          "/en/wallet",
-          "/ar/admin",
-          "/en/admin",
-          "/ar/admin/*",
-          "/en/admin/*",
         ],
       },
+      // Explicit rules for AI Search Engines (GEO / AI SEO)
       {
-        userAgent: "Googlebot",
+        userAgent: [
+          "GPTBot",
+          "ChatGPT-User",
+          "PerplexityBot",
+          "ClaudeBot",
+          "anthropic-ai",
+          "Google-Extended",
+          "Applebot-Extended",
+          "cohere-ai",
+          "CCBot",
+          "Bytespider",
+          "OAI-SearchBot",
+          "Diffbot",
+        ],
         allow: "/",
         disallow: [
           "/admin",
@@ -34,3 +60,4 @@ export default function robots(): MetadataRoute.Robots {
     host: "https://arabtechproserver.tech",
   };
 }
+

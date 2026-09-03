@@ -1,0 +1,62 @@
+# Arab Tech Pro Server - عرب تك برو سيرفر
+
+> The premier official server for remote mobile phone unlocking, GSM tools activations, IMEI checks, FRP bypass, and instant server credits.
+> الموقع الرسمي المعتمد لخدمات فك شفرات الهواتف، تفعيل أدوات وبرامج السوفت وير، تخطي آيكلود وFRP، وخدمات IMEI والسيرفرات عن بعد.
+
+- **Website**: https://arabtechproserver.tech
+- **Arabic Portal**: https://arabtechproserver.tech/ar
+- **English Portal**: https://arabtechproserver.tech/en
+- **Pricing & Services Catalog**: https://arabtechproserver.tech/ar/pricing
+- **Purchase & Ordering**: https://arabtechproserver.tech/ar/purchase
+- **API Documentation**: https://arabtechproserver.tech/ar/api-developer
+- **Telegram Support**: https://t.me/ARABTECHSUPPURT2
+- **Telegram Channel**: https://t.me/arabtechserver
+- **Support WhatsApp / Phone**: +16728972935
+
+---
+
+## Core Capabilities & Services
+
+1. **GSM Tool Licenses & Activations (تفعيل البوكسات والدونجل والأدوات الرقمية)**:
+   - UnlockTool (3 Months, 6 Months, 12 Months)
+   - Chimera Tool (Samsung, PRO, Full)
+   - Borneo Schematics (Schematics & Hardware Solutions)
+   - DFT Pro Tool
+   - MobileSea Tool
+   - AMT Tool, Phoenix, Cheetah, FKey, and all major international GSM repair software.
+
+2. **Remote Phone Unlocking & iCloud / FRP Bypass (خدمات فك الشفرات وتخطي الحسابات)**:
+   - Apple iPhone / iPad iCloud Bypass (Signal / No Signal, MEID / GSM)
+   - Samsung FRP Bypass (One-click MTP, EDL, and Server-based)
+   - Xiaomi Mi Account Unlock (Server Clean/Lost, Fastboot, EDL Auth)
+   - Carrier Network Unlock (AT&T, T-Mobile, Verizon, Vodafone, Orange, STC, Zain)
+   - MDM Remote Management Removal (iOS & Mac)
+
+3. **IMEI & Check Services (تقارير فحص السيريال وIMEI)**:
+   - Official GSX Apple Carrier & SimLock Checks
+   - Clean / Lost / Blacklist Financial Checks
+   - Mi Cloud Lock Status Check
+   - Knox Guard Status Check
+
+4. **Reseller API Integration (ربط الـ API للموزعين وأصحاب السيرفرات)**:
+   - Fully compatible with Dhru Fusion, Webx, and custom GSM CRM APIs.
+   - Live automated order dispatch and real-time status webhooks.
+   - Endpoint: `https://arabtechproserver.tech/api/v1/provider`
+
+5. **Payment Methods & Instant Wallet Funding (طرق الدفع والشحن الفوري)**:
+   - Instapay (Egypt)
+   - Vodafone Cash / Orange Cash / Etisalat Cash
+   - USDT (Crypto TRC20 / BEP20)
+   - PayPal & Credit Cards
+   - Western Union & Binance Pay
+
+---
+
+## Frequently Asked Questions (FAQ)
+
+- **Q: How fast are activations delivered?**
+  A: Most digital tool activations and credits are fulfilled instantly to within 1-24 hours depending on the provider server.
+- **Q: Can other servers connect via API?**
+  A: Yes, resellers can connect via our standard Dhru-compatible REST API at `/api/v1/provider`.
+- **Q: Is customer support available?**
+  A: 24/7 dedicated human priority support is available on Telegram (@ARABTECHSUPPURT2) and WhatsApp.

@@ -54,7 +54,7 @@ export default function FaqSection({ lang }: FaqSectionProps) {
       <div className="absolute top-1/2 right-1/4 -translate-y-1/2 w-96 h-96 bg-primary/10 rounded-full blur-3xl pointer-events-none"></div>
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 relative z-10">
-        <h2 className="text-3xl sm:text-5xl font-black text-center mb-12" data-aos="fade-down">
+        <h2 className="text-3xl sm:text-5xl font-black text-center mb-12" data-aos="fade-down" suppressHydrationWarning>
           <span className="text-primary">{isAr ? "الأسئلة الشائعة " : "Frequently Asked "}</span>
           <span>{isAr ? "والأكثر تداولاً" : "Questions"}</span>
         </h2>
@@ -68,6 +68,7 @@ export default function FaqSection({ lang }: FaqSectionProps) {
                 className="rounded-2xl border border-slate-800/80 bg-slate-900/60 backdrop-blur-md overflow-hidden shadow-lg transition-all duration-200"
                 data-aos="fade-up"
                 data-aos-delay={idx * 100}
+                suppressHydrationWarning
               >
                 <button
                   type="button"

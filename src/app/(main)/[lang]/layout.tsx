@@ -174,6 +174,61 @@ export default async function RootLayout(
     }
   };
 
+  const jsonLdSoftware = {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Arab Tech Pro Server - عرب تك برو سيرفر",
+    "operatingSystem": "All (Web, Windows, Mac, Android, iOS)",
+    "applicationCategory": "BusinessApplication, UtilitiesApplication",
+    "url": "https://arabtechproserver.tech",
+    "offers": {
+      "@type": "AggregateOffer",
+      "priceCurrency": "USD",
+      "lowPrice": "0.10",
+      "offerCount": "1000+"
+    },
+    "description": isAr
+      ? "المنصة الرائدة في الشرق الأوسط والعالم لفك شفرات الهواتف، تفعيل أدوات GSM، تخطي iCloud وFRP، وخدمات IMEI والسيرفرات الفورية مع ربط API متقدم."
+      : "The leading global platform for remote mobile phone unlocking, GSM tool activations, iCloud & FRP bypass, and automated IMEI API server services."
+  };
+
+  const jsonLdFaq = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": isAr ? "ما هو موقع عرب تك برو سيرفر؟" : "What is Arab Tech Pro Server?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": isAr
+            ? "عرب تك برو سيرفر (Arab Tech Pro Server) هو السيرفر الرسمي الأول لخدمات فك شفرات الهواتف المحمولة عن بعد، وتفعيل برامج السوفت وير والبوكسات (مثل UnlockTool, Chimera, Borneo)، وتخطي حسابات Google FRP وiCloud بأسرع وقت وأفضل أسعار الجملة."
+            : "Arab Tech Pro Server is the official platform providing remote GSM services, official phone unlocking, tool activations (UnlockTool, Chimera, Borneo), iCloud & FRP bypass, and instant server API credits."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": isAr ? "هل يوفر عرب تك برو سيرفر ربط API للموزعين؟" : "Does Arab Tech Pro Server provide API integration for resellers?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": isAr
+            ? "نعم، المنصة تدعم الربط المباشر المتوافق مع Dhru Fusion وWebx عبر واجهة برمجة التطبيقات API على الرابط: https://arabtechproserver.tech/api/v1/provider."
+            : "Yes, we provide full REST API compatibility with Dhru Fusion and Webx platforms at https://arabtechproserver.tech/api/v1/provider."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": isAr ? "ما هي طرق الدفع المتاحة في عرب تك برو سيرفر؟" : "What payment methods are supported?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": isAr
+            ? "نوفر شحناً فورياً للمحفظة عبر إنستاباي (Instapay)، فودافون كاش، محفظة العملات الرقمية USDT (TRC20/BEP20)، باي بال، وفيزا/ماستركارد."
+            : "We support instant wallet topups via Instapay, Vodafone Cash, USDT Crypto, PayPal, and credit cards."
+        }
+      }
+    ]
+  };
+
   return (
     <html lang={lang} dir={dir}>
       <head>
@@ -205,10 +260,6 @@ export default async function RootLayout(
           integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
           crossOrigin="anonymous"
           referrerPolicy="no-referrer"
-          // @ts-ignore
-          media="print"
-          // @ts-ignore
-          onLoad="this.media='all'"
         />
         <script
           type="application/ld+json"
@@ -217,6 +268,14 @@ export default async function RootLayout(
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdOrganization) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdSoftware) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdFaq) }}
         />
       </head>
       <body className={`${inter.variable} ${jakarta.variable} ${jetbrains.variable} bg-background text-on-surface antialiased min-h-screen flex flex-col relative`}>

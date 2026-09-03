@@ -5,28 +5,27 @@ import AOS from "aos";
 
 export default function AosInit() {
   useEffect(() => {
-    AOS.init({
-      duration: 600,
-      once: true, // Only animate once to prevent repetitive scroll recalculation and lag
-      easing: "ease-out-cubic",
-      offset: 20,
-      mirror: false,
-    });
+    // Delay AOS initialization slightly to allow React hydration to complete cleanly
+    const initTimer = setTimeout(() => {
+      AOS.init({
+        duration: 600,
+        once: true,
+        easing: "ease-out-cubic",
+        offset: 20,
+        mirror: false,
+      });
+      AOS.refresh();
+    }, 100);
 
     const handleRefresh = () => {
       AOS.refresh();
     };
 
     window.addEventListener("load", handleRefresh);
-    
-    // Quick refresh after hydration
-    const timeout = setTimeout(() => {
-      AOS.refresh();
-    }, 300);
 
     return () => {
       window.removeEventListener("load", handleRefresh);
-      clearTimeout(timeout);
+      clearTimeout(initTimer);
     };
   }, []);
 
