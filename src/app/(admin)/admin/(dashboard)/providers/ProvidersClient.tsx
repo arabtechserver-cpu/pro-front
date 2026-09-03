@@ -1116,298 +1116,286 @@ export default function ProvidersClient() {
 
       {/* UPGRADED BROWSE SERVICES & PACKAGES MODAL WITH REQUIRED FIELDS */}
       {browseProvider && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-3 sm:p-5 animate-in fade-in">
-          <div className="bg-surface-container border border-outline-variant/30 rounded-3xl p-5 sm:p-7 max-w-4xl w-full shadow-2xl space-y-4 max-h-[92vh] flex flex-col">
-            {/* Modal Top Bar */}
-            <div className="flex items-center justify-between pb-3 border-b border-outline-variant/20">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
-                  <span className="material-symbols-outlined text-2xl">category</span>
-                </div>
-                <div>
-                  <h3 className="text-lg font-bold text-on-surface flex items-center gap-2">
-                    <span>خدمات وباقات المزود:</span>
-                    <span className="text-primary font-display">{browseProvider.name}</span>
-                  </h3>
-                  <p className="text-xs text-on-surface-variant">
-                    {filteredGroups.length} باقة مسجلة • {totalFilteredServicesCount} خدمة متاحة مع تفاصيل حقول الطلب
-                  </p>
-                </div>
-              </div>
-
-              <button
-                type="button"
-                onClick={() => setBrowseProvider(null)}
-                className="w-8 h-8 rounded-full bg-surface-variant flex items-center justify-center text-on-surface-variant hover:text-on-surface"
-              >
-                <span className="material-symbols-outlined text-sm">close</span>
-              </button>
-            </div>
-
-            {/* View Switcher Tabs: Live Provider Catalog vs Stored In Store */}
-            <div className="flex flex-wrap items-center justify-between gap-3 p-2 bg-surface-container-lowest border border-outline-variant/30 rounded-2xl">
-              <div className="flex items-center gap-2 flex-wrap">
-                <button
-                  type="button"
-                  onClick={() => handleBrowseServices(browseProvider, "remote")}
-                  disabled={loadingServices}
-                  className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
-                    serviceLoadSource === "remote"
-                      ? "bg-sky-500 text-white shadow-md"
-                      : "bg-surface-container hover:bg-surface-container-high text-on-surface-variant hover:text-on-surface"
-                  }`}
-                  title="عرض كل باقات وخدمات المزود من الـ API مباشرة لاختيار واستيراد باقات جديدة"
-                >
-                  <span className="material-symbols-outlined text-sm">cloud_sync</span>
-                  <span>تصفح واستيراد باقات جديدة (API Live)</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => handleBrowseServices(browseProvider, "stored")}
-                  disabled={loadingServices}
-                  className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
-                    serviceLoadSource === "stored"
-                      ? "bg-primary text-on-primary shadow-md"
-                      : "bg-surface-container hover:bg-surface-container-high text-on-surface-variant hover:text-on-surface"
-                  }`}
-                  title="عرض الخدمات المستوردة حالياً في الموقع للتحكم في ظهورها وهوامش الربح"
-                >
-                  <span className="material-symbols-outlined text-sm">inventory_2</span>
-                  <span>الخدمات المضافة في الموقع ({browseProvider.servicesCount || 0})</span>
-                </button>
-              </div>
-
-              {serviceLoadSource === "remote" && (
-                <span className="text-[11px] text-sky-400 font-bold bg-sky-500/10 border border-sky-500/20 px-3 py-1 rounded-xl flex items-center gap-1">
-                  <span className="material-symbols-outlined text-xs">tune</span>
-                  <span>يمكنك تحديد واستيراد أي باقة ولن تختفي باقي الباقات</span>
-                </span>
-              )}
-            </div>
-
-            {/* Quick Bulk Actions Toolbar */}
-            <div className="flex flex-wrap items-center justify-between gap-2.5 p-3 rounded-2xl bg-surface-container-lowest border border-outline-variant/20 text-xs">
-              <div className="flex items-center gap-2 flex-wrap">
-                {serviceLoadSource === "stored" && (
-                  <>
-                    {/* Make All Visible Button */}
-                    <button
-                      type="button"
-                      onClick={() => handleToggleAllServices(true)}
-                      disabled={isPerformingBulkAction || loadingServices}
-                      className="px-3.5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold transition-all flex items-center gap-1.5 shadow-sm disabled:opacity-50"
-                      title="تفعيل وإظهار كافة خدمات وباقات هذا المزود للعملاء في المتجر"
-                    >
-                      <span className="material-symbols-outlined text-sm">visibility</span>
-                      <span>إظهار وتفعيل كل الخدمات للعملاء</span>
-                    </button>
-
-                    {/* Hide All Button */}
-                    <button
-                      type="button"
-                      onClick={() => handleToggleAllServices(false)}
-                      disabled={isPerformingBulkAction || loadingServices}
-                      className="px-3 py-2 rounded-xl bg-surface-container-high hover:bg-surface-container-highest text-on-surface-variant hover:text-on-surface font-bold transition-all flex items-center gap-1 border border-outline-variant/20 disabled:opacity-50"
-                    >
-                      <span className="material-symbols-outlined text-sm">visibility_off</span>
-                      <span>إخفاء الكل</span>
-                    </button>
-                  </>
-                )}
-                {serviceLoadSource !== "stored" && (
-                  <div className="flex items-center gap-2 text-primary bg-primary/10 px-3 py-1.5 rounded-xl font-bold">
-                    <span className="material-symbols-outlined text-sm">info</span>
-                    <span>حدد الباقات التي تريد استيرادها أو انقر على استيراد بجانب كل باقة.</span>
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-2 sm:p-5 animate-in fade-in overflow-hidden">
+          <div className="bg-surface-container border border-outline-variant/30 rounded-2xl sm:rounded-3xl p-3 sm:p-6 max-w-4xl w-full shadow-2xl flex flex-col h-[95dvh] sm:h-auto sm:max-h-[92vh] overflow-hidden">
+            {/* Modal Top Header & Controls (Fixed / Non-shrinking) */}
+            <div className="shrink-0 space-y-2 sm:space-y-3 pb-1">
+              {/* Modal Top Bar */}
+              <div className="flex items-center justify-between pb-2 sm:pb-3 border-b border-outline-variant/20">
+                <div className="flex items-center gap-2.5 sm:gap-3">
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                    <span className="material-symbols-outlined text-xl sm:text-2xl">category</span>
                   </div>
-                )}
-
-                {/* Show Selected Packages Button */}
-                {selectedGroupNames.length > 0 && (
-                  <>
-                    {serviceLoadSource === "stored" ? (
-                      <>
-                        <button
-                          type="button"
-                          onClick={() => handleBulkToggleSelectedPackages(true)}
-                          disabled={isPerformingBulkAction}
-                          className="px-3.5 py-2 rounded-xl bg-primary hover:bg-primary/90 text-on-primary font-bold transition-all flex items-center gap-1.5 shadow-sm"
-                        >
-                          <span className="material-symbols-outlined text-sm">check_box</span>
-                          <span>إظهار الباقات المحددة ({selectedGroupNames.length})</span>
-                        </button>
-
-                        <button
-                          type="button"
-                          onClick={() => handleBulkToggleSelectedPackages(false)}
-                          disabled={isPerformingBulkAction}
-                          className="px-3.5 py-2 rounded-xl bg-red-500/15 hover:bg-red-500/25 text-red-400 border border-red-500/30 font-bold transition-all flex items-center gap-1.5"
-                        >
-                          <span className="material-symbols-outlined text-sm">visibility_off</span>
-                          <span>إخفاء الباقات المحددة ({selectedGroupNames.length})</span>
-                        </button>
-                      </>
-                    ) : (
-                      <button
-                        type="button"
-                        onClick={() => openSyncModal(browseProvider, "selected")}
-                        className="px-3.5 py-2 rounded-xl bg-sky-500 hover:bg-sky-600 text-white font-bold transition-all flex items-center gap-1.5 shadow-sm"
-                      >
-                        <span className="material-symbols-outlined text-sm">cloud_download</span>
-                        <span>استيراد الباقات المحددة ({selectedGroupNames.length})</span>
-                      </button>
-                    )}
-                  </>
-                )}
-              </div>
-
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => openSyncModal(browseProvider)}
-                  disabled={syncingProviderId === browseProvider.id}
-                  className="px-3 py-1.5 rounded-xl bg-surface-container-high hover:bg-surface-container-highest text-on-surface font-bold transition-all flex items-center gap-1 border border-outline-variant/30 disabled:opacity-50 text-[11px]"
-                >
-                  <span className={`material-symbols-outlined text-xs text-primary ${syncingProviderId === browseProvider.id ? "animate-spin" : ""}`}>
-                    sync
-                  </span>
-                  <span>مزامنة من المزود</span>
-                </button>
-              </div>
-            </div>
-
-            {serviceLoadSource === "remote" && (
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-2xl bg-sky-500/10 border border-sky-500/30 text-xs">
-                <div className="flex items-start gap-2 text-sky-300">
-                  <span className="material-symbols-outlined text-lg shrink-0">cloud_download</span>
                   <div>
-                    <p className="font-bold text-sky-300">معاينة مباشرة من المزود</p>
-                    <p className="text-[11px] text-on-surface-variant mt-0.5">
-                      ظهرت الخدمات بدون مزامنة. للموافقة عليها والتحكم في إظهارها بالمتجر اضغط مزامنة من المزود.
+                    <h3 className="text-sm sm:text-lg font-bold text-on-surface flex items-center gap-1.5 sm:gap-2">
+                      <span>خدمات وباقات المزود:</span>
+                      <span className="text-primary font-display">{browseProvider.name}</span>
+                    </h3>
+                    <p className="text-[11px] sm:text-xs text-on-surface-variant">
+                      {filteredGroups.length} باقة مسجلة • {totalFilteredServicesCount} خدمة متاحة مع تفاصيل حقول الطلب
                     </p>
                   </div>
                 </div>
+
                 <button
                   type="button"
-                  onClick={() => openSyncModal(browseProvider)}
-                  className="px-3 py-2 rounded-xl bg-sky-500 text-white font-bold whitespace-nowrap hover:bg-sky-600 transition-all"
+                  onClick={() => setBrowseProvider(null)}
+                  className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-surface-variant flex items-center justify-center text-on-surface-variant hover:text-on-surface"
                 >
-                  مزامنة وحفظ الخدمات
+                  <span className="material-symbols-outlined text-sm">close</span>
                 </button>
               </div>
-            )}
 
-            {/* Real Provider Service Type Filters */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 p-2 rounded-2xl bg-surface-container-lowest border border-outline-variant/20">
-              {([
-                { type: "all", label: "كل الأقسام", count: serviceTypeCounts.all, icon: "apps" },
-                { type: "imei", label: "IMEI", count: serviceTypeCounts.imei, icon: "fingerprint" },
-                { type: "server", label: "Server", count: serviceTypeCounts.server, icon: "dns" },
-                { type: "remote", label: "Remote", count: serviceTypeCounts.remote, icon: "settings_remote" }
-              ] as const).map((option) => (
-                <button
-                  key={option.type}
-                  type="button"
-                  onClick={() => {
-                    setServiceTypeFilter(option.type);
-                    setSelectedGroupNames([]);
-                    setExpandedGroups({});
-                    setVisibleGroupsLimit(25);
-                  }}
-                  className={`px-3 py-2.5 rounded-xl border text-xs font-bold transition-all flex items-center justify-center gap-2 ${
-                    serviceTypeFilter === option.type
-                      ? "bg-primary text-on-primary border-primary shadow"
-                      : "bg-surface-container-high border-outline-variant/20 text-on-surface-variant hover:text-on-surface hover:border-primary/30"
-                  }`}
-                >
-                  <span className="material-symbols-outlined text-sm">{option.icon}</span>
-                  <span>{option.label}</span>
-                  <span className={`font-mono px-1.5 py-0.5 rounded-md ${
-                    serviceTypeFilter === option.type ? "bg-black/15" : "bg-surface-container-highest"
-                  }`}>
-                    {option.count}
+              {/* View Switcher Tabs: Live Provider Catalog vs Stored In Store */}
+              <div className="flex flex-wrap items-center justify-between gap-2 p-1.5 sm:p-2 bg-surface-container-lowest border border-outline-variant/30 rounded-2xl">
+                <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+                  <button
+                    type="button"
+                    onClick={() => handleBrowseServices(browseProvider, "remote")}
+                    disabled={loadingServices}
+                    className={`px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-xl text-[11px] sm:text-xs font-bold transition-all flex items-center gap-1.5 ${
+                      serviceLoadSource === "remote"
+                        ? "bg-sky-500 text-white shadow-md"
+                        : "bg-surface-container hover:bg-surface-container-high text-on-surface-variant hover:text-on-surface"
+                    }`}
+                    title="عرض كل باقات وخدمات المزود من الـ API مباشرة لاختيار واستيراد باقات جديدة"
+                  >
+                    <span className="material-symbols-outlined text-sm">cloud_sync</span>
+                    <span>تصفح واستيراد باقات جديدة (API Live)</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => handleBrowseServices(browseProvider, "stored")}
+                    disabled={loadingServices}
+                    className={`px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-xl text-[11px] sm:text-xs font-bold transition-all flex items-center gap-1.5 ${
+                      serviceLoadSource === "stored"
+                        ? "bg-primary text-on-primary shadow-md"
+                        : "bg-surface-container hover:bg-surface-container-high text-on-surface-variant hover:text-on-surface"
+                    }`}
+                    title="عرض الخدمات المستوردة حالياً في الموقع للتحكم في ظهورها وهوامش الربح"
+                  >
+                    <span className="material-symbols-outlined text-sm">inventory_2</span>
+                    <span>الخدمات المضافة في الموقع ({browseProvider.servicesCount || 0})</span>
+                  </button>
+                </div>
+
+                {serviceLoadSource === "remote" && (
+                  <span className="text-[10px] sm:text-[11px] text-sky-400 font-bold bg-sky-500/10 border border-sky-500/20 px-2.5 py-0.5 sm:py-1 rounded-xl flex items-center gap-1">
+                    <span className="material-symbols-outlined text-xs">tune</span>
+                    <span>يمكنك تحديد واستيراد أي باقة ولن تختفي باقي الباقات</span>
                   </span>
-                </button>
-              ))}
-            </div>
-
-            {/* Search & Filter Tabs */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              {/* Search Box */}
-              <div className="relative flex-1">
-                <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-base">
-                  search
-                </span>
-                <input
-                  type="text"
-                  placeholder="بحث باسم الباقة أو الخدمة أو الحقل المطلوب..."
-                  value={serviceSearch}
-                  onChange={(e) => {
-                    setServiceSearch(e.target.value);
-                    setVisibleGroupsLimit(25);
-                  }}
-                  className="w-full pr-9 pl-4 py-2.5 bg-surface-container-lowest border border-outline-variant/30 rounded-xl focus:border-primary outline-none text-xs text-on-surface"
-                />
-              </div>
-
-              {/* Status Filter Tabs */}
-              <div className="flex items-center gap-2 text-xs font-bold">
-                <button
-                  type="button"
-                  onClick={() => setPackageFilter("all")}
-                  className={`px-3 py-1.5 rounded-lg transition-all ${
-                    packageFilter === "all"
-                      ? "bg-primary text-on-primary shadow"
-                      : "bg-surface-container-high text-on-surface-variant hover:text-on-surface"
-                  }`}
-                >
-                  الكل ({groupedPackages.length})
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setPackageFilter("active")}
-                  className={`px-3 py-1.5 rounded-lg transition-all ${
-                    packageFilter === "active"
-                      ? "bg-emerald-500 text-white shadow"
-                      : "bg-surface-container-high text-on-surface-variant hover:text-on-surface"
-                  }`}
-                >
-                  النشطة في المتجر
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setPackageFilter("hidden")}
-                  className={`px-3 py-1.5 rounded-lg transition-all ${
-                    packageFilter === "hidden"
-                      ? "bg-amber-500 text-black shadow"
-                      : "bg-surface-container-high text-on-surface-variant hover:text-on-surface"
-                  }`}
-                >
-                  المخفية بالكامل
-                </button>
-              </div>
-            </div>
-
-            {/* Select All Checkbox Row */}
-            {filteredGroups.length > 0 && (
-              <div className="flex items-center justify-between px-2 text-xs text-on-surface-variant">
-                <label className="flex items-center gap-2 cursor-pointer font-bold select-none">
-                  <input
-                      type="checkbox"
-                      checked={selectedGroupNames.length > 0 && selectedGroupNames.length === filteredGroups.length}
-                    onChange={handleSelectAllGroups}
-                    className="w-4 h-4 accent-primary cursor-pointer"
-                  />
-                  <span>تحديد كل الباقات المعروضة ({filteredGroups.length} باقة)</span>
-                </label>
-                {selectedGroupNames.length > 0 && (
-                  <span className="text-primary font-bold">{selectedGroupNames.length} باقة محددة</span>
                 )}
               </div>
-            )}
 
-            {/* Grouped Packages & Services List */}
-            <div className="overflow-y-auto flex-1 space-y-3 rounded-2xl border border-outline-variant/20 bg-surface-container-lowest p-3">
+              {/* Quick Bulk Actions Toolbar */}
+              <div className="flex flex-wrap items-center justify-between gap-2 p-2 sm:p-2.5 rounded-2xl bg-surface-container-lowest border border-outline-variant/20 text-xs">
+                <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+                  {serviceLoadSource === "stored" && (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => handleToggleAllServices(true)}
+                        disabled={isPerformingBulkAction || loadingServices}
+                        className="px-3 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold transition-all flex items-center gap-1 shadow-sm disabled:opacity-50 text-[11px]"
+                        title="تفعيل وإظهار كافة خدمات وباقات هذا المزود للعملاء في المتجر"
+                      >
+                        <span className="material-symbols-outlined text-sm">visibility</span>
+                        <span>إظهار الكل للعملاء</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => handleToggleAllServices(false)}
+                        disabled={isPerformingBulkAction || loadingServices}
+                        className="px-3 py-1.5 rounded-xl bg-surface-container-high hover:bg-surface-container-highest text-on-surface-variant hover:text-on-surface font-bold transition-all flex items-center gap-1 border border-outline-variant/20 disabled:opacity-50 text-[11px]"
+                      >
+                        <span className="material-symbols-outlined text-sm">visibility_off</span>
+                        <span>إخفاء الكل</span>
+                      </button>
+                    </>
+                  )}
+                  {serviceLoadSource !== "stored" && (
+                    <div className="flex items-center gap-1.5 text-primary bg-primary/10 px-2.5 py-1 rounded-xl font-bold text-[11px]">
+                      <span className="material-symbols-outlined text-sm">info</span>
+                      <span>حدد الباقات التي تريد استيرادها أو انقر على استيراد بجانب كل باقة.</span>
+                    </div>
+                  )}
+
+                  {selectedGroupNames.length > 0 && (
+                    <>
+                      {serviceLoadSource === "stored" ? (
+                        <>
+                          <button
+                            type="button"
+                            onClick={() => handleBulkToggleSelectedPackages(true)}
+                            disabled={isPerformingBulkAction}
+                            className="px-3 py-1.5 rounded-xl bg-primary hover:bg-primary/90 text-on-primary font-bold transition-all flex items-center gap-1 shadow-sm text-[11px]"
+                          >
+                            <span className="material-symbols-outlined text-sm">check_box</span>
+                            <span>إظهار الباقات ({selectedGroupNames.length})</span>
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => handleBulkToggleSelectedPackages(false)}
+                            disabled={isPerformingBulkAction}
+                            className="px-3 py-1.5 rounded-xl bg-red-500/15 hover:bg-red-500/25 text-red-400 border border-red-500/30 font-bold transition-all flex items-center gap-1 text-[11px]"
+                          >
+                            <span className="material-symbols-outlined text-sm">visibility_off</span>
+                            <span>إخفاء الباقات ({selectedGroupNames.length})</span>
+                          </button>
+                        </>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => openSyncModal(browseProvider, "selected")}
+                          className="px-3 py-1.5 rounded-xl bg-sky-500 hover:bg-sky-600 text-white font-bold transition-all flex items-center gap-1 shadow-sm text-[11px]"
+                        >
+                          <span className="material-symbols-outlined text-sm">cloud_download</span>
+                          <span>استيراد الباقات المحددة ({selectedGroupNames.length})</span>
+                        </button>
+                      )}
+                    </>
+                  )}
+                </div>
+
+                <div className="flex items-center gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() => openSyncModal(browseProvider)}
+                    disabled={syncingProviderId === browseProvider.id}
+                    className="px-2.5 py-1.5 rounded-xl bg-surface-container-high hover:bg-surface-container-highest text-on-surface font-bold transition-all flex items-center gap-1 border border-outline-variant/30 disabled:opacity-50 text-[11px]"
+                  >
+                    <span className={`material-symbols-outlined text-xs text-primary ${syncingProviderId === browseProvider.id ? "animate-spin" : ""}`}>
+                      sync
+                    </span>
+                    <span>مزامنة من المزود</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Real Provider Service Type Filters */}
+              <div className="grid grid-cols-4 gap-1.5 p-1.5 sm:p-2 rounded-2xl bg-surface-container-lowest border border-outline-variant/20">
+                {([
+                  { type: "all", label: "الكل", count: serviceTypeCounts.all, icon: "apps" },
+                  { type: "imei", label: "IMEI", count: serviceTypeCounts.imei, icon: "fingerprint" },
+                  { type: "server", label: "Server", count: serviceTypeCounts.server, icon: "dns" },
+                  { type: "remote", label: "Remote", count: serviceTypeCounts.remote, icon: "settings_remote" }
+                ] as const).map((option) => (
+                  <button
+                    key={option.type}
+                    type="button"
+                    onClick={() => {
+                      setServiceTypeFilter(option.type);
+                      setSelectedGroupNames([]);
+                      setExpandedGroups({});
+                      setVisibleGroupsLimit(25);
+                    }}
+                    className={`px-2 py-1.5 sm:py-2 rounded-xl border text-[11px] sm:text-xs font-bold transition-all flex items-center justify-center gap-1 sm:gap-1.5 ${
+                      serviceTypeFilter === option.type
+                        ? "bg-primary text-on-primary border-primary shadow"
+                        : "bg-surface-container-high border-outline-variant/20 text-on-surface-variant hover:text-on-surface hover:border-primary/30"
+                    }`}
+                  >
+                    <span className="material-symbols-outlined text-xs sm:text-sm">{option.icon}</span>
+                    <span>{option.label}</span>
+                    <span className={`font-mono px-1 py-0.2 rounded text-[10px] sm:text-xs ${
+                      serviceTypeFilter === option.type ? "bg-black/20" : "bg-surface-container-highest"
+                    }`}>
+                      {option.count}
+                    </span>
+                  </button>
+                ))}
+              </div>
+
+              {/* Search & Filter Tabs */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <div className="relative flex-1">
+                  <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-base">
+                    search
+                  </span>
+                  <input
+                    type="text"
+                    placeholder="بحث باسم الباقة أو الخدمة أو الحقل..."
+                    value={serviceSearch}
+                    onChange={(e) => {
+                      setServiceSearch(e.target.value);
+                      setVisibleGroupsLimit(25);
+                    }}
+                    className="w-full pr-9 pl-3 py-1.5 sm:py-2 bg-surface-container-lowest border border-outline-variant/30 rounded-xl focus:border-primary outline-none text-xs text-on-surface"
+                  />
+                </div>
+
+                <div className="flex items-center gap-1.5 text-xs font-bold">
+                  <button
+                    type="button"
+                    onClick={() => setPackageFilter("all")}
+                    className={`px-2.5 py-1 rounded-lg transition-all text-[11px] sm:text-xs ${
+                      packageFilter === "all"
+                        ? "bg-primary text-on-primary shadow"
+                        : "bg-surface-container-high text-on-surface-variant hover:text-on-surface"
+                    }`}
+                  >
+                    الكل ({groupedPackages.length})
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPackageFilter("active")}
+                    className={`px-2.5 py-1 rounded-lg transition-all text-[11px] sm:text-xs ${
+                      packageFilter === "active"
+                        ? "bg-emerald-500 text-white shadow"
+                        : "bg-surface-container-high text-on-surface-variant hover:text-on-surface"
+                    }`}
+                  >
+                    النشطة
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPackageFilter("hidden")}
+                    className={`px-2.5 py-1 rounded-lg transition-all text-[11px] sm:text-xs ${
+                      packageFilter === "hidden"
+                        ? "bg-amber-500 text-black shadow"
+                        : "bg-surface-container-high text-on-surface-variant hover:text-on-surface"
+                    }`}
+                  >
+                    المخفية
+                  </button>
+                </div>
+              </div>
+
+              {/* Select All Checkbox Row */}
+              {filteredGroups.length > 0 && (
+                <div className="flex items-center justify-between px-1 text-xs text-on-surface-variant">
+                  <label className="flex items-center gap-2 cursor-pointer font-bold select-none text-[11px] sm:text-xs">
+                    <input
+                      type="checkbox"
+                      checked={selectedGroupNames.length > 0 && selectedGroupNames.length === filteredGroups.length}
+                      onChange={handleSelectAllGroups}
+                      className="w-4 h-4 accent-primary cursor-pointer"
+                    />
+                    <span>تحديد كل الباقات ({filteredGroups.length} باقة)</span>
+                  </label>
+                  {selectedGroupNames.length > 0 && (
+                    <span className="text-primary font-bold text-[11px] sm:text-xs">{selectedGroupNames.length} باقة محددة</span>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Grouped Packages & Services List (Smooth Mobile Touch Scrolling with min-h-0) */}
+            <div
+              className="min-h-0 flex-1 overflow-y-auto overscroll-contain touch-pan-y space-y-2.5 sm:space-y-3 rounded-2xl border border-outline-variant/20 bg-surface-container-lowest p-2 sm:p-3"
+              style={{ WebkitOverflowScrolling: "touch" }}
+              onScroll={(e) => {
+                const t = e.currentTarget;
+                if (t.scrollHeight - t.scrollTop - t.clientHeight < 350) {
+                  if (visibleGroupsLimit < filteredGroups.length) {
+                    setVisibleGroupsLimit((prev) => prev + 25);
+                  }
+                }
+              }}
+            >
               {loadingServices ? (
                 <div className="p-16 text-center text-on-surface-variant text-xs flex flex-col items-center gap-3">
                   <span className="w-8 h-8 border-3 border-primary border-t-transparent rounded-full animate-spin"></span>
@@ -1434,42 +1422,50 @@ export default function ProvidersClient() {
                             : "bg-surface-container/50 border-outline-variant/30 hover:border-primary/40"
                         }`}
                       >
-                        {/* Package Header Card */}
-                        <div className="p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-surface-container-high/40 border-b border-outline-variant/15">
-                          <div className="flex items-center gap-3">
+                        {/* Package Row Header */}
+                        <div className="p-2.5 sm:p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 bg-surface-container-high/40 border-b border-outline-variant/15">
+                          <div className="flex items-center gap-2.5 sm:gap-3">
                             <input
-                                type="checkbox"
-                                checked={isSelected}
+                              type="checkbox"
+                              checked={isSelected}
                               onChange={() => toggleGroupSelection(group.groupName)}
                               className="w-4 h-4 accent-primary cursor-pointer shrink-0"
                             />
-
-                            <div className="cursor-pointer" onClick={() => toggleGroupExpand(group.groupName)}>
-                              <div className="font-bold text-on-surface text-xs sm:text-sm flex items-center gap-2 flex-wrap">
+                            <div
+                              onClick={() => toggleGroupExpand(group.groupName)}
+                              className="cursor-pointer"
+                            >
+                              <div className="font-bold text-on-surface text-xs sm:text-sm flex items-center gap-1.5 sm:gap-2 flex-wrap">
                                 <span>{group.groupName}</span>
-                                {group.serviceTypes.map((serviceType: string) => (
+                                {group.serviceTypes.map((type: string) => (
                                   <span
-                                    key={serviceType}
-                                    className="text-[9px] px-2 py-0.5 rounded-md bg-primary/10 text-primary border border-primary/20 font-mono"
+                                    key={type}
+                                    className="text-[9px] px-1.5 sm:px-2 py-0.5 rounded-md bg-primary/10 text-primary border border-primary/20 font-mono"
                                   >
-                                    {getProviderServiceTypeLabel(serviceType)}
+                                    {getProviderServiceTypeLabel(type)}
                                   </span>
                                 ))}
-                                {group.isAllHidden ? (
-                                  <span className="text-[10px] px-2 py-0.5 rounded-md bg-red-500/15 text-red-400 font-bold border border-red-500/20">
-                                    مخفية عن المتجر
-                                  </span>
-                                ) : group.isAllActive ? (
-                                  <span className="text-[10px] px-2 py-0.5 rounded-md bg-emerald-500/15 text-emerald-400 font-bold border border-emerald-500/20">
-                                    ظاهرة بالكامل للعملاء
-                                  </span>
+                                {serviceLoadSource === "stored" ? (
+                                  group.isAllActive ? (
+                                    <span className="text-[10px] px-2 py-0.5 rounded-md bg-emerald-500/15 text-emerald-400 font-bold border border-emerald-500/20">
+                                      مفعلة بالكامل ({group.activeCount}/{group.total})
+                                    </span>
+                                  ) : group.isAllHidden ? (
+                                    <span className="text-[10px] px-2 py-0.5 rounded-md bg-red-500/15 text-red-400 font-bold border border-red-500/20">
+                                      مخفية بالكامل
+                                    </span>
+                                  ) : (
+                                    <span className="text-[10px] px-2 py-0.5 rounded-md bg-amber-500/15 text-amber-400 font-bold border border-amber-500/20">
+                                      ظهور جزئي ({group.activeCount}/{group.total})
+                                    </span>
+                                  )
                                 ) : (
-                                  <span className="text-[10px] px-2 py-0.5 rounded-md bg-amber-500/15 text-amber-400 font-bold border border-amber-500/20">
-                                    ظهور جزئي ({group.activeCount}/{group.total})
+                                  <span className="text-[10px] px-2 py-0.5 rounded-md bg-sky-500/15 text-sky-400 font-bold border border-sky-500/20">
+                                    معاينة مباشرة ({group.total})
                                   </span>
                                 )}
                               </div>
-                              <div className="text-[11px] text-on-surface-variant mt-0.5 flex items-center gap-2">
+                              <div className="text-[10px] sm:text-[11px] text-on-surface-variant mt-0.5 flex items-center gap-2">
                                 <span>{group.total} خدمة في هذه الباقة</span>
                                 <span>•</span>
                                 <span className="text-primary font-medium">{group.activeCount} نشطة</span>
@@ -1477,40 +1473,30 @@ export default function ProvidersClient() {
                             </div>
                           </div>
 
-                          <div className="flex items-center gap-2 self-end sm:self-center">
-                            {/* Package Visibility / Import Toggle Button */}
+                          <div className="flex items-center gap-1.5 self-end sm:self-center">
                             {serviceLoadSource !== "stored" ? (
                               <button
                                 type="button"
-                                onClick={(e) => {
-                                  e.stopPropagation();
+                                onClick={() => {
                                   setSelectedGroupNames([group.groupName]);
                                   openSyncModal(browseProvider, "selected");
                                 }}
-                                className={`px-3 py-1.5 rounded-xl font-bold text-xs transition-all flex items-center gap-1 border ${
-                                  group.services.some((s) => s.isImported)
-                                    ? "bg-emerald-500/15 text-emerald-400 hover:bg-emerald-500/25 border-emerald-500/30"
-                                    : "bg-sky-500/10 text-sky-500 hover:bg-sky-500/20 border-sky-500/20"
-                                }`}
+                                className="px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-xl font-bold text-xs transition-all flex items-center gap-1 border bg-sky-500/10 text-sky-500 hover:bg-sky-500/20 border-sky-500/20"
                                 title="استيراد وتفعيل هذه الباقة"
                               >
-                                <span className="material-symbols-outlined text-xs">
-                                  {group.services.some((s) => s.isImported) ? "check_circle" : "cloud_download"}
-                                </span>
-                                <span>
-                                  {group.services.some((s) => s.isImported) ? "تم الاستيراد (تحديث)" : "استيراد الباقة"}
-                                </span>
+                                <span className="material-symbols-outlined text-xs">cloud_download</span>
+                                <span>استيراد الباقة</span>
                               </button>
                             ) : (
                               <button
                                 type="button"
                                 onClick={() => handleToggleSinglePackage(group.groupName, !group.isAllActive)}
-                                className={`px-3 py-1.5 rounded-xl font-bold text-xs transition-all flex items-center gap-1 border disabled:opacity-40 disabled:cursor-not-allowed ${
+                                className={`px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-xl font-bold text-xs transition-all flex items-center gap-1 border ${
                                   group.isAllActive
                                     ? "bg-red-500/10 text-red-400 hover:bg-red-500/20 border-red-500/20"
                                     : "bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 border-emerald-500/20"
                                 }`}
-                                title={group.isAllActive ? "إخفاء كل خدمات هذه الباقة عن المتجر" : "إظهار كل خدمات هذه الباقة للعملاء"}
+                                title={group.isAllActive ? "إخفاء كل خدمات هذه الباقة عن المتجر" : "تفعيل وإظهار كل خدمات الباقة في المتجر"}
                               >
                                 <span className="material-symbols-outlined text-xs">
                                   {group.isAllActive ? "visibility_off" : "visibility"}
@@ -1519,81 +1505,63 @@ export default function ProvidersClient() {
                               </button>
                             )}
 
-                            {/* Expand / Collapse Button */}
                             <button
                               type="button"
                               onClick={() => toggleGroupExpand(group.groupName)}
-                              className="px-2.5 py-1.5 rounded-xl bg-surface-container-highest hover:bg-surface-container text-on-surface-variant hover:text-on-surface text-xs font-bold transition-all flex items-center gap-1 border border-outline-variant/20"
+                              className="px-2.5 py-1 sm:py-1.5 rounded-xl bg-surface-container-highest hover:bg-surface-container text-on-surface-variant hover:text-on-surface text-xs font-bold transition-all flex items-center gap-1 border border-outline-variant/20"
                             >
-                              <span>{isExpanded ? "طي" : "عرض الخدمات"}</span>
-                              <span className="material-symbols-outlined text-sm">
-                                {isExpanded ? "expand_less" : "expand_more"}
+                              <span>عرض الخدمات</span>
+                              <span className={`material-symbols-outlined text-sm transition-transform ${isExpanded ? "rotate-180" : ""}`}>
+                                expand_more
                               </span>
                             </button>
                           </div>
                         </div>
 
-                        {/* Services Under this Package */}
+                        {/* Services List Inside This Package */}
                         {isExpanded && (
-                          <div className="divide-y divide-outline-variant/10 bg-surface/60">
+                          <div className="p-2 sm:p-3 space-y-2 bg-surface-container-lowest/70 divide-y divide-outline-variant/10">
                             {group.services.map((srv) => {
+                              const srvType = getProviderServiceType(srv);
                               const reqFields = getServiceRequiredFields(srv);
 
                               return (
                                 <div
                                   key={srv.id}
-                                  className={`p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-colors ${
-                                    !srv.isActive ? "bg-red-500/5 opacity-70" : "hover:bg-surface-container-high/30"
-                                  }`}
+                                  className="pt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs"
                                 >
-                                  <div className="space-y-1.5 flex-1">
-                                    <div className="font-bold text-on-surface text-xs flex items-center gap-2 flex-wrap">
+                                  <div className="space-y-1">
+                                    <div className="font-bold text-on-surface flex items-center gap-2 flex-wrap">
                                       <span>{srv.name}</span>
-                                      <span className="text-[9px] px-2 py-0.5 rounded-md bg-primary/10 text-primary border border-primary/20 font-mono">
-                                        {getProviderServiceTypeLabel(getProviderServiceType(srv))}
+                                      <span className="text-[9px] px-1.5 py-0.5 rounded bg-primary/10 text-primary border border-primary/20 font-mono">
+                                        {getProviderServiceTypeLabel(srvType)}
                                       </span>
-                                      {!srv.isActive && (
-                                        <span className="text-[10px] bg-red-500/15 text-red-400 px-1.5 py-0.2 rounded font-semibold">
-                                          مخفية
-                                        </span>
-                                      )}
+                                      <span className="text-primary font-mono font-bold text-xs">
+                                        ${Number(srv.providerPrice || srv.price || 0).toFixed(2)}
+                                      </span>
                                     </div>
 
-                                    {/* Cost & Delivery Time */}
-                                    <div className="text-[10px] text-on-surface-variant flex items-center gap-3">
-                                      <span className="font-mono text-primary font-bold">
-                                        التكلفة: ${(srv.credit || 0).toFixed(2)}
+                                    {/* Fields Details Tag */}
+                                    <div className="flex items-center gap-1.5 flex-wrap">
+                                      <span className="text-[10px] text-on-surface-variant font-medium">
+                                        الحقول المطلوبة للطلب:
                                       </span>
-                                      <span>•</span>
-                                      <span>وقت التسليم: {srv.time || "1-24h"}</span>
-                                    </div>
-
-                                    {/* REQUIRED INPUT FIELDS BADGES */}
-                                    <div className="flex flex-wrap items-center gap-1.5 pt-1">
-                                      <span className="text-[10px] text-on-surface-variant font-bold flex items-center gap-1">
-                                        <span className="material-symbols-outlined text-xs text-secondary">input</span>
-                                        <span>الحقول المطلوبة من العميل للمزود:</span>
-                                      </span>
-
-                                      {reqFields.map((rf, rfIdx) => (
+                                      {reqFields.map((f, idx) => (
                                         <span
-                                          key={rfIdx}
-                                          className="text-[10px] px-2 py-0.5 rounded-lg bg-surface-container-high border border-primary/30 text-primary font-bold flex items-center gap-1 shadow-2xs font-mono"
-                                          title={rf.options && rf.options.length > 0 ? `خيارات: ${rf.options.join(" | ")}` : rf.label}
+                                          key={idx}
+                                          className={`text-[9px] px-1.5 py-0.5 rounded-md border font-mono ${
+                                            f.required
+                                              ? "bg-amber-500/10 border-amber-500/30 text-amber-300"
+                                              : "bg-surface-container-high border-outline-variant/20 text-on-surface-variant"
+                                          }`}
                                         >
-                                          <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
-                                          <span>{rf.label}</span>
-                                          {rf.options && rf.options.length > 0 && (
-                                            <span className="text-[9px] bg-primary/20 text-primary px-1 rounded">
-                                              {rf.options.length} خيارات
-                                            </span>
-                                          )}
+                                          {f.label} {f.required ? "*" : "(اختياري)"}
                                         </span>
                                       ))}
                                     </div>
                                   </div>
 
-                                  <div className="flex items-center gap-3 self-end sm:self-center">
+                                  <div className="flex items-center gap-1.5 self-end sm:self-center">
                                     {serviceLoadSource !== "stored" ? (
                                       <button
                                         type="button"
@@ -1637,8 +1605,15 @@ export default function ProvidersClient() {
                   })}
 
                   {visibleGroupsLimit < filteredGroups.length && (
-                    <div className="p-3 text-center text-xs text-on-surface-variant">
-                      جاري تحميل المزيد من الباقات مع التمرير ({visibleGroupsLimit} من أصل {filteredGroups.length})...
+                    <div className="p-3 text-center">
+                      <button
+                        type="button"
+                        onClick={() => setVisibleGroupsLimit((prev) => prev + 50)}
+                        className="px-4 py-2.5 rounded-xl bg-surface-container-high hover:bg-surface-container-highest text-primary font-bold text-xs border border-primary/20 transition-all shadow-sm flex items-center gap-1.5 mx-auto"
+                      >
+                        <span className="material-symbols-outlined text-sm">expand_more</span>
+                        <span>تحميل المزيد من الباقات ({visibleGroupsLimit} من أصل {filteredGroups.length}) ⬇️</span>
+                      </button>
                     </div>
                   )}
                 </>
