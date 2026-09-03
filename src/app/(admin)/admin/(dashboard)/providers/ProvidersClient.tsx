@@ -360,7 +360,22 @@ export default function ProvidersClient() {
         showToast(data.message || `تمت المزامنة بنجاح! تم جلب وتحديث ${data.count} خدمة.`);
         await fetchProviders();
         if (browseProvider && browseProvider.id === p.id) {
-          await handleBrowseServices(p);
+          if (syncMode === "selected" && serviceLoadSource === "remote") {
+            // Keep remote catalog so user can select and import MORE packages without losing anything!
+            const importedGroupNames = new Set(selectedGroupNames);
+            setProviderServices((prev) =>
+              prev.map((s) => {
+                const g = s.groupName || s.group_name || "باقة عامة";
+                if (importedGroupNames.has(g)) {
+                  return { ...s, isImported: true, isActive: true };
+                }
+                return s;
+              })
+            );
+            setSelectedGroupNames([]);
+          } else {
+            await handleBrowseServices(p, serviceLoadSource || "auto");
+          }
         }
       } else {
         showToast(data.error || "فشلت المزامنة من المزود", "error");
@@ -372,10 +387,9 @@ export default function ProvidersClient() {
     }
   };
 
-  const handleBrowseServices = async (provider: Provider) => {
+  const handleBrowseServices = async (provider: Provider, forceSource?: "stored" | "remote" | "auto") => {
     setBrowseProvider(provider);
     setLoadingServices(true);
-    setServiceLoadSource(null);
     setServiceSearch("");
     setPackageFilter("all");
     setSelectedGroupNames([]);
@@ -383,15 +397,16 @@ export default function ProvidersClient() {
     setServiceTypeFilter("all");
     setVisibleGroupsLimit(25);
     try {
+      const preferred = forceSource || (serviceLoadSource || "auto");
       const result = await loadProviderServicesForBrowse(provider.id, async (url: string) => {
         const res = await fetch(url, { cache: "no-store" });
         const data = await res.json().catch(() => ({}));
         return { ok: res.ok, data };
-      });
+      }, preferred);
       setProviderServices(result.services);
       setServiceLoadSource(result.source);
       setProviders((current) => current.map((item) => (
-        item.id === provider.id ? { ...item, servicesCount: result.services.length } : item
+        item.id === provider.id && result.source === "stored" ? { ...item, servicesCount: result.services.length } : item
       )));
     } catch (error) {
       setProviderServices([]);
@@ -1129,6 +1144,48 @@ export default function ProvidersClient() {
               </button>
             </div>
 
+            {/* View Switcher Tabs: Live Provider Catalog vs Stored In Store */}
+            <div className="flex flex-wrap items-center justify-between gap-3 p-2 bg-surface-container-lowest border border-outline-variant/30 rounded-2xl">
+              <div className="flex items-center gap-2 flex-wrap">
+                <button
+                  type="button"
+                  onClick={() => handleBrowseServices(browseProvider, "remote")}
+                  disabled={loadingServices}
+                  className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
+                    serviceLoadSource === "remote"
+                      ? "bg-sky-500 text-white shadow-md"
+                      : "bg-surface-container hover:bg-surface-container-high text-on-surface-variant hover:text-on-surface"
+                  }`}
+                  title="عرض كل باقات وخدمات المزود من الـ API مباشرة لاختيار واستيراد باقات جديدة"
+                >
+                  <span className="material-symbols-outlined text-sm">cloud_sync</span>
+                  <span>تصفح واستيراد باقات جديدة (API Live)</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => handleBrowseServices(browseProvider, "stored")}
+                  disabled={loadingServices}
+                  className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
+                    serviceLoadSource === "stored"
+                      ? "bg-primary text-on-primary shadow-md"
+                      : "bg-surface-container hover:bg-surface-container-high text-on-surface-variant hover:text-on-surface"
+                  }`}
+                  title="عرض الخدمات المستوردة حالياً في الموقع للتحكم في ظهورها وهوامش الربح"
+                >
+                  <span className="material-symbols-outlined text-sm">inventory_2</span>
+                  <span>الخدمات المضافة في الموقع ({browseProvider.servicesCount || 0})</span>
+                </button>
+              </div>
+
+              {serviceLoadSource === "remote" && (
+                <span className="text-[11px] text-sky-400 font-bold bg-sky-500/10 border border-sky-500/20 px-3 py-1 rounded-xl flex items-center gap-1">
+                  <span className="material-symbols-outlined text-xs">tune</span>
+                  <span>يمكنك تحديد واستيراد أي باقة ولن تختفي باقي الباقات</span>
+                </span>
+              )}
+            </div>
+
             {/* Quick Bulk Actions Toolbar */}
             <div className="flex flex-wrap items-center justify-between gap-2.5 p-3 rounded-2xl bg-surface-container-lowest border border-outline-variant/20 text-xs">
               <div className="flex items-center gap-2 flex-wrap">
@@ -1430,11 +1487,19 @@ export default function ProvidersClient() {
                                   setSelectedGroupNames([group.groupName]);
                                   openSyncModal(browseProvider, "selected");
                                 }}
-                                className="px-3 py-1.5 rounded-xl font-bold text-xs transition-all flex items-center gap-1 border bg-sky-500/10 text-sky-500 hover:bg-sky-500/20 border-sky-500/20"
+                                className={`px-3 py-1.5 rounded-xl font-bold text-xs transition-all flex items-center gap-1 border ${
+                                  group.services.some((s) => s.isImported)
+                                    ? "bg-emerald-500/15 text-emerald-400 hover:bg-emerald-500/25 border-emerald-500/30"
+                                    : "bg-sky-500/10 text-sky-500 hover:bg-sky-500/20 border-sky-500/20"
+                                }`}
                                 title="استيراد وتفعيل هذه الباقة"
                               >
-                                <span className="material-symbols-outlined text-xs">cloud_download</span>
-                                <span>استيراد الباقة</span>
+                                <span className="material-symbols-outlined text-xs">
+                                  {group.services.some((s) => s.isImported) ? "check_circle" : "cloud_download"}
+                                </span>
+                                <span>
+                                  {group.services.some((s) => s.isImported) ? "تم الاستيراد (تحديث)" : "استيراد الباقة"}
+                                </span>
                               </button>
                             ) : (
                               <button
