@@ -227,11 +227,102 @@ export default function Footer({ dict, lang = "ar" }: FooterProps) {
           </div>
         </div>
 
+        {/* Contact Strip: Site Name, WhatsApp, Email, & Support */}
+        <div className="pt-6 border-t border-outline-variant/20 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+          {/* Site Name & Identity */}
+          <div className="flex items-center gap-3 p-3 rounded-2xl bg-surface-container-high/40 border border-outline-variant/20">
+            <div className="w-9 h-9 rounded-xl bg-primary/10 border border-primary/30 flex items-center justify-center text-primary shrink-0">
+              <span className="material-symbols-outlined text-lg">domain</span>
+            </div>
+            <div>
+              <p className="text-[10px] text-on-surface-variant font-medium">
+                {lang === "ar" ? "اسم المنصة الرسمية" : "Official Platform"}
+              </p>
+              <p className="font-bold text-on-surface text-xs mt-0.5">
+                {lang === "ar" ? "عرب تك برو سيرفر" : "Arab Tech Pro Server"}
+              </p>
+            </div>
+          </div>
+
+          {/* WhatsApp Admin 1 */}
+          <a
+            href="https://wa.me/16728972935"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-3 p-3 rounded-2xl bg-surface-container-high/40 hover:bg-emerald-500/10 border border-outline-variant/20 hover:border-emerald-500/40 transition-all duration-200 group"
+          >
+            <div className="w-9 h-9 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shrink-0 group-hover:scale-105 transition-transform">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12.012 2c-5.506 0-9.989 4.478-9.99 9.984 0 1.762.459 3.48 1.332 5.001L2 22l5.148-1.348c1.472.802 3.13 1.224 4.863 1.225h.005c5.505 0 9.989-4.478 9.99-9.985 0-2.668-1.039-5.176-2.927-7.062A9.923 9.923 0 0 0 12.012 2zm.005 16.521h-.004c-1.493 0-2.957-.401-4.232-1.157l-.304-.18-3.146.825.839-3.067-.198-.315c-.832-1.323-1.272-2.859-1.272-4.436 0-4.492 3.656-8.147 8.152-8.147 2.176 0 4.221.848 5.76 2.387a8.096 8.096 0 0 1 2.384 5.763c0 4.493-3.656 8.147-8.152 8.147zm4.469-6.108c-.245-.123-1.452-.716-1.677-.798-.225-.082-.389-.123-.553.123-.164.246-.635.798-.778.962-.143.164-.286.184-.531.062-.245-.123-1.037-.382-1.976-1.219-.73-.651-1.223-1.455-1.366-1.7-.143-.246-.015-.379.108-.501.111-.11.245-.286.368-.429.123-.143.164-.246.245-.409.082-.164.041-.307-.02-.429-.062-.123-.553-1.332-.757-1.822-.204-.49-.409-.419-.553-.429h-.471c-.164 0-.429.062-.654.307-.225.246-.86.84-.86 2.05 0 1.209.88 2.373 1.002 2.537.123.164 1.733 2.646 4.198 3.712.586.254 1.044.406 1.401.52.59.187 1.127.16 1.551.097.473-.07 1.452-.593 1.656-1.166.204-.573.204-1.064.143-1.166-.061-.102-.225-.164-.47-.287z"/></svg>
+            </div>
+            <div>
+              <p className="text-[10px] text-on-surface-variant font-medium">
+                {lang === "ar" ? "واتساب الدعم والإدارة" : "WhatsApp Admin"}
+              </p>
+              <p className="font-bold text-emerald-400 font-mono text-xs mt-0.5" dir="ltr">
+                +1 (672) 897-2935
+              </p>
+            </div>
+          </a>
+
+          {/* WhatsApp Admin 2 */}
+          <a
+            href="https://wa.me/249123667227"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-3 p-3 rounded-2xl bg-surface-container-high/40 hover:bg-emerald-500/10 border border-outline-variant/20 hover:border-emerald-500/40 transition-all duration-200 group"
+          >
+            <div className="w-9 h-9 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shrink-0 group-hover:scale-105 transition-transform">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12.012 2c-5.506 0-9.989 4.478-9.99 9.984 0 1.762.459 3.48 1.332 5.001L2 22l5.148-1.348c1.472.802 3.13 1.224 4.863 1.225h.005c5.505 0 9.989-4.478 9.99-9.985 0-2.668-1.039-5.176-2.927-7.062A9.923 9.923 0 0 0 12.012 2zm.005 16.521h-.004c-1.493 0-2.957-.401-4.232-1.157l-.304-.18-3.146.825.839-3.067-.198-.315c-.832-1.323-1.272-2.859-1.272-4.436 0-4.492 3.656-8.147 8.152-8.147 2.176 0 4.221.848 5.76 2.387a8.096 8.096 0 0 1 2.384 5.763c0 4.493-3.656 8.147-8.152 8.147zm4.469-6.108c-.245-.123-1.452-.716-1.677-.798-.225-.082-.389-.123-.553.123-.164.246-.635.798-.778.962-.143.164-.286.184-.531.062-.245-.123-1.037-.382-1.976-1.219-.73-.651-1.223-1.455-1.366-1.7-.143-.246-.015-.379.108-.501.111-.11.245-.286.368-.429.123-.143.164-.246.245-.409.082-.164.041-.307-.02-.429-.062-.123-.553-1.332-.757-1.822-.204-.49-.409-.419-.553-.429h-.471c-.164 0-.429.062-.654.307-.225.246-.86.84-.86 2.05 0 1.209.88 2.373 1.002 2.537.123.164 1.733 2.646 4.198 3.712.586.254 1.044.406 1.401.52.59.187 1.127.16 1.551.097.473-.07 1.452-.593 1.656-1.166.204-.573.204-1.064.143-1.166-.061-.102-.225-.164-.47-.287z"/></svg>
+            </div>
+            <div>
+              <p className="text-[10px] text-on-surface-variant font-medium">
+                {lang === "ar" ? "واتساب خدمة العملاء" : "Customer Support"}
+              </p>
+              <p className="font-bold text-emerald-400 font-mono text-xs mt-0.5" dir="ltr">
+                +249 12 366 7227
+              </p>
+            </div>
+          </a>
+
+          {/* Official Gmail */}
+          <a
+            href="mailto:arabtechserver@gmail.com"
+            className="flex items-center gap-3 p-3 rounded-2xl bg-surface-container-high/40 hover:bg-rose-500/10 border border-outline-variant/20 hover:border-rose-500/40 transition-all duration-200 group"
+          >
+            <div className="w-9 h-9 rounded-xl bg-rose-500/10 border border-rose-500/30 flex items-center justify-center text-rose-400 shrink-0 group-hover:scale-105 transition-transform">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+            </div>
+            <div className="overflow-hidden">
+              <p className="text-[10px] text-on-surface-variant font-medium">
+                {lang === "ar" ? "البريد الإلكتروني الرسمي" : "Official Support Email"}
+              </p>
+              <p className="font-bold text-rose-400 font-mono text-xs mt-0.5 truncate" dir="ltr">
+                arabtechserver@gmail.com
+              </p>
+            </div>
+          </a>
+        </div>
+
         {/* Bottom Copyright */}
-        <div className="pt-6 border-t border-outline-variant/20 flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-xs text-on-surface-variant">
-            &copy; {new Date().getFullYear()}. {dict.rights}
+        <div className="pt-4 border-t border-outline-variant/20 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-on-surface-variant">
+          <p className="flex items-center gap-1 flex-wrap text-center md:text-start">
+            <span>&copy; {new Date().getFullYear()}</span>
+            <span className="font-bold text-on-surface">عرب تك برو سيرفر - Arab Tech Pro Server.</span>
+            <span>{dict.rights || "جميع الحقوق محفوظة."}</span>
           </p>
+          <div className="flex items-center gap-4 text-[11px]">
+            <Link href={`/${lang}/terms`} className="hover:text-primary transition-colors">
+              {dict.terms || "شروط الخدمة"}
+            </Link>
+            <span>•</span>
+            <Link href={`/${lang}/refund`} className="hover:text-primary transition-colors">
+              {dict.refund || "سياسة الاسترجاع"}
+            </Link>
+            <span>•</span>
+            <Link href={`/${lang}/contact`} className="hover:text-primary transition-colors">
+              {dict.contact || "تواصل معنا"}
+            </Link>
+          </div>
         </div>
       </div>
     </footer>
