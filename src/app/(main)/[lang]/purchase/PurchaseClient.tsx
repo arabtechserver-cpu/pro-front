@@ -815,23 +815,7 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
             if (isImeiService || hasCustomFields) {
               return (
                 <div className="space-y-6">
-                  {/* ── حالة: خدمة IMEI بدون حقول مخصصة من المزود ── */}
-                  {isImeiService && !hasCustomFields && (
-                    <div className="flex flex-col gap-2">
-                      <label className="text-xs font-bold text-on-surface-variant uppercase tracking-wider flex items-center justify-between">
-                        <span>{lang === 'ar' ? 'رقم الـ IMEI / الرقم التسلسلي' : 'Target IMEI / Serial Number'}</span>
-                        <span className="text-primary/70 text-[11px] font-normal">{lang === 'ar' ? '(اختياري)' : '(Optional)'}</span>
-                      </label>
-                      <input
-                        type="text"
-                        value={targetInput}
-                        onChange={(e) => setTargetInput(e.target.value)}
-                        placeholder={lang === 'ar' ? 'أدخل رقم الـ IMEI الخاص بالجهاز (15 رقم) أو Serial...' : 'Enter 15-digit IMEI or device Serial number...'}
-                        className="w-full bg-surface-container-lowest border border-outline-variant/40 rounded-xl py-3.5 px-4 text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all font-mono text-sm dir-ltr"
-                      />
-                    </div>
-                  )}
-
+                  {/* تم إخفاء حقل IMEI اليدوي بناءً على طلبك */}
                   {/* ── حالة: المزود أرسل حقول مخصصة (Custom Fields) ── */}
                   {hasCustomFields && (
                     <div className="space-y-4 p-5 rounded-2xl bg-surface-container-high/40 border border-primary/20">
@@ -940,27 +924,8 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
             }
 
             // ── حالة: خدمة سيرفر عامة لا تتطلب حقول مخصصة إجبارية من المزود
-            return (
-              <div className="space-y-3">
-                <div className="flex flex-col gap-2">
-                  <label className="text-xs font-bold text-on-surface-variant uppercase tracking-wider flex items-center justify-between">
-                    <span>{lang === 'ar' ? 'رقم الـ IMEI / بيانات الحساب المستهدف' : 'Target IMEI / Account Data'}</span>
-                    <span className="text-primary/70 text-[11px] font-normal">{lang === 'ar' ? '(اختياري)' : '(Optional)'}</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={targetInput}
-                    onChange={(e) => setTargetInput(e.target.value)}
-                    placeholder={lang === 'ar' ? 'أدخل رقم الـ IMEI أو الإيميل أو المعرف المستهدف للخدمة...' : 'Enter target IMEI, email or device ID...'}
-                    className="w-full bg-surface-container-lowest border border-outline-variant/40 rounded-xl py-3.5 px-4 text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all font-mono text-sm dir-ltr"
-                  />
-                </div>
-                <p className="text-[11px] text-primary/90 flex items-center gap-1.5 px-1">
-                  <span className="material-symbols-outlined text-xs">verified</span>
-                  <span>{lang === 'ar' ? 'يرجى كتابة رقم الـ IMEI أو اسم الحساب المطلوب لهذه الخدمة بشكل صحيح.' : 'Please enter the required IMEI or account details for this service correctly.'}</span>
-                </p>
-              </div>
-            );
+            // تم إخفاء حقل الإدخال اليدوي بناءً على طلبك
+            return null;
           })()}
 
           {/* Quantity & Notes — الكمية تظهر فقط لو API المزود يدعمها */}
