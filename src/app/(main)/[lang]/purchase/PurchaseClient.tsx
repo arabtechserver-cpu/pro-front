@@ -405,35 +405,22 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
         .map(([k, v]) => `${k}: ${v}`)
         .join(" | ");
 
-      if (isImeiService && !hasCustomFields) {
-        // خدمة IMEI بدون حقول مخصصة — الـ targetInput إجباري
-        if (!targetInput.trim()) {
-          setSubmitFeedback({ 
-            type: "error", 
-            text: lang === 'ar' ? 'يرجى إدخال رقم الـ IMEI أو Serial الخاص بالجهاز' : 'Please enter the target IMEI/Serial number.' 
-          });
-          return;
-        }
+      // خدمة بها حقول مخصصة من المزود (تشمل IMEI/LOCK CODE/إلخ)
+      // نبحث عن أول حقل IMEI أساسي في حقول المزود لاستخدامه كـ rawImei
+      const imeiKey = Object.keys(providerFields).find(k => {
+        const f = providerFields[k];
+        return isPrimaryImeiProviderField(k, f);
+      });
+      if (imeiKey && customFieldValues[imeiKey]) {
+        rawImeiStr = customFieldValues[imeiKey];
+      } else if (targetInput.trim()) {
         rawImeiStr = targetInput.trim();
-        payloadTarget = customString ? `IMEI: ${targetInput.trim()} | ${customString}` : `IMEI: ${targetInput.trim()}`;
-      } else {
-        // خدمة بها حقول مخصصة من المزود (تشمل IMEI/LOCK CODE/إلخ)
-        // نبحث عن أول حقل IMEI أساسي في حقول المزود لاستخدامه كـ rawImei
-        const imeiKey = Object.keys(providerFields).find(k => {
-          const f = providerFields[k];
-          return isPrimaryImeiProviderField(k, f);
-        });
-        if (imeiKey && customFieldValues[imeiKey]) {
-          rawImeiStr = customFieldValues[imeiKey];
-        } else if (targetInput.trim()) {
-          rawImeiStr = targetInput.trim();
-        }
+      }
 
-        if (targetInput.trim() && customString) {
-          payloadTarget = `${targetInput.trim()} | ${customString}`;
-        } else {
-          payloadTarget = customString || targetInput.trim() || (lang === 'ar' ? 'طلب فوري' : 'Instant Order');
-        }
+      if (targetInput.trim() && customString) {
+        payloadTarget = `${targetInput.trim()} | ${customString}`;
+      } else {
+        payloadTarget = customString || targetInput.trim() || (lang === 'ar' ? 'طلب فوري' : 'Instant Order');
       }
     } else if (isImeiService) {
       if (!targetInput.trim()) {
