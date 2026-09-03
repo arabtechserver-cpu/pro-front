@@ -290,7 +290,7 @@ export default async function Home(props: { params: Promise<{ lang: Locale }> })
           <Link href={imeiUrl} data-aos="fade-up" data-aos-delay="100" className="glass-card p-5 sm:p-6 rounded-xl sm:rounded-2xl border border-outline-variant/30 hover:border-primary/50 group transition-all relative overflow-hidden flex flex-col gap-3 sm:gap-4">
             <div 
               className="absolute inset-0 bg-cover bg-center opacity-50 group-hover:opacity-80 transition-opacity duration-500 z-0 pointer-events-none" 
-              style={{ backgroundImage: "url('/images/promo_imei.png')" }}
+              style={{ backgroundImage: "url('/images/promo_imei.webp')" }}
             ></div>
             <div className="absolute inset-0 bg-gradient-to-t from-[#0c1324]/90 via-[#0c1324]/40 to-transparent z-0 pointer-events-none"></div>
             <div className="relative z-10 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary text-lg sm:text-xl group-hover:bg-primary group-hover:text-on-primary transition-colors">
@@ -306,7 +306,7 @@ export default async function Home(props: { params: Promise<{ lang: Locale }> })
           <Link href={serverUrl} data-aos="fade-up" data-aos-delay="200" className="glass-card p-5 sm:p-6 rounded-xl sm:rounded-2xl border border-outline-variant/30 hover:border-secondary/50 group transition-all relative overflow-hidden flex flex-col gap-3 sm:gap-4">
             <div 
               className="absolute inset-0 bg-cover bg-center opacity-50 group-hover:opacity-80 transition-opacity duration-500 z-0 pointer-events-none" 
-              style={{ backgroundImage: "url('/images/promo_server.png')" }}
+              style={{ backgroundImage: "url('/images/promo_server.webp')" }}
             ></div>
             <div className="absolute inset-0 bg-gradient-to-t from-[#0c1324]/90 via-[#0c1324]/40 to-transparent z-0 pointer-events-none"></div>
             <div className="relative z-10 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-secondary/10 flex items-center justify-center text-secondary text-lg sm:text-xl group-hover:bg-secondary group-hover:text-on-secondary transition-colors">
@@ -322,7 +322,7 @@ export default async function Home(props: { params: Promise<{ lang: Locale }> })
           <Link href={remoteUrl} data-aos="fade-up" data-aos-delay="300" className="glass-card p-5 sm:p-6 rounded-xl sm:rounded-2xl border border-outline-variant/30 hover:border-tertiary/50 group transition-all relative overflow-hidden flex flex-col gap-3 sm:gap-4">
             <div 
               className="absolute inset-0 bg-cover bg-center opacity-50 group-hover:opacity-80 transition-opacity duration-500 z-0 pointer-events-none" 
-              style={{ backgroundImage: "url('/images/promo_remote.png')" }}
+              style={{ backgroundImage: "url('/images/promo_remote.webp')" }}
             ></div>
             <div className="absolute inset-0 bg-gradient-to-t from-[#0c1324]/90 via-[#0c1324]/40 to-transparent z-0 pointer-events-none"></div>
             <div className="relative z-10 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-tertiary/10 flex items-center justify-center text-tertiary text-lg sm:text-xl group-hover:bg-tertiary group-hover:text-on-tertiary transition-colors">
@@ -338,7 +338,7 @@ export default async function Home(props: { params: Promise<{ lang: Locale }> })
           <Link href={storeUrl} data-aos="fade-up" data-aos-delay="400" className="glass-card p-5 sm:p-6 rounded-xl sm:rounded-2xl border border-outline-variant/30 hover:border-primary/50 group transition-all relative overflow-hidden flex flex-col gap-3 sm:gap-4">
             <div 
               className="absolute inset-0 bg-cover bg-center opacity-50 group-hover:opacity-80 transition-opacity duration-500 z-0 pointer-events-none" 
-              style={{ backgroundImage: "url('/images/promo_store.png')" }}
+              style={{ backgroundImage: "url('/images/promo_store.webp')" }}
             ></div>
             <div className="absolute inset-0 bg-gradient-to-t from-[#0c1324]/90 via-[#0c1324]/40 to-transparent z-0 pointer-events-none"></div>
             <div className="relative z-10 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-surface-container-highest flex items-center justify-center text-on-surface text-lg sm:text-xl group-hover:bg-on-surface group-hover:text-surface-container-lowest transition-colors">
