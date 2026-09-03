@@ -209,3 +209,158 @@ html, body {
   animation: onlineBlink 1.5s ease-in-out infinite;
 }
 
+/* --- Vertical Light Beams & Cyber Scanners (حاجات بالطول بتتحرك وبتنور) --- */
+@keyframes verticalBeamDown {
+  0% {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(400%);
+    opacity: 0;
+  }
+}
+
+@keyframes verticalBeamUp {
+  0% {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-400%);
+    opacity: 0;
+  }
+}
+
+@keyframes laserScanVertical {
+  0% {
+    top: -20%;
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.9;
+  }
+  80% {
+    opacity: 0.9;
+  }
+  100% {
+    top: 110%;
+    opacity: 0;
+  }
+}
+
+@keyframes neonBorderShift {
+  0%, 100% {
+    border-color: rgba(52, 211, 153, 0.45);
+    box-shadow: 0 0 25px rgba(52, 211, 153, 0.2), inset 0 0 15px rgba(52, 211, 153, 0.05);
+  }
+  33% {
+    border-color: rgba(34, 211, 238, 0.6);
+    box-shadow: 0 0 35px rgba(34, 211, 238, 0.25), inset 0 0 20px rgba(34, 211, 238, 0.08);
+  }
+  66% {
+    border-color: rgba(168, 85, 247, 0.5);
+    box-shadow: 0 0 30px rgba(168, 85, 247, 0.2), inset 0 0 15px rgba(168, 85, 247, 0.05);
+  }
+}
+
+@keyframes rocketWiggle {
+  0%, 100% {
+    transform: rotate(0deg) translateY(0);
+  }
+  25% {
+    transform: rotate(-10deg) translateY(-2px);
+  }
+  75% {
+    transform: rotate(10deg) translateY(2px);
+  }
+}
+
+@keyframes lightShimmerSweep {
+  0% {
+    transform: translateX(-150%) skewX(-20deg);
+  }
+  100% {
+    transform: translateX(250%) skewX(-20deg);
+  }
+}
+
+@keyframes cardFloatGentle {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes progressGlowPulse {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.animate-vertical-stream-1 {
+  animation: verticalBeamDown 3.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.animate-vertical-stream-2 {
+  animation: verticalBeamDown 4.8s cubic-bezier(0.4, 0, 0.6, 1) 1.2s infinite;
+}
+
+.animate-vertical-stream-3 {
+  animation: verticalBeamDown 3.8s cubic-bezier(0.4, 0, 0.6, 1) 2.4s infinite;
+}
+
+.animate-vertical-stream-up {
+  animation: verticalBeamUp 4s cubic-bezier(0.4, 0, 0.6, 1) 0.6s infinite;
+}
+
+.animate-laser-scan {
+  animation: laserScanVertical 3s ease-in-out infinite;
+}
+
+.animate-neon-border {
+  animation: neonBorderShift 4s ease-in-out infinite;
+}
+
+.animate-rocket-wiggle {
+  animation: rocketWiggle 1.8s ease-in-out infinite;
+}
+
+.animate-shimmer {
+  animation: lightShimmerSweep 2.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+.animate-card-float {
+  animation: cardFloatGentle 5s ease-in-out infinite;
+}
+
+.animate-card-float-delayed {
+  animation: cardFloatGentle 5s ease-in-out 2.5s infinite;
+}
+
+.animate-progress-glow {
+  background-size: 200% 200%;
+  animation: progressGlowPulse 2.5s ease infinite;
+}
+
+

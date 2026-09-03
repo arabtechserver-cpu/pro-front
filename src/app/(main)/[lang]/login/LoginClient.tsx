@@ -163,7 +163,7 @@ export default function LoginClient({ lang, dict }: { lang: Locale; dict: any })
 
       if (res.ok && data.success) {
         setForgotStep("otp_verify");
-        setForgotSuccess(lang === "ar" ? `تم إرسال كود تفعيل كلمة المرور إلى: ${forgotEmail} عبر Loops` : `OTP sent to: ${forgotEmail}`);
+        setForgotSuccess(lang === "ar" ? `تم إرسال كود تفعيل كلمة المرور إلى: ${forgotEmail}` : `OTP sent to: ${forgotEmail}`);
       } else {
         setForgotError(data.error || "فشل إرسال كود التفعيل");
       }
@@ -393,7 +393,7 @@ export default function LoginClient({ lang, dict }: { lang: Locale; dict: any })
                 </div>
                 <div>
                   <h3 className="font-bold text-on-surface text-base">استعادة كلمة المرور</h3>
-                  <p className="text-xs text-on-surface-variant">إرسال كود تفعيل OTP عبر Loops إلى بريدك الإلكتروني</p>
+                  <p className="text-xs text-on-surface-variant">إرسال كود التحقق OTP إلى بريدك الإلكتروني</p>
                 </div>
               </div>
               <button 
@@ -442,7 +442,7 @@ export default function LoginClient({ lang, dict }: { lang: Locale; dict: any })
                     {forgotLoading ? (
                       <>
                         <span className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></span>
-                        <span>جاري إرسال OTP عبر Loops...</span>
+                        <span>جاري إرسال كود OTP...</span>
                       </>
                     ) : (
                       <>

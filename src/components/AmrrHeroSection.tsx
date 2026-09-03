@@ -17,6 +17,19 @@ export default function AmrrHeroSection({ lang }: AmrrHeroSectionProps) {
       <div className="absolute -top-32 -left-32 w-96 h-96 bg-cyan-500/10 rounded-full blur-[120px] pointer-events-none"></div>
       <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-purple-500/10 rounded-full blur-[120px] pointer-events-none"></div>
 
+      {/* Vertical Cyber Light Beams (حاجات بالطول بتتحرك وبتنور) */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute left-[15%] top-0 bottom-0 w-[1px] bg-gradient-to-b from-transparent via-cyan-500/10 to-transparent">
+          <div className="w-full h-36 bg-gradient-to-b from-transparent via-cyan-400 to-transparent shadow-[0_0_15px_#22d3ee] animate-vertical-stream-1"></div>
+        </div>
+        <div className="absolute right-[20%] top-0 bottom-0 w-[1px] bg-gradient-to-b from-transparent via-emerald-500/10 to-transparent">
+          <div className="w-full h-44 bg-gradient-to-b from-transparent via-emerald-400 to-transparent shadow-[0_0_18px_#34d399] animate-vertical-stream-2"></div>
+        </div>
+        <div className="absolute right-[45%] top-0 bottom-0 w-[1px] bg-gradient-to-b from-transparent via-purple-500/10 to-transparent">
+          <div className="w-full h-28 bg-gradient-to-b from-transparent via-purple-400 to-transparent shadow-[0_0_12px_#c084fc] animate-vertical-stream-3"></div>
+        </div>
+      </div>
+
       <div className="relative z-10 flex flex-col lg:flex-row items-center h-full p-6 sm:p-10 lg:p-14 gap-10 lg:gap-8">
         
         {/* Left Side - Hero Content */}
