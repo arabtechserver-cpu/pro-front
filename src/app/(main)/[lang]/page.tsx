@@ -125,7 +125,7 @@ export default async function Home(props: { params: Promise<{ lang: Locale }> })
 
   const featTitle = isAr ? hp?.sidebarPromos?.featuredTitleAr : hp?.sidebarPromos?.featuredTitleEn;
   const featSub = isAr ? hp?.sidebarPromos?.featuredSubtitleAr : hp?.sidebarPromos?.featuredSubtitleEn;
-  const featImg = hp?.sidebarPromos?.featuredImage || "/images/promo_borneo.png";
+  const featImg = hp?.sidebarPromos?.featuredImage || "/images/promo_borneo.webp";
   const featUrl = formatUrl(hp?.sidebarPromos?.featuredUrl, "/pricing");
 
   const supportTitle = isAr ? hp?.sidebarPromos?.supportTitleAr : hp?.sidebarPromos?.supportTitleEn;

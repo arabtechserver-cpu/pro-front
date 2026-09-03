@@ -50,7 +50,7 @@ export default function CampaignSlider({ campaigns, lang }: { campaigns: Campaig
         >
           <div 
             className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
-            style={{ backgroundImage: `url('${current?.image || "/images/promo_samsung.png"}')` }}
+            style={{ backgroundImage: `url('${current?.image || "/images/promo_samsung.webp"}')` }}
           ></div>
           <div className="absolute inset-0 bg-gradient-to-t from-[#0c1324]/90 via-[#0c1324]/40 to-transparent opacity-80"></div>
           

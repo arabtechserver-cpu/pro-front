@@ -109,10 +109,10 @@ export async function generateMetadata(props: { params: Promise<{ lang: string }
     icons: {
       icon: [
         { url: "/favicon.ico", sizes: "any" },
-        { url: "/images/logo_en.png", type: "image/png" },
+        { url: "/images/icon-48.png", sizes: "48x48", type: "image/png" },
       ],
       shortcut: "/favicon.ico",
-      apple: "/images/logo_en.png",
+      apple: "/images/apple-touch-icon.png",
     },
     verification: {
       google: "N34n3oI-P5elZmLFHgFqp_BK93EijixhnIHEj_2oGnI",
