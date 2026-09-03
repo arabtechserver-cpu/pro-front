@@ -72,14 +72,16 @@ export async function generateMetadata(props: { params: Promise<{ lang: string }
     openGraph: {
       title: siteTitle,
       description: siteDesc,
-      url: "https://arabtechproserver.tech",
+      url: `https://arabtechproserver.tech/${params.lang}`,
       siteName: "Arab Tech Pro Server - عرب تك برو سيرفر",
       images: [
         {
-          url: "https://arabtechproserver.tech/images/og-image.png",
+          url: isAr
+            ? "https://arabtechproserver.tech/images/og_share_ar.png"
+            : "https://arabtechproserver.tech/images/og_share_en.png",
           width: 1200,
           height: 630,
-          alt: "Arab Tech Pro Server",
+          alt: "Arab Tech Pro Server Logo",
         },
       ],
       locale: isAr ? "ar_AR" : "en_US",
@@ -91,7 +93,11 @@ export async function generateMetadata(props: { params: Promise<{ lang: string }
       description: siteDesc,
       site: "@ARABTECHSUPPURT2",
       creator: "@ARABTECHSUPPURT2",
-      images: ["https://arabtechproserver.tech/images/og-image.png"],
+      images: [
+        isAr
+          ? "https://arabtechproserver.tech/images/og_share_ar.png"
+          : "https://arabtechproserver.tech/images/og_share_en.png",
+      ],
     },
     alternates: {
       canonical: "https://arabtechproserver.tech",
@@ -189,6 +195,14 @@ export default async function RootLayout(
           href={isAr ? "/images/hero_cyber_ar.webp" : "/images/hero_cyber_en.webp"}
           type="image/webp"
         />
+        {/* Explicit Meta tags for WhatsApp, Telegram, Facebook & Twitter link previews */}
+        <meta property="og:image" content={isAr ? "https://arabtechproserver.tech/images/og_share_ar.png" : "https://arabtechproserver.tech/images/og_share_en.png"} />
+        <meta property="og:image:secure_url" content={isAr ? "https://arabtechproserver.tech/images/og_share_ar.png" : "https://arabtechproserver.tech/images/og_share_en.png"} />
+        <meta property="og:image:type" content="image/png" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:image:alt" content="Arab Tech Pro Server Logo" />
+        <meta name="twitter:image" content={isAr ? "https://arabtechproserver.tech/images/og_share_ar.png" : "https://arabtechproserver.tech/images/og_share_en.png"} />
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" />
         <link
           rel="stylesheet"
