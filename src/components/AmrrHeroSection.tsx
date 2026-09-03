@@ -141,17 +141,24 @@ export default function AmrrHeroSection({ lang }: AmrrHeroSectionProps) {
             {/* Ambient Radial Pulsing Glow */}
             <div className="absolute inset-10 bg-gradient-to-tr from-emerald-500/20 via-cyan-500/25 to-purple-500/20 rounded-full blur-2xl animate-pulse-glow pointer-events-none"></div>
 
-            {/* Central Glass Orb */}
-            <div className="relative w-48 h-48 sm:w-56 sm:h-56 rounded-full bg-slate-900/80 backdrop-blur-xl border border-white/20 shadow-[0_0_50px_rgba(45,212,191,0.3)] flex flex-col items-center justify-center text-center p-4">
-              <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-gradient-to-tr from-emerald-500 to-cyan-500 flex items-center justify-center text-white text-3xl sm:text-4xl shadow-2xl mb-2.5 animate-pulse">
-                <i className="fas fa-unlock-alt"></i>
+            {/* Central 3D Cyber Holographic Orb Visual (Customized per Language) */}
+            <div className="relative w-52 h-52 sm:w-64 sm:h-64 rounded-full overflow-hidden border-2 border-cyan-400/50 shadow-[0_0_60px_rgba(45,212,191,0.4)] flex items-center justify-center group bg-slate-950">
+              <img
+                src={isAr ? "/images/hero_cyber_ar.jpg" : "/images/hero_cyber_en.jpg"}
+                alt={isAr ? "عرب تك برو سيرفر" : "Arab Tech Pro Server"}
+                className="w-full h-full object-cover rounded-full transform group-hover:scale-110 transition-transform duration-700"
+              />
+              {/* Subtle glass reflection & bottom dark vignette */}
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-white/10 pointer-events-none rounded-full"></div>
+
+              {/* Holographic Official Logo Badge at bottom */}
+              <div className="absolute bottom-2 sm:bottom-3 left-1/2 -translate-x-1/2 bg-slate-900/90 backdrop-blur-md px-3 sm:px-4 py-1 rounded-xl border border-cyan-400/40 flex items-center gap-1.5 shadow-lg max-w-[85%]">
+                <img
+                  src={isAr ? "/images/logo_ar.png" : "/images/logo_en.png"}
+                  alt="Arab Tech Pro Logo"
+                  className="h-4 sm:h-5 w-auto object-contain max-w-[120px]"
+                />
               </div>
-              <span className="text-white font-black text-sm sm:text-base tracking-widest uppercase">
-                ARAB TECH
-              </span>
-              <span className="text-emerald-400 font-extrabold text-xs tracking-wider">
-                PRO UNLOCKER
-              </span>
             </div>
 
             {/* Orbiting Floating Badge 1 - Top Left */}
