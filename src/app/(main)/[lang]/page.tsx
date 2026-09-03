@@ -4,6 +4,7 @@ import { getDictionary } from "@/i18n/get-dictionary";
 import { Locale } from "@/i18n/config";
 import NewsletterSection from "@/components/NewsletterSection";
 import CampaignSlider from "@/components/CampaignSlider";
+import LiveMetricsSection from "@/components/LiveMetricsSection";
 
 async function getHomepageConfig() {
   try {
@@ -384,6 +385,9 @@ export default async function Home(props: { params: Promise<{ lang: Locale }> })
           </div>
         </div>
       </section>
+
+      {/* --- Live Performance Metrics & Quick Action (Screenshot Feature) --- */}
+      <LiveMetricsSection lang={params.lang} />
 
       {/* --- Service Lanes --- */}
       <section className="container mx-auto px-4">

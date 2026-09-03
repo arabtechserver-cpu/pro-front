@@ -8,6 +8,7 @@ import { Locale } from "@/i18n/config";
 import AnalyticsTracker from "@/components/AnalyticsTracker";
 import AiChatWidget from "@/components/AiChatWidget";
 import ContactFloatingButton from "@/components/ContactFloatingButton";
+import FloatingSideDock from "@/components/FloatingSideDock";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const jakarta = Plus_Jakarta_Sans({ subsets: ["latin"], variable: "--font-jakarta" });
@@ -209,6 +210,9 @@ export default async function RootLayout(
 
         {/* Arab Tech Pro AI Chatbot Assistant */}
         <AiChatWidget />
+
+        {/* Floating Side Social Dock & Scroll to Top (Screenshot Match) */}
+        <FloatingSideDock lang={lang} />
       </body>
     </html>
   );
