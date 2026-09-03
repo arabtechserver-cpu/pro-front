@@ -23,6 +23,7 @@ export default function ServicesPage() {
   const [editCredit, setEditCredit] = useState<number>(0);
   const [editMargin, setEditMargin] = useState<number>(0);
   const [editIsActive, setEditIsActive] = useState<boolean>(true);
+  const [editFields, setEditFields] = useState<Array<{label: string; fieldname: string; fieldtype: string; required: boolean}>>([]);
   const [isSavingEdit, setIsSavingEdit] = useState(false);
 
   // Filter state (all, active, hidden, zeroPrice)
@@ -231,6 +232,25 @@ export default function ServicesPage() {
     setEditCredit(Number(service.credit) || 0);
     setEditMargin(Number(service.margin) || 0);
     setEditIsActive(service.isActive !== false);
+    // تحليل الحقول المخصصة الحالية للخدمة
+    try {
+      if (service.requiresCustom) {
+        const parsed = JSON.parse(service.requiresCustom);
+        const fields = Array.isArray(parsed)
+          ? parsed
+          : Object.entries(parsed).map(([k, v]: any) => ({
+              label: v?.label || k,
+              fieldname: k,
+              fieldtype: v?.fieldtype || 'text',
+              required: v?.required !== false
+            }));
+        setEditFields(fields);
+      } else {
+        setEditFields([]);
+      }
+    } catch {
+      setEditFields([]);
+    }
   };
 
   // Save Service Edits
@@ -240,6 +260,22 @@ export default function ServicesPage() {
 
     setIsSavingEdit(true);
     try {
+      // بناء requiresCustom JSON من الحقول المعدّلة
+      let requiresCustom: string | null = null;
+      if (editFields.length > 0) {
+        const fieldsObj: any = {};
+        editFields.forEach(f => {
+          if (f.fieldname.trim()) {
+            fieldsObj[f.fieldname.trim()] = {
+              label: f.label || f.fieldname,
+              fieldtype: f.fieldtype || 'text',
+              required: f.required !== false
+            };
+          }
+        });
+        requiresCustom = Object.keys(fieldsObj).length > 0 ? JSON.stringify(fieldsObj) : null;
+      }
+
       const res = await fetch("/api/dhru/services/update", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -248,7 +284,8 @@ export default function ServicesPage() {
           name: editName,
           credit: editCredit,
           margin: editMargin,
-          isActive: editIsActive
+          isActive: editIsActive,
+          requiresCustom
         })
       });
 
@@ -266,7 +303,8 @@ export default function ServicesPage() {
                 margin: Number(editMargin),
                 price: finalCalculated,
                 finalPrice: finalCalculated,
-                isActive: editIsActive
+                isActive: editIsActive,
+                requiresCustom
               } : s
             )
           }))
@@ -370,7 +408,7 @@ export default function ServicesPage() {
       {/* Enhanced Edit Single Service Modal */}
       {editingService && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in">
-          <div className="bg-surface-container border border-outline-variant/30 rounded-3xl p-6 sm:p-8 max-w-lg w-full shadow-2xl">
+          <div className="bg-surface-container border border-outline-variant/30 rounded-3xl p-6 sm:p-8 max-w-lg w-full shadow-2xl max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-6 pb-3 border-b border-outline-variant/20">
               <h3 className="text-xl font-bold text-on-surface flex items-center gap-2">
                 <span className="material-symbols-outlined text-primary">edit_square</span>
@@ -453,6 +491,91 @@ export default function ServicesPage() {
                   <span>السعر الإجمالي النهائي للعميل:</span>
                   <span className="font-mono text-lg font-bold">${((Number(editCredit) || 0) + (Number(editMargin) || 0)).toFixed(2)} USD</span>
                 </div>
+              </div>
+
+              {/* ── قسم إدارة الحقول المخصصة للخدمة ── */}
+              <div className="border border-outline-variant/30 rounded-2xl overflow-hidden">
+                <div className="bg-surface-container-low px-4 py-3 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="material-symbols-outlined text-base text-secondary">input</span>
+                    <span className="text-xs font-bold text-on-surface">حقول الإدخال للعميل عند الشراء</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setEditFields(prev => [...prev, { label: '', fieldname: `field_${Date.now()}`, fieldtype: 'text', required: true }])}
+                    className="flex items-center gap-1 text-[11px] bg-primary/10 text-primary px-3 py-1.5 rounded-lg hover:bg-primary/20 transition-colors font-bold"
+                  >
+                    <span className="material-symbols-outlined text-sm">add</span>
+                    إضافة حقل
+                  </button>
+                </div>
+
+                {editFields.length === 0 ? (
+                  <div className="px-4 py-5 text-center text-xs text-on-surface-variant">
+                    لا توجد حقول مخصصة — العميل يُدخل IMEI تلقائياً من حقل الهدف
+                  </div>
+                ) : (
+                  <div className="divide-y divide-outline-variant/20">
+                    {editFields.map((field, idx) => (
+                      <div key={idx} className="p-3 space-y-2 bg-surface">
+                        <div className="grid grid-cols-2 gap-2">
+                          <div>
+                            <label className="text-[10px] text-on-surface-variant font-bold block mb-1">اسم الحقل (يظهر للعميل)</label>
+                            <input
+                              type="text"
+                              value={field.label}
+                              onChange={e => setEditFields(prev => prev.map((f, i) => i === idx ? { ...f, label: e.target.value } : f))}
+                              placeholder="مثال: رقم IMEI"
+                              className="w-full px-3 py-2 bg-surface-container border border-outline-variant/40 rounded-lg text-xs outline-none focus:border-primary"
+                            />
+                          </div>
+                          <div>
+                            <label className="text-[10px] text-on-surface-variant font-bold block mb-1">المفتاح التقني (fieldname)</label>
+                            <input
+                              type="text"
+                              value={field.fieldname}
+                              onChange={e => setEditFields(prev => prev.map((f, i) => i === idx ? { ...f, fieldname: e.target.value.replace(/\s+/g, '_') } : f))}
+                              placeholder="مثال: imei"
+                              className="w-full px-3 py-2 bg-surface-container border border-outline-variant/40 rounded-lg text-xs font-mono outline-none focus:border-primary"
+                            />
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <div className="flex-1">
+                            <label className="text-[10px] text-on-surface-variant font-bold block mb-1">نوع الحقل</label>
+                            <select
+                              value={field.fieldtype}
+                              onChange={e => setEditFields(prev => prev.map((f, i) => i === idx ? { ...f, fieldtype: e.target.value } : f))}
+                              className="w-full px-3 py-2 bg-surface-container border border-outline-variant/40 rounded-lg text-xs outline-none focus:border-primary"
+                            >
+                              <option value="text">نص (text)</option>
+                              <option value="number">رقم (number)</option>
+                              <option value="textarea">نص طويل (textarea)</option>
+                              <option value="select">اختيار (select)</option>
+                            </select>
+                          </div>
+                          <div className="flex items-center gap-2 mt-4">
+                            <input
+                              type="checkbox"
+                              checked={field.required}
+                              onChange={e => setEditFields(prev => prev.map((f, i) => i === idx ? { ...f, required: e.target.checked } : f))}
+                              className="w-4 h-4 accent-primary"
+                              id={`req_${idx}`}
+                            />
+                            <label htmlFor={`req_${idx}`} className="text-xs text-on-surface-variant cursor-pointer">إجباري</label>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => setEditFields(prev => prev.filter((_, i) => i !== idx))}
+                            className="mt-4 p-1.5 text-error hover:bg-error/10 rounded-lg transition-colors"
+                          >
+                            <span className="material-symbols-outlined text-base">delete</span>
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
               <div className="flex gap-3 pt-2">

@@ -111,7 +111,7 @@ export default function Navbar({ lang, dict }: NavbarProps) {
             }
             const res = await fetch(`/api/users/profile?${queryParam}`, {
               headers,
-              credentials: "include"
+              credentials: "omit"  // لا نرسل cookies (admin_token) مع طلب البروفايل للمستخدم العادي
             });
             if (res.ok) {
               const data = await res.json().catch(() => null);

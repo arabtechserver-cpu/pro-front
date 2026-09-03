@@ -405,7 +405,8 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
         .map(([k, v]) => `${k}: ${v}`)
         .join(" | ");
 
-      if (isImeiService) {
+      if (isImeiService && !hasCustomFields) {
+        // خدمة IMEI بدون حقول مخصصة — الـ targetInput إجباري
         if (!targetInput.trim()) {
           setSubmitFeedback({ 
             type: "error", 
@@ -416,7 +417,8 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
         rawImeiStr = targetInput.trim();
         payloadTarget = customString ? `IMEI: ${targetInput.trim()} | ${customString}` : `IMEI: ${targetInput.trim()}`;
       } else {
-        // If provider explicitly required an IMEI/SN custom field, find it to send as rawImei
+        // خدمة بها حقول مخصصة من المزود (تشمل IMEI/LOCK CODE/إلخ)
+        // نبحث عن أول حقل IMEI أساسي في حقول المزود لاستخدامه كـ rawImei
         const imeiKey = Object.keys(providerFields).find(k => {
           const f = providerFields[k];
           return isPrimaryImeiProviderField(k, f);
@@ -840,8 +842,8 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
             if (isImeiService || hasCustomFields) {
               return (
                 <div className="space-y-6">
-                  {/* ── حالة: الخدمة IMEI وتحتاج حقل مخصص ── */}
-                  {isImeiService && (
+                  {/* ── حالة: خدمة IMEI بدون حقول مخصصة من المزود ── */}
+                  {isImeiService && !hasCustomFields && (
                     <div className="flex flex-col gap-2">
                       <label className="text-xs font-bold text-on-surface-variant uppercase tracking-wider flex items-center justify-between">
                         <span>{lang === 'ar' ? 'رقم الـ IMEI / الرقم التسلسلي' : 'Target IMEI / Serial Number'}</span>
