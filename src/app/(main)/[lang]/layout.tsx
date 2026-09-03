@@ -5,12 +5,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { getDictionary } from "@/i18n/get-dictionary";
 import { Locale } from "@/i18n/config";
-import AnalyticsTracker from "@/components/AnalyticsTracker";
-import AiChatWidget from "@/components/AiChatWidget";
-import ContactFloatingButton from "@/components/ContactFloatingButton";
-import FloatingSideDock from "@/components/FloatingSideDock";
-import AosInit from "@/components/AosInit";
-import CyberMouseBackground from "@/components/CyberMouseBackground";
+import ClientWidgets from "@/components/ClientWidgets";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
 const jakarta = Plus_Jakarta_Sans({ subsets: ["latin"], variable: "--font-jakarta", display: "swap" });
@@ -225,10 +220,8 @@ export default async function RootLayout(
         />
       </head>
       <body className={`${inter.variable} ${jakarta.variable} ${jetbrains.variable} bg-background text-on-surface antialiased min-h-screen flex flex-col relative`}>
-        <AosInit />
-        <AnalyticsTracker />
-        {/* Global Interactive Mouse Glow & Full-Page Vertical Cyber Light Beams */}
-        <CyberMouseBackground />
+        {/* Client Enhancement Widgets (Lazy loaded, non-blocking) */}
+        <ClientWidgets lang={lang} />
 
         <Navbar lang={lang} dict={dict.nav} />
         
@@ -237,15 +230,6 @@ export default async function RootLayout(
         </main>
 
         <Footer lang={lang} dict={dict.footer} />
-
-        {/* Floating Animated Contact Channels Mascot */}
-        <ContactFloatingButton lang={lang} />
-
-        {/* Arab Tech Pro AI Chatbot Assistant */}
-        <AiChatWidget />
-
-        {/* Floating Side Social Dock & Scroll to Top (Screenshot Match) */}
-        <FloatingSideDock lang={lang} />
       </body>
     </html>
   );

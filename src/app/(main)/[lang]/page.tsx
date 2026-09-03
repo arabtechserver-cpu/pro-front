@@ -1,21 +1,32 @@
 import { Metadata } from "next";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { getDictionary } from "@/i18n/get-dictionary";
 import { Locale } from "@/i18n/config";
-import NewsletterSection from "@/components/NewsletterSection";
 import CampaignSlider from "@/components/CampaignSlider";
-import HexagonalFeatures from "@/components/HexagonalFeatures";
 import PackagesSlider from "@/components/PackagesSlider";
-import FaqSection from "@/components/FaqSection";
-import SupportCtaSection from "@/components/SupportCtaSection";
 import AmrrHeroSection from "@/components/AmrrHeroSection";
 import AmrrStatsSection from "@/components/AmrrStatsSection";
 import AmrrCountersSection from "@/components/AmrrCountersSection";
 
+// Lazy load below-the-fold sections to drastically reduce initial mobile JS bundle & execution
+const HexagonalFeatures = dynamic(() => import("@/components/HexagonalFeatures"), {
+  loading: () => <div className="h-40" />
+});
+const FaqSection = dynamic(() => import("@/components/FaqSection"), {
+  loading: () => <div className="h-40" />
+});
+const SupportCtaSection = dynamic(() => import("@/components/SupportCtaSection"), {
+  loading: () => <div className="h-40" />
+});
+const NewsletterSection = dynamic(() => import("@/components/NewsletterSection"), {
+  loading: () => <div className="h-40" />
+});
+
 async function getHomepageConfig() {
   try {
     const res = await fetch("https://api.arabtechproserver.tech/api/homepage", {
-      cache: "no-store"
+      next: { revalidate: 60 }
     });
     if (res.ok) {
       return await res.json();
@@ -35,6 +46,10 @@ export async function generateMetadata(props: { params: Promise<{ lang: Locale }
   const description = isAr 
     ? "الموقع الرسمي لمنصة عرب تك برو سيرفر (Arab Tech Pro Server). خدمات فك شبكات الهواتف الرسمية، تخطي iCloud و FRP، وتفعيل بوكسات ودونجل وسيرفرات IMEI بأفضل الأسعار وأعلى سرعة."
     : "Official Arab Tech Pro Server for phone network unlocking, iCloud & FRP bypass, box and dongle activations, and IMEI services worldwide.";
+
+  const shareImg = isAr 
+    ? "https://arabtechproserver.tech/images/og_share_ar.png"
+    : "https://arabtechproserver.tech/images/og_share_en.png";
 
   return {
     title,
@@ -60,7 +75,7 @@ export async function generateMetadata(props: { params: Promise<{ lang: Locale }
       siteName: "Arab Tech Pro Server",
       images: [
         {
-          url: "https://arabtechproserver.tech/images/og-image.png",
+          url: shareImg,
           width: 1200,
           height: 630,
           alt: "Arab Tech Pro Server",
@@ -72,7 +87,7 @@ export async function generateMetadata(props: { params: Promise<{ lang: Locale }
       card: "summary_large_image",
       title,
       description,
-      images: ["https://arabtechproserver.tech/images/og-image.png"],
+      images: [shareImg],
     },
   };
 }
