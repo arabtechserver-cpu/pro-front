@@ -143,22 +143,34 @@ export default function AmrrHeroSection({ lang }: AmrrHeroSectionProps) {
 
             {/* Central 3D Cyber Holographic Orb Visual (Customized per Language) */}
             <div className="relative w-44 h-44 sm:w-56 sm:h-56 md:w-64 md:h-64 rounded-full overflow-hidden border-2 border-cyan-400/50 shadow-[0_0_50px_rgba(45,212,191,0.35)] flex items-center justify-center group bg-slate-950">
-              <img
-                src={isAr ? "/images/hero_cyber_ar.jpg" : "/images/hero_cyber_en.jpg"}
-                alt={isAr ? "عرب تك برو سيرفر" : "Arab Tech Pro Server"}
-                className="w-full h-full object-cover rounded-full transform group-hover:scale-105 transition-transform duration-700"
-                loading="eager"
-              />
+              <picture className="w-full h-full">
+                <source srcSet={isAr ? "/images/hero_cyber_ar.webp" : "/images/hero_cyber_en.webp"} type="image/webp" />
+                <img
+                  src={isAr ? "/images/hero_cyber_ar.jpg" : "/images/hero_cyber_en.jpg"}
+                  alt={isAr ? "عرب تك برو سيرفر" : "Arab Tech Pro Server"}
+                  width={256}
+                  height={256}
+                  className="w-full h-full object-cover rounded-full transform group-hover:scale-105 transition-transform duration-700"
+                  loading="eager"
+                  // @ts-ignore
+                  fetchPriority="high"
+                />
+              </picture>
               {/* Subtle glass reflection & bottom dark vignette */}
               <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-white/10 pointer-events-none rounded-full"></div>
 
               {/* Holographic Official Logo Badge at bottom */}
               <div className="absolute bottom-2 sm:bottom-3 left-1/2 -translate-x-1/2 bg-slate-900/90 backdrop-blur-md px-2.5 sm:px-4 py-1 rounded-lg sm:rounded-xl border border-cyan-400/40 flex items-center gap-1 shadow-lg max-w-[85%]">
-                <img
-                  src={isAr ? "/images/logo_ar.png" : "/images/logo_en.png"}
-                  alt="Arab Tech Pro Logo"
-                  className="h-3.5 sm:h-5 w-auto object-contain max-w-[110px]"
-                />
+                <picture>
+                  <source srcSet={isAr ? "/images/logo_ar.webp" : "/images/logo_en.webp"} type="image/webp" />
+                  <img
+                    src={isAr ? "/images/logo_ar.png" : "/images/logo_en.png"}
+                    alt="Arab Tech Pro Logo"
+                    width={110}
+                    height={20}
+                    className="h-3.5 sm:h-5 w-auto object-contain max-w-[110px]"
+                  />
+                </picture>
               </div>
             </div>
 

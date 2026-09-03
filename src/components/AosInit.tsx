@@ -6,11 +6,11 @@ import AOS from "aos";
 export default function AosInit() {
   useEffect(() => {
     AOS.init({
-      duration: 800,
-      once: false,
+      duration: 600,
+      once: true, // Only animate once to prevent repetitive scroll recalculation and lag
       easing: "ease-out-cubic",
-      offset: 30,
-      mirror: true,
+      offset: 20,
+      mirror: false,
     });
 
     const handleRefresh = () => {
@@ -18,16 +18,14 @@ export default function AosInit() {
     };
 
     window.addEventListener("load", handleRefresh);
-    window.addEventListener("scroll", handleRefresh, { passive: true });
     
-    // Initial refresh after render
+    // Quick refresh after hydration
     const timeout = setTimeout(() => {
       AOS.refresh();
-    }, 400);
+    }, 300);
 
     return () => {
       window.removeEventListener("load", handleRefresh);
-      window.removeEventListener("scroll", handleRefresh);
       clearTimeout(timeout);
     };
   }, []);

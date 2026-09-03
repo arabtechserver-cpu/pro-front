@@ -66,11 +66,16 @@ export default function Footer({ dict, lang = "ar" }: FooterProps) {
           <div className="col-span-1 md:col-span-1 space-y-4">
             <Link href={`/${lang}`} className="relative flex items-center gap-2 group w-fit" aria-label="Home">
               <div className="absolute -inset-2 bg-gradient-to-r from-white/20 via-primary/25 to-white/20 rounded-full blur-md opacity-75 group-hover:opacity-100 transition-all pointer-events-none"></div>
-              <img 
-                src={lang === "ar" ? "/images/logo_ar.png" : "/images/logo_en.png"} 
-                alt="Logo" 
-                className="relative z-10 h-11 sm:h-14 w-auto max-w-[220px] sm:max-w-[300px] object-contain drop-shadow-[0_0_10px_rgba(255,255,255,0.25)]" 
-              />
+              <picture>
+                <source srcSet={lang === "ar" ? "/images/logo_ar.webp" : "/images/logo_en.webp"} type="image/webp" />
+                <img 
+                  src={lang === "ar" ? "/images/logo_ar.png" : "/images/logo_en.png"} 
+                  alt="Logo" 
+                  width={220}
+                  height={55}
+                  className="relative z-10 h-11 sm:h-14 w-auto max-w-[220px] sm:max-w-[300px] object-contain drop-shadow-[0_0_10px_rgba(255,255,255,0.25)]" 
+                />
+              </picture>
             </Link>
 
             <p className="text-xs leading-relaxed text-on-surface-variant max-w-xs">
