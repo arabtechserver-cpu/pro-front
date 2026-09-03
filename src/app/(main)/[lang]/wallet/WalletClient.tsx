@@ -976,19 +976,21 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
             <div className="glass-card rounded-3xl p-6 border border-outline-variant/30 shadow-xl space-y-3">
               <h3 className="font-bold text-sm text-on-surface flex items-center gap-2">
                 <span className="material-symbols-outlined text-emerald-400 text-lg">support_agent</span>
-                <span>تحتاج مساعدة في الشحن؟</span>
+                <span>{lang === "ar" ? "تحتاج مساعدة في الشحن؟" : "Need help with deposit?"}</span>
               </h3>
               <p className="text-xs text-on-surface-variant leading-relaxed">
-                إذا واجهتك أي مشكلة أثناء التحويل عبر بنكك أو المحافظ الرقمية، يمكنك التواصل مباشرة مع خدمة العملاء على واتساب.
+                {lang === "ar"
+                  ? "إذا واجهتك أي مشكلة أثناء التحويل عبر بنكك أو المحافظ الرقمية، يمكنك التواصل مباشرة مع خدمة العملاء على واتساب."
+                  : "If you encounter any issues during transfer via Bankak or digital wallets, you can contact customer service directly on WhatsApp."}
               </p>
               <a
-                href="https://wa.me/201036673447"
+                href="https://wa.me/16728972935"
                 target="_blank"
                 rel="noreferrer"
                 className="w-full py-2.5 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-400 font-bold text-xs flex items-center justify-center gap-2 transition-all"
               >
                 <span className="material-symbols-outlined text-base">chat</span>
-                <span>تواصل معنا عبر واتساب</span>
+                <span>{lang === "ar" ? "تواصل معنا عبر واتساب" : "Contact us on WhatsApp"}</span>
               </a>
             </div>
           </div>
