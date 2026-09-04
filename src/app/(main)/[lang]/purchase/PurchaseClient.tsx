@@ -416,13 +416,25 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
     selectedService?.name?.match(/بأي\s*كمية|كمية\s*مخصصة/i)
   );
 
+  const isExplicitlyNoQty =
+    selectedService?.requires_quantity === false ||
+    selectedService?.REQUIRES_QUANTITY === false ||
+    selectedService?.REQUIRES_QUANTITY === "0" ||
+    selectedService?.supportsQty === false ||
+    selectedService?.supports_quantity === false;
+
   // هل الخدمة تدعم الكمية (qty) بناءً على إعدادات المزود أو الحقول المخصصة أو نمط اسم الخدمة (Any QNT)
+  // خدمات IMEI وخدمات السيرفر الفردية لا تدعم الكمية إلا إذا كانت الخدمة تطلب كمية صراحة من المزود
   const serviceSupportsQty = Boolean(
-    selectedService?.supportsQty === true ||
-    selectedService?.supportsQty === "1" ||
-    selectedService?.supports_quantity === true ||
-    Boolean(quantityField) ||
-    hasQuantityNamePattern
+    !isExplicitlyNoQty &&
+    (
+      hasQuantityNamePattern ||
+      selectedService?.requires_quantity === true ||
+      selectedService?.REQUIRES_QUANTITY === "1" ||
+      selectedService?.REQUIRES_QUANTITY === true ||
+      (!isImeiService && Boolean(quantityField)) ||
+      (!isImeiService && (selectedService?.supportsQty === true || selectedService?.supports_quantity === true) && maxQty > 1 && maxQty > minQty)
+    )
   );
 
   // ضبط الكمية تلقائياً عند اختيار خدمة تتطلب حداً أدنى أكبر من الكمية الحالية
@@ -450,7 +462,7 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
   ));
   const isZeroUnpriced = Boolean(selectedService && unitPrice === 0 && !isFreeService);
 
-  const totalPrice = unitPrice * (quantity > 0 ? quantity : 1);
+  const totalPrice = serviceSupportsQty ? unitPrice * (quantity > 0 ? quantity : 1) : unitPrice;
   const hasEnoughBalance = userBalance >= totalPrice;
 
   // Handle Category Select Change
@@ -496,25 +508,6 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
     let rawImeiStr = "";
 
     if (providerFields && Object.keys(providerFields).length > 0) {
-      const missingKeys = Object.entries(providerFields)
-        .filter(([k, f]: [string, any]) => {
-          const isImei = /(imei|ecid|serial number|sn\b)/i.test(k) || /(imei|ecid|serial number|sn\b)/i.test(f?.name || f?.field_id || f?.label || '');
-          if (isImei) return false; // حقل الـ IMEI اختياري بالكامل بناءً على طلب الإدارة
-          if (isQuantityField(f, k)) return false; // حقل الكمية يتم التعامل معه عبر قسم الكمية المخصص
-          return (f?.required === "1" || f?.required === true) && !customFieldValues[k]?.trim();
-        })
-        .map(([k, f]: [string, any]) => getLocalizedFieldLabel(k, f, lang));
-
-      if (missingKeys.length > 0) {
-        setSubmitFeedback({
-          type: "error",
-          text: lang === 'ar' 
-            ? `يرجى إكمال الحقول المطلوبة للمزود: ${missingKeys.join("، ")}` 
-            : `Please fill required provider fields: ${missingKeys.join(", ")}`
-        });
-        return;
-      }
-
       let customString = Object.entries(customFieldValues)
         .filter(([k, v]) => !isQuantityField(undefined, k) && Boolean(v && String(v).trim()))
         .map(([k, v]) => `${k}: ${v}`)
@@ -539,9 +532,9 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
       }
     } else if (isImeiService) {
       rawImeiStr = targetInput.trim();
-      payloadTarget = targetInput.trim() || (lang === 'ar' ? 'بدون بيانات' : 'No Data');
+      payloadTarget = targetInput.trim() || (lang === 'ar' ? 'طلب فوري' : 'Instant Order');
     } else {
-      payloadTarget = targetInput.trim() || (lang === 'ar' ? 'بدون بيانات' : 'No Data');
+      payloadTarget = targetInput.trim() || (lang === 'ar' ? 'طلب فوري' : 'Instant Order');
     }
 
     // التحقق من حدود الكمية المفروضة من المزود
@@ -984,8 +977,6 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {nonQuantityFields.map(([key, fieldObj]: [string, any]) => {
                         const cleanLabel = getLocalizedFieldLabel(key, fieldObj, lang);
-                        const isImeiField = /(imei|ecid|serial number|sn\b)/i.test(key) || /(imei|ecid|serial number|sn\b)/i.test(fieldObj?.name || fieldObj?.field_id || fieldObj?.label || '');
-                        const isRequired = !isImeiField && (fieldObj?.required === "1" || fieldObj?.required === true || fieldObj?.REQUIRED === "1");
                         const fieldType = (fieldObj?.fieldtype || fieldObj?.type || fieldObj?.FIELDTYPE || '').toLowerCase();
                         const fieldDesc = fieldObj?.description || fieldObj?.DESCRIPTION || fieldObj?.hint || '';
                         const optionsList = extractFieldOptions(key, fieldObj);
@@ -997,17 +988,12 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
                             <div key={key} className="flex flex-col gap-2">
                               <label className="text-xs font-bold text-on-surface-variant uppercase tracking-wider flex items-center justify-between">
                                 <span>{cleanLabel}:</span>
-                                {isRequired ? (
-                                  <span className="text-primary text-[11px] font-normal">{lang === 'ar' ? '* إجباري' : '* Required'}</span>
-                                ) : (
-                                  <span className="text-primary/70 text-[11px] font-normal">{lang === 'ar' ? '(اختياري)' : '(Optional)'}</span>
-                                )}
+                                <span className="text-primary/70 text-[11px] font-normal">{lang === 'ar' ? '(اختياري)' : '(Optional)'}</span>
                               </label>
                               <select
                                 value={customFieldValues[key] || ""}
                                 onChange={(e) => setCustomFieldValues({ ...customFieldValues, [key]: e.target.value })}
                                 className="w-full bg-surface-container-lowest border border-outline-variant/40 rounded-xl py-3.5 px-4 text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all font-semibold text-xs cursor-pointer"
-                                required={isRequired}
                               >
                                 <option value="">{lang === 'ar' ? '-- اختر من القائمة --' : '-- Select from list --'}</option>
                                 {optionsList.map((opt, i) => (
@@ -1030,11 +1016,7 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
                             <div key={key} className="flex flex-col gap-2 md:col-span-2">
                               <label className="text-xs font-bold text-on-surface-variant uppercase tracking-wider flex items-center justify-between">
                                 <span>{cleanLabel}:</span>
-                                {isRequired ? (
-                                  <span className="text-primary text-[11px] font-normal">{lang === 'ar' ? '* إجباري' : '* Required'}</span>
-                                ) : (
-                                  <span className="text-primary/70 text-[11px] font-normal">{lang === 'ar' ? '(اختياري)' : '(Optional)'}</span>
-                                )}
+                                <span className="text-primary/70 text-[11px] font-normal">{lang === 'ar' ? '(اختياري)' : '(Optional)'}</span>
                               </label>
                               <textarea
                                 rows={2}
@@ -1042,7 +1024,6 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
                                 onChange={(e) => setCustomFieldValues({ ...customFieldValues, [key]: e.target.value })}
                                 placeholder={lang === 'ar' ? `أدخل ${cleanLabel}...` : `Enter ${cleanLabel}...`}
                                 className="w-full bg-surface-container-lowest border border-outline-variant/40 rounded-xl py-3.5 px-4 text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all font-mono text-sm dir-ltr"
-                                required={isRequired}
                               />
                               {fieldDesc && (
                                 <p className="text-[11px] text-on-surface-variant/80 flex items-center gap-1 mt-0.5 whitespace-pre-wrap">
@@ -1059,11 +1040,7 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
                           <div key={key} className="flex flex-col gap-2">
                             <label className="text-xs font-bold text-on-surface-variant uppercase tracking-wider flex items-center justify-between">
                               <span>{cleanLabel}:</span>
-                              {isRequired ? (
-                                <span className="text-primary text-[11px] font-normal">{lang === 'ar' ? '* إجباري' : '* Required'}</span>
-                              ) : (
-                                <span className="text-primary/70 text-[11px] font-normal">{lang === 'ar' ? '(اختياري)' : '(Optional)'}</span>
-                              )}
+                              <span className="text-primary/70 text-[11px] font-normal">{lang === 'ar' ? '(اختياري)' : '(Optional)'}</span>
                             </label>
                             <input
                               type={fieldType === "password" ? "password" : "text"}
@@ -1071,7 +1048,6 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
                               onChange={(e) => setCustomFieldValues({ ...customFieldValues, [key]: e.target.value })}
                               placeholder={lang === 'ar' ? `أدخل ${cleanLabel}...` : `Enter ${cleanLabel}...`}
                               className="w-full bg-surface-container-lowest border border-outline-variant/40 rounded-xl py-3.5 px-4 text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all font-mono text-sm dir-ltr"
-                              required={isRequired}
                             />
                             {fieldDesc && (
                               <p className="text-[11px] text-on-surface-variant/80 flex items-center gap-1 mt-0.5 whitespace-pre-wrap">
@@ -1091,7 +1067,7 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
                     <div className="space-y-2 p-5 rounded-2xl bg-surface-container-high/40 border border-primary/20">
                       <label className="text-xs font-bold text-on-surface-variant uppercase tracking-wider flex items-center justify-between">
                         <span>{lang === 'ar' ? 'رقم IMEI أو السيريال للجهاز (Device IMEI / Serial):' : 'Device IMEI / Serial Number:'}</span>
-                        <span className="text-primary text-[11px] font-normal">{lang === 'ar' ? '* إجباري' : '* Required'}</span>
+                        <span className="text-primary/70 text-[11px] font-normal">{lang === 'ar' ? '(اختياري)' : '(Optional)'}</span>
                       </label>
                       <input
                         type="text"
@@ -1099,7 +1075,6 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
                         onChange={(e) => setTargetInput(e.target.value)}
                         placeholder={lang === 'ar' ? 'أدخل رقم IMEI المكون من 15 رقم أو Serial...' : 'Enter 15-digit IMEI or device Serial number...'}
                         className="w-full bg-surface-container-lowest border border-outline-variant/40 rounded-xl py-3.5 px-4 text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all font-mono text-sm dir-ltr"
-                        required
                       />
                     </div>
                   )}
@@ -1109,7 +1084,7 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
                     <div className="space-y-2 p-5 rounded-2xl bg-surface-container-high/40 border border-primary/20">
                       <label className="text-xs font-bold text-on-surface-variant uppercase tracking-wider flex items-center justify-between">
                         <span>{lang === 'ar' ? 'بيانات الحساب / المعرف / الرقم المطلوب (Target Account / ID):' : 'Target Account / Username / ID / Number:'}</span>
-                        <span className="text-primary text-[11px] font-normal">{lang === 'ar' ? '* إجباري' : '* Required'}</span>
+                        <span className="text-primary/70 text-[11px] font-normal">{lang === 'ar' ? '(اختياري)' : '(Optional)'}</span>
                       </label>
                       <input
                         type="text"
@@ -1117,7 +1092,6 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
                         onChange={(e) => setTargetInput(e.target.value)}
                         placeholder={lang === 'ar' ? 'أدخل اسم المستخدم، البريد، أو المعرف المطلوب...' : 'Enter target username, email or ID...'}
                         className="w-full bg-surface-container-lowest border border-outline-variant/40 rounded-xl py-3.5 px-4 text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all font-mono text-sm dir-ltr"
-                        required
                       />
                     </div>
                   )}

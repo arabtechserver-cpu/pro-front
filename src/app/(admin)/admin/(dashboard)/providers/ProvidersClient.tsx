@@ -102,16 +102,20 @@ export function getServiceRequiredFields(service: any): { label: string; type?: 
     } catch (e) {}
   }
 
-  // إذا كانت الخدمة تدعم الكمية ولم يُضف حقل كمية بعد
+  // إذا كانت الخدمة تدعم الكمية صراحة ولم يُضف حقل كمية بعد
+  const isImeiService = (service.category?.name || service.category_name || "").toLowerCase().includes("imei") || service.api_service_type === "imei";
   const hasQty = fields.some(f => f.type === "quantity" || f.label.includes("الكمية"));
-  if (!hasQty && (service.supportsQty || service.supports_quantity || service.minQty || service.QNT_MIN || (service.name && /\bany\s*qnt\b/i.test(service.name)))) {
-    const min = service.minQty ?? service.min_quantity ?? service.QNT_MIN ?? 1;
-    const max = service.maxQty ?? service.max_quantity ?? service.QNT_MAX ?? 0;
+  const hasQtyName = Boolean(service.name && /\bany\s*qnt\b|\bany\s*quantity\b|\bcredits?\s*qnt\b|بأي\s*كمية/i.test(service.name));
+  const min = service.minQty ?? service.min_quantity ?? service.QNT_MIN ?? 1;
+  const max = service.maxQty ?? service.max_quantity ?? service.QNT_MAX ?? 0;
+  const hasValidRange = Number(max) > 1 && Number(max) > Number(min);
+
+  if (!hasQty && !isImeiService && service.requires_quantity !== false && (hasQtyName || service.requires_quantity === true || (service.supportsQty && hasValidRange))) {
     const limitText = Number(max) > 0 ? `(من ${min} إلى ${max})` : `(الحد الأدنى: ${min})`;
     fields.push({
       label: `الكمية ${limitText}`,
       type: "quantity",
-      required: true
+      required: false
     });
   }
 
@@ -161,6 +165,8 @@ export default function ProvidersClient() {
   // Action Loading States
   const [refreshingBalanceId, setRefreshingBalanceId] = useState<string | null>(null);
   const [syncingProviderId, setSyncingProviderId] = useState<string | null>(null);
+  const [exportingProviderId, setExportingProviderId] = useState<string | null>(null);
+  const [isExportingAll, setIsExportingAll] = useState(false);
   const [deleteModalProvider, setDeleteModalProvider] = useState<Provider | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -687,6 +693,132 @@ export default function ProvidersClient() {
     if (node) groupsObserverRef.current.observe(node);
   }, [loadingServices, visibleGroupsLimit, filteredGroups.length]);
 
+  // Helper to trigger browser JSON file download
+  const downloadJsonFile = (data: any, defaultFilename: string) => {
+    try {
+      const jsonStr = JSON.stringify(data, null, 2);
+      const blob = new Blob([jsonStr], { type: "application/json;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", defaultFilename);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error("Download JSON error:", err);
+    }
+  };
+
+  // Export full JSON data for a single provider
+  const handleExportProviderJson = async (provider: Provider) => {
+    setExportingProviderId(provider.id);
+    try {
+      const res = await fetch(`/api/providers/${provider.id}/export-full-data?download=false`);
+      const data = await res.json().catch(() => ({}));
+
+      if (res.ok && data.success && data.data) {
+        const cleanName = (provider.name || "provider").replace(/[^a-zA-Z0-9_\u0600-\u06FF]/g, "_");
+        const filename = `${cleanName}_full_data_${new Date().toISOString().slice(0, 10)}.json`;
+        downloadJsonFile(data.data, filename);
+        showToast(`تم تحميل ملف الـ JSON الشامل للمزود (${provider.name}) بنجاح!`, "success");
+        return;
+      }
+
+      // Fallback: build JSON from stored provider services
+      const storedRes = await fetch(`/api/providers/${provider.id}/services`);
+      const storedData = await storedRes.json().catch(() => ({}));
+      const services = Array.isArray(storedData.services) ? storedData.services : [];
+
+      const packagesMap: Record<string, any[]> = {};
+      for (const s of services) {
+        const pkg = s.groupName || s.group_name || "باقة عامة";
+        if (!packagesMap[pkg]) packagesMap[pkg] = [];
+        packagesMap[pkg].push(s);
+      }
+      const packages = Object.entries(packagesMap).map(([packageName, srvs]) => ({
+        packageName,
+        servicesCount: srvs.length,
+        services: srvs
+      }));
+
+      const fallbackData = {
+        provider,
+        metadata: {
+          exportedAt: new Date().toISOString(),
+          system: "Arab Tech Pro Server",
+          totalServices: services.length,
+          totalPackages: packages.length
+        },
+        packages,
+        services
+      };
+
+      const cleanName = (provider.name || "provider").replace(/[^a-zA-Z0-9_\u0600-\u06FF]/g, "_");
+      const filename = `${cleanName}_full_data_${new Date().toISOString().slice(0, 10)}.json`;
+      downloadJsonFile(fallbackData, filename);
+      showToast(`تم تحميل بيانات المزود (${provider.name}) بنجاح!`, "success");
+    } catch (err: any) {
+      console.error("Export provider JSON error:", err);
+      showToast("تعذر تحميل ملف الـ JSON للمزود: " + (err.message || ""), "error");
+    } finally {
+      setExportingProviderId(null);
+    }
+  };
+
+  // Export full JSON data for all providers
+  const handleExportAllProvidersJson = async () => {
+    setIsExportingAll(true);
+    try {
+      const res = await fetch("/api/providers/export-all-data");
+      const data = await res.json().catch(() => ({}));
+
+      if (res.ok && data.success && data.data) {
+        const filename = `all_providers_full_data_${new Date().toISOString().slice(0, 10)}.json`;
+        downloadJsonFile(data.data, filename);
+        showToast("تم تحميل بيانات كافة المزودين والخدمات والباقات بنجاح!", "success");
+        return;
+      }
+
+      const fallbackExport = {
+        metadata: {
+          exportedAt: new Date().toISOString(),
+          system: "Arab Tech Pro Server",
+          totalProviders: providers.length
+        },
+        providers
+      };
+      downloadJsonFile(fallbackExport, `all_providers_${new Date().toISOString().slice(0, 10)}.json`);
+      showToast("تم تحميل بيانات المزودين المتاحة بنجاح!", "success");
+    } catch (err: any) {
+      console.error("Export all providers error:", err);
+      showToast("تعذر تصدير بيانات كافة المزودين: " + (err.message || ""), "error");
+    } finally {
+      setIsExportingAll(false);
+    }
+  };
+
+  // Export currently browsed services as JSON
+  const handleExportCurrentBrowseServicesJson = () => {
+    if (!browseProvider) return;
+    const exportData = {
+      provider: browseProvider,
+      source: serviceLoadSource,
+      metadata: {
+        exportedAt: new Date().toISOString(),
+        totalServices: providerServices.length,
+        totalPackages: groupedPackages.length
+      },
+      packages: groupedPackages,
+      services: providerServices
+    };
+    const cleanName = (browseProvider.name || "provider").replace(/[^a-zA-Z0-9_\u0600-\u06FF]/g, "_");
+    const filename = `${cleanName}_${serviceLoadSource || "catalog"}_services_${new Date().toISOString().slice(0, 10)}.json`;
+    downloadJsonFile(exportData, filename);
+    showToast(`تم تصدير ${providerServices.length} خدمة كملف JSON بنجاح!`, "success");
+  };
+
   return (
     <div className="space-y-8 font-sans max-w-6xl mx-auto" dir="rtl">
       {/* Toast Notification */}
@@ -715,13 +847,27 @@ export default function ProvidersClient() {
           </p>
         </div>
 
-        <button
-          onClick={openAddModal}
-          className="px-5 py-3 rounded-2xl bg-gradient-to-r from-primary to-secondary text-on-primary text-sm font-bold shadow-lg hover:shadow-primary/30 transition-all flex items-center justify-center gap-2 active:scale-95"
-        >
-          <span className="material-symbols-outlined text-xl">add_circle</span>
-          <span>إضافة مزود جديد</span>
-        </button>
+        <div className="flex items-center gap-2.5 flex-wrap">
+          <button
+            onClick={handleExportAllProvidersJson}
+            disabled={isExportingAll}
+            className="px-4 py-3 rounded-2xl bg-surface-container-high hover:bg-surface-container-highest text-on-surface text-xs font-bold border border-outline-variant/30 hover:border-emerald-500/40 transition-all flex items-center justify-center gap-2 shadow-sm"
+            title="تحميل كافة بيانات المزودين والخدمات والباقات كملف JSON شامل"
+          >
+            <span className={`material-symbols-outlined text-base text-emerald-400 ${isExportingAll ? "animate-spin" : ""}`}>
+              {isExportingAll ? "refresh" : "download_for_offline"}
+            </span>
+            <span>{isExportingAll ? "جاري تجهيز البيانات..." : "تصدير كل المزودين (JSON)"}</span>
+          </button>
+
+          <button
+            onClick={openAddModal}
+            className="px-5 py-3 rounded-2xl bg-gradient-to-r from-primary to-secondary text-on-primary text-sm font-bold shadow-lg hover:shadow-primary/30 transition-all flex items-center justify-center gap-2 active:scale-95"
+          >
+            <span className="material-symbols-outlined text-xl">add_circle</span>
+            <span>إضافة مزود جديد</span>
+          </button>
+        </div>
       </div>
 
       {/* Providers List Grid */}
@@ -829,6 +975,18 @@ export default function ProvidersClient() {
                   </div>
 
                   <div className="flex items-center justify-end gap-2.5 flex-wrap">
+                    <button
+                      onClick={() => handleExportProviderJson(provider)}
+                      disabled={exportingProviderId === provider.id}
+                      className="px-4 py-2 rounded-xl bg-surface-container-high hover:bg-surface-container-highest text-on-surface text-xs font-bold transition-all flex items-center gap-1.5 border border-outline-variant/30 hover:border-emerald-500/40"
+                      title="تحميل كل داتا المزود والتفاصيل والباقات والحقول كملف JSON كامل"
+                    >
+                      <span className={`material-symbols-outlined text-sm text-emerald-400 ${exportingProviderId === provider.id ? "animate-spin" : ""}`}>
+                        {exportingProviderId === provider.id ? "refresh" : "download"}
+                      </span>
+                      <span>{exportingProviderId === provider.id ? "جاري التجهيز..." : "تحميل JSON"}</span>
+                    </button>
+
                     <button
                       onClick={() => handleBrowseServices(provider)}
                       className="px-4 py-2 rounded-xl bg-surface-container-high hover:bg-surface-container-highest text-on-surface text-xs font-bold transition-all flex items-center gap-1.5 border border-outline-variant/30"
@@ -1220,6 +1378,17 @@ export default function ProvidersClient() {
                   >
                     <span className="material-symbols-outlined text-sm">inventory_2</span>
                     <span>الخدمات المضافة في الموقع ({browseProvider.servicesCount || 0})</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleExportCurrentBrowseServicesJson}
+                    disabled={loadingServices || providerServices.length === 0}
+                    className="px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-xl text-[11px] sm:text-xs font-bold transition-all flex items-center gap-1.5 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
+                    title="تحميل الخدمات الحالية والباقات والحقول كملف JSON"
+                  >
+                    <span className="material-symbols-outlined text-sm">download</span>
+                    <span>تحميل كملف JSON ({providerServices.length})</span>
                   </button>
                 </div>
 
