@@ -382,14 +382,26 @@ export default function ProvidersClient() {
     setSyncModalProvider(null);
 
     try {
-            let endpoint = `/api/providers/${p.id}/sync`;
+      let endpoint = `/api/providers/${p.id}/sync`;
       let bodyData: any = syncConfig;
 
       if (syncMode === "selected") {
         endpoint = `/api/providers/${p.id}/import-services`;
+        const selectedGroupSet = new Set(selectedGroupNames.map((name) => name.trim().toLowerCase()));
+        const targetServices = providerServices.filter((s) => {
+          const g = (s.groupName || s.group_name || "باقة عامة").trim().toLowerCase();
+          return selectedGroupSet.has(g);
+        });
+
+        if (targetServices.length === 0) {
+          showToast("لم يتم العثور على خدمات في الباقات المحددة للاستيراد", "error");
+          setSyncingProviderId(null);
+          return;
+        }
+
         bodyData = {
           ...syncConfig,
-          services: providerServices.filter(s => selectedGroupNames.includes(s.groupName || s.group_name || "باقة عامة"))
+          services: targetServices
         };
       }
 
@@ -405,10 +417,10 @@ export default function ProvidersClient() {
         if (browseProvider && browseProvider.id === p.id) {
           if (syncMode === "selected" && serviceLoadSource === "remote") {
             // Keep remote catalog so user can select and import MORE packages without losing anything!
-            const importedGroupNames = new Set(selectedGroupNames);
+            const importedGroupNames = new Set(selectedGroupNames.map((name) => name.trim().toLowerCase()));
             setProviderServices((prev) =>
               prev.map((s) => {
-                const g = s.groupName || s.group_name || "باقة عامة";
+                const g = (s.groupName || s.group_name || "باقة عامة").trim().toLowerCase();
                 if (importedGroupNames.has(g)) {
                   return { ...s, isImported: true, isActive: true };
                 }
@@ -474,16 +486,18 @@ export default function ProvidersClient() {
   const groupedPackages = useMemo(() => {
     const map: Record<string, any[]> = {};
     for (const s of typeFilteredProviderServices) {
-      const g = s.groupName || s.group_name || "باقة عامة";
+      const g = (s.groupName || s.group_name || "باقة عامة").trim() || "باقة عامة";
       if (!map[g]) map[g] = [];
       map[g].push(s);
     }
 
     const groupsArray = Object.entries(map).map(([groupName, services]) => {
       const activeCount = services.filter((s) => s.isActive).length;
+      const importedCount = services.filter((s) => s.isImported || s.isActive).length;
       const isStoredData = serviceLoadSource === "stored";
       const isAllActive = isStoredData && activeCount === services.length;
       const isAllHidden = isStoredData && activeCount === 0;
+      const isAllImported = importedCount === services.length;
 
       return {
         groupName,
@@ -491,8 +505,10 @@ export default function ProvidersClient() {
         serviceTypes: Array.from(new Set(services.map((service) => getProviderServiceType(service)))),
         total: services.length,
         activeCount,
+        importedCount,
         isAllActive,
-        isAllHidden
+        isAllHidden,
+        isAllImported
       };
     });
 
@@ -1040,8 +1056,14 @@ export default function ProvidersClient() {
           <div className="bg-surface-container border border-outline-variant/30 rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl space-y-5">
             <div className="flex items-center justify-between pb-3 border-b border-outline-variant/20">
               <h3 className="text-lg font-bold text-on-surface flex items-center gap-2">
-                <span className="material-symbols-outlined text-primary">sync</span>
-                <span>مزامنة خدمات: {syncModalProvider.name}</span>
+                <span className="material-symbols-outlined text-primary">
+                  {syncMode === "selected" ? "cloud_download" : "sync"}
+                </span>
+                <span>
+                  {syncMode === "selected"
+                    ? `استيراد باقات محددة (${selectedGroupNames.length} باقة)`
+                    : `مزامنة خدمات: ${syncModalProvider.name}`}
+                </span>
               </h3>
               <button
                 type="button"
@@ -1053,15 +1075,37 @@ export default function ProvidersClient() {
             </div>
 
             <div className="space-y-4 text-xs">
-              <div className="p-3 bg-primary/10 border border-primary/20 rounded-xl text-on-surface-variant leading-relaxed">
-                سيتم جلب قوائم IMEI وServer وRemote تلقائياً، ثم اعتماد النوع المرسل داخل بيانات كل خدمة وحفظه للفلترة والتنفيذ الصحيح.
-                <br /><br />
-                <span className="font-bold text-amber-500">تنبيه هام:</span> يرجى التأكد من إضافة عناوين IP السيرفر الخاص بك في إعدادات API لدى المزود (WhiteList IP) قبل المزامنة لتجنب رفض الاتصال:
-                <div className="mt-1 flex flex-col gap-1">
-                  <code className="bg-surface-container-highest px-1.5 py-0.5 rounded text-primary text-[11px] text-left dir-ltr w-fit">186.240.155.152</code>
-                  <code className="bg-surface-container-highest px-1.5 py-0.5 rounded text-primary text-[11px] text-left dir-ltr w-fit">2c0f:fc89:5e:8063:b178:82be:2580:b934</code>
+              {syncMode === "selected" ? (
+                <div className="p-3 bg-sky-500/10 border border-sky-500/20 rounded-xl space-y-2">
+                  <div className="text-[11px] font-bold text-sky-400 flex items-center gap-1">
+                    <span className="material-symbols-outlined text-xs">category</span>
+                    <span>الباقات المحددة للاستيراد فقط ({selectedGroupNames.length}):</span>
+                  </div>
+                  <div className="flex flex-wrap gap-1.5 max-h-28 overflow-y-auto pr-1">
+                    {selectedGroupNames.map((name) => (
+                      <span
+                        key={name}
+                        className="px-2 py-0.5 rounded-lg bg-surface-container-highest text-on-surface text-[11px] font-medium border border-outline-variant/30"
+                      >
+                        {name.trim()}
+                      </span>
+                    ))}
+                  </div>
+                  <div className="text-[11px] text-sky-300/80 leading-relaxed">
+                    سيتم استيراد خدمات هذه الباقات المحددة وتفعيلها في المتجر للعملاء دون المساس بباقي الباقات غير المحددة.
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <div className="p-3 bg-primary/10 border border-primary/20 rounded-xl text-on-surface-variant leading-relaxed">
+                  سيتم جلب قوائم IMEI وServer وRemote تلقائياً، ثم اعتماد النوع المرسل داخل بيانات كل خدمة وحفظه للفلترة والتنفيذ الصحيح.
+                  <br /><br />
+                  <span className="font-bold text-amber-500">تنبيه هام:</span> يرجى التأكد من إضافة عناوين IP السيرفر الخاص بك في إعدادات API لدى المزود (WhiteList IP) قبل المزامنة لتجنب رفض الاتصال:
+                  <div className="mt-1 flex flex-col gap-1">
+                    <code className="bg-surface-container-highest px-1.5 py-0.5 rounded text-primary text-[11px] text-left dir-ltr w-fit">186.240.155.152</code>
+                    <code className="bg-surface-container-highest px-1.5 py-0.5 rounded text-primary text-[11px] text-left dir-ltr w-fit">2c0f:fc89:5e:8063:b178:82be:2580:b934</code>
+                  </div>
+                </div>
+              )}
 
               <div>
                 <label className="block font-bold text-on-surface-variant mb-1.5">
@@ -1098,8 +1142,12 @@ export default function ProvidersClient() {
                 onClick={executeSync}
                 className="flex-1 bg-gradient-to-r from-primary to-secondary text-on-primary py-3 rounded-xl font-bold text-xs transition-all shadow-md flex items-center justify-center gap-2"
               >
-                <span className="material-symbols-outlined text-sm">play_arrow</span>
-                <span>بدء المزامنة الآن</span>
+                <span className="material-symbols-outlined text-sm">
+                  {syncMode === "selected" ? "cloud_download" : "play_arrow"}
+                </span>
+                <span>
+                  {syncMode === "selected" ? "استيراد وتفعيل الباقات المحددة الآن" : "بدء المزامنة الآن"}
+                </span>
               </button>
               <button
                 type="button"
@@ -1503,33 +1551,65 @@ export default function ProvidersClient() {
                                     </span>
                                   )
                                 ) : (
-                                  <span className="text-[10px] px-2 py-0.5 rounded-md bg-sky-500/15 text-sky-400 font-bold border border-sky-500/20">
-                                    معاينة مباشرة ({group.total})
-                                  </span>
+                                  group.isAllImported ? (
+                                    <span className="text-[10px] px-2 py-0.5 rounded-md bg-emerald-500/15 text-emerald-400 font-bold border border-emerald-500/20 flex items-center gap-1">
+                                      <span className="material-symbols-outlined text-[12px]">check_circle</span>
+                                      تم الاستيراد والتفعيل ({group.total})
+                                    </span>
+                                  ) : group.importedCount > 0 ? (
+                                    <span className="text-[10px] px-2 py-0.5 rounded-md bg-amber-500/15 text-amber-400 font-bold border border-amber-500/20">
+                                      استيراد جزئي ({group.importedCount}/{group.total})
+                                    </span>
+                                  ) : (
+                                    <span className="text-[10px] px-2 py-0.5 rounded-md bg-sky-500/15 text-sky-400 font-bold border border-sky-500/20">
+                                      معاينة مباشرة ({group.total})
+                                    </span>
+                                  )
                                 )}
                               </div>
                               <div className="text-[10px] sm:text-[11px] text-on-surface-variant mt-0.5 flex items-center gap-2">
                                 <span>{group.total} خدمة في هذه الباقة</span>
                                 <span>•</span>
-                                <span className="text-primary font-medium">{group.activeCount} نشطة</span>
+                                {serviceLoadSource === "stored" ? (
+                                  <span className="text-primary font-medium">{group.activeCount} نشطة</span>
+                                ) : (
+                                  <span className={group.isAllImported ? "text-emerald-400 font-medium" : "text-sky-400 font-medium"}>
+                                    {group.importedCount} مستوردة
+                                  </span>
+                                )}
                               </div>
                             </div>
                           </div>
 
                           <div className="flex items-center gap-1.5 self-end sm:self-center">
                             {serviceLoadSource !== "stored" ? (
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  setSelectedGroupNames([group.groupName]);
-                                  openSyncModal(browseProvider, "selected");
-                                }}
-                                className="px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-xl font-bold text-xs transition-all flex items-center gap-1 border bg-sky-500/10 text-sky-500 hover:bg-sky-500/20 border-sky-500/20"
-                                title="استيراد وتفعيل هذه الباقة"
-                              >
-                                <span className="material-symbols-outlined text-xs">cloud_download</span>
-                                <span>استيراد الباقة</span>
-                              </button>
+                              group.isAllImported ? (
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setSelectedGroupNames([group.groupName]);
+                                    openSyncModal(browseProvider, "selected");
+                                  }}
+                                  className="px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-xl font-bold text-xs transition-all flex items-center gap-1 border bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 border-emerald-500/20"
+                                  title="إعادة تحديث أو مزامنة هذه الباقة"
+                                >
+                                  <span className="material-symbols-outlined text-xs">check_circle</span>
+                                  <span>مستوردة (تحديث)</span>
+                                </button>
+                              ) : (
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setSelectedGroupNames([group.groupName]);
+                                    openSyncModal(browseProvider, "selected");
+                                  }}
+                                  className="px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-xl font-bold text-xs transition-all flex items-center gap-1 border bg-sky-500/10 text-sky-500 hover:bg-sky-500/20 border-sky-500/20 shadow-sm"
+                                  title="استيراد وتفعيل هذه الباقة فقط"
+                                >
+                                  <span className="material-symbols-outlined text-xs">cloud_download</span>
+                                  <span>استيراد الباقة</span>
+                                </button>
+                              )
                             ) : (
                               <button
                                 type="button"
