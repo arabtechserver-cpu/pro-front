@@ -45,7 +45,7 @@ async function proxyRequest(
     headers: forwardHeaders,
     body,
     redirect: 'manual',
-    signal: AbortSignal.timeout(30000),
+    signal: AbortSignal.timeout(180000),
   });
 }
 

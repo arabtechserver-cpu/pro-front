@@ -342,72 +342,18 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
     }, 2000);
   };
 
-  const compressReceiptImage = (file: File): Promise<string> => {
-    return new Promise((resolve) => {
-      if (!file.type.startsWith("image/")) {
-        const reader = new FileReader();
-        reader.onload = (e) => resolve((e.target?.result as string) || "");
-        reader.onerror = () => resolve("");
-        reader.readAsDataURL(file);
-        return;
-      }
-
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const img = new Image();
-        img.onload = () => {
-          const maxDimension = 1200;
-          let { width, height } = img;
-          if (width > maxDimension || height > maxDimension) {
-            if (width > height) {
-              height = Math.round((height * maxDimension) / width);
-              width = maxDimension;
-            } else {
-              width = Math.round((width * maxDimension) / height);
-              height = maxDimension;
-            }
-          }
-          const canvas = document.createElement("canvas");
-          canvas.width = width;
-          canvas.height = height;
-          const ctx = canvas.getContext("2d");
-          if (ctx) {
-            ctx.drawImage(img, 0, 0, width, height);
-            let compressedBase64 = canvas.toDataURL("image/jpeg", 0.75);
-            if (compressedBase64.length > 2 * 1024 * 1024) {
-              compressedBase64 = canvas.toDataURL("image/jpeg", 0.5);
-            }
-            resolve(compressedBase64);
-          } else {
-            resolve((e.target?.result as string) || "");
-          }
-        };
-        img.onerror = () => resolve((e.target?.result as string) || "");
-        img.src = e.target?.result as string;
-      };
-      reader.onerror = () => resolve("");
-      reader.readAsDataURL(file);
-    });
-  };
-
-  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      if (file.size > 15 * 1024 * 1024) {
-        setErrorMessage(lang === "ar" ? "حجم الصورة كبير جداً! الأقصى 15 ميجابايت." : "File size too large! Max 15MB.");
-        return;
-      }
       setReceiptFileName(file.name);
-      try {
-        const compressed = await compressReceiptImage(file);
-        setReceiptImage(compressed);
-      } catch {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          setReceiptImage((reader.result as string) || "");
-        };
-        reader.readAsDataURL(file);
-      }
+      const reader = new FileReader();
+      reader.onload = () => {
+        setReceiptImage((reader.result as string) || "");
+      };
+      reader.onerror = () => {
+        setErrorMessage(lang === "ar" ? "تعذر قراءة ملف الصورة، يُرجى تجربة ملف آخر" : "Could not read image file");
+      };
+      reader.readAsDataURL(file);
     }
   };
 
@@ -430,24 +376,17 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
       return;
     }
 
-    const token = localStorage.getItem("user_token");
-    if (!token || token === "null" || token === "undefined") {
-      setErrorMessage(
-        lang === "ar"
-          ? "انتهت جلسة تسجيل الدخول! يرجى تسجيل الدخول مجدداً للمتابعة."
-          : "Session expired! Please log in again to continue."
-      );
-      setTimeout(() => router.push(`/${lang}/login`), 2000);
-      return;
-    }
-
     setIsLoading(true);
 
     try {
+      const token = localStorage.getItem("user_token") || localStorage.getItem("token");
       const headers: Record<string, string> = {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`
+        "Content-Type": "application/json"
       };
+
+      if (token && token !== "null" && token !== "undefined") {
+        headers["Authorization"] = `Bearer ${token}`;
+      }
 
       const res = await fetch("/api/transactions", {
         method: "POST",
@@ -469,7 +408,7 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
       if (res.ok && data.success) {
         setSuccessMessage(
           lang === "ar"
-            ? `🎉 تم تسجيل طلب الشحن بقيمة $${parseFloat(depositAmount).toFixed(2)} وإرفاق إشعار التحويل بنجاح! جاري المراجعة والتفعيل.`
+            ? `🎉 تم إرسال طلب الشحن بقيمة $${parseFloat(depositAmount).toFixed(2)} وإرفاق إشعار التحويل بنجاح! جاري المراجعة والتفعيل فوراً.`
             : `🎉 Deposit request of $${parseFloat(depositAmount).toFixed(2)} submitted & receipt attached successfully!`
         );
 
@@ -478,7 +417,7 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
         setReceiptFileName("");
         fetchRealTransactions(userSession?.id, userSession?.email);
       } else {
-        setErrorMessage(data.error || (lang === "ar" ? "فشل حفظ طلب الشحن" : "Failed to submit deposit request"));
+        setErrorMessage(data.error || (lang === "ar" ? "فشل إرسال طلب الشحن" : "Failed to submit deposit request"));
       }
     } catch {
       setErrorMessage(lang === "ar" ? "تعذر الاتصال بالسيرفر لإتمام طلب الشحن. يرجى التحقق من اتصال الإنترنت." : "Connection error submitting deposit");
@@ -823,7 +762,7 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
                   <div className="relative flex flex-col items-center justify-center p-6 border-2 border-dashed border-primary/50 rounded-2xl bg-[#0f172a]/80 hover:border-primary transition-all text-center group cursor-pointer">
                     <input
                       type="file"
-                      accept="image/png, image/jpeg, image/jpg"
+                      accept="image/*"
                       onChange={handleImageChange}
                       className="absolute inset-0 opacity-0 cursor-pointer w-full h-full z-10"
                     />
@@ -860,7 +799,7 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
                           {lang === "ar" ? "انقر هنا لاختيار صورة الإيصال من جهازك" : "Click to select receipt screenshot"}
                         </p>
                         <p className="text-xs text-slate-300">
-                          {lang === "ar" ? "الصيغ المدعومة: PNG, JPG, JPEG (أقصى حجم 10MB)" : "Supports PNG, JPG, JPEG (Max 10MB)"}
+                          {lang === "ar" ? "مفتوح الحجم والأبعاد: جميع صيغ الصور (PNG, JPG, WEBP وغيرها) بدقتها الكاملة" : "Open size & dimensions: all image formats supported in full resolution"}
                         </p>
                       </div>
                     )}
