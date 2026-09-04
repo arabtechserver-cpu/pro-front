@@ -1204,9 +1204,17 @@ export default function ServicesPage() {
                                       {getServiceRequiredFields(service).map((rf, rfIdx) => (
                                         <span
                                           key={rfIdx}
-                                          className="text-[10px] px-2 py-0.5 rounded-lg bg-surface-container-high border border-primary/30 text-primary font-bold flex items-center gap-1 font-mono"
+                                          className={`text-[10px] px-2 py-0.5 rounded-lg border font-bold flex items-center gap-1 font-mono ${
+                                            rf.type === 'quantity'
+                                              ? 'bg-secondary/15 border-secondary/40 text-secondary'
+                                              : 'bg-surface-container-high border-primary/30 text-primary'
+                                          }`}
                                         >
-                                          <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
+                                          {rf.type === 'quantity' ? (
+                                            <span className="material-symbols-outlined text-[12px]">tag</span>
+                                          ) : (
+                                            <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
+                                          )}
                                           <span>{rf.label}</span>
                                         </span>
                                       ))}

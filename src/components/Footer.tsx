@@ -21,8 +21,8 @@ export default function Footer({ dict, lang = "ar" }: FooterProps) {
       nameAr: "فودافون كاش",
       nameEn: "Vodafone Cash",
       badge: "📱",
-      tagAr: "01036673447",
-      tagEn: "01036673447",
+      tagAr: "01097160605",
+      tagEn: "01097160605",
       color: "from-red-600/20 to-rose-600/20 border-red-500/40 text-red-400"
     },
     {
@@ -48,8 +48,8 @@ export default function Footer({ dict, lang = "ar" }: FooterProps) {
       nameAr: "باينانس Binance Pay",
       nameEn: "Binance Pay",
       badge: "🔶",
-      tagAr: "ID: 287584748",
-      tagEn: "ID: 287584748",
+      tagAr: "ID: 894642115",
+      tagEn: "ID: 894642115",
       color: "from-amber-600/20 to-orange-600/20 border-amber-400/40 text-amber-300"
     }
   ];

@@ -45,8 +45,23 @@ export function getServiceRequiredFields(service: any): { label: string; type?: 
           if (Array.isArray(rawOpts)) opts = rawOpts.map((o: any) => String(o?.value || o || "").trim()).filter(Boolean);
           else if (typeof rawOpts === "string" && rawOpts.trim()) opts = rawOpts.split(/[\r\n,|]+/).map(s => s.trim()).filter(Boolean);
 
+          const cleanName = String(name).replace(/^custom_/, "").trim();
+          const isQty = f.is_quantity === true || f.type === "quantity" || f.fieldtype === "quantity" || /^(qnt|quantity|الكمية)$/i.test(cleanName);
+
+          if (isQty) {
+            const min = f.min_quantity ?? f.minQty ?? 1;
+            const max = f.max_quantity ?? f.maxQty ?? 0;
+            const limitText = max > 0 ? `(من ${min} إلى ${max})` : `(الحد الأدنى: ${min})`;
+            fields.push({
+              label: `الكمية ${limitText}`,
+              type: "quantity",
+              required: true
+            });
+            return;
+          }
+
           fields.push({
-            label: String(name).replace(/^custom_/, "").trim(),
+            label: cleanName,
             type: opts.length > 0 ? "select" : (f.fieldtype || f.type || "text"),
             required: f.required === "1" || f.required === true || f.required === "on",
             options: opts
@@ -61,8 +76,23 @@ export function getServiceRequiredFields(service: any): { label: string; type?: 
           if (Array.isArray(rawOpts)) opts = rawOpts.map((o: any) => String(o?.value || o || "").trim()).filter(Boolean);
           else if (typeof rawOpts === "string" && rawOpts.trim()) opts = rawOpts.split(/[\r\n,|]+/).map(s => s.trim()).filter(Boolean);
 
+          const cleanName = String(name).replace(/^custom_/, "").trim();
+          const isQty = val.is_quantity === true || val.type === "quantity" || val.fieldtype === "quantity" || /^(qnt|quantity|الكمية)$/i.test(cleanName);
+
+          if (isQty) {
+            const min = val.min_quantity ?? val.minQty ?? 1;
+            const max = val.max_quantity ?? val.maxQty ?? 0;
+            const limitText = max > 0 ? `(من ${min} إلى ${max})` : `(الحد الأدنى: ${min})`;
+            fields.push({
+              label: `الكمية ${limitText}`,
+              type: "quantity",
+              required: true
+            });
+            return;
+          }
+
           fields.push({
-            label: String(name).replace(/^custom_/, "").trim(),
+            label: cleanName,
             type: opts.length > 0 ? "select" : (val.fieldtype || val.type || "text"),
             required: val.required === "1" || val.required === true || val.required === "on",
             options: opts
@@ -70,6 +100,19 @@ export function getServiceRequiredFields(service: any): { label: string; type?: 
         });
       }
     } catch (e) {}
+  }
+
+  // إذا كانت الخدمة تدعم الكمية ولم يُضف حقل كمية بعد
+  const hasQty = fields.some(f => f.type === "quantity" || f.label.includes("الكمية"));
+  if (!hasQty && (service.supportsQty || service.supports_quantity || service.minQty || service.QNT_MIN || (service.name && /\bany\s*qnt\b/i.test(service.name)))) {
+    const min = service.minQty ?? service.min_quantity ?? service.QNT_MIN ?? 1;
+    const max = service.maxQty ?? service.max_quantity ?? service.QNT_MAX ?? 0;
+    const limitText = Number(max) > 0 ? `(من ${min} إلى ${max})` : `(الحد الأدنى: ${min})`;
+    fields.push({
+      label: `الكمية ${limitText}`,
+      type: "quantity",
+      required: true
+    });
   }
 
   // If no custom fields were found, infer standard requirements from category and name

@@ -73,6 +73,61 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
     return null;
   };
 
+  /**
+   * فحص هل الحقل يمثل حقل كمية (QNT / Quantity / etc)
+   */
+  const isQuantityField = (fieldObj?: any, key?: string): boolean => {
+    const candidateStrings: string[] = [];
+    if (key) candidateStrings.push(String(key));
+    if (fieldObj) {
+      if (typeof fieldObj === 'string') candidateStrings.push(fieldObj);
+      else if (typeof fieldObj === 'object') {
+        if (fieldObj.is_quantity === true || fieldObj.type === 'quantity' || fieldObj.fieldtype === 'quantity') return true;
+        if (fieldObj.field_id) candidateStrings.push(String(fieldObj.field_id));
+        if (fieldObj.reqid) candidateStrings.push(String(fieldObj.reqid));
+        if (fieldObj.REQID) candidateStrings.push(String(fieldObj.REQID));
+        if (fieldObj.name) candidateStrings.push(String(fieldObj.name));
+        if (fieldObj.fieldname) candidateStrings.push(String(fieldObj.fieldname));
+        if (fieldObj.label) candidateStrings.push(String(fieldObj.label));
+      }
+    }
+    for (const raw of candidateStrings) {
+      const clean = raw.replace(/^custom_/i, '').trim().toLowerCase();
+      if (
+        clean === 'qnt' ||
+        clean === 'quantity' ||
+        clean === 'qty' ||
+        clean === 'الكمية' ||
+        clean === 'الكميه'
+      ) {
+        return true;
+      }
+    }
+    return false;
+  };
+
+  /**
+   * استخراج حدود الكمية (الحد الأدنى والأقصى) من نصوص الوصف واسم الخدمة
+   */
+  const extractLimitsFromText = (text: string): { min: number | null; max: number | null } => {
+    if (!text || typeof text !== 'string') return { min: null, max: null };
+    let min: number | null = null;
+    let max: number | null = null;
+    const minMatch = text.match(/(?:min|minimum|qnt_min|أقل كمية|الحد الأدنى|اقل كمية)[:\s]*([0-9]+)/i);
+    if (minMatch && minMatch[1]) min = parseInt(minMatch[1], 10);
+    const maxMatch = text.match(/(?:max|maximum|qnt_max|أقصى كمية|الحد الأقصى|اقصى كمية)[:\s]*([0-9]+)/i);
+    if (maxMatch && maxMatch[1]) max = parseInt(maxMatch[1], 10);
+    if (min === null && max === null) {
+      const rangeMatch = text.match(/\b([1-9][0-9]*)\s*[-–—]\s*([1-9][0-9]*)\b/);
+      if (rangeMatch && rangeMatch[1] && rangeMatch[2]) {
+        const p1 = parseInt(rangeMatch[1], 10);
+        const p2 = parseInt(rangeMatch[2], 10);
+        if (p1 < p2 && p2 <= 1000000) { min = p1; max = p2; }
+      }
+    }
+    return { min, max };
+  };
+
   // Helper to extract options list for select/dropdown fields — يقرأ من بيانات Dhru API الحقيقية
   const extractFieldOptions = (key: string, fieldObj: any): string[] => {
     let options: string[] = [];
@@ -315,12 +370,59 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
     providerFieldsForImei
   );
 
-  // هل الخدمة تدعم الكمية (qty) — بناءً على API فقط
-  const serviceSupportsQty =
+  // استخراج حقول المزود
+  const providerFields = getProviderCustomFields(selectedService);
+
+  // البحث عن حقل كمية مخصص
+  const quantityFieldEntry = providerFields
+    ? Object.entries(providerFields).find(([k, f]) => isQuantityField(f, k))
+    : null;
+  const quantityField = quantityFieldEntry ? quantityFieldEntry[1] : null;
+
+  const textClues = extractLimitsFromText(
+    `${selectedService?.name || ''} ${selectedService?.info || ''} ${quantityField?.description || ''} ${quantityField?.placeholder || ''}`
+  );
+
+  const rawMin =
+    selectedService?.minQty ??
+    selectedService?.min_quantity ??
+    quantityField?.min_quantity ??
+    quantityField?.minQty ??
+    textClues.min;
+
+  const rawMax =
+    selectedService?.maxQty ??
+    selectedService?.max_quantity ??
+    quantityField?.max_quantity ??
+    quantityField?.maxQty ??
+    textClues.max;
+
+  const minQty = Math.max(1, typeof rawMin === 'number' ? rawMin : (parseInt(String(rawMin || '1'), 10) || 1));
+  const maxQty = typeof rawMax === 'number' ? Math.max(0, rawMax) : (rawMax !== undefined && rawMax !== null ? Math.max(0, parseInt(String(rawMax), 10) || 0) : 0);
+
+  const hasQuantityNamePattern = Boolean(
+    selectedService?.name?.match(/\bany\s*qnt\b|\bcredits?\s*qnt\b|\bqnt\b|\bquantity\b|\bqty\b|كمية|الكمية|كريديت/i) ||
+    selectedService?.info?.match(/\bany\s*qnt\b|\bcredits?\s*qnt\b|\bqnt\b|\bquantity\b|\bqty\b|كمية|الكمية/i) ||
+    selectedService?.originalName?.match(/\bany\s*qnt\b|\bcredits?\s*qnt\b|\bqnt\b|\bquantity\b|\bqty\b/i)
+  );
+
+  // هل الخدمة تدعم الكمية (qty)
+  const serviceSupportsQty = Boolean(
     selectedService?.supportsQty === true ||
     selectedService?.supportsQty === "1" ||
-    selectedService?.minQty !== undefined ||
-    selectedService?.maxQty !== undefined;
+    selectedService?.supports_quantity === true ||
+    Boolean(quantityField) ||
+    (selectedService?.minQty !== undefined && selectedService.minQty > 1) ||
+    (selectedService?.maxQty !== undefined && selectedService.maxQty > 0) ||
+    hasQuantityNamePattern
+  );
+
+  // ضبط الكمية تلقائياً عند اختيار خدمة تتطلب حداً أدنى أكبر من الكمية الحالية
+  useEffect(() => {
+    if (serviceSupportsQty && quantity < minQty) {
+      setQuantity(minQty);
+    }
+  }, [selectedServiceId, serviceSupportsQty, minQty]);
 
   // Unit price & total calculation
   const getCalculatedUnitPrice = (service: any): number => {
@@ -390,6 +492,7 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
         .filter(([k, f]: [string, any]) => {
           const isImei = /(imei|ecid|serial number|sn\b)/i.test(k) || /(imei|ecid|serial number|sn\b)/i.test(f?.name || f?.field_id || f?.label || '');
           if (isImei) return false; // حقل الـ IMEI اختياري بالكامل بناءً على طلب الإدارة
+          if (isQuantityField(f, k)) return false; // حقل الكمية يتم التعامل معه عبر قسم الكمية المخصص
           return (f?.required === "1" || f?.required === true) && !customFieldValues[k]?.trim();
         })
         .map(([k, f]: [string, any]) => getLocalizedFieldLabel(k, f, lang));
@@ -405,7 +508,7 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
       }
 
       let customString = Object.entries(customFieldValues)
-        .filter(([_, v]) => Boolean(v && String(v).trim()))
+        .filter(([k, v]) => !isQuantityField(undefined, k) && Boolean(v && String(v).trim()))
         .map(([k, v]) => `${k}: ${v}`)
         .join(" | ");
 
@@ -433,6 +536,28 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
       payloadTarget = targetInput.trim() || (lang === 'ar' ? 'بدون بيانات' : 'No Data');
     }
 
+    // التحقق من حدود الكمية المفروضة من المزود
+    if (serviceSupportsQty) {
+      if (quantity < minQty) {
+        setSubmitFeedback({
+          type: "error",
+          text: lang === 'ar'
+            ? `عذراً، أقل كمية مسموح بطلبها لهذه الخدمة هي (${minQty})`
+            : `Sorry, minimum quantity allowed for this service is (${minQty})`
+        });
+        return;
+      }
+      if (maxQty > 0 && quantity > maxQty) {
+        setSubmitFeedback({
+          type: "error",
+          text: lang === 'ar'
+            ? `عذراً، أقصى كمية مسموح بطلبها لهذه الخدمة هي (${maxQty})`
+            : `Sorry, maximum quantity allowed for this service is (${maxQty})`
+        });
+        return;
+      }
+    }
+
     if (!hasEnoughBalance) {
       setSubmitFeedback({ 
         type: "error", 
@@ -441,6 +566,17 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
           : `Insufficient balance. Required: $${totalPrice.toFixed(2)}, Current: $${userBalance.toFixed(2)}.` 
       });
       return;
+    }
+
+    // دمج قيمة الكمية في الحقول المخصصة لضمان إرسالها للمزود بالاسم المطلوب (QNT)
+    const finalCustomValues: Record<string, string> = { ...customFieldValues };
+    if (serviceSupportsQty) {
+      const qtyStr = String(quantity > 0 ? quantity : minQty);
+      finalCustomValues['QNT'] = qtyStr;
+      finalCustomValues['custom_QNT'] = qtyStr;
+      if (quantityFieldEntry && quantityFieldEntry[0]) {
+        finalCustomValues[quantityFieldEntry[0]] = qtyStr;
+      }
     }
 
     setSubmittingOrder(true);
@@ -464,10 +600,10 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
           serviceName: selectedService.name,
           targetInput: payloadTarget,
           rawImei: rawImeiStr,
-          quantity: quantity > 0 ? quantity : 1,
+          quantity: serviceSupportsQty && quantity > 0 ? quantity : 1,
           price: unitPrice,
           notes: notes.trim(),
-          customFields: customFieldValues
+          customFields: Object.keys(finalCustomValues).length > 0 ? finalCustomValues : null
         })
       });
 
@@ -488,6 +624,7 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
         setTargetInput("");
         setNotes("");
         setCustomFieldValues({});
+        setQuantity(minQty);
         
         if (data.newBalance !== undefined) {
           setUserBalance(data.newBalance);
@@ -802,7 +939,7 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
             </div>
           )}
 
-          {/* PROVIDER REQUIRED CUSTOM FIELDS VS STANDARD INPUT — يتحكم فيها API المزود تلقائياً */}
+          {/* PROVIDER REQUIRED CUSTOM FIELDS VS STANDARD INPUT */}
           {(() => {
             if (selectedServiceId && !selectedServiceDetailsLoaded) {
               return (
@@ -814,98 +951,40 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
             }
 
             const providerFields = getProviderCustomFields(selectedService);
-            const hasCustomFields = Boolean(providerFields && Object.keys(providerFields).length > 0);
+            const nonQuantityFields = providerFields
+              ? Object.entries(providerFields).filter(([k, f]: [string, any]) => !isQuantityField(f, k))
+              : [];
+            const hasCustomFields = nonQuantityFields.length > 0;
+            const hasImeiInCustom = nonQuantityFields.some(([key, fieldObj]: [string, any]) => {
+              return /(imei|ecid|serial number|sn\b)/i.test(key) || /(imei|ecid|serial number|sn\b)/i.test(fieldObj?.name || fieldObj?.field_id || fieldObj?.label || '');
+            });
 
-            if (isImeiService || hasCustomFields) {
-              return (
-                <div className="space-y-6">
-                  {/* تم إخفاء حقل IMEI اليدوي بناءً على طلبك */}
-                  {/* ── حالة: المزود أرسل حقول مخصصة (Custom Fields) ── */}
-                  {hasCustomFields && (
-                    <div className="space-y-4 p-5 rounded-2xl bg-surface-container-high/40 border border-primary/20">
-                      <div className="flex items-center gap-2 text-xs font-bold text-primary">
-                        <span className="material-symbols-outlined text-base">tune</span>
-                        <span>
-                          {lang === 'ar'
-                            ? 'بيانات وحقول الطلب المطلوبة من المزود:'
-                            : 'Order Details & Provider Required Fields:'}
-                        </span>
-                      </div>
+            return (
+              <div className="space-y-6">
+                {/* ── حالة 1: حقول مخصصة واردة ومطلوبة من المزود ── */}
+                {hasCustomFields && (
+                  <div className="space-y-4 p-5 rounded-2xl bg-surface-container-high/40 border border-primary/20">
+                    <div className="flex items-center gap-2 text-xs font-bold text-primary">
+                      <span className="material-symbols-outlined text-base">tune</span>
+                      <span>
+                        {lang === 'ar'
+                          ? 'بيانات وحقول الطلب المطلوبة من المزود:'
+                          : 'Order Details & Provider Required Fields:'}
+                      </span>
+                    </div>
 
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {Object.entries(providerFields!).map(([key, fieldObj]: [string, any]) => {
-                          const cleanLabel = getLocalizedFieldLabel(key, fieldObj, lang);
-                          const isImeiField = /(imei|ecid|serial number|sn\b)/i.test(key) || /(imei|ecid|serial number|sn\b)/i.test(fieldObj?.name || fieldObj?.field_id || fieldObj?.label || '');
-                          const isRequired = !isImeiField && (fieldObj?.required === "1" || fieldObj?.required === true || fieldObj?.REQUIRED === "1");
-                          const fieldType = (fieldObj?.fieldtype || fieldObj?.type || fieldObj?.FIELDTYPE || '').toLowerCase();
-                          const fieldDesc = fieldObj?.description || fieldObj?.DESCRIPTION || fieldObj?.hint || '';
-                          const optionsList = extractFieldOptions(key, fieldObj);
-                          const isLong = isLongTextField(key, fieldObj);
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {nonQuantityFields.map(([key, fieldObj]: [string, any]) => {
+                        const cleanLabel = getLocalizedFieldLabel(key, fieldObj, lang);
+                        const isImeiField = /(imei|ecid|serial number|sn\b)/i.test(key) || /(imei|ecid|serial number|sn\b)/i.test(fieldObj?.name || fieldObj?.field_id || fieldObj?.label || '');
+                        const isRequired = !isImeiField && (fieldObj?.required === "1" || fieldObj?.required === true || fieldObj?.REQUIRED === "1");
+                        const fieldType = (fieldObj?.fieldtype || fieldObj?.type || fieldObj?.FIELDTYPE || '').toLowerCase();
+                        const fieldDesc = fieldObj?.description || fieldObj?.DESCRIPTION || fieldObj?.hint || '';
+                        const optionsList = extractFieldOptions(key, fieldObj);
+                        const isLong = isLongTextField(key, fieldObj);
 
-                          // حقل select / dropdown — لو فيه options حقيقية
-                          if (fieldType === 'select' && optionsList.length > 0) {
-                            return (
-                              <div key={key} className="flex flex-col gap-2">
-                                <label className="text-xs font-bold text-on-surface-variant uppercase tracking-wider flex items-center justify-between">
-                                  <span>{cleanLabel}:</span>
-                                  {isRequired ? (
-                                    <span className="text-primary text-[11px] font-normal">{lang === 'ar' ? '* إجباري' : '* Required'}</span>
-                                  ) : (
-                                    <span className="text-primary/70 text-[11px] font-normal">{lang === 'ar' ? '(اختياري)' : '(Optional)'}</span>
-                                  )}
-                                </label>
-                                <select
-                                  value={customFieldValues[key] || ""}
-                                  onChange={(e) => setCustomFieldValues({ ...customFieldValues, [key]: e.target.value })}
-                                  className="w-full bg-surface-container-lowest border border-outline-variant/40 rounded-xl py-3.5 px-4 text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all font-semibold text-xs cursor-pointer"
-                                  required={isRequired}
-                                >
-                                  <option value="">{lang === 'ar' ? '-- اختر من القائمة --' : '-- Select from list --'}</option>
-                                  {optionsList.map((opt, i) => (
-                                    <option key={i} value={opt}>{opt}</option>
-                                  ))}
-                                </select>
-                                {fieldDesc && (
-                                  <p className="text-[11px] text-on-surface-variant/80 flex items-center gap-1 mt-0.5 whitespace-pre-wrap">
-                                    <span className="material-symbols-outlined text-xs text-primary">info</span>
-                                    <span>{cleanHtmlToText(fieldDesc)}</span>
-                                  </p>
-                                )}
-                              </div>
-                            );
-                          }
-
-                          // حقل نصي طويل (تقرير، إثبات، روابط متعددة)
-                          if (isLong) {
-                            return (
-                              <div key={key} className="flex flex-col gap-2 md:col-span-2">
-                                <label className="text-xs font-bold text-on-surface-variant uppercase tracking-wider flex items-center justify-between">
-                                  <span>{cleanLabel}:</span>
-                                  {isRequired ? (
-                                    <span className="text-primary text-[11px] font-normal">{lang === 'ar' ? '* إجباري' : '* Required'}</span>
-                                  ) : (
-                                    <span className="text-primary/70 text-[11px] font-normal">{lang === 'ar' ? '(اختياري)' : '(Optional)'}</span>
-                                  )}
-                                </label>
-                                <textarea
-                                  rows={2}
-                                  value={customFieldValues[key] || ""}
-                                  onChange={(e) => setCustomFieldValues({ ...customFieldValues, [key]: e.target.value })}
-                                  placeholder={lang === 'ar' ? `أدخل ${cleanLabel}...` : `Enter ${cleanLabel}...`}
-                                  className="w-full bg-surface-container-lowest border border-outline-variant/40 rounded-xl py-3 px-4 text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all font-mono text-sm dir-ltr"
-                                  required={isRequired}
-                                />
-                                {fieldDesc && (
-                                  <p className="text-[11px] text-on-surface-variant/80 flex items-center gap-1 mt-0.5 whitespace-pre-wrap">
-                                    <span className="material-symbols-outlined text-xs text-primary">info</span>
-                                    <span>{cleanHtmlToText(fieldDesc)}</span>
-                                  </p>
-                                )}
-                              </div>
-                            );
-                          }
-
-                          // حقل نصي عادي / كلمة مرور / إيميل / سيريال
+                        // حقل select / dropdown — لو فيه options حقيقية
+                        if (fieldType === 'select' && optionsList.length > 0) {
                           return (
                             <div key={key} className="flex flex-col gap-2">
                               <label className="text-xs font-bold text-on-surface-variant uppercase tracking-wider flex items-center justify-between">
@@ -916,8 +995,41 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
                                   <span className="text-primary/70 text-[11px] font-normal">{lang === 'ar' ? '(اختياري)' : '(Optional)'}</span>
                                 )}
                               </label>
-                              <input
-                                type={fieldType === "password" ? "password" : "text"}
+                              <select
+                                value={customFieldValues[key] || ""}
+                                onChange={(e) => setCustomFieldValues({ ...customFieldValues, [key]: e.target.value })}
+                                className="w-full bg-surface-container-lowest border border-outline-variant/40 rounded-xl py-3.5 px-4 text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all font-semibold text-xs cursor-pointer"
+                                required={isRequired}
+                              >
+                                <option value="">{lang === 'ar' ? '-- اختر من القائمة --' : '-- Select from list --'}</option>
+                                {optionsList.map((opt, i) => (
+                                  <option key={i} value={opt}>{opt}</option>
+                                ))}
+                              </select>
+                              {fieldDesc && (
+                                <p className="text-[11px] text-on-surface-variant/80 flex items-center gap-1 mt-0.5 whitespace-pre-wrap">
+                                  <span className="material-symbols-outlined text-xs text-primary">info</span>
+                                  <span>{cleanHtmlToText(fieldDesc)}</span>
+                                </p>
+                              )}
+                            </div>
+                          );
+                        }
+
+                        // حقل نصي طويل (تقرير، إثبات، روابط متعددة)
+                        if (isLong) {
+                          return (
+                            <div key={key} className="flex flex-col gap-2 md:col-span-2">
+                              <label className="text-xs font-bold text-on-surface-variant uppercase tracking-wider flex items-center justify-between">
+                                <span>{cleanLabel}:</span>
+                                {isRequired ? (
+                                  <span className="text-primary text-[11px] font-normal">{lang === 'ar' ? '* إجباري' : '* Required'}</span>
+                                ) : (
+                                  <span className="text-primary/70 text-[11px] font-normal">{lang === 'ar' ? '(اختياري)' : '(Optional)'}</span>
+                                )}
+                              </label>
+                              <textarea
+                                rows={2}
                                 value={customFieldValues[key] || ""}
                                 onChange={(e) => setCustomFieldValues({ ...customFieldValues, [key]: e.target.value })}
                                 placeholder={lang === 'ar' ? `أدخل ${cleanLabel}...` : `Enter ${cleanLabel}...`}
@@ -932,38 +1044,187 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
                               )}
                             </div>
                           );
-                        })}
+                        }
+
+                        // حقل نصي عادي / كلمة مرور / إيميل / سيريال
+                        return (
+                          <div key={key} className="flex flex-col gap-2">
+                            <label className="text-xs font-bold text-on-surface-variant uppercase tracking-wider flex items-center justify-between">
+                              <span>{cleanLabel}:</span>
+                              {isRequired ? (
+                                <span className="text-primary text-[11px] font-normal">{lang === 'ar' ? '* إجباري' : '* Required'}</span>
+                              ) : (
+                                <span className="text-primary/70 text-[11px] font-normal">{lang === 'ar' ? '(اختياري)' : '(Optional)'}</span>
+                              )}
+                            </label>
+                            <input
+                              type={fieldType === "password" ? "password" : "text"}
+                              value={customFieldValues[key] || ""}
+                              onChange={(e) => setCustomFieldValues({ ...customFieldValues, [key]: e.target.value })}
+                              placeholder={lang === 'ar' ? `أدخل ${cleanLabel}...` : `Enter ${cleanLabel}...`}
+                              className="w-full bg-surface-container-lowest border border-outline-variant/40 rounded-xl py-3.5 px-4 text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all font-mono text-sm dir-ltr"
+                              required={isRequired}
+                            />
+                            {fieldDesc && (
+                              <p className="text-[11px] text-on-surface-variant/80 flex items-center gap-1 mt-0.5 whitespace-pre-wrap">
+                                <span className="material-symbols-outlined text-xs text-primary">info</span>
+                                <span>{cleanHtmlToText(fieldDesc)}</span>
+                              </p>
+                            )}
+                          </div>
+                        );
+                      })}
                       </div>
+                    </div>
+                  )}
+
+                  {/* ── حالة 2: خدمة IMEI ولا يوجد حقل IMEI في الحقول المخصصة للمزود ── */}
+                  {isImeiService && !hasImeiInCustom && (
+                    <div className="space-y-2 p-5 rounded-2xl bg-surface-container-high/40 border border-primary/20">
+                      <label className="text-xs font-bold text-on-surface-variant uppercase tracking-wider flex items-center justify-between">
+                        <span>{lang === 'ar' ? 'رقم IMEI أو السيريال للجهاز (Device IMEI / Serial):' : 'Device IMEI / Serial Number:'}</span>
+                        <span className="text-primary text-[11px] font-normal">{lang === 'ar' ? '* إجباري' : '* Required'}</span>
+                      </label>
+                      <input
+                        type="text"
+                        value={targetInput}
+                        onChange={(e) => setTargetInput(e.target.value)}
+                        placeholder={lang === 'ar' ? 'أدخل رقم IMEI المكون من 15 رقم أو Serial...' : 'Enter 15-digit IMEI or device Serial number...'}
+                        className="w-full bg-surface-container-lowest border border-outline-variant/40 rounded-xl py-3.5 px-4 text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all font-mono text-sm dir-ltr"
+                        required
+                      />
+                    </div>
+                  )}
+
+                  {/* ── حالة 3: خدمة عامة لا تملك حقولاً مخصصة من المزود وليست IMEI ── */}
+                  {!hasCustomFields && !isImeiService && (
+                    <div className="space-y-2 p-5 rounded-2xl bg-surface-container-high/40 border border-primary/20">
+                      <label className="text-xs font-bold text-on-surface-variant uppercase tracking-wider flex items-center justify-between">
+                        <span>{lang === 'ar' ? 'بيانات الحساب / المعرف / الرقم المطلوب (Target Account / ID):' : 'Target Account / Username / ID / Number:'}</span>
+                        <span className="text-primary text-[11px] font-normal">{lang === 'ar' ? '* إجباري' : '* Required'}</span>
+                      </label>
+                      <input
+                        type="text"
+                        value={targetInput}
+                        onChange={(e) => setTargetInput(e.target.value)}
+                        placeholder={lang === 'ar' ? 'أدخل اسم المستخدم، البريد، أو المعرف المطلوب...' : 'Enter target username, email or ID...'}
+                        className="w-full bg-surface-container-lowest border border-outline-variant/40 rounded-xl py-3.5 px-4 text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all font-mono text-sm dir-ltr"
+                        required
+                      />
                     </div>
                   )}
                 </div>
               );
-            }
+            })()}
 
-            // ── حالة: خدمة سيرفر عامة لا تتطلب حقول مخصصة إجبارية من المزود
-            // تم إخفاء حقل الإدخال اليدوي بناءً على طلبك
-            return null;
-          })()}
-
-          {/* Quantity & Notes — الكمية تظهر فقط لو API المزود يدعمها */}
-          <div className={`grid gap-6 ${serviceSupportsQty ? 'grid-cols-1 md:grid-cols-3' : 'grid-cols-1'}`}>
+          {/* Quantity & Notes — يظهر قسم الكمية المحسن مع الحدين الأدنى والأقصى */}
+          <div className="space-y-4">
             {serviceSupportsQty && (
-              <div className="flex flex-col gap-2">
-                <label className="text-xs font-bold text-on-surface-variant uppercase tracking-wider">
-                  {lang === 'ar' ? 'الكمية' : 'Quantity'}
-                </label>
-                <input
-                  type="number"
-                  min={selectedService?.minQty || 1}
-                  max={selectedService?.maxQty || 100}
-                  value={quantity}
-                  onChange={(e) => setQuantity(parseInt(e.target.value) || 1)}
-                  className="w-full bg-surface-container-lowest border border-outline-variant/40 rounded-xl py-3.5 px-4 text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all font-mono text-sm dir-ltr"
-                />
+              <div className="p-5 rounded-2xl bg-surface-container-high/50 border border-primary/25 space-y-3">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    <span className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/20 text-primary flex items-center justify-center">
+                      <span className="material-symbols-outlined text-lg">pin</span>
+                    </span>
+                    <div>
+                      <h5 className="text-xs font-bold text-on-surface uppercase tracking-wider">
+                        {lang === 'ar' ? 'الكمية المطلوبة (Quantity)' : 'Required Quantity'}
+                      </h5>
+                      <p className="text-[11px] text-on-surface-variant">
+                        {lang === 'ar'
+                          ? `أقل كمية: ${minQty} ${maxQty > 0 ? `| أقصى كمية: ${maxQty}` : '| بدون حد أقصى'}`
+                          : `Min: ${minQty} ${maxQty > 0 ? `| Max: ${maxQty}` : '| Unlimited'}`}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Badges for Min & Max */}
+                  <div className="flex items-center gap-2">
+                    <span className="text-[11px] font-mono px-2.5 py-1 rounded-lg bg-primary/10 border border-primary/30 text-primary font-bold flex items-center gap-1">
+                      <span>{lang === 'ar' ? 'الحد الأدنى:' : 'Min:'}</span>
+                      <span className="dir-ltr">{minQty}</span>
+                    </span>
+                    <span className="text-[11px] font-mono px-2.5 py-1 rounded-lg bg-surface-container-lowest border border-outline-variant/40 text-on-surface-variant font-medium flex items-center gap-1">
+                      <span>{lang === 'ar' ? 'الحد الأقصى:' : 'Max:'}</span>
+                      <span className="dir-ltr">{maxQty > 0 ? maxQty : (lang === 'ar' ? 'غير محدود' : 'Unlimited')}</span>
+                    </span>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-center pt-1">
+                  <div className="flex items-center">
+                    <button
+                      type="button"
+                      onClick={() => setQuantity((q) => Math.max(minQty, q - 1))}
+                      disabled={quantity <= minQty}
+                      className="w-11 h-11 shrink-0 flex items-center justify-center rounded-l-xl rounded-r-none bg-surface-container-highest/80 hover:bg-primary/20 border border-r-0 border-outline-variant/40 text-on-surface hover:text-primary transition-all active:scale-95 disabled:opacity-40 disabled:pointer-events-none cursor-pointer"
+                      title={lang === 'ar' ? 'تقليل الكمية (-)' : 'Decrease (-)'}
+                    >
+                      <span className="material-symbols-outlined text-lg">remove</span>
+                    </button>
+                    <input
+                      type="number"
+                      min={minQty}
+                      max={maxQty > 0 ? maxQty : undefined}
+                      step={1}
+                      value={quantity}
+                      onChange={(e) => {
+                        const val = parseInt(e.target.value, 10);
+                        setQuantity(isNaN(val) ? minQty : val);
+                      }}
+                      className={`w-full text-center bg-surface-container-lowest border rounded-none py-2.5 px-3 text-on-surface focus:outline-none transition-all font-mono text-base font-bold dir-ltr ${
+                        quantity < minQty || (maxQty > 0 && quantity > maxQty)
+                          ? 'border-error ring-1 ring-error/50'
+                          : 'border-outline-variant/40 focus:border-primary focus:ring-1 focus:ring-primary/50'
+                      }`}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setQuantity((q) => (maxQty > 0 ? Math.min(maxQty, q + 1) : q + 1))}
+                      disabled={maxQty > 0 && quantity >= maxQty}
+                      className="w-11 h-11 shrink-0 flex items-center justify-center rounded-r-xl rounded-l-none bg-surface-container-highest/80 hover:bg-primary/20 border border-l-0 border-outline-variant/40 text-on-surface hover:text-primary transition-all active:scale-95 disabled:opacity-40 disabled:pointer-events-none cursor-pointer"
+                      title={lang === 'ar' ? 'زيادة الكمية (+)' : 'Increase (+)'}
+                    >
+                      <span className="material-symbols-outlined text-lg">add</span>
+                    </button>
+                  </div>
+
+                  <div className="p-3 rounded-xl bg-surface-container-lowest border border-outline-variant/30 flex items-center justify-between">
+                    <span className="text-xs text-on-surface-variant font-medium">
+                      {lang === 'ar' ? 'الحساب الإجمالي للكمية:' : 'Live Cost Calculation:'}
+                    </span>
+                    <span className="text-sm font-mono font-bold text-primary dir-ltr">
+                      ${unitPrice.toFixed(2)} × {quantity} = ${(unitPrice * (quantity > 0 ? quantity : 1)).toFixed(2)} USD
+                    </span>
+                  </div>
+                </div>
+
+                {/* Range alerts */}
+                {quantity < minQty && (
+                  <div className="p-2.5 rounded-xl bg-error/10 border border-error/25 text-error text-xs flex items-center gap-1.5">
+                    <span className="material-symbols-outlined text-sm shrink-0">error</span>
+                    <span>
+                      {lang === 'ar'
+                        ? `تنبيه: لقد أدخلت (${quantity}). الحد الأدنى المسموح به من المزود هو (${minQty})، لا يمكن إرسال الطلب بأقل من ذلك.`
+                        : `Warning: You entered (${quantity}). Provider minimum is (${minQty}), orders below this will be rejected.`}
+                    </span>
+                  </div>
+                )}
+
+                {maxQty > 0 && quantity > maxQty && (
+                  <div className="p-2.5 rounded-xl bg-error/10 border border-error/25 text-error text-xs flex items-center gap-1.5">
+                    <span className="material-symbols-outlined text-sm shrink-0">error</span>
+                    <span>
+                      {lang === 'ar'
+                        ? `تنبيه: لقد أدخلت (${quantity}). الحد الأقصى المسموح به من المزود هو (${maxQty})، لا يمكن إرسال الطلب بأكثر من ذلك.`
+                        : `Warning: You entered (${quantity}). Provider maximum is (${maxQty}), orders exceeding this will be rejected.`}
+                    </span>
+                  </div>
+                )}
               </div>
             )}
 
-            <div className={serviceSupportsQty ? 'md:col-span-2 flex flex-col gap-2' : 'flex flex-col gap-2'}>
+            <div className="flex flex-col gap-2">
               <label className="text-xs font-bold text-on-surface-variant uppercase tracking-wider">
                 {lang === 'ar' ? 'ملاحظات إضافية (اختياري)' : 'Additional Notes (Optional)'}
               </label>
