@@ -94,7 +94,7 @@ export default function OrdersClient() {
     setLoading(true);
     try {
       const adminToken = typeof window !== "undefined"
-        ? (localStorage.getItem("admin_token") || localStorage.getItem("adminToken") || localStorage.getItem("user_token"))
+        ? (localStorage.getItem("admin_token") || localStorage.getItem("adminToken"))
         : null;
       const res = await fetch("/api/orders?all=true", {
         headers: {
