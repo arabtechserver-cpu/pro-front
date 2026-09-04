@@ -67,7 +67,7 @@ export default function OrdersClient({ lang, dict }: { lang: string, dict: any }
       }
       const res = await fetch(`/api/orders?${param}`, {
         headers,
-        credentials: "include"
+        credentials: "omit"
       });
       if (res.ok) {
         const data = await res.json().catch(() => ({ orders: [] }));

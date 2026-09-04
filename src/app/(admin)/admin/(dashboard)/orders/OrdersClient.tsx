@@ -93,12 +93,15 @@ export default function OrdersClient() {
   const fetchOrders = async () => {
     setLoading(true);
     try {
-      const userToken = typeof window !== "undefined" ? localStorage.getItem("user_token") : null;
-      const res = await fetch("/api/orders", {
+      const adminToken = typeof window !== "undefined"
+        ? (localStorage.getItem("admin_token") || localStorage.getItem("adminToken") || localStorage.getItem("user_token"))
+        : null;
+      const res = await fetch("/api/orders?all=true", {
         headers: {
           "Cache-Control": "no-cache",
-          ...(userToken ? { Authorization: `Bearer ${userToken}` } : {})
-        }
+          ...(adminToken ? { Authorization: `Bearer ${adminToken}` } : {})
+        },
+        credentials: "include"
       });
 
       if (!res.ok) {

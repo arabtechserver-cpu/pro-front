@@ -600,7 +600,7 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
       const res = await fetch("/api/orders", {
         method: "POST",
         headers,
-        credentials: "include",
+        credentials: "omit",
         body: JSON.stringify({
           userId: userSession.id,
           email: userSession.email,
