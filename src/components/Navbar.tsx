@@ -197,19 +197,29 @@ export default function Navbar({ lang, dict }: NavbarProps) {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-18 sm:h-20">
             
-            {/* Logo with Glowing White Bubble Aura */}
-            <Link href={`/${lang}`} className="relative flex items-center group py-1 shrink-0" aria-label="Home">
-              <div className="absolute -inset-2 bg-gradient-to-r from-white/25 via-primary/30 to-white/25 rounded-full blur-lg opacity-75 group-hover:opacity-100 transition-all duration-500 pointer-events-none"></div>
-              <picture>
-                <source srcSet={lang === "ar" ? "/images/logo_ar.webp" : "/images/logo_en.webp"} type="image/webp" />
-                <img 
-                  src={lang === "ar" ? "/images/logo_ar.png" : "/images/logo_en.png"} 
-                  alt="Logo" 
-                  width={240}
-                  height={60}
-                  className="relative z-10 h-10 sm:h-13 md:h-16 lg:h-18 w-auto max-w-[200px] sm:max-w-[290px] md:max-w-[380px] lg:max-w-[440px] object-contain transition-transform duration-300 group-hover:scale-105 drop-shadow-[0_0_15px_rgba(255,255,255,0.35)]" 
-                />
-              </picture>
+            {/* Brand Logo with Glowing Bubble Aura & Title */}
+            <Link href={`/${lang}`} className="relative flex items-center gap-3 group py-1 shrink-0" aria-label="Home">
+              <div className="relative flex items-center justify-center">
+                <div className="absolute -inset-1.5 bg-gradient-to-r from-primary/30 via-secondary/35 to-primary/30 rounded-full blur-md opacity-75 group-hover:opacity-100 transition-all duration-500 pointer-events-none"></div>
+                <picture>
+                  <source srcSet={lang === "ar" ? "/images/logo_ar.webp" : "/images/logo_en.webp"} type="image/webp" />
+                  <img 
+                    src={lang === "ar" ? "/images/logo_ar.png" : "/images/logo_en.png"} 
+                    alt="Al-Wefaq Server Logo" 
+                    width={56}
+                    height={56}
+                    className="relative z-10 h-10 sm:h-12 md:h-13 w-10 sm:w-12 md:w-13 object-contain rounded-full transition-transform duration-300 group-hover:scale-105 drop-shadow-[0_0_12px_rgba(45,212,191,0.35)]" 
+                  />
+                </picture>
+              </div>
+              <div className="flex flex-col justify-center">
+                <span className="font-display font-extrabold text-base sm:text-lg tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-white via-primary-light to-primary group-hover:brightness-110 transition-all">
+                  {lang === "ar" ? "سيرفر الوفاق" : "Al-Wefaq Server"}
+                </span>
+                <span className="text-[9px] sm:text-[10px] font-mono tracking-wider text-primary/80 font-bold uppercase -mt-0.5">
+                  {lang === "ar" ? "AL-WEFAQ SERVER" : "GSM & REMOTE SERVICES"}
+                </span>
+              </div>
             </Link>
 
             {/* Desktop Navigation Links */}

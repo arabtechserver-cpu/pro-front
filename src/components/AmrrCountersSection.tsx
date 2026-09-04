@@ -71,7 +71,7 @@ export default function AmrrCountersSection({ lang }: AmrrCountersSectionProps) 
           <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black mb-4 leading-snug">
             <span>{isAr ? "مرحباً بك في " : "Welcome to "}</span>
             <span className="bg-emerald-400 text-slate-950 px-3 py-0.5 rounded-lg shadow inline-block">
-              {isAr ? "عرب تك برو" : "ArabTech Pro"}
+              {isAr ? "سيرفر الوفاق" : "Al-Wefaq Server"}
             </span>
             <br />
             <span className="bg-gradient-to-r from-cyan-400 to-emerald-400 bg-clip-text text-transparent block mt-2 text-xl sm:text-3xl font-bold">

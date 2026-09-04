@@ -64,18 +64,28 @@ export default function Footer({ dict, lang = "ar" }: FooterProps) {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           
           <div className="col-span-1 md:col-span-1 space-y-4">
-            <Link href={`/${lang}`} className="relative flex items-center gap-2 group w-fit" aria-label="Home">
-              <div className="absolute -inset-2 bg-gradient-to-r from-white/20 via-primary/25 to-white/20 rounded-full blur-md opacity-75 group-hover:opacity-100 transition-all pointer-events-none"></div>
-              <picture>
-                <source srcSet={lang === "ar" ? "/images/logo_ar.webp" : "/images/logo_en.webp"} type="image/webp" />
-                <img 
-                  src={lang === "ar" ? "/images/logo_ar.png" : "/images/logo_en.png"} 
-                  alt="Logo" 
-                  width={220}
-                  height={55}
-                  className="relative z-10 h-11 sm:h-14 w-auto max-w-[220px] sm:max-w-[300px] object-contain drop-shadow-[0_0_10px_rgba(255,255,255,0.25)]" 
-                />
-              </picture>
+            <Link href={`/${lang}`} className="relative flex items-center gap-3 group w-fit" aria-label="Home">
+              <div className="relative flex items-center justify-center">
+                <div className="absolute -inset-2 bg-gradient-to-r from-primary/20 via-secondary/25 to-primary/20 rounded-full blur-md opacity-75 group-hover:opacity-100 transition-all pointer-events-none"></div>
+                <picture>
+                  <source srcSet={lang === "ar" ? "/images/logo_ar.webp" : "/images/logo_en.webp"} type="image/webp" />
+                  <img 
+                    src={lang === "ar" ? "/images/logo_ar.png" : "/images/logo_en.png"} 
+                    alt="Al-Wefaq Server Logo" 
+                    width={56}
+                    height={56}
+                    className="relative z-10 h-12 w-12 object-contain rounded-full drop-shadow-[0_0_10px_rgba(45,212,191,0.3)]" 
+                  />
+                </picture>
+              </div>
+              <div className="flex flex-col">
+                <span className="font-display font-bold text-base text-on-surface">
+                  {lang === "ar" ? "سيرفر الوفاق" : "Al-Wefaq Server"}
+                </span>
+                <span className="text-[10px] font-mono uppercase tracking-widest text-primary font-semibold">
+                  AL-WEFAQ SERVER
+                </span>
+              </div>
             </Link>
 
             <p className="text-xs leading-relaxed text-on-surface-variant max-w-xs">
@@ -244,7 +254,7 @@ export default function Footer({ dict, lang = "ar" }: FooterProps) {
                 {lang === "ar" ? "اسم المنصة الرسمية" : "Official Platform"}
               </p>
               <p className="font-bold text-on-surface text-xs mt-0.5">
-                {lang === "ar" ? "عرب تك برو سيرفر" : "Arab Tech Pro Server"}
+                {lang === "ar" ? "سيرفر الوفاق" : "Al-Wefaq Server"}
               </p>
             </div>
           </div>
@@ -312,7 +322,7 @@ export default function Footer({ dict, lang = "ar" }: FooterProps) {
         <div className="pt-4 border-t border-outline-variant/20 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-on-surface-variant">
           <p className="flex items-center gap-1 flex-wrap text-center md:text-start">
             <span>&copy; {new Date().getFullYear()}</span>
-            <span className="font-bold text-on-surface">عرب تك برو سيرفر - Arab Tech Pro Server.</span>
+            <span className="font-bold text-on-surface">سيرفر الوفاق - Al-Wefaq Server.</span>
             <span>{dict.rights || "جميع الحقوق محفوظة."}</span>
           </p>
           <div className="flex items-center gap-4 text-[11px]">

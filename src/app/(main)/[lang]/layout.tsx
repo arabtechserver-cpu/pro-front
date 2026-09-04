@@ -14,25 +14,25 @@ const jetbrains = JetBrains_Mono({ subsets: ["latin"], variable: "--font-jetbrai
 export async function generateMetadata(props: { params: Promise<{ lang: string }> }): Promise<Metadata> {
   const params = await props.params;
   const isAr = params.lang === "ar";
-  const siteTitle = isAr ? "عرب تك برو سيرفر | Arab Tech Pro Server" : "Arab Tech Pro Server | GSM & Remote Unlock Services";
+  const siteTitle = isAr ? "سيرفر الوفاق | Al-Wefaq Server" : "Al-Wefaq Server | GSM & Remote Unlock Services";
   const siteDesc = isAr
-    ? "الموقع الرسمي لمنصة عرب تك برو سيرفر (Arab Tech Pro Server) - أفضل وأسرع سيرفر لفك شفرات الهواتف، تخطي آيكلود وFRP، وشراء رصيد البوكسات والدونجل وسيرفرات IMEI عن بعد."
-    : "Official Arab Tech Pro Server - The leading platform for remote phone unlocking, iCloud & FRP bypass, box and dongle activations, and instant IMEI services.";
+    ? "الموقع الرسمي لمنصة سيرفر الوفاق (Al-Wefaq Server) - أفضل وأسرع سيرفر لفك شفرات الهواتف، تخطي آيكلود وFRP، وشراء رصيد البوكسات والدونجل وسيرفرات IMEI عن بعد."
+    : "Official Al-Wefaq Server - The leading platform for remote phone unlocking, iCloud & FRP bypass, box and dongle activations, and instant IMEI services.";
 
   return {
     title: {
-      template: "%s | Arab Tech Pro Server",
+      template: "%s | Al-Wefaq Server",
       default: siteTitle,
     },
     description: siteDesc,
     keywords: [
-      "عرب تك برو سيرفر",
-      "عرب تيك برو سيرفر",
-      "عرب تك سيرفر",
-      "عرب تيك سيرفر",
+      "سيرفر الوفاق",
+      "الوفاق سيرفر",
+      "سيرفر الوفاق",
+      "الوفاق",
       "Arab Tech Pro Server",
-      "Arab Tech Server Pro",
-      "Arab Tech Server",
+      "Al-Wefaq Server Pro",
+      "Al-Wefaq Server",
       "arabtechproserver.tech",
       "سيرفر فك الهواتف",
       "فك شبكات",
@@ -47,10 +47,10 @@ export async function generateMetadata(props: { params: Promise<{ lang: string }
       "FRP Bypass"
     ],
     metadataBase: new URL("https://arabtechproserver.tech"),
-    applicationName: "Arab Tech Pro Server",
-    authors: [{ name: "Arab Tech Pro Server", url: "https://arabtechproserver.tech" }],
-    creator: "Arab Tech Pro Server",
-    publisher: "Arab Tech Pro Server",
+    applicationName: "Al-Wefaq Server",
+    authors: [{ name: "Al-Wefaq Server", url: "https://arabtechproserver.tech" }],
+    creator: "Al-Wefaq Server",
+    publisher: "Al-Wefaq Server",
     robots: {
       index: true,
       follow: true,
@@ -68,7 +68,7 @@ export async function generateMetadata(props: { params: Promise<{ lang: string }
       title: siteTitle,
       description: siteDesc,
       url: `https://arabtechproserver.tech/${params.lang}`,
-      siteName: "Arab Tech Pro Server - عرب تك برو سيرفر",
+      siteName: "سيرفر الوفاق - Al-Wefaq Server",
       images: [
         {
           url: isAr
@@ -76,7 +76,7 @@ export async function generateMetadata(props: { params: Promise<{ lang: string }
             : "https://arabtechproserver.tech/images/og_share_en.png",
           width: 1200,
           height: 630,
-          alt: "Arab Tech Pro Server Logo",
+          alt: "Al-Wefaq Server Logo",
         },
       ],
       locale: isAr ? "ar_AR" : "en_US",
@@ -135,20 +135,20 @@ export default async function RootLayout(
   const jsonLdWebsite = {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    "name": "Arab Tech Pro Server",
+    "name": "Al-Wefaq Server",
     "alternateName": [
-      "عرب تك برو سيرفر",
-      "عرب تيك برو سيرفر",
-      "Arab Tech Server Pro",
-      "Arab Tech Server",
-      "عرب تك سيرفر",
-      "عرب تيك سيرفر"
+      "سيرفر الوفاق",
+      "الوفاق سيرفر",
+      "Al-Wefaq Server Pro",
+      "Al-Wefaq Server",
+      "سيرفر الوفاق",
+      "الوفاق"
     ],
     "url": "https://arabtechproserver.tech",
     "inLanguage": ["ar", "en"],
     "description": isAr
-      ? "الموقع الرسمي لمنصة عرب تك برو سيرفر لخدمات فك الهواتف، تخطي iCloud وFRP، وخدمات IMEI والسيرفر عن بعد."
-      : "Official Arab Tech Pro Server for remote phone unlocking, iCloud & FRP bypass, and IMEI server services.",
+      ? "الموقع الرسمي لمنصة سيرفر الوفاق لخدمات فك الهواتف، تخطي iCloud وFRP، وخدمات IMEI والسيرفر عن بعد."
+      : "Official Al-Wefaq Server for remote phone unlocking, iCloud & FRP bypass, and IMEI server services.",
     "potentialAction": {
       "@type": "SearchAction",
       "target": "https://arabtechproserver.tech/ar/pricing?q={search_term_string}",
@@ -159,8 +159,8 @@ export default async function RootLayout(
   const jsonLdOrganization = {
     "@context": "https://schema.org",
     "@type": "Organization",
-    "name": "Arab Tech Pro Server",
-    "alternateName": "عرب تك برو سيرفر",
+    "name": "Al-Wefaq Server",
+    "alternateName": "سيرفر الوفاق",
     "url": "https://arabtechproserver.tech",
     "logo": "https://arabtechproserver.tech/images/logo_en.png",
     "sameAs": [
@@ -177,7 +177,7 @@ export default async function RootLayout(
   const jsonLdSoftware = {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
-    "name": "Arab Tech Pro Server - عرب تك برو سيرفر",
+    "name": "سيرفر الوفاق - Al-Wefaq Server",
     "operatingSystem": "All (Web, Windows, Mac, Android, iOS)",
     "applicationCategory": "BusinessApplication, UtilitiesApplication",
     "url": "https://arabtechproserver.tech",
@@ -198,17 +198,17 @@ export default async function RootLayout(
     "mainEntity": [
       {
         "@type": "Question",
-        "name": isAr ? "ما هو موقع عرب تك برو سيرفر؟" : "What is Arab Tech Pro Server?",
+        "name": isAr ? "ما هو موقع سيرفر الوفاق؟" : "What is Al-Wefaq Server?",
         "acceptedAnswer": {
           "@type": "Answer",
           "text": isAr
-            ? "عرب تك برو سيرفر (Arab Tech Pro Server) هو السيرفر الرسمي الأول لخدمات فك شفرات الهواتف المحمولة عن بعد، وتفعيل برامج السوفت وير والبوكسات (مثل UnlockTool, Chimera, Borneo)، وتخطي حسابات Google FRP وiCloud بأسرع وقت وأفضل أسعار الجملة."
-            : "Arab Tech Pro Server is the official platform providing remote GSM services, official phone unlocking, tool activations (UnlockTool, Chimera, Borneo), iCloud & FRP bypass, and instant server API credits."
+            ? "سيرفر الوفاق (Al-Wefaq Server) هو السيرفر الرسمي الأول لخدمات فك شفرات الهواتف المحمولة عن بعد، وتفعيل برامج السوفت وير والبوكسات (مثل UnlockTool, Chimera, Borneo)، وتخطي حسابات Google FRP وiCloud بأسرع وقت وأفضل أسعار الجملة."
+            : "Al-Wefaq Server is the official platform providing remote GSM services, official phone unlocking, tool activations (UnlockTool, Chimera, Borneo), iCloud & FRP bypass, and instant server API credits."
         }
       },
       {
         "@type": "Question",
-        "name": isAr ? "هل يوفر عرب تك برو سيرفر ربط API للموزعين؟" : "Does Arab Tech Pro Server provide API integration for resellers?",
+        "name": isAr ? "هل يوفر سيرفر الوفاق ربط API للموزعين؟" : "Does Al-Wefaq Server provide API integration for resellers?",
         "acceptedAnswer": {
           "@type": "Answer",
           "text": isAr
@@ -218,7 +218,7 @@ export default async function RootLayout(
       },
       {
         "@type": "Question",
-        "name": isAr ? "ما هي طرق الدفع المتاحة في عرب تك برو سيرفر؟" : "What payment methods are supported?",
+        "name": isAr ? "ما هي طرق الدفع المتاحة في سيرفر الوفاق؟" : "What payment methods are supported?",
         "acceptedAnswer": {
           "@type": "Answer",
           "text": isAr
@@ -251,7 +251,7 @@ export default async function RootLayout(
         <meta property="og:image:type" content="image/png" />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
-        <meta property="og:image:alt" content="Arab Tech Pro Server Logo" />
+        <meta property="og:image:alt" content="Al-Wefaq Server Logo" />
         <meta name="twitter:image" content={isAr ? "https://arabtechproserver.tech/images/og_share_ar.png" : "https://arabtechproserver.tech/images/og_share_en.png"} />
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" />
         <link

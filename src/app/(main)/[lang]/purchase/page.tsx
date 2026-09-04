@@ -40,10 +40,10 @@ export async function generateMetadata(props: Props, parent: ResolvingMetadata):
       const groupName = service.groupName || service.category?.name || "";
 
       const priceDisplayForTitle = isFree ? (isAr ? "مجاناً" : "Free") : priceNum > 0 ? `$${priceNum.toFixed(2)}` : (isAr ? "سعر خاص" : "Special Price");
-      const title = `${serviceName} - ${priceDisplayForTitle} | ${isAr ? "عرب تك برو سيرفر" : "Arab Tech Pro Server"}`;
+      const title = `${serviceName} - ${priceDisplayForTitle} | ${isAr ? "سيرفر الوفاق" : "Al-Wefaq Server"}`;
       const description = isAr
-        ? `اطلب خدمة ${serviceName} بسعر ${priceStr} فقط. وقت التسليم: ${deliveryTime}. قسم: ${groupName}. فك رسمي وسريع عبر منصة عرب تك برو سيرفر.`
-        : `Order ${serviceName} for only ${priceStr}. Delivery time: ${deliveryTime}. Category: ${groupName}. Fast & official remote phone unlocking from Arab Tech Pro Server.`;
+        ? `اطلب خدمة ${serviceName} بسعر ${priceStr} فقط. وقت التسليم: ${deliveryTime}. قسم: ${groupName}. فك رسمي وسريع عبر منصة سيرفر الوفاق.`
+        : `Order ${serviceName} for only ${priceStr}. Delivery time: ${deliveryTime}. Category: ${groupName}. Fast & official remote phone unlocking from Al-Wefaq Server.`;
 
       const pageUrl = `https://arabtechproserver.tech/${params.lang}/purchase?serviceId=${serviceId}`;
 
@@ -54,7 +54,7 @@ export async function generateMetadata(props: Props, parent: ResolvingMetadata):
           title,
           description,
           url: pageUrl,
-          siteName: "Arab Tech Pro Server",
+          siteName: "Al-Wefaq Server",
           images: [
             {
               url: "https://arabtechproserver.tech/images/og-image.png",
@@ -77,7 +77,7 @@ export async function generateMetadata(props: Props, parent: ResolvingMetadata):
   }
 
   // Default Purchase Page Metadata
-  const defaultTitle = isAr ? "طلب خدمة جديدة | عرب تك برو سيرفر" : "Order New Service | Arab Tech Pro Server";
+  const defaultTitle = isAr ? "طلب خدمة جديدة | سيرفر الوفاق" : "Order New Service | Al-Wefaq Server";
   const defaultDesc = isAr
     ? "اختر واطلب خدمات فك الشبكات، تخطي الآيكلود وFRP، وشراء رصيد البوكسات والدونجلات بأفضل الأسعار وأسرع وقت."
     : "Choose and order network unlock services, iCloud & FRP bypass, and server credits at the best rates.";
@@ -94,7 +94,7 @@ export async function generateMetadata(props: Props, parent: ResolvingMetadata):
           url: "https://arabtechproserver.tech/images/og-image.png",
           width: 1200,
           height: 630,
-          alt: "Arab Tech Pro Server",
+          alt: "Al-Wefaq Server",
         },
       ],
       type: "website",

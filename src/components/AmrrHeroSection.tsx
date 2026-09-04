@@ -145,7 +145,7 @@ export default function AmrrHeroSection({ lang }: AmrrHeroSectionProps) {
                 <source srcSet={isAr ? "/images/hero_cyber_ar.webp" : "/images/hero_cyber_en.webp"} type="image/webp" />
                 <img
                   src={isAr ? "/images/hero_cyber_ar.jpg" : "/images/hero_cyber_en.jpg"}
-                  alt={isAr ? "عرب تك برو سيرفر" : "Arab Tech Pro Server"}
+                  alt={isAr ? "سيرفر الوفاق" : "Al-Wefaq Server"}
                   width={256}
                   height={256}
                   className="w-full h-full object-cover rounded-full transform group-hover:scale-105 transition-transform duration-700"
@@ -163,7 +163,7 @@ export default function AmrrHeroSection({ lang }: AmrrHeroSectionProps) {
                   <source srcSet={isAr ? "/images/logo_ar.webp" : "/images/logo_en.webp"} type="image/webp" />
                   <img
                     src={isAr ? "/images/logo_ar.png" : "/images/logo_en.png"}
-                    alt="Arab Tech Pro Logo"
+                    alt="Al-Wefaq Server Logo"
                     width={110}
                     height={20}
                     className="h-3.5 sm:h-5 w-auto object-contain max-w-[110px]"

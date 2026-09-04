@@ -477,8 +477,8 @@ export default function RegisterClient({ lang, dict }: { lang: Locale; dict: any
             <div className="absolute -inset-2 bg-gradient-to-r from-white/20 via-primary/30 to-white/20 rounded-full blur-xl opacity-80 group-hover:opacity-100 transition-all pointer-events-none"></div>
             <img 
               src={lang === "ar" ? "/images/logo_ar.png" : "/images/logo_en.png"} 
-              alt="Logo" 
-              className="relative z-10 h-12 sm:h-14 w-auto max-w-[260px] object-contain transition-transform group-hover:scale-105 drop-shadow-[0_0_15px_rgba(255,255,255,0.35)]" 
+              alt="Al-Wefaq Server Logo" 
+              className="relative z-10 h-12 sm:h-14 w-auto h-16 w-16 rounded-full object-contain transition-transform group-hover:scale-105 drop-shadow-[0_0_15px_rgba(255,255,255,0.35)]" 
             />
           </Link>
           <h1 className="font-display-lg-mobile text-3xl font-bold text-on-surface">{dict.register.title}</h1>
