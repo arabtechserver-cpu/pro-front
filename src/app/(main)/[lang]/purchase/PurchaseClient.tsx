@@ -58,6 +58,8 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
       if (Array.isArray(parsed) && parsed.length > 0) {
         const result: Record<string, any> = {};
         for (const field of parsed) {
+          if (!field || typeof field !== 'object') continue;
+          if (field.id === 'custom_QNT' || field.field_id === 'custom_QNT') continue;
           const rawAdmin = field.adminonly ?? field.ADMINONLY ?? field.admin_only;
           const isAdminOnly = rawAdmin === true || rawAdmin === 1 || rawAdmin === '1' || rawAdmin === 'true';
           if (isAdminOnly) continue; // تجاهل الحقول المخصصة للأدمن فقط
@@ -69,7 +71,12 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
 
       // Object من Dhru API
       if (parsed && typeof parsed === 'object' && !Array.isArray(parsed) && Object.keys(parsed).length > 0) {
-        return parsed;
+        const filteredObj: Record<string, any> = {};
+        for (const [k, v] of Object.entries(parsed)) {
+          if (k === 'custom_QNT' || (v as any)?.id === 'custom_QNT' || (v as any)?.field_id === 'custom_QNT') continue;
+          filteredObj[k] = v;
+        }
+        return Object.keys(filteredObj).length > 0 ? filteredObj : null;
       }
     } catch (e) {}
     return null;
@@ -79,6 +86,11 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
    * فحص هل الحقل يمثل حقل كمية (QNT / Quantity / etc)
    */
   const isQuantityField = (fieldObj?: any, key?: string): boolean => {
+    // Ignore artificially injected custom_QNT
+    if (key === 'custom_QNT' || fieldObj?.id === 'custom_QNT' || fieldObj?.field_id === 'custom_QNT') {
+      return false;
+    }
+
     const candidateStrings: string[] = [];
     if (key) candidateStrings.push(String(key));
     if (fieldObj) {
@@ -407,6 +419,18 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
     selectedService?.name?.match(/بأي\s*كمية|كمية\s*مخصصة/i)
   );
 
+  // فحص هل الخدمة تتبع فئة IMEI / أجهزة أو تتطلب معرف جهاز محدد (IMEI / ECID / SN / Serial)
+  const isDeviceOrImeiService = Boolean(
+    (selectedCategory?.name || '').toLowerCase().includes('imei') ||
+    (selectedServiceDetails?.dhruCategory?.name || '').toLowerCase().includes('imei') ||
+    (selectedService?.categoryName || '').toLowerCase().includes('imei') ||
+    (selectedService?.SERVICETYPE || '').toLowerCase() === 'imei' ||
+    (providerFields && Object.values(providerFields).some((f: any) => {
+      const fn = String(f?.field_id || f?.name || f?.customname || f?.fieldname || '').toLowerCase();
+      return fn === 'imei' || fn === 'ecid' || fn === 'sn' || fn === 'serial';
+    }))
+  );
+
   // إذا كانت الخدمة محددة صراحة بأنها لا تدعم الكمية (مثل QNT: "0" في Dhru أو requires_quantity: false)
   const isExplicitlyNoQty =
     selectedService?.QNT === "0" ||
@@ -425,19 +449,26 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
     selectedService?.requires_quantity === 1 ||
     selectedService?.requires_quantity === "1" ||
     selectedService?.REQUIRES_QUANTITY === "1" ||
-    selectedService?.REQUIRES_QUANTITY === true ||
-    selectedService?.supportsQty === true ||
-    selectedService?.supports_quantity === true;
+    selectedService?.REQUIRES_QUANTITY === true;
 
-  // هل الخدمة تدعم الكمية (qty): فقط إذا كان المزود يطلبها صراحة أو بنمط الاسم
-  const serviceSupportsQty = Boolean(
-    !isExplicitlyNoQty &&
-    (
-      isExplicitlyQty ||
-      hasQuantityNamePattern ||
-      Boolean(quantityField && (quantityField.field_id === 'QNT' || quantityField.type === 'quantity') && quantityField.id !== 'custom_QNT')
-    )
-  );
+  // هل الخدمة تدعم الكمية (qty):
+  // 1. خدمات أجهزة / IMEI (مثل bypass أو فك شفرة) مخصصة لجهاز واحد ولا تقبل تحديد كمية إلا إذا طلب المزود QNT: "1" صراحة
+  // 2. خدمات السيرفر تدعم الكمية إذا كان المزود محدداً QNT = 1 أو بنمط اسم واضح مثل Any QNT أو Credits Qnt
+  let serviceSupportsQty = false;
+  if (isDeviceOrImeiService) {
+    serviceSupportsQty = Boolean(!isExplicitlyNoQty && (isExplicitlyQty || hasQuantityNamePattern));
+  } else {
+    serviceSupportsQty = Boolean(
+      !isExplicitlyNoQty &&
+      (
+        isExplicitlyQty ||
+        hasQuantityNamePattern ||
+        selectedService?.supportsQty === true ||
+        selectedService?.supports_quantity === true ||
+        Boolean(quantityField && (quantityField.field_id === 'QNT' || quantityField.type === 'quantity'))
+      )
+    );
+  }
 
   const rawMin =
     selectedService?.minQty ??
