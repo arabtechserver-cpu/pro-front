@@ -127,13 +127,11 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
     const sanitized = text.replace(/\b\d+\s*[-–—]\s*\d+\s*(?:hours?|hrs?|days?|minutes?|mins?|ساعة|ساعات|يوم|أيام|دقيقة|دقائق)\b/gi, '');
 
     const minMatch =
-      sanitized.match(/(?:qnt_min|min_qnt|min\s*qnt|minimum\s*qnt|min\s*quantity|minimum\s*quantity|أقل\s*كمية|اقل\s*كمية|الحد\s*الأدنى\s*للكمية|الحد\s*الادنى\s*للكمية|أدنى\s*كمية)[:\s]*([0-9]+)/i) ||
-      sanitized.match(/\bmin[:\s]+([0-9]+)\b/i);
+      sanitized.match(/(?:qnt_min|min_qnt|min\s*qnt|minimum\s*qnt|min\s*quantity|minimum\s*quantity|أقل\s*كمية|اقل\s*كمية|الحد\s*الأدنى\s*للكمية|الحد\s*الادنى\s*للكمية|أدنى\s*كمية)[:\s]*([0-9]+)/i);
     if (minMatch && minMatch[1]) min = parseInt(minMatch[1], 10);
 
     const maxMatch =
-      sanitized.match(/(?:qnt_max|max_qnt|max\s*qnt|maximum\s*qnt|max\s*quantity|maximum\s*quantity|أقصى\s*كمية|اقصى\s*كمية|الحد\s*الأقصى\s*للكمية|الحد\s*الاقصى\s*للكمية|أعلى\s*كمية)[:\s]*([0-9]+)/i) ||
-      sanitized.match(/\bmax[:\s]+([0-9]+)\b/i);
+      sanitized.match(/(?:qnt_max|max_qnt|max\s*qnt|maximum\s*qnt|max\s*quantity|maximum\s*quantity|أقصى\s*كمية|اقصى\s*كمية|الحد\s*الأقصى\s*للكمية|الحد\s*الاقصى\s*للكمية|أعلى\s*كمية)[:\s]*([0-9]+)/i);
     if (maxMatch && maxMatch[1]) max = parseInt(maxMatch[1], 10);
 
     if (min === null && max === null) {
@@ -402,23 +400,6 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
     `${selectedService?.name || ''} ${selectedService?.info || ''} ${quantityField?.description || ''} ${quantityField?.placeholder || ''}`
   );
 
-  const rawMin =
-    selectedService?.minQty ??
-    selectedService?.min_quantity ??
-    quantityField?.min_quantity ??
-    quantityField?.minQty ??
-    textClues.min;
-
-  const rawMax =
-    selectedService?.maxQty ??
-    selectedService?.max_quantity ??
-    quantityField?.max_quantity ??
-    quantityField?.maxQty ??
-    textClues.max;
-
-  const minQty = Math.max(1, typeof rawMin === 'number' ? rawMin : (parseInt(String(rawMin || '1'), 10) || 1));
-  const maxQty = typeof rawMax === 'number' ? Math.max(0, rawMax) : (rawMax !== undefined && rawMax !== null ? Math.max(0, parseInt(String(rawMax), 10) || 0) : 0);
-
   const hasQuantityNamePattern = Boolean(
     selectedService?.name?.match(/\bany\s*qnt\b|\bany\s*quantity\b|\bcustom\s*qnt\b|\bcustom\s*quantity\b|\bcredits?\s*qnt\b/i) ||
     selectedService?.info?.match(/\bany\s*qnt\b|\bany\s*quantity\b|\bcustom\s*qnt\b|\bcustom\s*quantity\b|\bcredits?\s*qnt\b/i) ||
@@ -426,35 +407,61 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
     selectedService?.name?.match(/بأي\s*كمية|كمية\s*مخصصة/i)
   );
 
+  // إذا كانت الخدمة محددة صراحة بأنها لا تدعم الكمية (مثل QNT: "0" في Dhru أو requires_quantity: false)
   const isExplicitlyNoQty =
+    selectedService?.QNT === "0" ||
+    selectedService?.QNT === 0 ||
     selectedService?.requires_quantity === false ||
     selectedService?.REQUIRES_QUANTITY === false ||
     selectedService?.REQUIRES_QUANTITY === "0" ||
     selectedService?.supportsQty === false ||
     selectedService?.supports_quantity === false;
 
-  // هل الخدمة تدعم الكمية (qty) بناءً على إعدادات المزود أو الحقول المخصصة أو نمط اسم الخدمة (Any QNT)
+  // هل تدعم الخدمة الكمية صراحة من المزود
+  const isExplicitlyQty =
+    selectedService?.QNT === "1" ||
+    selectedService?.QNT === 1 ||
+    selectedService?.requires_quantity === true ||
+    selectedService?.requires_quantity === 1 ||
+    selectedService?.requires_quantity === "1" ||
+    selectedService?.REQUIRES_QUANTITY === "1" ||
+    selectedService?.REQUIRES_QUANTITY === true ||
+    selectedService?.supportsQty === true ||
+    selectedService?.supports_quantity === true;
+
+  // هل الخدمة تدعم الكمية (qty): فقط إذا كان المزود يطلبها صراحة أو بنمط الاسم
   const serviceSupportsQty = Boolean(
     !isExplicitlyNoQty &&
     (
+      isExplicitlyQty ||
       hasQuantityNamePattern ||
-      selectedService?.supportsQty === true ||
-      selectedService?.supports_quantity === true ||
-      selectedService?.requires_quantity === true ||
-      selectedService?.REQUIRES_QUANTITY === "1" ||
-      selectedService?.REQUIRES_QUANTITY === true ||
-      selectedService?.QNT === "1" ||
-      selectedService?.QNT === 1 ||
-      minQty > 1 ||
-      maxQty > 1 ||
-      Boolean(quantityField)
+      Boolean(quantityField && (quantityField.field_id === 'QNT' || quantityField.type === 'quantity') && quantityField.id !== 'custom_QNT')
     )
   );
 
-  // ضبط الكمية تلقائياً عند اختيار خدمة تتطلب حداً أدنى أكبر من الكمية الحالية
+  const rawMin =
+    selectedService?.minQty ??
+    selectedService?.min_quantity ??
+    quantityField?.min_quantity ??
+    quantityField?.minQty ??
+    (serviceSupportsQty ? textClues.min : null);
+
+  const rawMax =
+    selectedService?.maxQty ??
+    selectedService?.max_quantity ??
+    quantityField?.max_quantity ??
+    quantityField?.maxQty ??
+    (serviceSupportsQty ? textClues.max : null);
+
+  const minQty = Math.max(1, typeof rawMin === 'number' ? rawMin : (parseInt(String(rawMin || '1'), 10) || 1));
+  const maxQty = typeof rawMax === 'number' ? Math.max(0, rawMax) : (rawMax !== undefined && rawMax !== null ? Math.max(0, parseInt(String(rawMax), 10) || 0) : 0);
+
+  // ضبط الكمية تلقائياً: إذا كانت تدعم كمية يتم مراعاة الحد الأدنى، وإذا كانت لا تدعم كمية تعود فوراً إلى 1
   useEffect(() => {
     if (serviceSupportsQty && quantity < minQty) {
       setQuantity(minQty);
+    } else if (!serviceSupportsQty && quantity !== 1) {
+      setQuantity(1);
     }
   }, [selectedServiceId, serviceSupportsQty, minQty]);
 
