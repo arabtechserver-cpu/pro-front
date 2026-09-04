@@ -58,8 +58,10 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
       if (Array.isArray(parsed) && parsed.length > 0) {
         const result: Record<string, any> = {};
         for (const field of parsed) {
-          if (field.adminonly) continue; // تجاهل الحقول المخصصة للأدمن
-          const key = field.id || field.field_id || field.name || field.label;
+          const rawAdmin = field.adminonly ?? field.ADMINONLY ?? field.admin_only;
+          const isAdminOnly = rawAdmin === true || rawAdmin === 1 || rawAdmin === '1' || rawAdmin === 'true';
+          if (isAdminOnly) continue; // تجاهل الحقول المخصصة للأدمن فقط
+          const key = field.field_id || field.id || field.name || field.label;
           if (key) result[key] = field;
         }
         return Object.keys(result).length > 0 ? result : null;
@@ -89,6 +91,7 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
         if (fieldObj.name) candidateStrings.push(String(fieldObj.name));
         if (fieldObj.fieldname) candidateStrings.push(String(fieldObj.fieldname));
         if (fieldObj.label) candidateStrings.push(String(fieldObj.label));
+        if (fieldObj.customname) candidateStrings.push(String(fieldObj.customname));
       }
     }
     for (const raw of candidateStrings) {
@@ -98,7 +101,13 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
         clean === 'quantity' ||
         clean === 'qty' ||
         clean === 'الكمية' ||
-        clean === 'الكميه'
+        clean === 'الكميه' ||
+        clean === 'minqnt' ||
+        clean === 'maxqnt' ||
+        clean === 'min_qnt' ||
+        clean === 'max_qnt' ||
+        clean === 'amount' ||
+        clean === 'credits_count'
       ) {
         return true;
       }
@@ -177,6 +186,7 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
       if (lower === 'sn or imei' || lower === 'imei/sn' || lower === 'sn / imeis' || lower === 'serial number or imei' || lower === 'imei or serial number' || lower === 'imei or sn') return 'رقم IMEI أو Serial Number';
       if (lower === 'model' || lower === 'model no') return 'موديل الجهاز (Model)';
       if (lower === 'lock code' || lower === 'code lock' || lower === 'keylock' || lower === 'lock code / imei') return 'رمز القفل (Lock Code)';
+      if (lower === 'order code' || lower === 'remove code' || lower === 'order_code' || lower === 'old code') return 'كود الطلب (Order Code)';
       if (lower.includes('lock screen photo') || lower.includes('screenshot') || lower.includes('picture')) return 'رابط صورة الشاشة (Screenshot Link)';
       if (lower.includes('video link') || lower.includes('video')) return 'رابط فيديو الإثبات (Video Link)';
       if (lower === 'checker report' || lower === 'link proof') return 'تقرير الفحص أو الإثبات (Report / Proof)';
@@ -424,16 +434,20 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
     selectedService?.supports_quantity === false;
 
   // هل الخدمة تدعم الكمية (qty) بناءً على إعدادات المزود أو الحقول المخصصة أو نمط اسم الخدمة (Any QNT)
-  // خدمات IMEI وخدمات السيرفر الفردية لا تدعم الكمية إلا إذا كانت الخدمة تطلب كمية صراحة من المزود
   const serviceSupportsQty = Boolean(
     !isExplicitlyNoQty &&
     (
       hasQuantityNamePattern ||
+      selectedService?.supportsQty === true ||
+      selectedService?.supports_quantity === true ||
       selectedService?.requires_quantity === true ||
       selectedService?.REQUIRES_QUANTITY === "1" ||
       selectedService?.REQUIRES_QUANTITY === true ||
-      (!isImeiService && Boolean(quantityField)) ||
-      (!isImeiService && (selectedService?.supportsQty === true || selectedService?.supports_quantity === true) && maxQty > 1 && maxQty > minQty)
+      selectedService?.QNT === "1" ||
+      selectedService?.QNT === 1 ||
+      minQty > 1 ||
+      maxQty > 1 ||
+      Boolean(quantityField)
     )
   );
 
@@ -508,6 +522,21 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
     let rawImeiStr = "";
 
     if (providerFields && Object.keys(providerFields).length > 0) {
+      // التحقق من الحقول الإجبارية المطلوبة من المزود
+      for (const [k, f] of Object.entries(providerFields)) {
+        if (isQuantityField(f, k)) continue;
+        const isReq = (f as any)?.required === true || (f as any)?.required === 1 || (f as any)?.required === '1' || (f as any)?.required === 'on';
+        const val = customFieldValues[k];
+        if (isReq && (!val || !String(val).trim())) {
+          const cleanLabel = getLocalizedFieldLabel(k, f, lang);
+          setSubmitFeedback({
+            type: "error",
+            text: lang === 'ar' ? `يرجى تعبئة الحقل الإجباري: (${cleanLabel})` : `Please fill in the required field: (${cleanLabel})`
+          });
+          return;
+        }
+      }
+
       let customString = Object.entries(customFieldValues)
         .filter(([k, v]) => !isQuantityField(undefined, k) && Boolean(v && String(v).trim()))
         .map(([k, v]) => `${k}: ${v}`)
@@ -978,9 +1007,10 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
                       {nonQuantityFields.map(([key, fieldObj]: [string, any]) => {
                         const cleanLabel = getLocalizedFieldLabel(key, fieldObj, lang);
                         const fieldType = (fieldObj?.fieldtype || fieldObj?.type || fieldObj?.FIELDTYPE || '').toLowerCase();
-                        const fieldDesc = fieldObj?.description || fieldObj?.DESCRIPTION || fieldObj?.hint || '';
+                        const fieldDesc = fieldObj?.description || fieldObj?.DESCRIPTION || fieldObj?.hint || fieldObj?.custominfo || '';
                         const optionsList = extractFieldOptions(key, fieldObj);
                         const isLong = isLongTextField(key, fieldObj);
+                        const isRequired = fieldObj?.required === true || fieldObj?.required === 1 || fieldObj?.required === '1' || fieldObj?.required === 'on';
 
                         // حقل select / dropdown — لو فيه options حقيقية
                         if (fieldType === 'select' && optionsList.length > 0) {
@@ -988,7 +1018,14 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
                             <div key={key} className="flex flex-col gap-2">
                               <label className="text-xs font-bold text-on-surface-variant uppercase tracking-wider flex items-center justify-between">
                                 <span>{cleanLabel}:</span>
-                                <span className="text-primary/70 text-[11px] font-normal">{lang === 'ar' ? '(اختياري)' : '(Optional)'}</span>
+                                {isRequired ? (
+                                  <span className="text-rose-400 font-bold text-[11px] flex items-center gap-0.5">
+                                    <span className="text-rose-500">*</span>
+                                    <span>{lang === 'ar' ? 'مطلوب' : 'Required'}</span>
+                                  </span>
+                                ) : (
+                                  <span className="text-on-surface-variant/60 text-[11px] font-normal">{lang === 'ar' ? '(اختياري)' : '(Optional)'}</span>
+                                )}
                               </label>
                               <select
                                 value={customFieldValues[key] || ""}
@@ -1016,7 +1053,14 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
                             <div key={key} className="flex flex-col gap-2 md:col-span-2">
                               <label className="text-xs font-bold text-on-surface-variant uppercase tracking-wider flex items-center justify-between">
                                 <span>{cleanLabel}:</span>
-                                <span className="text-primary/70 text-[11px] font-normal">{lang === 'ar' ? '(اختياري)' : '(Optional)'}</span>
+                                {isRequired ? (
+                                  <span className="text-rose-400 font-bold text-[11px] flex items-center gap-0.5">
+                                    <span className="text-rose-500">*</span>
+                                    <span>{lang === 'ar' ? 'مطلوب' : 'Required'}</span>
+                                  </span>
+                                ) : (
+                                  <span className="text-on-surface-variant/60 text-[11px] font-normal">{lang === 'ar' ? '(اختياري)' : '(Optional)'}</span>
+                                )}
                               </label>
                               <textarea
                                 rows={2}
@@ -1040,7 +1084,14 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
                           <div key={key} className="flex flex-col gap-2">
                             <label className="text-xs font-bold text-on-surface-variant uppercase tracking-wider flex items-center justify-between">
                               <span>{cleanLabel}:</span>
-                              <span className="text-primary/70 text-[11px] font-normal">{lang === 'ar' ? '(اختياري)' : '(Optional)'}</span>
+                              {isRequired ? (
+                                <span className="text-rose-400 font-bold text-[11px] flex items-center gap-0.5">
+                                  <span className="text-rose-500">*</span>
+                                  <span>{lang === 'ar' ? 'مطلوب' : 'Required'}</span>
+                                </span>
+                              ) : (
+                                <span className="text-on-surface-variant/60 text-[11px] font-normal">{lang === 'ar' ? '(اختياري)' : '(Optional)'}</span>
+                              )}
                             </label>
                             <input
                               type={fieldType === "password" ? "password" : "text"}
