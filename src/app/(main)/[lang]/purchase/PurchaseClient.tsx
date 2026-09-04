@@ -520,6 +520,8 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
   // Handle Category Select Change
   const handleCategoryChange = (catId: string) => {
     setSelectedCategoryId(catId);
+    setTargetInput("");
+    setCustomFieldValues({});
     const cat = categoriesList.find(c => c.id === catId);
     if (cat && cat.services && cat.services.length > 0) {
       setSelectedServiceId(cat.services[0].id);
@@ -531,6 +533,8 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
   // Handle Service Select Change
   const handleServiceChange = (srvId: string) => {
     setSelectedServiceId(srvId);
+    setTargetInput("");
+    setCustomFieldValues({});
     for (const group of categoriesList) {
       const found = (group.services || []).find((s: any) => s.id === srvId);
       if (found) {
@@ -598,8 +602,15 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
         payloadTarget = customString || targetInput.trim() || (lang === 'ar' ? 'طلب فوري' : 'Instant Order');
       }
     } else if (isImeiService) {
+      if (!targetInput.trim()) {
+        setSubmitFeedback({
+          type: "error",
+          text: lang === 'ar' ? 'يرجى إدخال رقم IMEI أو السيريال للجهاز' : 'Please enter the device IMEI or Serial number'
+        });
+        return;
+      }
       rawImeiStr = targetInput.trim();
-      payloadTarget = targetInput.trim() || (lang === 'ar' ? 'طلب فوري' : 'Instant Order');
+      payloadTarget = targetInput.trim();
     } else {
       payloadTarget = targetInput.trim() || (lang === 'ar' ? 'طلب فوري' : 'Instant Order');
     }
@@ -844,7 +855,7 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
             <span>{lang === 'ar' ? 'اختيار الخدمة وتأكيد الطلب' : 'Service Selection & Confirmation'}</span>
           </h2>
           <p className="text-xs text-on-surface-variant mt-1">
-            {lang === 'ar' ? 'حدد الفئة ثم اختر الخدمة المطلوبة وادخل رقم الـ IMEI للتنفيذ التلقائي.' : 'Select category, choose service, and enter IMEI.'}
+            {lang === 'ar' ? 'حدد الفئة ثم اختر الخدمة المطلوبة للتنفيذ الفوري والتلقائي.' : 'Select category and choose service for instant execution.'}
           </p>
         </div>
 
@@ -1027,6 +1038,10 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
               return /(imei|ecid|serial number|sn\b)/i.test(key) || /(imei|ecid|serial number|sn\b)/i.test(fieldObj?.name || fieldObj?.field_id || fieldObj?.label || '');
             });
 
+            if (!hasCustomFields && !isImeiService) {
+              return null;
+            }
+
             return (
               <div className="space-y-6">
                 {/* ── حالة 1: حقول مخصصة واردة ومطلوبة من المزود ── */}
@@ -1156,30 +1171,16 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
                     <div className="space-y-2 p-5 rounded-2xl bg-surface-container-high/40 border border-primary/20">
                       <label className="text-xs font-bold text-on-surface-variant uppercase tracking-wider flex items-center justify-between">
                         <span>{lang === 'ar' ? 'رقم IMEI أو السيريال للجهاز (Device IMEI / Serial):' : 'Device IMEI / Serial Number:'}</span>
-                        <span className="text-primary/70 text-[11px] font-normal">{lang === 'ar' ? '(اختياري)' : '(Optional)'}</span>
+                        <span className="text-rose-400 font-bold text-[11px] flex items-center gap-0.5">
+                          <span className="text-rose-500">*</span>
+                          <span>{lang === 'ar' ? 'مطلوب' : 'Required'}</span>
+                        </span>
                       </label>
                       <input
                         type="text"
                         value={targetInput}
                         onChange={(e) => setTargetInput(e.target.value)}
                         placeholder={lang === 'ar' ? 'أدخل رقم IMEI المكون من 15 رقم أو Serial...' : 'Enter 15-digit IMEI or device Serial number...'}
-                        className="w-full bg-surface-container-lowest border border-outline-variant/40 rounded-xl py-3.5 px-4 text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all font-mono text-sm dir-ltr"
-                      />
-                    </div>
-                  )}
-
-                  {/* ── حالة 3: خدمة عامة لا تملك حقولاً مخصصة من المزود وليست IMEI ── */}
-                  {!hasCustomFields && !isImeiService && (
-                    <div className="space-y-2 p-5 rounded-2xl bg-surface-container-high/40 border border-primary/20">
-                      <label className="text-xs font-bold text-on-surface-variant uppercase tracking-wider flex items-center justify-between">
-                        <span>{lang === 'ar' ? 'بيانات الحساب / المعرف / الرقم المطلوب (Target Account / ID):' : 'Target Account / Username / ID / Number:'}</span>
-                        <span className="text-primary/70 text-[11px] font-normal">{lang === 'ar' ? '(اختياري)' : '(Optional)'}</span>
-                      </label>
-                      <input
-                        type="text"
-                        value={targetInput}
-                        onChange={(e) => setTargetInput(e.target.value)}
-                        placeholder={lang === 'ar' ? 'أدخل اسم المستخدم، البريد، أو المعرف المطلوب...' : 'Enter target username, email or ID...'}
                         className="w-full bg-surface-container-lowest border border-outline-variant/40 rounded-xl py-3.5 px-4 text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all font-mono text-sm dir-ltr"
                       />
                     </div>

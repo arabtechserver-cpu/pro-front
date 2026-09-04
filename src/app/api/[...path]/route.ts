@@ -58,8 +58,12 @@ async function handler(
   const path = resolvedParams.path.join('/');
   const search = request.nextUrl.search;
 
-  // Skip telemetry/analytics routes — they are external and not our backend
-  if (path.startsWith('telemetry') || path.startsWith('_next')) {
+  // Handle telemetry/analytics gracefully without 404 console errors
+  if (path.startsWith('telemetry')) {
+    return NextResponse.json({ ok: true, success: true });
+  }
+
+  if (path.startsWith('_next')) {
     return NextResponse.json({ ok: false }, { status: 404 });
   }
 
