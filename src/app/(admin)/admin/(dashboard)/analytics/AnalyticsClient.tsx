@@ -32,7 +32,16 @@ export default function AnalyticsClient() {
   const fetchAnalytics = async () => {
     setIsLoading(true);
     try {
-      const res = await fetch(`/api/analytics/summary?days=${days}`);
+      const adminToken = typeof window !== "undefined"
+        ? (localStorage.getItem("admin_token") || localStorage.getItem("adminToken"))
+        : null;
+      const res = await fetch(`/api/analytics/summary?days=${days}`, {
+        headers: {
+          "Cache-Control": "no-cache",
+          ...(adminToken ? { Authorization: `Bearer ${adminToken}` } : {})
+        },
+        credentials: "include"
+      });
       const result = await res.json();
       if (res.ok && result.success) {
         setData(result.data);
@@ -80,7 +89,16 @@ export default function AnalyticsClient() {
         if (customEndDate) params.append("endDate", customEndDate);
       }
 
-      const res = await fetch(`/api/analytics/provider-orders?${params.toString()}`);
+      const adminToken = typeof window !== "undefined"
+        ? (localStorage.getItem("admin_token") || localStorage.getItem("adminToken"))
+        : null;
+      const res = await fetch(`/api/analytics/provider-orders?${params.toString()}`, {
+        headers: {
+          "Cache-Control": "no-cache",
+          ...(adminToken ? { Authorization: `Bearer ${adminToken}` } : {})
+        },
+        credentials: "include"
+      });
       const result = await res.json();
       if (res.ok && result.success) {
         setProviderOrders(result.data.orders || []);

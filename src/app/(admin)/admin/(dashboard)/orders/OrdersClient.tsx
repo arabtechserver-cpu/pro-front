@@ -56,7 +56,7 @@ interface OrderItem {
   };
 }
 
-const BATCH_SIZE = 25;
+const BATCH_SIZE = 40;
 
 export default function OrdersClient() {
   const [orders, setOrders] = useState<OrderItem[]>([]);
@@ -185,12 +185,12 @@ export default function OrdersClient() {
       setTimeout(() => {
         setVisibleCount((prev) => prev + BATCH_SIZE);
         setIsLoadingMore(false);
-      }, 150);
+      }, 80);
     }
   }, [hasMore]);
 
   useEffect(() => {
-    const option = { root: null, rootMargin: "150px", threshold: 0 };
+    const option = { root: null, rootMargin: "300px", threshold: 0 };
     const observer = new IntersectionObserver(handleObserver, option);
     if (sentinelRef.current) observer.observe(sentinelRef.current);
     return () => observer.disconnect();
@@ -689,13 +689,22 @@ export default function OrdersClient() {
         {/* Scroll Sentinel for Progressive Loading */}
         <div ref={sentinelRef} className="py-4 text-center border-t border-outline-variant/10">
           {hasMore ? (
-            <div className="flex items-center justify-center gap-2 text-xs text-on-surface-variant py-2">
-              <span className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></span>
-              <span>جاري تحميل المزيد مع التمرير ({displayedOrders.length} من {filteredOrders.length})...</span>
+            <div className="flex flex-col items-center justify-center gap-2 py-2">
+              <div className="flex items-center justify-center gap-2 text-xs text-on-surface-variant">
+                <span className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></span>
+                <span>جاري عرض ({displayedOrders.length} من {filteredOrders.length}) طلب... التمرير للأسفل يعرض المزيد</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setVisibleCount((prev) => prev + BATCH_SIZE)}
+                className="mt-1 px-4 py-1.5 rounded-xl bg-surface-container-high hover:bg-surface-container-highest text-primary border border-primary/20 text-xs font-bold transition-all"
+              >
+                عرض {BATCH_SIZE} طلب إضافي الآن ↓
+              </button>
             </div>
           ) : filteredOrders.length > 0 ? (
             <div className="text-[11px] text-on-surface-variant/70">
-              تم عرض كافة الطلبات ({filteredOrders.length} طلب)
+              تم عرض كافة الطلبات المسجلة في النظام بالكامل ({filteredOrders.length} طلب)
             </div>
           ) : null}
         </div>
