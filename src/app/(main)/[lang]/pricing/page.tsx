@@ -52,7 +52,7 @@ export async function generateMetadata(
     section = section.replace(/^%20/, '').trim();
   }
 
-  let title = isAr ? "قائمة الأسعار والخدمات | سيرفر الوفاق" : "Services & Price List | Al-Wefaq Server";
+  let title = isAr ? "قائمة الأسعار والخدمات | عرب تك برو سيرفر" : "Services & Price List | Arab Tech Pro Server";
   let description = isAr
     ? "تصفح قائمة أسعار جميع خدمات فك الشفرات، تخطي حسابات جوجل FRP و iCloud، وتنشيط الدونجلات والبوكسات بأفضل الأسعار وأعلى سرعة تسليم."
     : "Browse our complete catalog and price list for phone unlocking, FRP & iCloud bypass, and tool activations.";
@@ -76,8 +76,8 @@ export async function generateMetadata(
     if (matchingServices.length > 0) {
       const count = matchingServices.length;
       title = isAr
-        ? `${section} (${count} خدمات وأسعار) | سيرفر الوفاق`
-        : `${section} (${count} Services & Prices) | Al-Wefaq Server`;
+        ? `${section} (${count} خدمات وأسعار) | عرب تك برو سيرفر`
+        : `${section} (${count} Services & Prices) | Arab Tech Pro Server`;
 
       const serviceListFormatted = matchingServices
         .slice(0, 8)
@@ -89,13 +89,13 @@ export async function generateMetadata(
         .join(" • ");
 
       description = isAr
-        ? `أسعار باقة ${section} (${count} خدمات): ${serviceListFormatted}${matchingServices.length > 8 ? ' • والمزيد...' : ''} | تسليم فوري وتفعيل تلقائي 24/7 على منصة سيرفر الوفاق.`
-        : `Live prices for ${section} (${count} services): ${serviceListFormatted}${matchingServices.length > 8 ? ' • and more...' : ''} | Instant delivery 24/7 on Al-Wefaq Server.`;
+        ? `أسعار باقة ${section} (${count} خدمات): ${serviceListFormatted}${matchingServices.length > 8 ? ' • والمزيد...' : ''} | تسليم فوري وتفعيل تلقائي 24/7 على منصة عرب تك برو سيرفر.`
+        : `Live prices for ${section} (${count} services): ${serviceListFormatted}${matchingServices.length > 8 ? ' • and more...' : ''} | Instant delivery 24/7 on Arab Tech Pro Server.`;
     } else {
-      title = isAr ? `${section} - أسعار وخدمات | سيرفر الوفاق` : `${section} - Services & Price List | Al-Wefaq Server`;
+      title = isAr ? `${section} - أسعار وخدمات | عرب تك برو سيرفر` : `${section} - Services & Price List | Arab Tech Pro Server`;
       description = isAr
-        ? `تصفح أسعار وخدمات قسم "${section}" المتاحة على منصة سيرفر الوفاق مع التسليم الفوري وأقوى الخصومات.`
-        : `Explore ${section} services and real-time live prices on Al-Wefaq Server with instant 24/7 delivery.`;
+        ? `تصفح أسعار وخدمات قسم "${section}" المتاحة على منصة عرب تك برو سيرفر مع التسليم الفوري وأقوى الخصومات.`
+        : `Explore ${section} services and real-time live prices on Arab Tech Pro Server with instant 24/7 delivery.`;
     }
   }
 
@@ -109,19 +109,19 @@ export async function generateMetadata(
       title,
       description,
       url: currentUrl,
-      siteName: isAr ? "سيرفر الوفاق - Al-Wefaq Server" : "Al-Wefaq Server",
+      siteName: isAr ? "عرب تك برو سيرفر - Arab Tech Pro Server" : "Arab Tech Pro Server",
       images: [
         {
           url: "https://arabtechproserver.tech/main-logo.png",
           width: 512,
           height: 512,
-          alt: "Al-Wefaq Server Logo",
+          alt: "Arab Tech Pro Server Logo",
         },
         {
           url: "https://arabtechproserver.tech/images/og-image.png",
           width: 1200,
           height: 630,
-          alt: "Al-Wefaq Server",
+          alt: "Arab Tech Pro Server",
         },
       ],
       locale: isAr ? "ar_AR" : "en_US",

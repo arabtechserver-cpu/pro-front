@@ -36,11 +36,11 @@ export async function generateMetadata(props: { params: Promise<{ lang: Locale }
   const params = await props.params;
   const isAr = params.lang === "ar";
   const title = isAr
-    ? "سيرفر الوفاق | Al-Wefaq Server - أفضل منصة لفك الهواتف وخدمات IMEI"
-    : "Al-Wefaq Server - The Best Platform for Remote Phone Unlocking & IMEI Services";
+    ? "عرب تك برو سيرفر | Arab Tech Pro Server - أفضل منصة لفك الهواتف وخدمات IMEI"
+    : "Arab Tech Pro Server - The Best Platform for Remote Phone Unlocking & IMEI Services";
   const description = isAr 
-    ? "الموقع الرسمي لمنصة سيرفر الوفاق (Al-Wefaq Server). خدمات فك شبكات الهواتف الرسمية، تخطي iCloud و FRP، وتفعيل بوكسات ودونجل وسيرفرات IMEI بأفضل الأسعار وأعلى سرعة."
-    : "Official Al-Wefaq Server for phone network unlocking, iCloud & FRP bypass, box and dongle activations, and IMEI services worldwide.";
+    ? "الموقع الرسمي لمنصة عرب تك برو سيرفر (Arab Tech Pro Server). خدمات فك شبكات الهواتف الرسمية، تخطي iCloud و FRP، وتفعيل بوكسات ودونجل وسيرفرات IMEI بأفضل الأسعار وأعلى سرعة."
+    : "Official Arab Tech Pro Server for phone network unlocking, iCloud & FRP bypass, box and dongle activations, and IMEI services worldwide.";
 
   const shareImg = isAr 
     ? "https://arabtechproserver.tech/images/og_share_ar.png"
@@ -50,13 +50,13 @@ export async function generateMetadata(props: { params: Promise<{ lang: Locale }
     title,
     description,
     keywords: [
-      "سيرفر الوفاق",
-      "الوفاق سيرفر",
-      "الوفاق",
-      "Al-Wefaq Server",
-      "Al-Wefaq",
-      "Al Wefaq",
-      "alwefaq",
+      "عرب تك برو سيرفر",
+      "عرب تيك برو سيرفر",
+      "عرب تك سيرفر",
+      "عرب تيك سيرفر",
+      "Arab Tech Pro Server",
+      "Arab Tech Server Pro",
+      "Arab Tech Server",
       "arabtechproserver.tech",
       "سيرفر فك الهواتف",
       "فك شبكات",
@@ -67,13 +67,13 @@ export async function generateMetadata(props: { params: Promise<{ lang: Locale }
       title,
       description,
       url: `https://arabtechproserver.tech/${params.lang}`,
-      siteName: "سيرفر الوفاق - Al-Wefaq Server",
+      siteName: "Arab Tech Pro Server",
       images: [
         {
           url: shareImg,
           width: 1200,
           height: 630,
-          alt: "Al-Wefaq Server",
+          alt: "Arab Tech Pro Server",
         },
       ],
       type: "website",
@@ -177,8 +177,7 @@ export default async function Home(props: { params: Promise<{ lang: Locale }> })
           __html: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "WebSite",
-            "name": "Al-Wefaq Server",
-            "alternateName": "سيرفر الوفاق",
+            "name": "Arab Tech Pro Server",
             "url": "https://arabtechproserver.tech",
             "potentialAction": {
               "@type": "SearchAction",

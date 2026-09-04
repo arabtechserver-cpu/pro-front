@@ -36,7 +36,7 @@ export default function TermsModal({
                 {lang === "ar" ? "الشروط والأحكام وسياسة الاسترجاع والضمان" : "Terms of Service & Refund Policy"}
               </h2>
               <p className="text-xs text-on-surface-variant">
-                {lang === "ar" ? "وثيقة رسمية ومعتمدة لدى منصة سيرفر الوفاق" : "Official Certified Document"}
+                {lang === "ar" ? "وثيقة رسمية ومعتمدة لدى منصة عرب تك سيرفر" : "Official Certified Document"}
               </p>
             </div>
           </div>
@@ -88,7 +88,7 @@ export default function TermsModal({
                 <div>
                   <p className="font-semibold text-on-surface mb-1">
                     {lang === "ar" 
-                      ? "نحرص في منصة سيرفر الوفاق على الشفافية التامة ووضوح العلاقة مع عملائنا. يرجى قراءة شروط الاستخدام وسياسة الاسترجاع والضمان بعناية قبل إتمام أي طلب."
+                      ? "نحرص في منصة عرب تك سيرفر على الشفافية التامة ووضوح العلاقة مع عملائنا. يرجى قراءة شروط الاستخدام وسياسة الاسترجاع والضمان بعناية قبل إتمام أي طلب."
                       : "We are committed to full transparency. Please read our terms and refund policies carefully before completing any order."}
                   </p>
                   <button 
@@ -108,7 +108,7 @@ export default function TermsModal({
                 </div>
                 <p className="text-on-surface-variant text-xs sm:text-sm">
                   {lang === "ar" 
-                    ? "باستخدامك لمنصة الوفاق، فإنك توافق التزاماً كاملاً بجميع الشروط والأحكام والسياسات المعلنة."
+                    ? "باستخدامك لمنصة عرب تك، فإنك توافق التزاماً كاملاً بجميع الشروط والأحكام والسياسات المعلنة."
                     : "By using our platform, you fully agree to comply with all stated terms and conditions."}
                 </p>
               </div>
@@ -265,7 +265,7 @@ export default function TermsModal({
         <div className="p-4 border-t border-outline-variant/20 flex items-center justify-between bg-surface-container-high/40">
           <div className="flex items-center gap-2 text-xs text-on-surface-variant">
             <span className="material-symbols-outlined text-primary text-base">verified_user</span>
-            <span>{lang === "ar" ? "منصة سيرفر الوفاق — جميع الحقوق محفوظة" : "Al-Wefaq Server"}</span>
+            <span>{lang === "ar" ? "منصة عرب تك سيرفر — جميع الحقوق محفوظة" : "Arab Tech Pro Server"}</span>
           </div>
 
           <button

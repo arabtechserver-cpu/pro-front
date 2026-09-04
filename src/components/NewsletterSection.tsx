@@ -69,7 +69,7 @@ export default function NewsletterSection({ lang = "ar", className = "" }: Newsl
           </div>
 
           <h3 className="text-xl sm:text-2xl lg:text-3xl font-bold text-on-surface tracking-tight">
-            {isAr ? "اشترك في النشرة الإخبارية لـ سيرفر الوفاق" : "Subscribe to Al-Wefaq Server newsletter"}
+            {isAr ? "اشترك في النشرة الإخبارية لـ عرب تك برو" : "Subscribe to our newsletter"}
           </h3>
 
           <p className="text-on-surface-variant text-xs sm:text-sm max-w-xl leading-relaxed">

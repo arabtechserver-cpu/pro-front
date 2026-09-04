@@ -85,7 +85,7 @@ export default function AiChatWidget() {
   useEffect(() => {
     if (typeof window === 'undefined') return;
     try {
-      const saved = JSON.parse(localStorage.getItem('alwefaq_ai_history') || '[]');
+      const saved = JSON.parse(localStorage.getItem('arabtech_ai_history') || '[]');
       if (Array.isArray(saved) && saved.length > 0) {
         setMessages(saved.slice(-50));
       }
@@ -95,7 +95,7 @@ export default function AiChatWidget() {
   useEffect(() => {
     if (typeof window === 'undefined') return;
     if (messages.length) {
-      localStorage.setItem('alwefaq_ai_history', JSON.stringify(messages.slice(-50)));
+      localStorage.setItem('arabtech_ai_history', JSON.stringify(messages.slice(-50)));
     }
   }, [messages]);
 
@@ -142,7 +142,7 @@ export default function AiChatWidget() {
   const startNewChat = () => {
     setMessages([]);
     if (typeof window !== 'undefined') {
-      localStorage.removeItem('alwefaq_ai_history');
+      localStorage.removeItem('arabtech_ai_history');
     }
   };
 
@@ -380,7 +380,7 @@ export default function AiChatWidget() {
               </div>
               <div>
                 <h3 className="font-bold text-xs sm:text-sm text-on-surface flex items-center gap-1.5">
-                  <span>سيرفر الوفاق AI</span>
+                  <span>عرب تك برو AI</span>
                   <span className="text-[9px] sm:text-[10px] bg-primary/20 text-primary px-1.5 py-0.5 rounded-full font-mono border border-primary/30">PRO</span>
                 </h3>
                 <p className="text-[10px] sm:text-[11px] text-on-surface-variant flex items-center gap-1">

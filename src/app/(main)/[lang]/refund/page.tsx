@@ -29,7 +29,7 @@ export default async function RefundPolicyPage(props: PageProps) {
         </h1>
         <p className="text-sm text-on-surface-variant max-w-2xl mx-auto">
           {lang === "ar"
-            ? "الشروط والأحكام الكاملة لاسترجاع الرصيد وإلغاء الطلبات الرقمية في منصة سيرفر الوفاق."
+            ? "الشروط والأحكام الكاملة لاسترجاع الرصيد وإلغاء الطلبات الرقمية في منصة عرب تك سيرفر."
             : "Complete terms and conditions for refunds and order cancellations."}
         </p>
       </div>

@@ -57,16 +57,9 @@ export default function AdminLayout({
       {/* Sidebar */}
       <aside className="w-full md:w-64 bg-surface-container border-l border-outline-variant/30 flex-shrink-0 flex flex-col">
         <div className="p-5 border-b border-outline-variant/30 flex items-center justify-between">
-          <Link href="/admin" className="flex items-center gap-2.5 group">
-            <img 
-              src="/images/logo_ar.png" 
-              alt="Al-Wefaq Server" 
-              className="w-9 h-9 object-contain rounded-full shadow-[0_0_10px_rgba(45,212,191,0.3)]"
-            />
-            <div className="flex flex-col">
-              <span className="font-display font-bold text-sm text-on-surface">سيرفر الوفاق</span>
-              <span className="text-[10px] text-primary font-mono">لوحة الإدارة</span>
-            </div>
+          <Link href="/admin" className="text-lg font-display font-bold text-primary flex items-center gap-2">
+            <span className="material-symbols-outlined text-primary text-2xl">admin_panel_settings</span>
+            <span>لوحة الإدارة</span>
           </Link>
           <span className="flex h-2.5 w-2.5 relative">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
