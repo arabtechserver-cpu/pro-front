@@ -344,11 +344,19 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
 
   const compressReceiptImage = (file: File): Promise<string> => {
     return new Promise((resolve) => {
+      if (!file.type.startsWith("image/")) {
+        const reader = new FileReader();
+        reader.onload = (e) => resolve((e.target?.result as string) || "");
+        reader.onerror = () => resolve("");
+        reader.readAsDataURL(file);
+        return;
+      }
+
       const reader = new FileReader();
       reader.onload = (e) => {
         const img = new Image();
         img.onload = () => {
-          const maxDimension = 1600;
+          const maxDimension = 1200;
           let { width, height } = img;
           if (width > maxDimension || height > maxDimension) {
             if (width > height) {
@@ -365,13 +373,16 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
           const ctx = canvas.getContext("2d");
           if (ctx) {
             ctx.drawImage(img, 0, 0, width, height);
-            const compressedBase64 = canvas.toDataURL("image/jpeg", 0.85);
+            let compressedBase64 = canvas.toDataURL("image/jpeg", 0.75);
+            if (compressedBase64.length > 2 * 1024 * 1024) {
+              compressedBase64 = canvas.toDataURL("image/jpeg", 0.5);
+            }
             resolve(compressedBase64);
           } else {
-            resolve(e.target?.result as string);
+            resolve((e.target?.result as string) || "");
           }
         };
-        img.onerror = () => resolve(e.target?.result as string);
+        img.onerror = () => resolve((e.target?.result as string) || "");
         img.src = e.target?.result as string;
       };
       reader.onerror = () => resolve("");
@@ -382,8 +393,8 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      if (file.size > 20 * 1024 * 1024) {
-        setErrorMessage(lang === "ar" ? "حجم الصورة كبير جداً! الأقصى 20 ميجابايت." : "File size too large! Max 20MB.");
+      if (file.size > 15 * 1024 * 1024) {
+        setErrorMessage(lang === "ar" ? "حجم الصورة كبير جداً! الأقصى 15 ميجابايت." : "File size too large! Max 15MB.");
         return;
       }
       setReceiptFileName(file.name);
@@ -393,7 +404,7 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
       } catch {
         const reader = new FileReader();
         reader.onloadend = () => {
-          setReceiptImage(reader.result as string);
+          setReceiptImage((reader.result as string) || "");
         };
         reader.readAsDataURL(file);
       }
@@ -410,25 +421,33 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
       return;
     }
 
-    setIsLoading(true);
-
     if (activeMethod.isAutomaticPayPal) {
-      setIsLoading(false);
       return;
     }
 
     if (!transactionRef.trim()) {
       setErrorMessage(lang === "ar" ? "الرجاء إدخال رقم المعاملة أو رقم الحساب/المحفظة المحول منها!" : "Please enter transaction reference / sender number!");
-      setIsLoading(false);
       return;
     }
 
+    const token = localStorage.getItem("user_token");
+    if (!token || token === "null" || token === "undefined") {
+      setErrorMessage(
+        lang === "ar"
+          ? "انتهت جلسة تسجيل الدخول! يرجى تسجيل الدخول مجدداً للمتابعة."
+          : "Session expired! Please log in again to continue."
+      );
+      setTimeout(() => router.push(`/${lang}/login`), 2000);
+      return;
+    }
+
+    setIsLoading(true);
+
     try {
-      const token = localStorage.getItem("user_token");
-      const headers: Record<string, string> = { "Content-Type": "application/json" };
-      if (token && token !== "null" && token !== "undefined") {
-        headers["Authorization"] = `Bearer ${token}`;
-      }
+      const headers: Record<string, string> = {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      };
 
       const res = await fetch("/api/transactions", {
         method: "POST",
@@ -450,8 +469,8 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
       if (res.ok && data.success) {
         setSuccessMessage(
           lang === "ar"
-            ? `تم تسجيل طلب الشحن بقيمة $${parseFloat(depositAmount).toFixed(2)} وإرفاق صورة الإيصال بنجاح! جاري المراجعة والتفعيل.`
-            : `Deposit request of $${parseFloat(depositAmount).toFixed(2)} saved & receipt attached successfully!`
+            ? `🎉 تم تسجيل طلب الشحن بقيمة $${parseFloat(depositAmount).toFixed(2)} وإرفاق إشعار التحويل بنجاح! جاري المراجعة والتفعيل.`
+            : `🎉 Deposit request of $${parseFloat(depositAmount).toFixed(2)} submitted & receipt attached successfully!`
         );
 
         setTransactionRef("");
@@ -462,7 +481,7 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
         setErrorMessage(data.error || (lang === "ar" ? "فشل حفظ طلب الشحن" : "Failed to submit deposit request"));
       }
     } catch {
-      setErrorMessage(lang === "ar" ? "تعذر الاتصال بالسيرفر لإتمام طلب الشحن" : "Connection error submitting deposit");
+      setErrorMessage(lang === "ar" ? "تعذر الاتصال بالسيرفر لإتمام طلب الشحن. يرجى التحقق من اتصال الإنترنت." : "Connection error submitting deposit");
     } finally {
       setIsLoading(false);
     }
@@ -923,15 +942,24 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
                   className="w-full bg-gradient-to-r from-primary to-secondary text-on-primary py-4 rounded-2xl font-bold text-sm hover:shadow-xl hover:shadow-primary/30 transition-all flex items-center justify-center gap-2 shadow-lg disabled:opacity-50 active:scale-95"
                 >
                   {isLoading ? (
-                    <span className="material-symbols-outlined animate-spin text-lg">refresh</span>
+                    <>
+                      <span className="material-symbols-outlined animate-spin text-lg">refresh</span>
+                      <span>
+                        {lang === "ar"
+                          ? "جاري إرفاق الإشعار وتسجيل طلب الشحن..."
+                          : "Submitting deposit & receipt..."}
+                      </span>
+                    </>
                   ) : (
-                    <span className="material-symbols-outlined text-lg">send</span>
+                    <>
+                      <span className="material-symbols-outlined text-lg">send</span>
+                      <span>
+                        {lang === "ar"
+                          ? `تأكيد وإرسال طلب الشحن ($${parseFloat(depositAmount || "0").toFixed(2)} USD)`
+                          : `Submit Top-up Request ($${parseFloat(depositAmount || "0").toFixed(2)} USD)`}
+                      </span>
+                    </>
                   )}
-                  <span>
-                    {lang === "ar"
-                      ? `تأكيد وإرسال طلب الشحن ($${parseFloat(depositAmount || "0").toFixed(2)} USD)`
-                      : `Submit Top-up Request ($${parseFloat(depositAmount || "0").toFixed(2)} USD)`}
-                  </span>
                 </button>
               )}
             </form>
