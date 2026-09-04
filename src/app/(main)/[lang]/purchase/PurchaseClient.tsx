@@ -113,16 +113,25 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
     if (!text || typeof text !== 'string') return { min: null, max: null };
     let min: number | null = null;
     let max: number | null = null;
-    const minMatch = text.match(/(?:min|minimum|qnt_min|أقل كمية|الحد الأدنى|اقل كمية)[:\s]*([0-9]+)/i);
+
+    // استبعاد نصوص أوقات التسليم لتجنب اعتباره كحدود كمية (مثل 1-24 Hours أو 1-3 Days)
+    const sanitized = text.replace(/\b\d+\s*[-–—]\s*\d+\s*(?:hours?|hrs?|days?|minutes?|mins?|ساعة|ساعات|يوم|أيام|دقيقة|دقائق)\b/gi, '');
+
+    const minMatch =
+      sanitized.match(/(?:qnt_min|min_qnt|min\s*qnt|minimum\s*qnt|min\s*quantity|minimum\s*quantity|أقل\s*كمية|اقل\s*كمية|الحد\s*الأدنى\s*للكمية|الحد\s*الادنى\s*للكمية|أدنى\s*كمية)[:\s]*([0-9]+)/i) ||
+      sanitized.match(/\bmin[:\s]+([0-9]+)\b/i);
     if (minMatch && minMatch[1]) min = parseInt(minMatch[1], 10);
-    const maxMatch = text.match(/(?:max|maximum|qnt_max|أقصى كمية|الحد الأقصى|اقصى كمية)[:\s]*([0-9]+)/i);
+
+    const maxMatch =
+      sanitized.match(/(?:qnt_max|max_qnt|max\s*qnt|maximum\s*qnt|max\s*quantity|maximum\s*quantity|أقصى\s*كمية|اقصى\s*كمية|الحد\s*الأقصى\s*للكمية|الحد\s*الاقصى\s*للكمية|أعلى\s*كمية)[:\s]*([0-9]+)/i) ||
+      sanitized.match(/\bmax[:\s]+([0-9]+)\b/i);
     if (maxMatch && maxMatch[1]) max = parseInt(maxMatch[1], 10);
+
     if (min === null && max === null) {
-      const rangeMatch = text.match(/\b([1-9][0-9]*)\s*[-–—]\s*([1-9][0-9]*)\b/);
-      if (rangeMatch && rangeMatch[1] && rangeMatch[2]) {
-        const p1 = parseInt(rangeMatch[1], 10);
-        const p2 = parseInt(rangeMatch[2], 10);
-        if (p1 < p2 && p2 <= 1000000) { min = p1; max = p2; }
+      const explicitRangeMatch = sanitized.match(/\bmin[:\s]*([0-9]+)\s*[-–—,]\s*max[:\s]*([0-9]+)\b/i);
+      if (explicitRangeMatch && explicitRangeMatch[1] && explicitRangeMatch[2]) {
+        min = parseInt(explicitRangeMatch[1], 10);
+        max = parseInt(explicitRangeMatch[2], 10);
       }
     }
     return { min, max };
@@ -401,19 +410,18 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
   const maxQty = typeof rawMax === 'number' ? Math.max(0, rawMax) : (rawMax !== undefined && rawMax !== null ? Math.max(0, parseInt(String(rawMax), 10) || 0) : 0);
 
   const hasQuantityNamePattern = Boolean(
-    selectedService?.name?.match(/\bany\s*qnt\b|\bcredits?\s*qnt\b|\bqnt\b|\bquantity\b|\bqty\b|كمية|الكمية|كريديت/i) ||
-    selectedService?.info?.match(/\bany\s*qnt\b|\bcredits?\s*qnt\b|\bqnt\b|\bquantity\b|\bqty\b|كمية|الكمية/i) ||
-    selectedService?.originalName?.match(/\bany\s*qnt\b|\bcredits?\s*qnt\b|\bqnt\b|\bquantity\b|\bqty\b/i)
+    selectedService?.name?.match(/\bany\s*qnt\b|\bany\s*quantity\b|\bcustom\s*qnt\b|\bcustom\s*quantity\b|\bcredits?\s*qnt\b/i) ||
+    selectedService?.info?.match(/\bany\s*qnt\b|\bany\s*quantity\b|\bcustom\s*qnt\b|\bcustom\s*quantity\b|\bcredits?\s*qnt\b/i) ||
+    selectedService?.originalName?.match(/\bany\s*qnt\b|\bany\s*quantity\b|\bcustom\s*qnt\b|\bcustom\s*quantity\b|\bcredits?\s*qnt\b/i) ||
+    selectedService?.name?.match(/بأي\s*كمية|كمية\s*مخصصة/i)
   );
 
-  // هل الخدمة تدعم الكمية (qty)
+  // هل الخدمة تدعم الكمية (qty) بناءً على إعدادات المزود أو الحقول المخصصة أو نمط اسم الخدمة (Any QNT)
   const serviceSupportsQty = Boolean(
     selectedService?.supportsQty === true ||
     selectedService?.supportsQty === "1" ||
     selectedService?.supports_quantity === true ||
     Boolean(quantityField) ||
-    (selectedService?.minQty !== undefined && selectedService.minQty > 1) ||
-    (selectedService?.maxQty !== undefined && selectedService.maxQty > 0) ||
     hasQuantityNamePattern
   );
 
