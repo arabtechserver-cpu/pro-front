@@ -413,22 +413,41 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
   );
 
   const hasQuantityNamePattern = Boolean(
-    selectedService?.name?.match(/\bany\s*qnt\b|\bany\s*quantity\b|\bcustom\s*qnt\b|\bcustom\s*quantity\b|\bcredits?\s*qnt\b/i) ||
-    selectedService?.info?.match(/\bany\s*qnt\b|\bany\s*quantity\b|\bcustom\s*qnt\b|\bcustom\s*quantity\b|\bcredits?\s*qnt\b/i) ||
-    selectedService?.originalName?.match(/\bany\s*qnt\b|\bany\s*quantity\b|\bcustom\s*qnt\b|\bcustom\s*quantity\b|\bcredits?\s*qnt\b/i) ||
-    selectedService?.name?.match(/بأي\s*كمية|كمية\s*مخصصة/i)
+    selectedService?.name?.match(/\bany\s*qnt\b|\bany\s*quantity\b|\bcustom\s*qnt\b|\bcustom\s*quantity\b|\bcredits?\s*qnt\b|\bany\s*qty\b|\bcustom\s*qty\b|\bcredits?\s*qty\b/i) ||
+    selectedService?.info?.match(/\bany\s*qnt\b|\bany\s*quantity\b|\bcustom\s*qnt\b|\bcustom\s*quantity\b|\bcredits?\s*qnt\b|\bany\s*qty\b|\bcustom\s*qty\b|\bcredits?\s*qty\b/i) ||
+    selectedService?.originalName?.match(/\bany\s*qnt\b|\bany\s*quantity\b|\bcustom\s*qnt\b|\bcustom\s*quantity\b|\bcredits?\s*qnt\b|\bany\s*qty\b|\bcustom\s*qty\b|\bcredits?\s*qty\b/i) ||
+    selectedService?.name?.match(/بأي\s*كمية|كمية\s*مخصصة/i) ||
+    // خدمات الرصيد والكردت (طالما لم يذكر صراحة بدون كردت)
+    (!`${selectedService?.name || ''} ${selectedService?.info || ''}`.match(/\b(?:without|no|0)\s*credits?\b|بدون\s*(?:كريدت|رصيد)/i) &&
+      (
+        selectedService?.name?.match(/\bcredits?\b|\bcredit\b|\bكريدت\b|\bرصيد\b/i) ||
+        selectedService?.info?.match(/\bcredits?\b|\bcredit\b|\bكريدت\b|\bرصيد\b/i) ||
+        selectedService?.originalName?.match(/\bcredits?\b|\bcredit\b|\bكريدت\b|\bرصيد\b/i)
+      )
+    ) ||
+    // خدمات الجملة مع حد أدنى أو أقصى للقطع
+    selectedService?.name?.match(/\b(?:min|minimum|أقل|اقل|أدنى|ادنى)[:\s]*[0-9]+\s*(?:pcs|pieces|قطع|قطعة|حبة|حبات|credits?|عملات)?\b/i) ||
+    // خدمات السوشيال ميديا والتفاعل
+    selectedService?.name?.match(/\b(?:followers?|subscribers?|views?|likes?|comments?|shares?|retweets?|members?)\b|متابعين|مشتركين|مشاهدات|لايكات|إعجابات|تعليقات/i) ||
+    // خدمات المحافظ الرقمية والتحويل
+    selectedService?.name?.match(/vodafone\s*cash|فودافون\s*كاش|instapay|انستاباي|شحن\s*رصيد|تحويل\s*رصيد/i) ||
+    (textClues.min !== null && textClues.min > 1) ||
+    (textClues.max !== null && textClues.max > 0)
   );
 
   // فحص هل الخدمة تتبع فئة IMEI / أجهزة أو تتطلب معرف جهاز محدد (IMEI / ECID / SN / Serial)
   const isDeviceOrImeiService = Boolean(
-    (selectedCategory?.name || '').toLowerCase().includes('imei') ||
-    (selectedServiceDetails?.dhruCategory?.name || '').toLowerCase().includes('imei') ||
-    (selectedService?.categoryName || '').toLowerCase().includes('imei') ||
-    (selectedService?.SERVICETYPE || '').toLowerCase() === 'imei' ||
-    (providerFields && Object.values(providerFields).some((f: any) => {
-      const fn = String(f?.field_id || f?.name || f?.customname || f?.fieldname || '').toLowerCase();
-      return fn === 'imei' || fn === 'ecid' || fn === 'sn' || fn === 'serial';
-    }))
+    !hasQuantityNamePattern &&
+    (
+      (selectedCategory?.name || '').toLowerCase().includes('imei') ||
+      (selectedServiceDetails?.dhruCategory?.name || '').toLowerCase().includes('imei') ||
+      (selectedService?.categoryName || '').toLowerCase().includes('imei') ||
+      (selectedService?.SERVICETYPE || '').toLowerCase() === 'imei' ||
+      (providerFields && Object.values(providerFields).some((f: any) => {
+        const fn = String(f?.field_id || f?.name || f?.customname || f?.fieldname || '').toLowerCase();
+        return fn === 'imei' || fn === 'ecid' || fn === 'sn' || fn === 'serial';
+      }))
+    )
   );
 
   // إذا كانت الخدمة محددة صراحة بأنها لا تدعم الكمية (مثل QNT: "0" في Dhru أو requires_quantity: false)
@@ -437,12 +456,12 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
     selectedService?.QNT === 0 ||
     selectedService?.requires_quantity === false ||
     selectedService?.REQUIRES_QUANTITY === false ||
-    selectedService?.REQUIRES_QUANTITY === "0" ||
-    selectedService?.supportsQty === false ||
-    selectedService?.supports_quantity === false;
+    selectedService?.REQUIRES_QUANTITY === "0";
 
-  // هل تدعم الخدمة الكمية صراحة من المزود
+  // هل تدعم الخدمة الكمية صراحة من المزود أو من قاعدة البيانات
   const isExplicitlyQty =
+    selectedService?.supportsQty === true ||
+    selectedService?.supports_quantity === true ||
     selectedService?.QNT === "1" ||
     selectedService?.QNT === 1 ||
     selectedService?.requires_quantity === true ||
@@ -452,8 +471,6 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
     selectedService?.REQUIRES_QUANTITY === true;
 
   // هل الخدمة تدعم الكمية (qty):
-  // 1. خدمات أجهزة / IMEI (مثل bypass أو فك شفرة) مخصصة لجهاز واحد ولا تقبل تحديد كمية إلا إذا طلب المزود QNT: "1" صراحة
-  // 2. خدمات السيرفر تدعم الكمية إذا كان المزود محدداً QNT = 1 أو بنمط اسم واضح مثل Any QNT أو Credits Qnt
   let serviceSupportsQty = false;
   if (isDeviceOrImeiService) {
     serviceSupportsQty = Boolean(!isExplicitlyNoQty && (isExplicitlyQty || hasQuantityNamePattern));
@@ -465,7 +482,7 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
         hasQuantityNamePattern ||
         selectedService?.supportsQty === true ||
         selectedService?.supports_quantity === true ||
-        Boolean(quantityField && (quantityField.field_id === 'QNT' || quantityField.type === 'quantity'))
+        Boolean(quantityField && (quantityField.field_id === 'QNT' || quantityField.type === 'quantity' || quantityField.is_quantity))
       )
     );
   }
