@@ -167,6 +167,8 @@ export default function ProvidersClient() {
   const [syncingProviderId, setSyncingProviderId] = useState<string | null>(null);
   const [exportingProviderId, setExportingProviderId] = useState<string | null>(null);
   const [isExportingAll, setIsExportingAll] = useState(false);
+  const [rawExportModalProvider, setRawExportModalProvider] = useState<Provider | null>(null);
+  const [isDownloadingRaw, setIsDownloadingRaw] = useState(false);
   const [deleteModalProvider, setDeleteModalProvider] = useState<Provider | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -819,6 +821,39 @@ export default function ProvidersClient() {
     showToast(`تم تصدير ${providerServices.length} خدمة كملف JSON بنجاح!`, "success");
   };
 
+  // Download untouched raw provider data directly from provider API without ANY modifications
+  const handleDownloadRawProviderData = async (
+    provider: Provider,
+    type: "all" | "pure_dhru" | "imei" | "server" | "remote" = "all"
+  ) => {
+    setIsDownloadingRaw(true);
+    try {
+      const res = await fetch(`/api/providers/${provider.id}/raw-data?type=${type}&download=false`);
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok || data.error) {
+        showToast(data.error || "تعذر سحب الداتا الأصلية من المزود", "error");
+        return;
+      }
+
+      const cleanName = (provider.name || "provider").replace(/[^a-zA-Z0-9_\u0600-\u06FF]/g, "_");
+      const filenameSuffix =
+        type === "pure_dhru" ? "RAW_Dhru_SUCCESS" :
+        type === "imei" ? "RAW_IMEI_Services" :
+        type === "server" ? "RAW_Server_Services" :
+        type === "remote" ? "RAW_Remote_Services" : "RAW_Original_Full";
+
+      const filename = `${cleanName}_${filenameSuffix}_${new Date().toISOString().slice(0, 10)}.json`;
+      downloadJsonFile(data, filename);
+      showToast(`تم تحميل الداتا الأصلية الخام للمزود (${provider.name}) بنجاح!`, "success");
+    } catch (err: any) {
+      console.error("Raw download error:", err);
+      showToast("خطأ أثناء تحميل الداتا الأصلية: " + (err.message || ""), "error");
+    } finally {
+      setIsDownloadingRaw(false);
+    }
+  };
+
   return (
     <div className="space-y-8 font-sans max-w-6xl mx-auto" dir="rtl">
       {/* Toast Notification */}
@@ -976,15 +1011,24 @@ export default function ProvidersClient() {
 
                   <div className="flex items-center justify-end gap-2.5 flex-wrap">
                     <button
+                      onClick={() => setRawExportModalProvider(provider)}
+                      className="px-3.5 py-2 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-400 text-xs font-bold transition-all flex items-center gap-1.5 border border-emerald-500/30 shadow-sm"
+                      title="تحميل محتوى المزود الأصلي بالكامل بدون أي إضافات منا (Raw JSON)"
+                    >
+                      <span className="material-symbols-outlined text-sm">download_for_offline</span>
+                      <span>تحميل الداتا الأصلية الخام</span>
+                    </button>
+
+                    <button
                       onClick={() => handleExportProviderJson(provider)}
                       disabled={exportingProviderId === provider.id}
-                      className="px-4 py-2 rounded-xl bg-surface-container-high hover:bg-surface-container-highest text-on-surface text-xs font-bold transition-all flex items-center gap-1.5 border border-outline-variant/30 hover:border-emerald-500/40"
-                      title="تحميل كل داتا المزود والتفاصيل والباقات والحقول كملف JSON كامل"
+                      className="px-3.5 py-2 rounded-xl bg-surface-container-high hover:bg-surface-container-highest text-on-surface text-xs font-bold transition-all flex items-center gap-1.5 border border-outline-variant/30 hover:border-emerald-500/40"
+                      title="تحميل كل داتا المزود والتفاصيل والباقات والحقول كملف JSON شامل"
                     >
                       <span className={`material-symbols-outlined text-sm text-emerald-400 ${exportingProviderId === provider.id ? "animate-spin" : ""}`}>
                         {exportingProviderId === provider.id ? "refresh" : "download"}
                       </span>
-                      <span>{exportingProviderId === provider.id ? "جاري التجهيز..." : "تحميل JSON"}</span>
+                      <span>{exportingProviderId === provider.id ? "جاري التجهيز..." : "تصدير شامل"}</span>
                     </button>
 
                     <button
@@ -1382,13 +1426,24 @@ export default function ProvidersClient() {
 
                   <button
                     type="button"
+                    onClick={() => setRawExportModalProvider(browseProvider)}
+                    disabled={loadingServices}
+                    className="px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-xl text-[11px] sm:text-xs font-bold transition-all flex items-center gap-1.5 bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-400 border border-emerald-500/30 shadow-sm"
+                    title="تحميل محتوى المزود الأصلي بالكامل بدون أي إضافات منا (Raw JSON)"
+                  >
+                    <span className="material-symbols-outlined text-sm">download_for_offline</span>
+                    <span>الداتا الأصلية الخام (Raw)</span>
+                  </button>
+
+                  <button
+                    type="button"
                     onClick={handleExportCurrentBrowseServicesJson}
                     disabled={loadingServices || providerServices.length === 0}
-                    className="px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-xl text-[11px] sm:text-xs font-bold transition-all flex items-center gap-1.5 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
+                    className="px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-xl text-[11px] sm:text-xs font-bold transition-all flex items-center gap-1.5 bg-surface-container-high hover:bg-surface-container-highest text-on-surface border border-outline-variant/30"
                     title="تحميل الخدمات الحالية والباقات والحقول كملف JSON"
                   >
                     <span className="material-symbols-outlined text-sm">download</span>
-                    <span>تحميل كملف JSON ({providerServices.length})</span>
+                    <span>تصدير JSON ({providerServices.length})</span>
                   </button>
                 </div>
 
@@ -1845,6 +1900,130 @@ export default function ProvidersClient() {
                 type="button"
                 onClick={() => setBrowseProvider(null)}
                 className="px-5 py-2 rounded-xl bg-surface-variant text-on-surface-variant hover:text-on-surface text-xs font-bold"
+              >
+                إغلاق
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* RAW DATA DOWNLOAD MODAL */}
+      {rawExportModalProvider && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-in fade-in">
+          <div className="bg-surface-container border border-outline-variant/30 rounded-3xl p-6 sm:p-8 max-w-lg w-full shadow-2xl space-y-6">
+            <div className="flex items-center justify-between pb-4 border-b border-outline-variant/20">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 flex items-center justify-center">
+                  <span className="material-symbols-outlined text-2xl">download</span>
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-on-surface">تحميل داتا المزود الأصلية الخام (Raw Data)</h3>
+                  <p className="text-xs text-on-surface-variant font-mono mt-0.5">{rawExportModalProvider.name}</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setRawExportModalProvider(null)}
+                disabled={isDownloadingRaw}
+                className="w-8 h-8 rounded-full bg-surface-container-high text-on-surface-variant hover:text-on-surface flex items-center justify-center"
+              >
+                <span className="material-symbols-outlined text-sm">close</span>
+              </button>
+            </div>
+
+            <div className="p-3.5 rounded-2xl bg-surface-container-lowest/80 border border-outline-variant/20 text-xs text-on-surface-variant space-y-1 leading-relaxed">
+              <p className="font-bold text-emerald-400 flex items-center gap-1.5">
+                <span className="material-symbols-outlined text-sm">verified</span>
+                <span>بيانات خام أصلية 100% بدون أي إضافات أو تعديلات من نظامنا:</span>
+              </p>
+              <p>يتم سحب الرد الأصلي من سيرفر المزود كما هو بدون حقول إضافية أو حساب هوامش أو تغيير مسميات.</p>
+            </div>
+
+            <div className="space-y-3">
+              <button
+                onClick={() => handleDownloadRawProviderData(rawExportModalProvider, "all")}
+                disabled={isDownloadingRaw}
+                className="w-full p-4 rounded-2xl bg-surface-container-high hover:bg-surface-container-highest border border-outline-variant/30 hover:border-emerald-500/40 text-right transition-all flex items-center justify-between group"
+              >
+                <div className="space-y-1">
+                  <div className="text-sm font-bold text-on-surface group-hover:text-emerald-400 transition-colors flex items-center gap-2">
+                    <span className="material-symbols-outlined text-lg text-emerald-400">inventory_2</span>
+                    <span>1. تحميل جميع الاستجابات الخام (Full Raw API)</span>
+                  </div>
+                  <p className="text-[11px] text-on-surface-variant">
+                    ملف JSON يضم الردود الكاملة الأصلية لجميع الأقسام: IMEI + Server + Remote
+                  </p>
+                </div>
+                <span className="material-symbols-outlined text-xl text-on-surface-variant group-hover:text-emerald-400 group-hover:translate-x-[-4px] transition-all">
+                  download
+                </span>
+              </button>
+
+              <button
+                onClick={() => handleDownloadRawProviderData(rawExportModalProvider, "pure_dhru")}
+                disabled={isDownloadingRaw}
+                className="w-full p-4 rounded-2xl bg-surface-container-high hover:bg-surface-container-highest border border-outline-variant/30 hover:border-emerald-500/40 text-right transition-all flex items-center justify-between group"
+              >
+                <div className="space-y-1">
+                  <div className="text-sm font-bold text-on-surface group-hover:text-emerald-400 transition-colors flex items-center gap-2">
+                    <span className="material-symbols-outlined text-lg text-emerald-400">code</span>
+                    <span>2. تحميل بصيغة Dhru الأصلية المباشرة (SUCCESS: LIST)</span>
+                  </div>
+                  <p className="text-[11px] text-on-surface-variant">
+                    مصفوفة SUCCESS موحدة للباقات والخدمات بنفس صياغة وسيرفرات Dhru القياسية
+                  </p>
+                </div>
+                <span className="material-symbols-outlined text-xl text-on-surface-variant group-hover:text-emerald-400 group-hover:translate-x-[-4px] transition-all">
+                  download
+                </span>
+              </button>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-1">
+                <button
+                  onClick={() => handleDownloadRawProviderData(rawExportModalProvider, "imei")}
+                  disabled={isDownloadingRaw}
+                  className="p-3 rounded-xl bg-surface-container-lowest hover:bg-surface-container-high border border-outline-variant/30 hover:border-primary/40 text-center transition-all flex flex-col items-center gap-1.5"
+                >
+                  <span className="material-symbols-outlined text-primary text-xl">phone_iphone</span>
+                  <span className="text-xs font-bold text-on-surface">خدمات IMEI الخام</span>
+                  <span className="text-[10px] text-on-surface-variant">imeiservicelist</span>
+                </button>
+
+                <button
+                  onClick={() => handleDownloadRawProviderData(rawExportModalProvider, "server")}
+                  disabled={isDownloadingRaw}
+                  className="p-3 rounded-xl bg-surface-container-lowest hover:bg-surface-container-high border border-outline-variant/30 hover:border-primary/40 text-center transition-all flex flex-col items-center gap-1.5"
+                >
+                  <span className="material-symbols-outlined text-primary text-xl">dns</span>
+                  <span className="text-xs font-bold text-on-surface">خدمات السيرفر الخام</span>
+                  <span className="text-[10px] text-on-surface-variant">serverservicelist</span>
+                </button>
+
+                <button
+                  onClick={() => handleDownloadRawProviderData(rawExportModalProvider, "remote")}
+                  disabled={isDownloadingRaw}
+                  className="p-3 rounded-xl bg-surface-container-lowest hover:bg-surface-container-high border border-outline-variant/30 hover:border-primary/40 text-center transition-all flex flex-col items-center gap-1.5"
+                >
+                  <span className="material-symbols-outlined text-primary text-xl">settings_remote</span>
+                  <span className="text-xs font-bold text-on-surface">خدمات Remote الخام</span>
+                  <span className="text-[10px] text-on-surface-variant">remoteservicelist</span>
+                </button>
+              </div>
+            </div>
+
+            {isDownloadingRaw && (
+              <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-bold flex items-center justify-center gap-2 animate-pulse">
+                <span className="material-symbols-outlined animate-spin text-base">refresh</span>
+                <span>جاري سحب وتجهيز البيانات الأصلية من سيرفر المزود...</span>
+              </div>
+            )}
+
+            <div className="flex justify-end pt-2 border-t border-outline-variant/20">
+              <button
+                type="button"
+                onClick={() => setRawExportModalProvider(null)}
+                disabled={isDownloadingRaw}
+                className="px-5 py-2.5 rounded-xl bg-surface-variant text-on-surface-variant hover:text-on-surface text-xs font-bold transition-all"
               >
                 إغلاق
               </button>
