@@ -57,8 +57,15 @@ export default function CurrenciesClient() {
   const fetchCurrencies = async () => {
     setLoading(true);
     try {
+      const adminToken = typeof window !== "undefined"
+        ? (localStorage.getItem("admin_token") || localStorage.getItem("adminToken"))
+        : null;
       const res = await fetch("/api/currencies", {
-        headers: { "Cache-Control": "no-cache" }
+        headers: {
+          "Cache-Control": "no-cache",
+          ...(adminToken ? { Authorization: `Bearer ${adminToken}` } : {})
+        },
+        credentials: "include"
       });
       const data = await res.json();
       if (res.ok && data.success) {
@@ -83,9 +90,16 @@ export default function CurrenciesClient() {
 
     setIsSaving(true);
     try {
+      const adminToken = typeof window !== "undefined"
+        ? (localStorage.getItem("admin_token") || localStorage.getItem("adminToken"))
+        : null;
       const res = await fetch("/api/currencies", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...(adminToken ? { Authorization: `Bearer ${adminToken}` } : {})
+        },
+        credentials: "include",
         body: JSON.stringify(config)
       });
       const data = await res.json();
@@ -234,7 +248,7 @@ export default function CurrenciesClient() {
                       bankak: { ...config.bankak, accountNumber: e.target.value }
                     })
                   }
-                  placeholder="6302273"
+                  placeholder="أدخل رقم الحساب"
                   className="w-full px-4 py-3 bg-surface-container border border-outline-variant/40 rounded-xl focus:border-primary outline-none font-mono text-sm font-bold text-on-surface text-left dir-ltr transition-all"
                 />
               </div>
@@ -253,7 +267,7 @@ export default function CurrenciesClient() {
                       bankak: { ...config.bankak, accountName: e.target.value }
                     })
                   }
-                  placeholder="حسن"
+                  placeholder="اسم صاحب الحساب"
                   className="w-full px-4 py-3 bg-surface-container border border-outline-variant/40 rounded-xl focus:border-primary outline-none text-xs font-bold text-on-surface transition-all"
                 />
               </div>

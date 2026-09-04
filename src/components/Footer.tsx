@@ -21,8 +21,8 @@ export default function Footer({ dict, lang = "ar" }: FooterProps) {
       nameAr: "فودافون كاش",
       nameEn: "Vodafone Cash",
       badge: "📱",
-      tagAr: "01097160605",
-      tagEn: "01097160605",
+      tagAr: "محفظة كاش",
+      tagEn: "E-Wallet",
       color: "from-red-600/20 to-rose-600/20 border-red-500/40 text-red-400"
     },
     {
@@ -30,8 +30,8 @@ export default function Footer({ dict, lang = "ar" }: FooterProps) {
       nameAr: "بنك الخرطوم (بنكك)",
       nameEn: "Bank of Khartoum",
       badge: "🏦",
-      tagAr: "6302273 (باسم حسن)",
-      tagEn: "6302273 (Hassan)",
+      tagAr: "تحويل مباشر",
+      tagEn: "Direct Transfer",
       color: "from-emerald-600/20 to-teal-600/20 border-emerald-500/40 text-emerald-400"
     },
     {

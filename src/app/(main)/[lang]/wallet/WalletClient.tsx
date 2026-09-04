@@ -170,9 +170,9 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
       badge: "🇸🇩",
       icon: "account_balance",
       color: "from-emerald-600 to-teal-700",
-      copyValue: currencyConfig?.bankak?.accountNumber || "6302273",
-      detailLabelAr: `رقم حساب بنكك (باسم: ${currencyConfig?.bankak?.accountName || "حسن"}):`,
-      detailLabelEn: `Bankak Account # (Name: ${currencyConfig?.bankak?.accountName || "Hassan"}):`,
+      copyValue: currencyConfig?.bankak?.accountNumber || "",
+      detailLabelAr: currencyConfig?.bankak?.accountName ? `رقم حساب بنكك (باسم: ${currencyConfig.bankak.accountName}):` : "رقم حساب بنكك:",
+      detailLabelEn: currencyConfig?.bankak?.accountName ? `Bankak Account # (Name: ${currencyConfig.bankak.accountName}):` : "Bankak Account #:",
       instructionsAr:
         currencyConfig?.bankak?.instructionsAr ||
         "حول المبلغ بالجنيه السوداني عبر تطبيق بنكك إلى رقم الحساب ثم ارفع صورة إشعار التحويل للتأكيد.",
@@ -188,15 +188,15 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
       badge: "📱",
       icon: "phone_iphone",
       color: "from-red-600 to-rose-700",
-      copyValue: currencyConfig?.vodafone?.walletNumber || "01097160605",
+      copyValue: currencyConfig?.vodafone?.walletNumber || "",
       detailLabelAr: "رقم محفظة فودافون كاش:",
       detailLabelEn: "Vodafone Cash Wallet Number:",
       instructionsAr:
         currencyConfig?.vodafone?.instructionsAr ||
-        "حول المبلغ إلى رقم المحفظة (01097160605) واكتب الرقم المحول منه وارفق صورة رسالة أو إيصال التحويل.",
+        "حول المبلغ إلى رقم المحفظة واكتب الرقم المحول منه وارفق صورة رسالة أو إيصال التحويل.",
       instructionsEn:
         currencyConfig?.vodafone?.instructionsEn ||
-        "Transfer funds to wallet number 01097160605 then attach receipt screenshot."
+        "Transfer funds to the designated wallet number then attach receipt screenshot."
     },
     {
       id: "binance",
@@ -205,15 +205,15 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
       badge: "🔶",
       icon: "currency_exchange",
       color: "from-amber-500 to-yellow-600",
-      copyValue: currencyConfig?.binance?.payId || "894642115",
+      copyValue: currencyConfig?.binance?.payId || "",
       detailLabelAr: "معرف باينانس باي (Binance Pay ID):",
       detailLabelEn: "Binance Pay ID:",
       instructionsAr:
         currencyConfig?.binance?.instructionsAr ||
-        "افتح تطبيق باينانس واكتب معرف Binance Pay ID (894642115) ثم ارفق لقطة الشاشة للتأكيد.",
+        "افتح تطبيق باينانس واكتب معرف Binance Pay ID ثم ارفق لقطة الشاشة للتأكيد.",
       instructionsEn:
         currencyConfig?.binance?.instructionsEn ||
-        "Open Binance App and send funds via Pay ID (894642115) then attach payment screenshot."
+        "Open Binance App and send funds via Pay ID then attach payment screenshot."
     },
     {
       id: "bnb",
