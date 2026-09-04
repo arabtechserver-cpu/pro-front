@@ -157,9 +157,18 @@ interface DisplayGroup {
   services: any[];
 }
 
-export default function PricingClient({ lang, dict }: { lang: string, dict: any }) {
-  const [services, setServices] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+export default function PricingClient({
+  lang,
+  dict,
+  initialServices
+}: {
+  lang: string;
+  dict: any;
+  initialServices?: any[];
+}) {
+  const hasInitialData = Array.isArray(initialServices) && initialServices.length > 0;
+  const [services, setServices] = useState<any>(hasInitialData ? initialServices : null);
+  const [loading, setLoading] = useState(!hasInitialData);
   const [error, setError] = useState<string | null>(null);
   const [userSession, setUserSession] = useState<any>(null);
 
@@ -216,13 +225,15 @@ export default function PricingClient({ lang, dict }: { lang: string, dict: any 
         const data = await res.json();
         setServices(data);
       } catch (err: any) {
-        setError(err.message);
+        if (!hasInitialData) setError(err.message);
       } finally {
         setLoading(false);
       }
     }
-    fetchServices();
-  }, []);
+    if (!hasInitialData) {
+      fetchServices();
+    }
+  }, [hasInitialData]);
 
   // Reset visibleGroupCount whenever filters change
   useEffect(() => {

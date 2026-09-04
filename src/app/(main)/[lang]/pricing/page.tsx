@@ -138,7 +138,10 @@ export async function generateMetadata(
 
 export default async function Pricing(props: { params: Promise<{ lang: Locale }> }) {
   const params = await props.params;
-  const dict = await getDictionary(params.lang);
+  const [dict, initialServices] = await Promise.all([
+    getDictionary(params.lang),
+    fetchPricingServices()
+  ]);
 
   return (
     <div className="flex flex-col gap-8 pb-12">
@@ -152,7 +155,7 @@ export default async function Pricing(props: { params: Promise<{ lang: Locale }>
       </div>
 
       {/* Pricing Client List (Includes Search and Filters) */}
-      <PricingClient lang={params.lang} dict={dict} />
+      <PricingClient lang={params.lang} dict={dict} initialServices={initialServices} />
     </div>
   );
 }
