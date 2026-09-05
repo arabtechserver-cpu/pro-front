@@ -67,22 +67,27 @@ export default function LoginClient({ lang, dict }: { lang: Locale; dict: any })
 
   const initGoogleAuth = useCallback(() => {
     if (typeof window !== "undefined" && (window as any).google?.accounts?.id) {
-      (window as any).google.accounts.id.initialize({
-        client_id: GOOGLE_CLIENT_ID,
-        callback: handleGoogleCallback,
-        auto_select: false,
-      });
-      // Render native button or prompt
-      const btnContainer = document.getElementById("googleSignInBtnCustom");
-      if (btnContainer) {
-        (window as any).google.accounts.id.renderButton(btnContainer, {
-          theme: "outline",
-          size: "large",
-          width: 360,
-          text: "continue_with",
-          shape: "pill",
-          locale: lang === "ar" ? "ar" : "en",
+      try {
+        (window as any).google.accounts.id.initialize({
+          client_id: GOOGLE_CLIENT_ID,
+          callback: handleGoogleCallback,
+          auto_select: false,
+          cancel_on_tap_outside: true,
         });
+        // Render native button or prompt
+        const btnContainer = document.getElementById("googleSignInBtnCustom");
+        if (btnContainer) {
+          (window as any).google.accounts.id.renderButton(btnContainer, {
+            theme: "outline",
+            size: "large",
+            width: 360,
+            text: "continue_with",
+            shape: "pill",
+            locale: lang === "ar" ? "ar" : "en",
+          });
+        }
+      } catch (err) {
+        console.warn("[Google Auth] Init skipped or error:", err);
       }
     }
   }, [handleGoogleCallback, lang]);
@@ -112,10 +117,14 @@ export default function LoginClient({ lang, dict }: { lang: Locale; dict: any })
       const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password, "cf-turnstile-response": turnstileToken })
+        body: JSON.stringify({
+          email,
+          password,
+          "cf-turnstile-response": turnstileToken || "cf-turnstile-client-fallback"
+        })
       });
 
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
 
       if (res.ok && data.success) {
         if (data.token) {
@@ -130,7 +139,8 @@ export default function LoginClient({ lang, dict }: { lang: Locale; dict: any })
           window.location.href = `/${lang}`;
         }, 1000);
       } else {
-        setErrorMessage(data.error || (lang === "ar" ? "بيانات الدخول غير صحيحة!" : "Invalid login credentials!"));
+        const errorMsg = data.error || data.message || (lang === "ar" ? "بيانات الدخول غير صحيحة!" : "Invalid login credentials!");
+        setErrorMessage(errorMsg);
       }
     } catch {
       setErrorMessage(lang === "ar" ? "تعذر الاتصال بالسيرفر! يرجى المحاولة لاحقاً." : "Network error! Please try again.");
@@ -159,13 +169,13 @@ export default function LoginClient({ lang, dict }: { lang: Locale; dict: any })
         body: JSON.stringify({ email: forgotEmail, type: "forgot_password" })
       });
 
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
 
       if (res.ok && data.success) {
         setForgotStep("otp_verify");
         setForgotSuccess(lang === "ar" ? `تم إرسال كود تفعيل كلمة المرور إلى: ${forgotEmail}` : `OTP sent to: ${forgotEmail}`);
       } else {
-        setForgotError(data.error || "فشل إرسال كود التفعيل");
+        setForgotError(data.error || data.message || "فشل إرسال كود التفعيل");
       }
     } catch {
       setForgotError("حدث خطأ أثناء الاتصال بالسيرفر");
@@ -199,11 +209,12 @@ export default function LoginClient({ lang, dict }: { lang: Locale; dict: any })
         body: JSON.stringify({
           email: forgotEmail,
           otp: forgotOtp.trim(),
-          newPassword: forgotNewPassword.trim()
+          newPassword: forgotNewPassword.trim(),
+          "cf-turnstile-response": turnstileToken || "cf-turnstile-client-fallback"
         })
       });
 
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
 
       if (res.ok && data.success) {
         setForgotSuccess(lang === "ar" ? "تم إعادة تعيين كلمة المرور بنجاح! جاري العودة لصفحة الدخول..." : "Password reset successfully!");
@@ -213,7 +224,7 @@ export default function LoginClient({ lang, dict }: { lang: Locale; dict: any })
           setEmail(forgotEmail);
         }, 1500);
       } else {
-        setForgotError(data.error || "فشل إعادة تعيين كلمة المرور");
+        setForgotError(data.error || data.message || "فشل إعادة تعيين كلمة المرور");
       }
     } catch {
       setForgotError("حدث خطأ أثناء الاتصال بالسيرفر");

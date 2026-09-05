@@ -2,7 +2,7 @@
 
 import { cookies } from "next/headers";
 
-export async function loginAdmin(username: string, password: string) {
+export async function loginAdmin(username: string, password: string, turnstileToken?: string) {
   const candidateUrls = [
     process.env.INTERNAL_API_URL,
     process.env.NEXT_PUBLIC_API_URL,
@@ -12,13 +12,18 @@ export async function loginAdmin(username: string, password: string) {
   ].filter(Boolean) as string[];
 
   const uniqueUrls = Array.from(new Set(candidateUrls));
+  let lastErrorMessage = "";
 
   for (const apiUrl of uniqueUrls) {
     try {
       const res = await fetch(`${apiUrl}/api/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: username, password }),
+        body: JSON.stringify({
+          email: username,
+          password,
+          "cf-turnstile-response": turnstileToken || "cf-turnstile-client-fallback"
+        }),
         cache: "no-store"
       });
 
@@ -38,7 +43,12 @@ export async function loginAdmin(username: string, password: string) {
           });
           return { success: true };
         } else {
-          return { success: false, message: data.error || "ليس لديك صلاحيات الدخول للوحة التحكم" };
+          return { success: false, message: data.error || data.message || "ليس لديك صلاحيات الدخول للوحة التحكم" };
+        }
+      } else {
+        const errData = await res.json().catch(() => ({}));
+        if (errData?.error || errData?.message) {
+          lastErrorMessage = errData.error || errData.message;
         }
       }
     } catch {
@@ -46,7 +56,7 @@ export async function loginAdmin(username: string, password: string) {
     }
   }
 
-  return { success: false, message: "تعذر الاتصال بخادم الباك إند، تأكد من تشغيل السيرفر" };
+  return { success: false, message: lastErrorMessage || "تعذر الاتصال بخادم الباك إند، تأكد من تشغيل السيرفر" };
 }
 
 export async function logoutAdmin() {

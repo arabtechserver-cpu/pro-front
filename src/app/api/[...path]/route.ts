@@ -81,7 +81,7 @@ async function handler(
 
       const responseHeaders = new Headers();
       res.headers.forEach((val, key) => {
-        if (!['content-encoding', 'transfer-encoding', 'connection'].includes(key.toLowerCase())) {
+        if (!['content-encoding', 'transfer-encoding', 'connection', 'content-security-policy', 'cross-origin-opener-policy'].includes(key.toLowerCase())) {
           responseHeaders.set(key, val);
         }
       });

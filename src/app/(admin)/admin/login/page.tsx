@@ -20,7 +20,7 @@ export default function AdminLogin() {
     setLoading(true);
 
     try {
-      const result = await loginAdmin(username, password);
+      const result = await loginAdmin(username, password, turnstileToken);
       if (result.success) {
         router.push("/admin");
       } else {

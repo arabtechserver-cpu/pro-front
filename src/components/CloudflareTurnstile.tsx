@@ -49,10 +49,9 @@ export default function CloudflareTurnstile({
     onErrorRef.current = onError;
   });
 
-  useEffect(() => {
-    // Initial token ready
-    onVerifyRef.current?.("cf-turnstile-client-fallback");
+  const [retryCount, setRetryCount] = useState(0);
 
+  useEffect(() => {
     let isMounted = true;
     const scriptId = "cf-turnstile-script";
 
@@ -75,6 +74,7 @@ export default function CloudflareTurnstile({
           "expired-callback": () => {
             if (!isMounted) return;
             onExpireRef.current?.();
+            onVerifyRef.current?.("");
           },
           "error-callback": (err: any) => {
             if (!isMounted) return;
@@ -130,7 +130,19 @@ export default function CloudflareTurnstile({
         widgetIdRef.current = null;
       }
     };
-  }, [theme, size]);
+  }, [theme, size, retryCount]);
+
+  const handleRetry = () => {
+    if (widgetIdRef.current && window.turnstile) {
+      try {
+        window.turnstile.remove(widgetIdRef.current);
+      } catch {}
+      widgetIdRef.current = null;
+    }
+    setHasError(false);
+    setIsLoaded(false);
+    setRetryCount(prev => prev + 1);
+  };
 
   return (
     <div className={`flex flex-col items-center justify-center my-3 min-h-[50px] ${className}`}>
@@ -142,9 +154,17 @@ export default function CloudflareTurnstile({
         </div>
       )}
       {hasError && (
-        <div className="flex items-center gap-1.5 text-[11px] text-emerald-400/80 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20">
+        <div className="flex items-center gap-2 text-[11px] text-emerald-400/90 bg-emerald-500/10 px-3 py-1.5 rounded-full border border-emerald-500/20">
           <span className="material-symbols-outlined text-xs text-emerald-400">verified_user</span>
           <span>الاتصال محمي عبر Cloudflare WAF</span>
+          <button
+            type="button"
+            onClick={handleRetry}
+            className="text-[10px] text-cyan-300 underline hover:text-cyan-200 ml-1"
+            title="إعادة تحميل التحقق"
+          >
+            إعادة فحص
+          </button>
         </div>
       )}
     </div>
