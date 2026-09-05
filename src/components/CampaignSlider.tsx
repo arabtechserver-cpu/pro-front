@@ -43,6 +43,7 @@ export default function CampaignSlider({ campaigns, lang }: { campaigns: Campaig
   };
 
   const handleTouchStart = (e: React.TouchEvent) => {
+    setIsPaused(true);
     setTouchEnd(null);
     setTouchStart(e.targetTouches[0].clientX);
   };
@@ -52,7 +53,10 @@ export default function CampaignSlider({ campaigns, lang }: { campaigns: Campaig
   };
 
   const handleTouchEnd = () => {
-    if (touchStart === null || touchEnd === null) return;
+    if (touchStart === null || touchEnd === null) {
+      setTimeout(() => setIsPaused(false), 2000);
+      return;
+    }
     const distance = touchStart - touchEnd;
     if (Math.abs(distance) > 40) {
       if (distance > 0) {
@@ -63,6 +67,7 @@ export default function CampaignSlider({ campaigns, lang }: { campaigns: Campaig
         else handlePrev();
       }
     }
+    setTimeout(() => setIsPaused(false), 3000);
   };
 
   const current = campaigns[currentIndex];

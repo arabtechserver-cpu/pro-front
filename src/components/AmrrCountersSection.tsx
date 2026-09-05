@@ -32,16 +32,21 @@ export default function AmrrCountersSection({ lang }: AmrrCountersSectionProps) 
           const duration = 1500;
           const startTime = performance.now();
 
+          let lastUpdate = 0;
           const animateCounts = (currentTime: number) => {
             const elapsed = currentTime - startTime;
             const progress = Math.min(elapsed / duration, 1);
             // Ease-out cubic
             const easeProgress = 1 - Math.pow(1 - progress, 3);
 
-            setCounts({
-              devices: Math.floor(easeProgress * end1),
-              services: Math.floor(easeProgress * 500),
-            });
+            // Throttle React state updates to ~30fps to prevent mobile scroll thread lock
+            if (currentTime - lastUpdate > 33 || progress === 1) {
+              lastUpdate = currentTime;
+              setCounts({
+                devices: Math.floor(easeProgress * end1),
+                services: Math.floor(easeProgress * 500),
+              });
+            }
 
             if (progress < 1) {
               requestAnimationFrame(animateCounts);
@@ -63,8 +68,10 @@ export default function AmrrCountersSection({ lang }: AmrrCountersSectionProps) 
     return () => observer.disconnect();
   }, []);
 
-  // Interactive 3D tilt tracking for ultra-immersive curvature
+  // Interactive 3D tilt tracking for ultra-immersive curvature (Desktop only with mouse)
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (typeof window === "undefined") return;
+    if (!window.matchMedia("(pointer: fine)").matches) return;
     if (!sectionRef.current) return;
     const rect = sectionRef.current.getBoundingClientRect();
     const x = e.clientX - rect.left;
@@ -135,7 +142,7 @@ export default function AmrrCountersSection({ lang }: AmrrCountersSectionProps) 
 
         {/* Continuous Cyber Laser Scanline (ماسح ليزر متحرك) */}
         <div className="absolute inset-0 overflow-hidden rounded-2xl sm:rounded-[2.75rem] pointer-events-none">
-          <div className="absolute left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-emerald-400 to-transparent shadow-[0_0_15px_#34d399] animate-laser-scan"></div>
+          <div className="hidden sm:block absolute left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-emerald-400 to-transparent shadow-[0_0_15px_#34d399] animate-laser-scan"></div>
           {/* Subtle curved grid lines */}
           <div className="absolute inset-0 bg-[radial-gradient(#34d399_1px,transparent_1px)] [background-size:24px_24px] opacity-10"></div>
         </div>

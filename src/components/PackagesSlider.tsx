@@ -210,6 +210,7 @@ export default function PackagesSlider({ lang }: PackagesSliderProps) {
   };
 
   const handleTouchStart = (e: React.TouchEvent) => {
+    setIsPaused(true);
     setTouchEnd(null);
     setTouchStart(e.targetTouches[0].clientX);
   };
@@ -219,7 +220,10 @@ export default function PackagesSlider({ lang }: PackagesSliderProps) {
   };
 
   const handleTouchEnd = () => {
-    if (touchStart === null || touchEnd === null) return;
+    if (touchStart === null || touchEnd === null) {
+      setTimeout(() => setIsPaused(false), 2000);
+      return;
+    }
     const distance = touchStart - touchEnd;
     if (Math.abs(distance) > 40) {
       if (distance > 0) {
@@ -230,6 +234,7 @@ export default function PackagesSlider({ lang }: PackagesSliderProps) {
         else handlePrev();
       }
     }
+    setTimeout(() => setIsPaused(false), 3000);
   };
 
   // Display 3 packages visible on desktop, 2 on tablet, 1 on mobile

@@ -14,15 +14,15 @@ export default function AmrrStatsSection({ lang }: AmrrStatsSectionProps) {
         
         {/* Left Column: Ready to Unlock CTA Card */}
         <div
-          className="lg:col-span-5 relative overflow-hidden curved-cockpit rounded-2xl sm:rounded-3xl p-5 sm:p-8 border-2 border-emerald-500/40 shadow-2xl flex flex-col justify-between animate-card-float animate-neon-border will-change-transform"
+          className="lg:col-span-5 relative overflow-hidden curved-cockpit rounded-2xl sm:rounded-3xl p-5 sm:p-8 border-2 border-emerald-500/40 shadow-2xl flex flex-col justify-between md:animate-card-float animate-neon-border"
           data-aos="fade-right"
           data-aos-delay="100"
         >
           {/* Top Arched Cyber Horizon */}
           <div className="absolute -top-[2px] left-0 right-0 h-[2.5px] bg-gradient-to-r from-transparent via-emerald-400 to-transparent shadow-[0_0_15px_#34d399] pointer-events-none"></div>
 
-          {/* Vertical Laser Scanline */}
-          <div className="absolute left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-emerald-400 to-transparent shadow-[0_0_12px_#34d399] animate-laser-scan pointer-events-none will-change-transform"></div>
+          {/* Vertical Laser Scanline (Desktop only to prevent mobile lag) */}
+          <div className="hidden sm:block absolute left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-emerald-400 to-transparent shadow-[0_0_12px_#34d399] animate-laser-scan pointer-events-none"></div>
 
           <div>
             <div className="text-center sm:text-start mb-5 sm:mb-6">
@@ -86,15 +86,15 @@ export default function AmrrStatsSection({ lang }: AmrrStatsSectionProps) {
 
         {/* Right Column: Live Performance Metrics Display */}
         <div
-          className="lg:col-span-7 relative overflow-hidden curved-cockpit rounded-2xl sm:rounded-3xl p-5 sm:p-8 border-2 border-cyan-500/30 shadow-2xl flex flex-col justify-between animate-card-float-delayed will-change-transform"
+          className="lg:col-span-7 relative overflow-hidden curved-cockpit rounded-2xl sm:rounded-3xl p-5 sm:p-8 border-2 border-cyan-500/30 shadow-2xl flex flex-col justify-between md:animate-card-float-delayed"
           data-aos="fade-left"
           data-aos-delay="200"
         >
           {/* Top Arched Cyber Horizon */}
           <div className="absolute -top-[2px] left-0 right-0 h-[2.5px] bg-gradient-to-r from-transparent via-cyan-400 to-transparent shadow-[0_0_15px_#22d3ee] pointer-events-none"></div>
 
-          {/* Vertical Laser Scanline */}
-          <div className="absolute left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-cyan-400 to-transparent shadow-[0_0_12px_#22d3ee] animate-laser-scan pointer-events-none will-change-transform"></div>
+          {/* Vertical Laser Scanline (Desktop only to prevent mobile lag) */}
+          <div className="hidden sm:block absolute left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-cyan-400 to-transparent shadow-[0_0_12px_#22d3ee] animate-laser-scan pointer-events-none"></div>
 
           {/* Header */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5 sm:mb-6">
