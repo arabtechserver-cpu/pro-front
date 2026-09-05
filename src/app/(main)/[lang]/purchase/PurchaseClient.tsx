@@ -3,7 +3,7 @@
 import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { shouldShowDefaultImeiField } from "../../../../lib/purchase-service-fields";
+import { shouldShowDefaultImeiField, getProviderCustomFields, isProviderQuantityField as isQuantityField, supportsProviderQuantity } from "../../../../lib/purchase-service-fields";
 import { cleanHtmlToText } from "@/utils/cleanHtml";
 
 function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
@@ -50,97 +50,6 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
     newBalance: number;
   } | null>(null);
 
-  /**
-   * يقرأ حقول المزود من بنيتين مختلفتين:
-   * 1. Array (النظام الجديد): [{id, label, type, options, required, description}]
-   * 2. Object (Dhru القديم): {key: {fieldname, required, fieldtype, fieldoptions, description}}
-   * يُعيد دائماً: Record<key, fieldObj> أو null
-   */
-  const getProviderCustomFields = (service: any): Record<string, any> | null => {
-    if (!service) return null;
-
-    const rawFields = service.fields ?? service.requiresCustom;
-    if (!rawFields) return null;
-
-    try {
-      const parsed = typeof rawFields === 'string' ? JSON.parse(rawFields) : rawFields;
-
-      // Array من field objects
-      if (Array.isArray(parsed) && parsed.length > 0) {
-        const result: Record<string, any> = {};
-        for (const field of parsed) {
-          if (!field || typeof field !== 'object') continue;
-          if (field.id === 'custom_QNT' || field.field_id === 'custom_QNT') continue;
-          const rawAdmin = field.adminonly ?? field.ADMINONLY ?? field.admin_only;
-          const isAdminOnly = rawAdmin === true || rawAdmin === 1 || rawAdmin === '1' || rawAdmin === 'true';
-          if (isAdminOnly) continue; // تجاهل الحقول المخصصة للأدمن فقط
-          const key = field.field_id || field.id || field.name || field.label;
-          if (key) result[key] = field;
-        }
-        return Object.keys(result).length > 0 ? result : null;
-      }
-
-      // Object من Dhru API
-      if (parsed && typeof parsed === 'object' && !Array.isArray(parsed) && Object.keys(parsed).length > 0) {
-        const filteredObj: Record<string, any> = {};
-        for (const [k, v] of Object.entries(parsed)) {
-          if (k === 'custom_QNT' || (v as any)?.id === 'custom_QNT' || (v as any)?.field_id === 'custom_QNT') continue;
-          filteredObj[k] = v;
-        }
-        return Object.keys(filteredObj).length > 0 ? filteredObj : null;
-      }
-    } catch (e) {}
-    return null;
-  };
-
-  /**
-   * فحص هل الحقل يمثل حقل كمية (QNT / Quantity / etc)
-   */
-  const isQuantityField = (fieldObj?: any, key?: string): boolean => {
-    // Ignore artificially injected custom_QNT
-    if (key === 'custom_QNT' || fieldObj?.id === 'custom_QNT' || fieldObj?.field_id === 'custom_QNT') {
-      return false;
-    }
-
-    const candidateStrings: string[] = [];
-    if (key) candidateStrings.push(String(key));
-    if (fieldObj) {
-      if (typeof fieldObj === 'string') candidateStrings.push(fieldObj);
-      else if (typeof fieldObj === 'object') {
-        if (fieldObj.is_quantity === true || fieldObj.type === 'quantity' || fieldObj.fieldtype === 'quantity') return true;
-        if (fieldObj.field_id) candidateStrings.push(String(fieldObj.field_id));
-        if (fieldObj.reqid) candidateStrings.push(String(fieldObj.reqid));
-        if (fieldObj.REQID) candidateStrings.push(String(fieldObj.REQID));
-        if (fieldObj.name) candidateStrings.push(String(fieldObj.name));
-        if (fieldObj.fieldname) candidateStrings.push(String(fieldObj.fieldname));
-        if (fieldObj.label) candidateStrings.push(String(fieldObj.label));
-        if (fieldObj.customname) candidateStrings.push(String(fieldObj.customname));
-      }
-    }
-    for (const raw of candidateStrings) {
-      const clean = raw.replace(/^custom_/i, '').trim().toLowerCase();
-      if (
-        clean === 'qnt' ||
-        clean === 'quantity' ||
-        clean === 'qty' ||
-        clean === 'الكمية' ||
-        clean === 'الكميه' ||
-        clean === 'minqnt' ||
-        clean === 'maxqnt' ||
-        clean === 'min_qnt' ||
-        clean === 'max_qnt' ||
-        clean === 'amount' ||
-        clean === 'credits_count'
-      ) {
-        return true;
-      }
-    }
-    return false;
-  };
-
-  /**
-   * استخراج حدود الكمية (الحد الأدنى والأقصى) من نصوص الوصف واسم الخدمة
-   */
   const extractLimitsFromText = (text: string): { min: number | null; max: number | null } => {
     if (!text || typeof text !== 'string') return { min: null, max: null };
     let min: number | null = null;
@@ -423,80 +332,7 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
     `${selectedService?.name || ''} ${selectedService?.info || ''} ${quantityField?.description || ''} ${quantityField?.placeholder || ''}`
   );
 
-  const hasQuantityNamePattern = Boolean(
-    selectedService?.name?.match(/\bany\s*qnt\b|\bany\s*quantity\b|\bcustom\s*qnt\b|\bcustom\s*quantity\b|\bcredits?\s*qnt\b|\bany\s*qty\b|\bcustom\s*qty\b|\bcredits?\s*qty\b/i) ||
-    selectedService?.info?.match(/\bany\s*qnt\b|\bany\s*quantity\b|\bcustom\s*qnt\b|\bcustom\s*quantity\b|\bcredits?\s*qnt\b|\bany\s*qty\b|\bcustom\s*qty\b|\bcredits?\s*qty\b/i) ||
-    selectedService?.originalName?.match(/\bany\s*qnt\b|\bany\s*quantity\b|\bcustom\s*qnt\b|\bcustom\s*quantity\b|\bcredits?\s*qnt\b|\bany\s*qty\b|\bcustom\s*qty\b|\bcredits?\s*qty\b/i) ||
-    selectedService?.name?.match(/بأي\s*كمية|كمية\s*مخصصة/i) ||
-    // خدمات الرصيد والكردت (طالما لم يذكر صراحة بدون كردت)
-    (!`${selectedService?.name || ''} ${selectedService?.info || ''}`.match(/\b(?:without|no|0)\s*credits?\b|بدون\s*(?:كريدت|رصيد)/i) &&
-      (
-        selectedService?.name?.match(/\bcredits?\b|\bcredit\b|\bكريدت\b|\bرصيد\b/i) ||
-        selectedService?.info?.match(/\bcredits?\b|\bcredit\b|\bكريدت\b|\bرصيد\b/i) ||
-        selectedService?.originalName?.match(/\bcredits?\b|\bcredit\b|\bكريدت\b|\bرصيد\b/i)
-      )
-    ) ||
-    // خدمات الجملة مع حد أدنى أو أقصى للقطع
-    selectedService?.name?.match(/\b(?:min|minimum|أقل|اقل|أدنى|ادنى)[:\s]*[0-9]+\s*(?:pcs|pieces|قطع|قطعة|حبة|حبات|credits?|عملات)?\b/i) ||
-    // خدمات السوشيال ميديا والتفاعل
-    selectedService?.name?.match(/\b(?:followers?|subscribers?|views?|likes?|comments?|shares?|retweets?|members?)\b|متابعين|مشتركين|مشاهدات|لايكات|إعجابات|تعليقات/i) ||
-    // خدمات المحافظ الرقمية والتحويل
-    selectedService?.name?.match(/vodafone\s*cash|فودافون\s*كاش|instapay|انستاباي|شحن\s*رصيد|تحويل\s*رصيد/i) ||
-    (textClues.min !== null && textClues.min > 1) ||
-    (textClues.max !== null && textClues.max > 0)
-  );
-
-  // فحص هل الخدمة تتبع فئة IMEI / أجهزة أو تتطلب معرف جهاز محدد (IMEI / ECID / SN / Serial)
-  const isDeviceOrImeiService = Boolean(
-    !hasQuantityNamePattern &&
-    (
-      (selectedCategory?.name || '').toLowerCase().includes('imei') ||
-      (selectedServiceDetails?.dhruCategory?.name || '').toLowerCase().includes('imei') ||
-      (selectedService?.categoryName || '').toLowerCase().includes('imei') ||
-      (selectedService?.SERVICETYPE || '').toLowerCase() === 'imei' ||
-      (providerFields && Object.values(providerFields).some((f: any) => {
-        const fn = String(f?.field_id || f?.name || f?.customname || f?.fieldname || '').toLowerCase();
-        return fn === 'imei' || fn === 'ecid' || fn === 'sn' || fn === 'serial';
-      }))
-    )
-  );
-
-  // إذا كانت الخدمة محددة صراحة بأنها لا تدعم الكمية (مثل QNT: "0" في Dhru أو requires_quantity: false)
-  const isExplicitlyNoQty =
-    selectedService?.QNT === "0" ||
-    selectedService?.QNT === 0 ||
-    selectedService?.requires_quantity === false ||
-    selectedService?.REQUIRES_QUANTITY === false ||
-    selectedService?.REQUIRES_QUANTITY === "0";
-
-  // هل تدعم الخدمة الكمية صراحة من المزود أو من قاعدة البيانات
-  const isExplicitlyQty =
-    selectedService?.supportsQty === true ||
-    selectedService?.supports_quantity === true ||
-    selectedService?.QNT === "1" ||
-    selectedService?.QNT === 1 ||
-    selectedService?.requires_quantity === true ||
-    selectedService?.requires_quantity === 1 ||
-    selectedService?.requires_quantity === "1" ||
-    selectedService?.REQUIRES_QUANTITY === "1" ||
-    selectedService?.REQUIRES_QUANTITY === true;
-
-  // هل الخدمة تدعم الكمية (qty):
-  let serviceSupportsQty = false;
-  if (isDeviceOrImeiService) {
-    serviceSupportsQty = Boolean(!isExplicitlyNoQty && (isExplicitlyQty || hasQuantityNamePattern));
-  } else {
-    serviceSupportsQty = Boolean(
-      !isExplicitlyNoQty &&
-      (
-        isExplicitlyQty ||
-        hasQuantityNamePattern ||
-        selectedService?.supportsQty === true ||
-        selectedService?.supports_quantity === true ||
-        Boolean(quantityField && (quantityField.field_id === 'QNT' || quantityField.type === 'quantity' || quantityField.is_quantity))
-      )
-    );
-  }
+  const serviceSupportsQty = selectedServiceDetailsLoaded && supportsProviderQuantity(selectedService);
 
   const rawMin =
     selectedService?.minQty ??

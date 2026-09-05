@@ -8,6 +8,7 @@ import {
   getProviderServiceTypeCounts,
   getProviderServiceTypeLabel
 } from "../../../../../lib/provider-service-types";
+import { getProviderCustomFields } from "../../../../../lib/purchase-service-fields";
 import { loadProviderServicesForBrowse } from "../../../../../lib/provider-service-browse";
 
 type ProviderServiceType = "imei" | "server" | "remote";
@@ -32,13 +33,13 @@ interface Provider {
 export function getServiceRequiredFields(service: any): { label: string; type?: string; required?: boolean; options?: string[] }[] {
   const fields: { label: string; type?: string; required?: boolean; options?: string[] }[] = [];
 
-  const raw = service.fields ?? service.requiresCustom ?? service.customFields;
+  const raw = getProviderCustomFields(service);
   if (raw) {
     try {
       const parsed = typeof raw === "string" ? JSON.parse(raw) : raw;
       if (Array.isArray(parsed)) {
         parsed.forEach((f: any) => {
-          if (f.adminonly) return;
+          if ([true, 1, "1", "true"].includes(f.adminonly)) return;
           const name = f.fieldname || f.reqid || f.name || f.label || "حقل مخصص";
           const rawOpts = f.options || f.fieldoptions || f.FIELDOPTIONS;
           let opts: string[] = [];
@@ -69,8 +70,8 @@ export function getServiceRequiredFields(service: any): { label: string; type?: 
         });
       } else if (typeof parsed === "object" && parsed !== null) {
         Object.entries(parsed).forEach(([key, val]: [string, any]) => {
-          if (val.adminonly) return;
-          const name = val.fieldname || val.reqid || val.label || key;
+          if ([true, 1, "1", "true"].includes(val.adminonly)) return;
+          const name = val.label || val.name || val.fieldname || val.reqid || key;
           const rawOpts = val.options || val.fieldoptions || val.FIELDOPTIONS;
           let opts: string[] = [];
           if (Array.isArray(rawOpts)) opts = rawOpts.map((o: any) => String(o?.value || o || "").trim()).filter(Boolean);
@@ -103,37 +104,17 @@ export function getServiceRequiredFields(service: any): { label: string; type?: 
   }
 
   // إذا كانت الخدمة تدعم الكمية صراحة ولم يُضف حقل كمية بعد
-  const isImeiService = (service.category?.name || service.category_name || "").toLowerCase().includes("imei") || service.api_service_type === "imei";
   const hasQty = fields.some(f => f.type === "quantity" || f.label.includes("الكمية"));
-  const hasQtyName = Boolean(service.name && /\bany\s*qnt\b|\bany\s*quantity\b|\bcredits?\s*qnt\b|بأي\s*كمية/i.test(service.name));
   const min = service.minQty ?? service.min_quantity ?? service.QNT_MIN ?? 1;
   const max = service.maxQty ?? service.max_quantity ?? service.QNT_MAX ?? 0;
-  const hasValidRange = Number(max) > 1 && Number(max) > Number(min);
 
-  if (!hasQty && !isImeiService && service.requires_quantity !== false && (hasQtyName || service.requires_quantity === true || (service.supportsQty && hasValidRange))) {
+  if (!hasQty && service.requires_quantity !== false && (service.requires_quantity === true || service.supportsQty === true || service.supports_quantity === true)) {
     const limitText = Number(max) > 0 ? `(من ${min} إلى ${max})` : `(الحد الأدنى: ${min})`;
     fields.push({
       label: `الكمية ${limitText}`,
       type: "quantity",
       required: false
     });
-  }
-
-  // If no custom fields were found, infer standard requirements from category and name
-  if (fields.length === 0) {
-    const cat = service.category?.name || service.category_name || "";
-    const name = (service.name || "").toLowerCase();
-    const grp = (service.groupName || service.group_name || "").toLowerCase();
-
-    if (cat.includes("IMEI") || name.includes("imei") || name.includes("sn") || grp.includes("imei") || name.includes("check")) {
-      fields.push({ label: "IMEI / Serial Number", type: "number", required: true });
-    } else if (cat.includes("Remote") || name.includes("remote") || name.includes("teamviewer") || name.includes("anydesk") || grp.includes("remote")) {
-      fields.push({ label: "AnyDesk / TeamViewer ID + Pass", type: "text", required: true });
-    } else if (name.includes("pubg") || grp.includes("pubg")) {
-      fields.push({ label: "Player ID (معرف اللاعب)", type: "text", required: true });
-    } else {
-      fields.push({ label: "اسم المستخدم / الإيميل المسجل (Username / Email)", type: "text", required: true });
-    }
   }
 
   return fields;
