@@ -30,6 +30,17 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
   const [submitFeedback, setSubmitFeedback] = useState<{ type: "success" | "error"; text: string } | null>(null);
   const [showServiceInfo, setShowServiceInfo] = useState<boolean>(false);
 
+  // Coupon Code States
+  const [couponInput, setCouponInput] = useState<string>("");
+  const [appliedCoupon, setAppliedCoupon] = useState<{
+    code: string;
+    discountPercent: number;
+    discountAmount: number;
+    finalPrice: number;
+  } | null>(null);
+  const [validatingCoupon, setValidatingCoupon] = useState<boolean>(false);
+  const [couponFeedback, setCouponFeedback] = useState<{ type: "success" | "error"; text: string } | null>(null);
+
   // Success Confirmation Modal Data
   const [successOrderModalData, setSuccessOrderModalData] = useState<{
     orderId: string;
@@ -531,8 +542,65 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
   ));
   const isZeroUnpriced = Boolean(selectedService && unitPrice === 0 && !isFreeService);
 
-  const totalPrice = serviceSupportsQty ? unitPrice * (quantity > 0 ? quantity : 1) : unitPrice;
+  const rawTotalPrice = serviceSupportsQty ? unitPrice * (quantity > 0 ? quantity : 1) : unitPrice;
+  const couponDiscount = appliedCoupon ? Number(((rawTotalPrice * appliedCoupon.discountPercent) / 100).toFixed(2)) : 0;
+  const totalPrice = Math.max(0, Number((rawTotalPrice - couponDiscount).toFixed(2)));
   const hasEnoughBalance = userBalance >= totalPrice;
+
+  const handleApplyCoupon = async () => {
+    if (!couponInput.trim()) {
+      setCouponFeedback({
+        type: "error",
+        text: lang === "ar" ? "الرجاء كتابة كود الخصم أولاً" : "Please enter a coupon code"
+      });
+      return;
+    }
+    setValidatingCoupon(true);
+    setCouponFeedback(null);
+    try {
+      const res = await fetch("/api/coupons/validate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          code: couponInput.trim(),
+          price: rawTotalPrice,
+          userId: userSession?.id || undefined
+        })
+      });
+      const data = await res.json();
+      if (res.ok && data.valid) {
+        setAppliedCoupon({
+          code: data.code,
+          discountPercent: data.discountPercent,
+          discountAmount: data.discountAmount,
+          finalPrice: data.finalPrice
+        });
+        setCouponFeedback({
+          type: "success",
+          text: data.message || (lang === "ar" ? `تم تطبيق خصم ${data.discountPercent}% بنجاح!` : `Discount of ${data.discountPercent}% applied!`)
+        });
+      } else {
+        setAppliedCoupon(null);
+        setCouponFeedback({
+          type: "error",
+          text: data.error || (lang === "ar" ? "كود الخصم غير صالح أو منتهي الصلاحية" : "Invalid or expired coupon code")
+        });
+      }
+    } catch {
+      setCouponFeedback({
+        type: "error",
+        text: lang === "ar" ? "فشل التحقق من كود الخصم" : "Failed to validate coupon"
+      });
+    } finally {
+      setValidatingCoupon(false);
+    }
+  };
+
+  const handleRemoveCoupon = () => {
+    setAppliedCoupon(null);
+    setCouponInput("");
+    setCouponFeedback(null);
+  };
 
   // Handle Category Select Change
   const handleCategoryChange = (catId: string) => {
@@ -698,6 +766,7 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
           rawImei: rawImeiStr,
           quantity: serviceSupportsQty && quantity > 0 ? quantity : 1,
           price: unitPrice,
+          couponCode: appliedCoupon ? appliedCoupon.code : undefined,
           notes: notes.trim(),
           customFields: Object.keys(finalCustomValues).length > 0 ? finalCustomValues : null
         })
@@ -721,6 +790,9 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
         setNotes("");
         setCustomFieldValues({});
         setQuantity(minQty);
+        setAppliedCoupon(null);
+        setCouponInput("");
+        setCouponFeedback(null);
         
         if (data.newBalance !== undefined) {
           setUserBalance(data.newBalance);
@@ -845,24 +917,6 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
         </div>
       </div>
 
-      {/* NOT LOGGED IN WARNING */}
-      {!userSession && (
-        <div className="p-6 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-300 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <span className="material-symbols-outlined text-3xl text-amber-400">lock</span>
-            <div>
-              <p className="font-bold text-sm text-on-surface">{lang === 'ar' ? 'يرجى تسجيل الدخول لتقديم طلب جديدة' : 'Please Sign In to Order Services'}</p>
-              <p className="text-xs text-on-surface-variant mt-0.5">{lang === 'ar' ? 'قم بتسجيل الدخول بحسابك لطلب الخدمات وحسم التكلفة من المحفظة.' : 'Sign in to order services.'}</p>
-            </div>
-          </div>
-          <Link
-            href={`/${lang}/login`}
-            className="px-5 py-2.5 rounded-xl bg-amber-500 text-black font-bold text-xs hover:bg-amber-400 transition-all shrink-0 shadow-md"
-          >
-            {lang === 'ar' ? 'تسجيل الدخول' : 'Sign In'}
-          </Link>
-        </div>
-      )}
 
       {/* DEDICATED ORDER CREATION FORM CARD */}
       <div className="glass-card rounded-3xl p-6 sm:p-8 border border-outline-variant/30 shadow-2xl space-y-6">
@@ -1325,6 +1379,72 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
                 className="w-full bg-surface-container-lowest border border-outline-variant/40 rounded-xl py-3.5 px-4 text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all text-xs"
               />
             </div>
+
+            {/* Coupon Code Section */}
+            <div className="p-4 sm:p-5 rounded-2xl bg-surface-container-high/40 border border-primary/20 space-y-3">
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-bold text-on-surface-variant uppercase tracking-wider flex items-center gap-1.5">
+                  <span className="material-symbols-outlined text-primary text-base">confirmation_number</span>
+                  <span>{lang === 'ar' ? 'كود الخصم (Coupon Code)' : 'Coupon Code'}</span>
+                </label>
+                {appliedCoupon && (
+                  <button
+                    type="button"
+                    onClick={handleRemoveCoupon}
+                    className="text-[11px] text-red-400 hover:text-red-300 font-bold transition-colors flex items-center gap-1 cursor-pointer"
+                  >
+                    <span className="material-symbols-outlined text-xs">close</span>
+                    <span>{lang === 'ar' ? 'إلغاء الكود' : 'Remove'}</span>
+                  </button>
+                )}
+              </div>
+
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={couponInput}
+                  onChange={(e) => setCouponInput(e.target.value.toUpperCase())}
+                  disabled={Boolean(appliedCoupon) || validatingCoupon}
+                  placeholder={lang === 'ar' ? 'أدخل كود الخصم هنا (مثال: SAVE20)...' : 'Enter coupon code (e.g. SAVE20)...'}
+                  className="w-full bg-surface-container-lowest border border-outline-variant/40 rounded-xl py-3 px-4 text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all font-mono font-bold text-sm tracking-wider uppercase disabled:opacity-60 dir-ltr"
+                />
+                {!appliedCoupon ? (
+                  <button
+                    type="button"
+                    onClick={handleApplyCoupon}
+                    disabled={validatingCoupon || !couponInput.trim()}
+                    className="px-5 py-3 rounded-xl bg-primary text-on-primary font-bold text-xs hover:bg-primary/90 transition-all shrink-0 flex items-center gap-1.5 disabled:opacity-50 disabled:pointer-events-none shadow-md cursor-pointer"
+                  >
+                    {validatingCoupon ? (
+                      <span className="w-4 h-4 border-2 border-on-primary border-t-transparent rounded-full animate-spin"></span>
+                    ) : (
+                      <span className="material-symbols-outlined text-sm">check</span>
+                    )}
+                    <span>{lang === 'ar' ? 'تطبيق الخصم' : 'Apply'}</span>
+                  </button>
+                ) : (
+                  <div className="px-4 py-3 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 font-bold text-xs shrink-0 flex items-center gap-1">
+                    <span className="material-symbols-outlined text-sm">verified</span>
+                    <span>{appliedCoupon.discountPercent}% OFF</span>
+                  </div>
+                )}
+              </div>
+
+              {couponFeedback && (
+                <div
+                  className={`p-2.5 rounded-xl text-xs font-bold flex items-center gap-2 ${
+                    couponFeedback.type === 'success'
+                      ? 'bg-emerald-500/15 border border-emerald-500/30 text-emerald-300'
+                      : 'bg-red-500/15 border border-red-500/30 text-red-300'
+                  }`}
+                >
+                  <span className="material-symbols-outlined text-sm shrink-0">
+                    {couponFeedback.type === 'success' ? 'check_circle' : 'error'}
+                  </span>
+                  <span>{couponFeedback.text}</span>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Cost Summary & Balance Check */}
@@ -1335,7 +1455,19 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
               </div>
               <div>
                 <p className="text-xs font-bold text-on-surface-variant">{lang === 'ar' ? 'إجمالي التكلفة المطلوبة:' : 'Total Cost Required:'}</p>
-                <p className="text-xl font-bold font-mono text-primary dir-ltr">${totalPrice.toFixed(2)} USD</p>
+                <div className="flex items-baseline gap-2 flex-wrap">
+                  <p className="text-xl font-bold font-mono text-primary dir-ltr">${totalPrice.toFixed(2)} USD</p>
+                  {appliedCoupon && (
+                    <span className="text-xs line-through text-on-surface-variant/70 font-mono dir-ltr">
+                      ${rawTotalPrice.toFixed(2)} USD
+                    </span>
+                  )}
+                  {appliedCoupon && (
+                    <span className="text-[11px] font-bold text-emerald-400 bg-emerald-500/15 border border-emerald-500/30 px-2 py-0.5 rounded-md dir-ltr">
+                      -{appliedCoupon.discountPercent}% (-${couponDiscount.toFixed(2)})
+                    </span>
+                  )}
+                </div>
               </div>
             </div>
 

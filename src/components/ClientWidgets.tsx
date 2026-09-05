@@ -16,7 +16,6 @@ export default function ClientWidgets({ lang }: { lang: string }) {
       <AosInit />
       <AnalyticsTracker />
       <CyberMouseBackground />
-      <ContactFloatingButton lang={lang} />
       <AiChatWidget />
       <FloatingSideDock lang={lang} />
     </>

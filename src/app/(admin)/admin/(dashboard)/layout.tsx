@@ -12,6 +12,7 @@ const NAV_ITEMS = [
   { href: "/admin/users", label: "إدارة المستخدمين المسجلين", icon: "manage_accounts" },
   { href: "/admin/api-users", label: "إدارة مشتركي الـ API", icon: "api" },
   { href: "/admin/memberships", label: "إدارة العضويات والخصومات VIP", icon: "card_membership" },
+  { href: "/admin/coupons", label: "أكواد الخصم والكوبونات", icon: "confirmation_number" },
   { href: "/admin/wallet", label: "إدارة المحفظة وطلبات الشحن", icon: "account_balance_wallet" },
   { href: "/admin/providers", label: "ربط سيرفرات الـ API", icon: "dns" },
   { href: "/admin/currencies", label: "أسعار العملات", icon: "currency_exchange" },

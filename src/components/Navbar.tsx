@@ -403,6 +403,15 @@ export default function Navbar({ lang, dict }: NavbarProps) {
                     {/* Menu Options */}
                     <div className="space-y-1 text-xs font-semibold">
                       <Link 
+                        href={`/${lang}/profile`}
+                        onClick={() => setUserDropdownOpen(false)}
+                        className="flex items-center gap-2.5 p-2.5 rounded-xl text-primary font-bold bg-primary/10 hover:bg-primary/20 transition-all border border-primary/20"
+                      >
+                        <span className="material-symbols-outlined text-primary text-base">account_circle</span>
+                        <span>{lang === "ar" ? "الملف الشخصي والحساب" : "My Profile & Account"}</span>
+                      </Link>
+
+                      <Link 
                         href={`/${lang}/wallet`}
                         onClick={() => setUserDropdownOpen(false)}
                         className="flex items-center gap-2.5 p-2.5 rounded-xl text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-all"
@@ -519,6 +528,19 @@ export default function Navbar({ lang, dict }: NavbarProps) {
                   خروج
                 </button>
               </div>
+            )}
+
+            {userSession && (
+              <Link 
+                href={`/${lang}/profile`} 
+                onClick={() => setMobileMenuOpen(false)} 
+                className={`flex items-center gap-3 p-3.5 rounded-xl font-bold text-sm transition-all ${
+                  isActive("/profile") ? "bg-primary/20 text-primary border border-primary/30" : "text-primary bg-primary/10 hover:bg-primary/20 border border-primary/20"
+                }`}
+              >
+                <span className="material-symbols-outlined text-lg">account_circle</span>
+                <span>{lang === "ar" ? "الملف الشخصي والحساب" : "My Profile & Account"}</span>
+              </Link>
             )}
 
             <Link 

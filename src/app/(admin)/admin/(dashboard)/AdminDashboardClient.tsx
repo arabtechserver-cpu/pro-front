@@ -60,7 +60,10 @@ export default function AdminDashboardClient() {
     fetchDashboardStats();
   }, []);
 
-  const dhruCredit = data?.dhru?.SUCCESS?.[0]?.credit || (data?.dhru?.error ? "غير متوفر" : "متصل");
+  const dhruCredit =
+    data?.dhru?.formattedBalance ||
+    data?.dhru?.SUCCESS?.[0]?.credit ||
+    (data?.dhru?.balance !== undefined ? `$${Number(data.dhru.balance).toFixed(2)} ${data.dhru.currency || "USD"}` : (data?.dhru?.error ? "غير متوفر" : "متصل"));
 
   return (
     <div className="space-y-8 font-sans" dir="rtl">
@@ -189,18 +192,23 @@ export default function AdminDashboardClient() {
             </Link>
 
             {/* Dhru Fusion Provider Status */}
-            <div className="glass-card p-6 rounded-3xl border border-outline-variant/30 shadow-lg flex items-center justify-between">
+            <Link
+              href="/admin/providers"
+              className="glass-card p-6 rounded-3xl border border-outline-variant/30 hover:border-sky-500/50 transition-all shadow-lg flex items-center justify-between group"
+            >
               <div className="space-y-1">
-                <p className="text-xs font-bold text-on-surface-variant">رصيد مزود Dhru Fusion API</p>
+                <p className="text-xs font-bold text-on-surface-variant">
+                  رصيد مزود الـ API {data.dhru?.providerName ? `(${data.dhru.providerName})` : "(Dhru Fusion)"}
+                </p>
                 <h3 className="text-2xl font-bold text-sky-400 font-mono">{dhruCredit}</h3>
-                <p className="text-[11px] text-on-surface-variant font-semibold">
-                  {data.dhru?.error ? "تحقق من إعدادات المفتاح والـ IP" : "متصل بالسيرفر المزود"}
+                <p className="text-[11px] text-on-surface-variant font-semibold group-hover:text-sky-300 transition-colors">
+                  {data.dhru?.error ? "تحقق من إعدادات المفتاح والـ IP" : "متصل بالسيرفر المزود • إدارة المزودين"}
                 </p>
               </div>
-              <div className="w-14 h-14 rounded-2xl bg-sky-500/10 border border-sky-500/20 text-sky-400 flex items-center justify-center">
+              <div className="w-14 h-14 rounded-2xl bg-sky-500/10 border border-sky-500/20 text-sky-400 flex items-center justify-center group-hover:scale-110 transition-transform">
                 <span className="material-symbols-outlined text-3xl">dns</span>
               </div>
-            </div>
+            </Link>
           </div>
 
           {/* Quick Shortcuts Section */}
