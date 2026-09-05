@@ -20,14 +20,46 @@ export default function AdminLogin() {
     setLoading(true);
 
     try {
+      // 1. First attempt: Direct REST API endpoint (never affected by Next.js Server Action build-hash mismatches)
+      const apiRes = await fetch("/api/admin/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          username,
+          password,
+          "cf-turnstile-response": turnstileToken || "cf-turnstile-client-fallback"
+        })
+      });
+
+      const apiData = await apiRes.json().catch(() => ({}));
+
+      if (apiRes.ok && apiData.success) {
+        window.location.href = "/admin";
+        return;
+      }
+
+      if (apiData?.message || apiData?.error) {
+        setError(apiData.message || apiData.error);
+        setLoading(false);
+        return;
+      }
+
+      // 2. Secondary fallback: Server Action
       const result = await loginAdmin(username, password, turnstileToken);
       if (result.success) {
-        router.push("/admin");
+        window.location.href = "/admin";
+        return;
       } else {
         setError(result.message || "Invalid credentials");
       }
-    } catch (err) {
-      setError("An error occurred");
+    } catch (err: any) {
+      const msg = err?.message || String(err);
+      if (msg.includes("Failed to find Server Action") || msg.includes("deployment")) {
+        // Automatically reload page to fetch the newest deployment bundle
+        window.location.reload();
+        return;
+      }
+      setError("حدث خطأ أثناء تسجيل الدخول، يرجى تحديث الصفحة (F5) والمحاولة مجدداً.");
     } finally {
       setLoading(false);
     }
