@@ -77,12 +77,13 @@ export async function generateMetadata(props: Props, parent: ResolvingMetadata):
   }
 
   // Default Purchase Page Metadata
-  const defaultTitle = isAr ? "طلب خدمة جديدة | عرب تك برو سيرفر" : "Order New Service | Arab Tech Pro Server";
+  const defaultTitle = isAr ? "طلب خدمة جديدة | عرب تك برو سيرفر (عرب تيك)" : "Order New Service | Arab Tech Pro Server";
   const defaultDesc = isAr
-    ? "اختر واطلب خدمات فك الشبكات، تخطي الآيكلود وFRP، وشراء رصيد البوكسات والدونجلات بأفضل الأسعار وأسرع وقت."
+    ? "اختر واطلب خدمات فك الشبكات، تخطي الآيكلود وFRP، وشراء رصيد البوكسات والدونجلات عبر سيرفر عرب تك برو (عرب تيك سيرفر) بأفضل الأسعار وأسرع وقت."
     : "Choose and order network unlock services, iCloud & FRP bypass, and server credits at the best rates.";
 
   return {
+    metadataBase: new URL("https://arabtechproserver.tech"),
     title: defaultTitle,
     description: defaultDesc,
     openGraph: {

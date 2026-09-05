@@ -52,9 +52,9 @@ export async function generateMetadata(
     section = section.replace(/^%20/, '').trim();
   }
 
-  let title = isAr ? "قائمة الأسعار والخدمات | عرب تك برو سيرفر" : "Services & Price List | Arab Tech Pro Server";
+  let title = isAr ? "قائمة الأسعار والخدمات | عرب تك برو سيرفر (عرب تيك)" : "Services & Price List | Arab Tech Pro Server";
   let description = isAr
-    ? "تصفح قائمة أسعار جميع خدمات فك الشفرات، تخطي حسابات جوجل FRP و iCloud، وتنشيط الدونجلات والبوكسات بأفضل الأسعار وأعلى سرعة تسليم."
+    ? "تصفح قائمة أسعار وخدمات منصة عرب تك برو سيرفر (عرب تيك سيرفر): فك الشفرات، تخطي حسابات جوجل FRP وiCloud، وتنشيط الدونجلات والبوكسات بأفضل الأسعار وأعلى سرعة تسليم."
     : "Browse our complete catalog and price list for phone unlocking, FRP & iCloud bypass, and tool activations.";
 
   if (section) {
@@ -109,7 +109,7 @@ export async function generateMetadata(
       title,
       description,
       url: currentUrl,
-      siteName: isAr ? "عرب تك برو سيرفر - Arab Tech Pro Server" : "Arab Tech Pro Server",
+      siteName: isAr ? "عرب تك برو سيرفر (عرب تيك سيرفر) - Arab Tech Pro Server" : "Arab Tech Pro Server",
       images: [
         {
           url: "https://arabtechproserver.tech/main-logo.png",

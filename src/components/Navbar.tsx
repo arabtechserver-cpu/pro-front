@@ -194,17 +194,22 @@ export default function Navbar({ lang, dict }: NavbarProps) {
             : "bg-transparent py-2"
         }`}
       >
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="w-full px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-18 sm:h-20">
             
             {/* Logo with Glowing White Bubble Aura */}
-            <Link href={`/${lang}`} className="relative flex items-center group py-1 shrink-0" aria-label="Home">
+            <Link 
+              href={`/${lang}`} 
+              className="relative flex items-center group py-1 shrink-0" 
+              aria-label={lang === "ar" ? "عرب تك برو سيرفر | Arab Tech Pro Server" : "Arab Tech Pro Server"}
+              title={lang === "ar" ? "عرب تك برو سيرفر | Arab Tech Pro Server" : "Arab Tech Pro Server"}
+            >
               <div className="absolute -inset-2 bg-gradient-to-r from-white/25 via-primary/30 to-white/25 rounded-full blur-lg opacity-75 group-hover:opacity-100 transition-all duration-500 pointer-events-none"></div>
               <picture>
                 <source srcSet={lang === "ar" ? "/images/logo_ar.webp" : "/images/logo_en.webp"} type="image/webp" />
                 <img 
                   src={lang === "ar" ? "/images/logo_ar.png" : "/images/logo_en.png"} 
-                  alt="Logo" 
+                  alt={lang === "ar" ? "عرب تك برو سيرفر | Arab Tech Pro Server (عرب تيك سيرفر)" : "Arab Tech Pro Server Logo"} 
                   width={240}
                   height={60}
                   className="relative z-10 h-10 sm:h-13 md:h-16 lg:h-18 w-auto max-w-[200px] sm:max-w-[290px] md:max-w-[380px] lg:max-w-[440px] object-contain transition-transform duration-300 group-hover:scale-105 drop-shadow-[0_0_15px_rgba(255,255,255,0.35)]" 

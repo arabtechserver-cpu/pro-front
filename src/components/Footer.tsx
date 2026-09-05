@@ -55,22 +55,27 @@ export default function Footer({ dict, lang = "ar" }: FooterProps) {
   ];
 
   return (
-    <footer className="mt-auto border-t border-outline-variant/30 bg-surface-container-lowest/70 backdrop-blur-xl relative overflow-hidden">
+    <footer className="mt-auto border-t-2 border-cyan-500/25 bg-[#070c1a]/95 backdrop-blur-2xl relative overflow-hidden shadow-[0_-8px_30px_rgba(0,0,0,0.5)]">
       {/* Background Decorative Glow */}
-      <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl pointer-events-none"></div>
+      <div className="absolute top-0 left-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 relative z-10 space-y-10">
+      <div className="w-full cyber-container py-12 relative z-10 space-y-10">
         {/* Main Footer Links */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           
           <div className="col-span-1 md:col-span-1 space-y-4">
-            <Link href={`/${lang}`} className="relative flex items-center gap-2 group w-fit" aria-label="Home">
+            <Link 
+              href={`/${lang}`} 
+              className="relative flex items-center gap-2 group w-fit" 
+              aria-label={lang === "ar" ? "عرب تك برو سيرفر | Arab Tech Pro Server" : "Arab Tech Pro Server"}
+              title={lang === "ar" ? "عرب تك برو سيرفر | Arab Tech Pro Server" : "Arab Tech Pro Server"}
+            >
               <div className="absolute -inset-2 bg-gradient-to-r from-white/20 via-primary/25 to-white/20 rounded-full blur-md opacity-75 group-hover:opacity-100 transition-all pointer-events-none"></div>
               <picture>
                 <source srcSet={lang === "ar" ? "/images/logo_ar.webp" : "/images/logo_en.webp"} type="image/webp" />
                 <img 
                   src={lang === "ar" ? "/images/logo_ar.png" : "/images/logo_en.png"} 
-                  alt="Logo" 
+                  alt={lang === "ar" ? "عرب تك برو سيرفر | Arab Tech Pro Server (عرب تيك سيرفر)" : "Arab Tech Pro Server Logo"} 
                   width={220}
                   height={55}
                   className="relative z-10 h-11 sm:h-14 w-auto max-w-[220px] sm:max-w-[300px] object-contain drop-shadow-[0_0_10px_rgba(255,255,255,0.25)]" 

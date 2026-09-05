@@ -14,22 +14,28 @@ const jetbrains = JetBrains_Mono({ subsets: ["latin"], variable: "--font-jetbrai
 export async function generateMetadata(props: { params: Promise<{ lang: string }> }): Promise<Metadata> {
   const params = await props.params;
   const isAr = params.lang === "ar";
-  const siteTitle = isAr ? "عرب تك برو سيرفر | Arab Tech Pro Server" : "Arab Tech Pro Server | GSM & Remote Unlock Services";
+  const siteTitle = isAr
+    ? "عرب تك برو سيرفر | Arab Tech Pro Server - سيرفر عرب تيك لفك وتفعيل الأجهزة"
+    : "Arab Tech Pro Server | GSM & Remote Unlock Services";
   const siteDesc = isAr
-    ? "الموقع الرسمي لمنصة عرب تك برو سيرفر (Arab Tech Pro Server) - أفضل وأسرع سيرفر لفك شفرات الهواتف، تخطي آيكلود وFRP، وشراء رصيد البوكسات والدونجل وسيرفرات IMEI عن بعد."
-    : "Official Arab Tech Pro Server - The leading platform for remote phone unlocking, iCloud & FRP bypass, box and dongle activations, and instant IMEI services.";
+    ? "الموقع الرسمي لمنصة عرب تك برو سيرفر | Arab Tech Pro Server (عرب تيك سيرفر) - أفضل وأسرع سيرفر لفك شفرات الهواتف، تخطي آيكلود وFRP، وشراء رصيد البوكسات والدونجل وسيرفرات IMEI عن بعد بأفضل أسعار الجملة."
+    : "Official Arab Tech Pro Server (Arab Tech Server) - The leading platform for remote phone unlocking, iCloud & FRP bypass, box and dongle activations, and instant IMEI services.";
 
   return {
     title: {
-      template: "%s | Arab Tech Pro Server",
+      template: "%s | عرب تك برو سيرفر - Arab Tech Pro Server",
       default: siteTitle,
     },
     description: siteDesc,
     keywords: [
-      "عرب تك برو سيرفر",
-      "عرب تيك برو سيرفر",
-      "عرب تك سيرفر",
       "عرب تيك سيرفر",
+      "عرب تك سيرفر",
+      "سيرفر عرب تيك",
+      "سيرفر عرب تك",
+      "عرب تيك برو سيرفر",
+      "عرب تك برو سيرفر",
+      "عرب تيك",
+      "عرب تك",
       "Arab Tech Pro Server",
       "Arab Tech Server Pro",
       "Arab Tech Server",
@@ -68,7 +74,7 @@ export async function generateMetadata(props: { params: Promise<{ lang: string }
       title: siteTitle,
       description: siteDesc,
       url: `https://arabtechproserver.tech/${params.lang}`,
-      siteName: "Arab Tech Pro Server - عرب تك برو سيرفر",
+      siteName: isAr ? "عرب تك برو سيرفر (عرب تيك سيرفر) - Arab Tech Pro Server" : "Arab Tech Pro Server",
       images: [
         {
           url: isAr
@@ -76,7 +82,7 @@ export async function generateMetadata(props: { params: Promise<{ lang: string }
             : "https://arabtechproserver.tech/images/og_share_en.png",
           width: 1200,
           height: 630,
-          alt: "Arab Tech Pro Server Logo",
+          alt: isAr ? "عرب تك برو سيرفر - عرب تيك سيرفر" : "Arab Tech Pro Server Logo",
         },
       ],
       locale: isAr ? "ar_AR" : "en_US",
@@ -135,19 +141,24 @@ export default async function RootLayout(
   const jsonLdWebsite = {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    "name": "Arab Tech Pro Server",
+    "name": isAr ? "عرب تك برو سيرفر | Arab Tech Pro Server" : "Arab Tech Pro Server",
     "alternateName": [
       "عرب تك برو سيرفر",
-      "عرب تيك برو سيرفر",
-      "Arab Tech Server Pro",
-      "Arab Tech Server",
+      "Arab Tech Pro Server",
+      "عرب تيك سيرفر",
       "عرب تك سيرفر",
-      "عرب تيك سيرفر"
+      "سيرفر عرب تيك",
+      "سيرفر عرب تك",
+      "عرب تيك برو سيرفر",
+      "عرب تيك",
+      "عرب تك",
+      "Arab Tech Server Pro",
+      "Arab Tech Server"
     ],
     "url": "https://arabtechproserver.tech",
     "inLanguage": ["ar", "en"],
     "description": isAr
-      ? "الموقع الرسمي لمنصة عرب تك برو سيرفر لخدمات فك الهواتف، تخطي iCloud وFRP، وخدمات IMEI والسيرفر عن بعد."
+      ? "الموقع الرسمي لمنصة عرب تك برو سيرفر | Arab Tech Pro Server (عرب تيك سيرفر) لخدمات فك الهواتف، تخطي iCloud وFRP، وخدمات IMEI والسيرفر عن بعد."
       : "Official Arab Tech Pro Server for remote phone unlocking, iCloud & FRP bypass, and IMEI server services.",
     "potentialAction": {
       "@type": "SearchAction",
@@ -159,12 +170,22 @@ export default async function RootLayout(
   const jsonLdOrganization = {
     "@context": "https://schema.org",
     "@type": "Organization",
-    "name": "Arab Tech Pro Server",
-    "alternateName": "عرب تك برو سيرفر",
+    "name": "عرب تك برو سيرفر | Arab Tech Pro Server",
+    "legalName": "Arab Tech Pro Server",
+    "alternateName": [
+      "Arab Tech Pro Server",
+      "عرب تك برو سيرفر",
+      "عرب تيك سيرفر",
+      "عرب تك سيرفر",
+      "عرب تيك برو سيرفر",
+      "سيرفر عرب تيك",
+      "Arab Tech Server"
+    ],
     "url": "https://arabtechproserver.tech",
     "logo": "https://arabtechproserver.tech/images/logo_en.png",
     "sameAs": [
-      "https://t.me/ARABTECHSUPPURT2"
+      "https://t.me/ARABTECHSUPPURT2",
+      "https://t.me/arabtechserveronline"
     ],
     "contactPoint": {
       "@type": "ContactPoint",
@@ -284,7 +305,7 @@ export default async function RootLayout(
 
         <Navbar lang={lang} dict={dict.nav} />
         
-        <main className="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 pt-28 sm:pt-32 pb-12">
+        <main className="flex-grow w-full pt-16 sm:pt-20 pb-12 overflow-x-hidden">
           {children}
         </main>
 

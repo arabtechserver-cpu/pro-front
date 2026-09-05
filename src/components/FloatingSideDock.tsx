@@ -87,9 +87,10 @@ export default function FloatingSideDock({ lang = "ar" }: FloatingSideDockProps)
           type="button"
           onClick={scrollToTop}
           aria-label={isAr ? "الرجوع لأعلى الصفحة" : "Scroll to top"}
-          className="fixed bottom-5 left-4 sm:bottom-8 sm:left-8 z-40 w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-emerald-500 hover:bg-emerald-400 text-white flex items-center justify-center shadow-[0_4px_20px_rgba(16,185,129,0.5)] transition-all duration-300 hover:scale-110 active:scale-95 animate-in fade-in zoom-in-75"
+          className="fixed bottom-5 left-4 sm:bottom-8 sm:left-8 z-40 w-12 h-12 rounded-full bg-emerald-500 hover:bg-emerald-400 text-white flex items-center justify-center shadow-[0_4px_20px_rgba(16,185,129,0.6)] transition-all duration-300 hover:scale-110 active:scale-90 animate-in fade-in zoom-in-75 relative group"
         >
-          <span className="material-symbols-outlined text-2xl font-bold">keyboard_arrow_up</span>
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-40 pointer-events-none"></span>
+          <span className="material-symbols-outlined text-2xl font-bold group-hover:-translate-y-0.5 transition-transform">keyboard_arrow_up</span>
         </button>
       )}
     </>

@@ -77,14 +77,14 @@ export default function HexagonalFeatures({ lang }: HexagonalFeaturesProps) {
   ];
 
   return (
-    <section className="relative py-20 lg:py-28 bg-gradient-to-br from-slate-950 via-[#0b1329] to-slate-900 overflow-hidden border-y border-outline-variant/15">
+    <section className="relative py-14 sm:py-20 bg-transparent overflow-hidden">
       {/* Dynamic Background Glows */}
-      <div className="absolute top-1/4 -left-32 w-96 h-96 bg-primary/10 rounded-full blur-3xl pointer-events-none"></div>
+      <div className="absolute top-1/4 -left-32 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
       <div className="absolute bottom-1/4 -right-32 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
-      <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="relative z-10 w-full cyber-container">
         {/* Section Header */}
-        <div className="text-center mb-16 lg:mb-20" data-aos="fade-up">
+        <div className="text-center mb-12 lg:mb-16" data-aos="fade-up">
           <div className="inline-flex items-center gap-2.5 bg-gradient-to-r from-emerald-500/20 to-cyan-500/20 backdrop-blur-md px-5 py-2 rounded-full border border-emerald-400/30 mb-5 shadow-sm">
             <i className="fas fa-sparkles text-emerald-400 text-sm"></i>
             <span className="text-emerald-300 font-bold text-xs sm:text-sm uppercase tracking-wider">
@@ -94,7 +94,7 @@ export default function HexagonalFeatures({ lang }: HexagonalFeaturesProps) {
 
           <h2 className="text-3xl sm:text-5xl lg:text-6xl font-black text-white mb-6 tracking-tight">
             <span>{isAr ? "تميز في عالم " : "Unlock "}</span>
-            <span className="bg-gradient-to-r from-cyan-400 via-emerald-400 to-purple-400 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-cyan-400 via-emerald-400 to-purple-400 bg-clip-text text-transparent drop-shadow-[0_2px_15px_rgba(34,211,238,0.35)]">
               {isAr ? "خدمات الـ GSM والسيرفر" : "Excellence & Performance"}
             </span>
           </h2>
@@ -106,45 +106,39 @@ export default function HexagonalFeatures({ lang }: HexagonalFeaturesProps) {
           </p>
         </div>
 
-        {/* Hexagonal / Feature Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 max-w-6xl mx-auto">
+        {/* Feature Cards Grid (Expansive 3-Col Layout) */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 w-full">
           {features.map((f) => (
             <div
               key={f.id}
-              className="group relative rounded-2xl p-7 transition-all duration-300 hover:-translate-y-2"
+              className="curved-cockpit group relative rounded-3xl p-7 sm:p-8 transition-all duration-300 hover:-translate-y-2 active:scale-[0.97] border-2 border-cyan-500/30 hover:border-cyan-400/80 active:border-cyan-400 shadow-2xl active:shadow-[0_0_35px_rgba(34,211,238,0.45)] flex flex-col justify-between"
               data-aos="fade-up"
               data-aos-delay={f.delay}
-              style={{
-                background: "linear-gradient(135deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.01))",
-                backdropFilter: "blur(14px)",
-                border: "1px solid rgba(255, 255, 255, 0.1)",
-              }}
             >
-              {/* Card Hover Glow Border */}
-              <div
-                className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-                style={{
-                  boxShadow: `0 15px 35px ${f.glowColor}`,
-                  border: "1px solid rgba(87, 241, 219, 0.4)",
-                }}
-              ></div>
+              {/* Top Arched Accent */}
+              <div className="absolute -top-[2px] left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-cyan-400/60 to-transparent pointer-events-none"></div>
 
-              {/* Icon Circle */}
-              <div
-                className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${f.gradient} flex items-center justify-center text-white text-2xl mb-5 shadow-lg transform group-hover:scale-110 group-hover:rotate-6 transition-all duration-300`}
-              >
-                <i className={f.icon}></i>
+              {/* Glowing Corner Chip Accent */}
+              <div className="absolute top-4 end-4 w-2 h-2 rounded-full bg-cyan-400/40 group-hover:bg-cyan-400 group-hover:shadow-[0_0_10px_#22d3ee] transition-all"></div>
+
+              <div>
+                {/* Icon Circle */}
+                <div
+                  className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${f.gradient} flex items-center justify-center text-white text-2xl mb-5 shadow-lg transform group-hover:scale-110 group-hover:rotate-6 group-active:scale-95 transition-all duration-300`}
+                >
+                  <i className={f.icon}></i>
+                </div>
+
+                {/* Title */}
+                <h3 className="text-xl font-bold text-white mb-2.5 group-hover:text-primary transition-colors">
+                  {f.title}
+                </h3>
+
+                {/* Description */}
+                <p className="text-slate-300/80 text-sm leading-relaxed">
+                  {f.desc}
+                </p>
               </div>
-
-              {/* Title */}
-              <h3 className="text-xl font-bold text-white mb-2.5 group-hover:text-primary transition-colors">
-                {f.title}
-              </h3>
-
-              {/* Description */}
-              <p className="text-slate-300/80 text-sm leading-relaxed">
-                {f.desc}
-              </p>
             </div>
           ))}
         </div>

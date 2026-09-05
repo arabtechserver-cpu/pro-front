@@ -42,6 +42,7 @@ export async function generateMetadata(props: Props, parent: ResolvingMetadata):
 
   // Set up SEO properties
   return {
+    metadataBase: new URL("https://arabtechproserver.tech"),
     title: title,
     description: description,
     openGraph: {

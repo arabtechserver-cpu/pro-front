@@ -49,46 +49,51 @@ export default function FaqSection({ lang }: FaqSectionProps) {
   };
 
   return (
-    <section className="relative py-24 bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 text-white overflow-hidden">
+    <section className="relative py-14 sm:py-20 bg-transparent text-white overflow-hidden">
       {/* Subtle Glow */}
-      <div className="absolute top-1/2 right-1/4 -translate-y-1/2 w-96 h-96 bg-primary/10 rounded-full blur-3xl pointer-events-none"></div>
+      <div className="absolute top-1/2 right-1/4 -translate-y-1/2 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 relative z-10">
-        <h2 className="text-3xl sm:text-5xl font-black text-center mb-12" data-aos="fade-down" suppressHydrationWarning>
-          <span className="text-primary">{isAr ? "الأسئلة الشائعة " : "Frequently Asked "}</span>
+      <div className="w-full cyber-container relative z-10">
+        <h2 className="text-3xl sm:text-5xl font-black text-center mb-10 sm:mb-14" data-aos="fade-down" suppressHydrationWarning>
+          <span className="bg-gradient-to-r from-emerald-400 via-cyan-300 to-teal-200 bg-clip-text text-transparent">
+            {isAr ? "الأسئلة الشائعة " : "Frequently Asked "}
+          </span>
           <span>{isAr ? "والأكثر تداولاً" : "Questions"}</span>
         </h2>
 
-        <div className="space-y-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 items-start">
           {faqs.map((faq, idx) => {
             const isOpen = openIndex === idx;
             return (
               <div
                 key={idx}
-                className="rounded-2xl border border-slate-800/80 bg-slate-900/60 backdrop-blur-md overflow-hidden shadow-lg transition-all duration-200"
+                className="curved-cockpit rounded-2xl sm:rounded-3xl border-2 border-cyan-500/30 hover:border-cyan-400/70 overflow-hidden shadow-xl transition-all duration-300 backdrop-blur-xl"
                 data-aos="fade-up"
                 data-aos-delay={idx * 100}
                 suppressHydrationWarning
               >
+                {/* Top Arched Line Accent */}
+                <div className="absolute -top-[2px] left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-cyan-400/50 to-transparent pointer-events-none"></div>
+
                 <button
                   type="button"
                   onClick={() => toggleFaq(idx)}
-                  className="w-full flex justify-between items-center px-6 py-5 text-left rtl:text-right focus:outline-none hover:bg-slate-800/40 transition-colors"
+                  className="w-full flex justify-between items-center px-6 sm:px-8 py-5 text-left rtl:text-right focus:outline-none hover:bg-[#0c1328]/50 transition-colors"
                 >
                   <span className="text-base sm:text-lg font-bold text-white">
                     {isAr ? faq.qAr : faq.qEn}
                   </span>
                   <div
-                    className={`w-8 h-8 rounded-full flex items-center justify-center bg-primary/10 text-primary transition-transform duration-300 ${
+                    className={`convex-pill w-10 h-10 flex items-center justify-center bg-[#070c1a] border border-cyan-400/50 text-cyan-300 transition-transform duration-300 shrink-0 ms-4 shadow-md ${
                       isOpen ? "rotate-45" : "rotate-0"
                     }`}
                   >
-                    <i className="fas fa-plus text-sm"></i>
+                    <i className="fas fa-plus text-xs"></i>
                   </div>
                 </button>
 
                 {isOpen && (
-                  <div className="px-6 pb-5 pt-1 text-slate-300 text-sm sm:text-base leading-relaxed border-t border-slate-800/60">
+                  <div className="px-6 sm:px-8 pb-6 pt-2 text-slate-300 text-sm sm:text-base leading-relaxed border-t border-cyan-500/20 bg-[#070c1a]/40">
                     {isAr ? faq.aAr : faq.aEn}
                   </div>
                 )}

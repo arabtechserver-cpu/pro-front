@@ -55,15 +55,19 @@ export default function NewsletterSection({ lang = "ar", className = "" }: Newsl
   };
 
   return (
-    <section className={`w-full ${className}`}>
-      <div className="glass-panel p-6 sm:p-8 lg:p-10 rounded-3xl border border-primary/30 relative overflow-hidden flex flex-col md:flex-row items-center gap-6 sm:gap-8 shadow-2xl bg-surface-container/60 backdrop-blur-xl">
+    <section className={`w-full cyber-container ${className}`}>
+      <div className="curved-cockpit p-6 sm:p-8 lg:p-12 rounded-3xl border-2 border-cyan-500/30 shadow-2xl relative overflow-hidden flex flex-col md:flex-row items-center gap-6 sm:gap-8 backdrop-blur-xl animate-neon-border">
+        {/* Top & Bottom Arched Line Accents */}
+        <div className="absolute -top-[2px] left-0 right-0 h-[2.5px] bg-gradient-to-r from-transparent via-cyan-400 to-transparent shadow-[0_0_15px_#22d3ee] pointer-events-none"></div>
+        <div className="absolute -bottom-[2px] left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-emerald-400/60 to-transparent pointer-events-none"></div>
+
         {/* Decorative background glows */}
-        <div className="absolute top-0 right-0 w-64 h-64 bg-primary/15 rounded-bl-full pointer-events-none z-0 blur-2xl"></div>
-        <div className="absolute bottom-0 left-0 w-48 h-48 bg-secondary/10 rounded-tr-full pointer-events-none z-0 blur-xl"></div>
+        <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-500/15 rounded-bl-full pointer-events-none z-0 blur-2xl"></div>
+        <div className="absolute bottom-0 left-0 w-48 h-48 bg-emerald-500/10 rounded-tr-full pointer-events-none z-0 blur-xl"></div>
 
         {/* Content text */}
         <div className="flex-1 relative z-10 text-center md:text-start space-y-2">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/25 text-primary text-xs font-bold mb-1">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/25 text-cyan-300 text-xs font-bold mb-1">
             <span className="material-symbols-outlined text-sm animate-bounce">mark_email_unread</span>
             <span>{isAr ? "النشرة الإخبارية والعروض الحصرية" : "Exclusive Newsletter & Offers"}</span>
           </div>
@@ -133,14 +137,14 @@ export default function NewsletterSection({ lang = "ar", className = "" }: Newsl
                     type="email"
                     required
                     disabled={loading}
-                    className="w-full px-4 py-3 sm:py-3.5 pl-10 rtl:pl-4 rtl:pr-10 bg-surface-container border border-outline-variant/50 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all text-on-surface text-sm placeholder:text-on-surface-variant/60 shadow-inner"
+                    className="w-full px-4 py-3 sm:py-3.5 pl-10 rtl:pl-4 rtl:pr-10 bg-[#070c1a]/90 border border-cyan-500/35 rounded-xl focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 outline-none transition-all text-white text-sm placeholder:text-slate-400 shadow-inner"
                   />
                 </div>
 
                 <button
                   type="submit"
                   disabled={loading}
-                  className="btn-primary py-3 sm:py-3.5 px-6 rounded-xl font-bold flex items-center justify-center gap-2 shrink-0 shadow-lg hover:shadow-primary/25 disabled:opacity-60 transition-all cursor-pointer active:scale-95"
+                  className="convex-pill py-3 sm:py-3.5 px-7 font-black text-slate-950 bg-gradient-to-r from-emerald-500 via-teal-400 to-cyan-500 flex items-center justify-center gap-2 shrink-0 shadow-lg active:scale-95 active:shadow-[0_0_25px_rgba(45,212,191,0.8)] disabled:opacity-60 cursor-pointer"
                 >
                   {loading ? (
                     <>

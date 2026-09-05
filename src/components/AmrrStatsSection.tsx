@@ -9,25 +9,24 @@ export default function AmrrStatsSection({ lang }: AmrrStatsSectionProps) {
   const isAr = lang === "ar";
 
   return (
-    <section className="relative my-8 sm:my-10">
+    <section className="relative my-6 sm:my-10 cyber-container">
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 relative z-10">
         
         {/* Left Column: Ready to Unlock CTA Card */}
         <div
-          className="lg:col-span-5 relative overflow-hidden bg-gradient-to-br from-slate-900/95 via-slate-850/90 to-slate-900/95 backdrop-blur-xl rounded-2xl sm:rounded-3xl p-5 sm:p-8 border-2 border-emerald-500/40 shadow-xl flex flex-col justify-between animate-card-float animate-neon-border will-change-transform"
+          className="lg:col-span-5 relative overflow-hidden curved-cockpit rounded-2xl sm:rounded-3xl p-5 sm:p-8 border-2 border-emerald-500/40 shadow-2xl flex flex-col justify-between animate-card-float animate-neon-border will-change-transform"
           data-aos="fade-right"
           data-aos-delay="100"
         >
+          {/* Top Arched Cyber Horizon */}
+          <div className="absolute -top-[2px] left-0 right-0 h-[2.5px] bg-gradient-to-r from-transparent via-emerald-400 to-transparent shadow-[0_0_15px_#34d399] pointer-events-none"></div>
+
           {/* Vertical Laser Scanline */}
           <div className="absolute left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-emerald-400 to-transparent shadow-[0_0_12px_#34d399] animate-laser-scan pointer-events-none will-change-transform"></div>
 
-          {/* Vertical Glowing Border Accents */}
-          <div className="absolute top-0 bottom-0 start-0 w-[2px] bg-gradient-to-b from-transparent via-emerald-400/50 to-transparent pointer-events-none"></div>
-          <div className="absolute top-0 bottom-0 end-0 w-[2px] bg-gradient-to-b from-transparent via-cyan-400/50 to-transparent pointer-events-none"></div>
-
           <div>
             <div className="text-center sm:text-start mb-5 sm:mb-6">
-              <div className="inline-flex items-center gap-2 bg-emerald-500/15 border border-emerald-500/30 px-3 py-1 rounded-full text-xs font-bold text-emerald-300 mb-3 shadow-sm">
+              <div className="inline-flex items-center gap-2 bg-emerald-500/15 border border-emerald-500/30 px-3.5 py-1.5 rounded-full text-xs font-bold text-emerald-300 mb-3 shadow-sm">
                 <span className="w-2 h-2 rounded-full bg-emerald-400 online-blink"></span>
                 <span>{isAr ? "جاهز للتنفيذ الفوري ⚡" : "Instant Processing Ready ⚡"}</span>
               </div>
@@ -40,21 +39,21 @@ export default function AmrrStatsSection({ lang }: AmrrStatsSectionProps) {
             </div>
 
             <div className="flex flex-col gap-3 mb-6">
-              {/* Primary Action Button */}
+              {/* Primary Action Button with 3D Convex Curvature */}
               <Link
                 href={`/${lang}/register`}
-                className="group relative overflow-hidden bg-gradient-to-r from-emerald-600 via-teal-500 to-cyan-500 hover:from-emerald-500 hover:to-cyan-400 text-white px-5 sm:px-6 py-3.5 sm:py-4 rounded-xl sm:rounded-2xl font-bold text-sm sm:text-base shadow-lg hover:shadow-emerald-500/30 transition-all duration-300 transform hover:scale-[1.02] flex items-center justify-center gap-2 active:scale-95"
+                className="convex-pill group relative overflow-hidden bg-gradient-to-r from-emerald-600 via-teal-500 to-cyan-500 hover:from-emerald-500 hover:to-cyan-400 text-white px-5 sm:px-6 py-3.5 sm:py-4 font-bold text-sm sm:text-base flex items-center justify-center gap-2 shadow-lg"
               >
-                <div className="absolute inset-0 w-1/2 h-full bg-gradient-to-r from-transparent via-white/25 to-transparent skew-x-[-20deg] animate-shimmer pointer-events-none"></div>
-                <i className="fas fa-rocket text-lg text-yellow-300 animate-rocket-wiggle"></i>
+                <div className="absolute inset-0 w-1/2 h-full bg-gradient-to-r from-transparent via-white/30 to-transparent -skew-x-12 animate-shimmer pointer-events-none"></div>
+                <i className="fas fa-rocket text-lg text-yellow-300 animate-thruster"></i>
                 <span className="tracking-wide">{isAr ? "ابدأ الفك والتفعيل الآن" : "Start Unlocking Now"}</span>
                 <i className={`fas ${isAr ? "fa-arrow-left" : "fa-arrow-right"} text-xs transition-transform group-hover:translate-x-1`}></i>
               </Link>
 
-              {/* Secondary Action Button */}
+              {/* Secondary Action Button with 3D Convex Curvature */}
               <Link
                 href={`/${lang}/pricing`}
-                className="group relative overflow-hidden bg-slate-800/80 hover:bg-slate-700/80 border border-slate-600/60 hover:border-cyan-400/80 text-white px-5 sm:px-6 py-3.5 sm:py-4 rounded-xl sm:rounded-2xl font-bold text-sm sm:text-base transition-all duration-300 flex items-center justify-center gap-2 hover:shadow-md active:scale-95"
+                className="convex-pill group relative overflow-hidden bg-[#070c1a]/90 hover:bg-[#0c1328] border border-cyan-500/35 hover:border-cyan-400 text-white px-5 sm:px-6 py-3.5 sm:py-4 font-bold text-sm sm:text-base transition-all duration-300 flex items-center justify-center gap-2 shadow-lg"
               >
                 <i className="fas fa-list-alt text-cyan-400 text-base sm:text-lg group-hover:scale-110 transition-transform"></i>
                 <span>{isAr ? "عرض قائمة كافة الخدمات" : "View All Services"}</span>
@@ -64,7 +63,7 @@ export default function AmrrStatsSection({ lang }: AmrrStatsSectionProps) {
           </div>
 
           {/* Quick Highlights with Glowing Animated Badges */}
-          <div className="pt-4 border-t border-slate-700/60">
+          <div className="pt-4 border-t border-cyan-500/20">
             <div className="flex flex-wrap items-center justify-center sm:justify-between gap-2 text-xs">
               <div className="flex items-center gap-1.5 text-emerald-400 font-semibold bg-emerald-500/10 px-2.5 sm:px-3 py-1 rounded-full border border-emerald-500/20">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
@@ -87,17 +86,20 @@ export default function AmrrStatsSection({ lang }: AmrrStatsSectionProps) {
 
         {/* Right Column: Live Performance Metrics Display */}
         <div
-          className="lg:col-span-7 relative overflow-hidden bg-gradient-to-br from-slate-900/95 via-slate-850/90 to-slate-900/95 backdrop-blur-xl rounded-2xl sm:rounded-3xl p-5 sm:p-8 border border-slate-700/60 shadow-xl flex flex-col justify-between animate-card-float-delayed will-change-transform"
+          className="lg:col-span-7 relative overflow-hidden curved-cockpit rounded-2xl sm:rounded-3xl p-5 sm:p-8 border-2 border-cyan-500/30 shadow-2xl flex flex-col justify-between animate-card-float-delayed will-change-transform"
           data-aos="fade-left"
           data-aos-delay="200"
         >
+          {/* Top Arched Cyber Horizon */}
+          <div className="absolute -top-[2px] left-0 right-0 h-[2.5px] bg-gradient-to-r from-transparent via-cyan-400 to-transparent shadow-[0_0_15px_#22d3ee] pointer-events-none"></div>
+
           {/* Vertical Laser Scanline */}
           <div className="absolute left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-cyan-400 to-transparent shadow-[0_0_12px_#22d3ee] animate-laser-scan pointer-events-none will-change-transform"></div>
 
           {/* Header */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5 sm:mb-6">
             <div>
-              <div className="inline-flex items-center gap-2 bg-slate-800/80 px-3.5 py-1 rounded-full border border-slate-700 mb-1.5 shadow-sm">
+              <div className="inline-flex items-center gap-2 bg-[#070c1a]/80 px-3.5 py-1.5 rounded-full border border-cyan-500/30 mb-1.5 shadow-sm">
                 <span className="w-2 h-2 bg-emerald-400 rounded-full online-blink"></span>
                 <span className="text-slate-300 text-[11px] sm:text-xs font-bold uppercase tracking-wider">
                   {isAr ? "مؤشرات الأداء اللحظية" : "LIVE PERFORMANCE METRICS"}
@@ -116,7 +118,7 @@ export default function AmrrStatsSection({ lang }: AmrrStatsSectionProps) {
           {/* Stats 3-Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 my-2">
             {/* Stat 1 */}
-            <div className="group relative overflow-hidden bg-slate-800/70 hover:bg-slate-800 border border-slate-700/70 hover:border-emerald-400/60 rounded-xl sm:rounded-2xl p-4 text-center transition-all duration-300">
+            <div className="group relative overflow-hidden bg-[#070c1a]/85 hover:bg-[#0c1328] border border-cyan-500/25 hover:border-emerald-400/60 rounded-xl sm:rounded-2xl p-4 text-center transition-all duration-300 shadow-md">
               <div className="w-11 h-11 sm:w-13 sm:h-13 bg-emerald-500/15 border border-emerald-500/30 rounded-xl sm:rounded-2xl flex items-center justify-center mx-auto mb-2.5 group-hover:scale-110 transition-transform">
                 <i className="fas fa-unlock-alt text-emerald-400 text-xl sm:text-2xl"></i>
               </div>
@@ -132,7 +134,7 @@ export default function AmrrStatsSection({ lang }: AmrrStatsSectionProps) {
             </div>
 
             {/* Stat 2 */}
-            <div className="group relative overflow-hidden bg-slate-800/70 hover:bg-slate-800 border border-slate-700/70 hover:border-cyan-400/60 rounded-xl sm:rounded-2xl p-4 text-center transition-all duration-300">
+            <div className="group relative overflow-hidden bg-[#070c1a]/85 hover:bg-[#0c1328] border border-cyan-500/25 hover:border-cyan-400/60 rounded-xl sm:rounded-2xl p-4 text-center transition-all duration-300 shadow-md">
               <div className="w-11 h-11 sm:w-13 sm:h-13 bg-cyan-500/15 border border-cyan-500/30 rounded-xl sm:rounded-2xl flex items-center justify-center mx-auto mb-2.5 group-hover:scale-110 transition-transform">
                 <i className="fas fa-chart-line text-cyan-400 text-xl sm:text-2xl"></i>
               </div>
@@ -148,7 +150,7 @@ export default function AmrrStatsSection({ lang }: AmrrStatsSectionProps) {
             </div>
 
             {/* Stat 3 */}
-            <div className="group relative overflow-hidden bg-slate-800/70 hover:bg-slate-800 border border-slate-700/70 hover:border-purple-400/60 rounded-xl sm:rounded-2xl p-4 text-center transition-all duration-300">
+            <div className="group relative overflow-hidden bg-[#070c1a]/85 hover:bg-[#0c1328] border border-cyan-500/25 hover:border-purple-400/60 rounded-xl sm:rounded-2xl p-4 text-center transition-all duration-300 shadow-md">
               <div className="w-11 h-11 sm:w-13 sm:h-13 bg-purple-500/15 border border-purple-500/30 rounded-xl sm:rounded-2xl flex items-center justify-center mx-auto mb-2.5 group-hover:scale-110 transition-transform">
                 <i className="fas fa-headset text-purple-400 text-xl sm:text-2xl"></i>
               </div>
@@ -165,7 +167,7 @@ export default function AmrrStatsSection({ lang }: AmrrStatsSectionProps) {
           </div>
 
           {/* Bottom Status Bar */}
-          <div className="mt-5 sm:mt-6 pt-3.5 sm:pt-4 border-t border-slate-700/60">
+          <div className="mt-5 sm:mt-6 pt-3.5 sm:pt-4 border-t border-cyan-500/20">
             <div className="flex items-center justify-between mb-2 text-xs">
               <span className="text-slate-300 font-semibold flex items-center gap-1.5">
                 <i className="fas fa-server text-cyan-400"></i>
@@ -176,7 +178,7 @@ export default function AmrrStatsSection({ lang }: AmrrStatsSectionProps) {
                 {isAr ? "مستقر ومثالي ● OPTIMAL" : "● OPTIMAL"}
               </span>
             </div>
-            <div className="w-full bg-slate-800 rounded-full h-2.5 overflow-hidden p-0.5 border border-slate-700/80 shadow-inner">
+            <div className="w-full bg-[#070c1a] rounded-full h-2.5 overflow-hidden p-0.5 border border-cyan-500/30 shadow-inner">
               <div className="bg-gradient-to-r from-emerald-500 via-teal-400 to-cyan-500 h-full rounded-full w-full animate-progress-glow shadow-[0_0_10px_rgba(52,211,153,0.4)]"></div>
             </div>
           </div>

@@ -9,14 +9,23 @@ export default function AmrrHeroSection({ lang }: AmrrHeroSectionProps) {
   const isAr = lang === "ar";
 
   return (
-    <section className="relative min-h-[580px] lg:min-h-[700px] bg-gradient-to-br from-slate-950 via-[#0b132b] to-slate-900 overflow-hidden rounded-2xl sm:rounded-3xl border border-slate-800/80 shadow-2xl mb-8">
+    <section className="relative min-h-[580px] lg:min-h-[700px] curved-cockpit overflow-visible rounded-2xl sm:rounded-[2.75rem] border-y-2 sm:border-2 border-cyan-500/30 shadow-2xl mb-8 animate-neon-border">
+      {/* Curved Arched Cyber Horizon lines */}
+      <div className="absolute -top-[2px] left-0 right-0 h-[2.5px] bg-gradient-to-r from-transparent via-cyan-400 to-transparent shadow-[0_0_20px_#22d3ee] pointer-events-none"></div>
+      <div className="absolute -bottom-[2px] left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-emerald-400/80 to-transparent shadow-[0_0_15px_#34d399] pointer-events-none"></div>
+
       {/* Dynamic Background Grid & Glows */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/10 via-transparent to-transparent pointer-events-none"></div>
-      <div className="absolute -top-24 -left-24 sm:-top-32 sm:-left-32 w-72 sm:w-96 h-72 sm:h-96 bg-cyan-500/10 rounded-full blur-[80px] sm:blur-[120px] pointer-events-none"></div>
-      <div className="absolute -bottom-24 -right-24 sm:-bottom-32 sm:-right-32 w-72 sm:w-96 h-72 sm:h-96 bg-purple-500/10 rounded-full blur-[80px] sm:blur-[120px] pointer-events-none"></div>
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/15 via-transparent to-transparent pointer-events-none rounded-2xl sm:rounded-[2.75rem]"></div>
+      <div className="absolute -top-24 -left-24 sm:-top-32 sm:-left-32 w-72 sm:w-96 h-72 sm:h-96 bg-cyan-500/15 rounded-full blur-[80px] sm:blur-[120px] pointer-events-none"></div>
+      <div className="absolute -bottom-24 -right-24 sm:-bottom-32 sm:-right-32 w-72 sm:w-96 h-72 sm:h-96 bg-purple-500/15 rounded-full blur-[80px] sm:blur-[120px] pointer-events-none"></div>
+
+      {/* Laser Scanline */}
+      <div className="absolute inset-0 overflow-hidden rounded-2xl sm:rounded-[2.75rem] pointer-events-none">
+        <div className="absolute left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-cyan-400 to-transparent shadow-[0_0_15px_#22d3ee] animate-laser-scan"></div>
+      </div>
 
       {/* Vertical Cyber Light Beams (Desktop only to keep mobile 100% fluid) */}
-      <div className="hidden sm:block absolute inset-0 pointer-events-none overflow-hidden">
+      <div className="hidden sm:block absolute inset-0 pointer-events-none overflow-hidden rounded-2xl sm:rounded-[2.75rem]">
         <div className="absolute left-[15%] top-0 bottom-0 w-[1px] bg-gradient-to-b from-transparent via-cyan-500/10 to-transparent">
           <div className="w-full h-36 bg-gradient-to-b from-transparent via-cyan-400 to-transparent shadow-[0_0_15px_#22d3ee] animate-vertical-stream-1 will-change-transform"></div>
         </div>
@@ -34,22 +43,24 @@ export default function AmrrHeroSection({ lang }: AmrrHeroSectionProps) {
         <div className="flex-1 max-w-2xl w-full text-center lg:text-start">
           {/* Status Badge */}
           <div
-            className="inline-flex items-center gap-2 bg-gradient-to-r from-emerald-500/20 to-cyan-500/20 backdrop-blur-md px-3.5 sm:px-5 py-1.5 sm:py-2 rounded-full border border-emerald-400/30 mb-4 sm:mb-6 shadow-sm"
+            className="inline-flex items-center gap-2 bg-gradient-to-r from-emerald-500/20 to-cyan-500/20 backdrop-blur-md px-3.5 sm:px-5 py-1.5 sm:py-2 rounded-full border border-emerald-400/40 mb-4 sm:mb-6 shadow-[0_4px_15px_rgba(52,211,153,0.25)]"
             data-aos="fade-right"
             data-aos-delay="100"
           >
             <span className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
             <span className="text-emerald-300 font-bold text-xs sm:text-sm tracking-wider uppercase">
-              {isAr ? "نظام مباشر وشغال 24/7" : "LIVE & OPERATIONAL"}
+              {isAr ? "عرب تك برو سيرفر (عرب تيك) • Arab Tech Pro Server" : "Arab Tech Pro Server • Live 24/7"}
             </span>
           </div>
 
           {/* Main Heading (Responsive text sizes for small mobile screens) */}
           <div className="space-y-1 sm:space-y-2 mb-4 sm:mb-6" data-aos="fade-right" data-aos-delay="200">
             <h1 className="text-3xl sm:text-5xl lg:text-7xl font-black leading-tight tracking-tight">
-              <span className="block text-white">{isAr ? "افتح وتحكم في" : "UNLOCK"}</span>
-              <span className="block bg-gradient-to-r from-cyan-400 via-emerald-400 to-purple-400 bg-clip-text text-transparent">
-                {isAr ? "كافة الأجهزة" : "EVERYTHING"}
+              <span className="block text-white">
+                {isAr ? "عرب تك برو سيرفر | فك وتحكم في" : "Arab Tech Pro Server | Unlock"}
+              </span>
+              <span className="block bg-gradient-to-r from-cyan-400 via-emerald-400 to-purple-400 bg-clip-text text-transparent drop-shadow-[0_2px_20px_rgba(34,211,238,0.4)]">
+                {isAr ? "كافة الهواتف والأجهزة" : "All Mobile Devices"}
               </span>
             </h1>
           </div>
@@ -62,7 +73,7 @@ export default function AmrrHeroSection({ lang }: AmrrHeroSectionProps) {
           >
             {isAr ? (
               <>
-                منظومة فك وتفعيل أجهزة الجيل القادم مع{" "}
+                منصة <strong className="text-white font-bold">عرب تك برو سيرفر | Arab Tech Pro Server (عرب تيك سيرفر)</strong> — منظومة فك وتفعيل أجهزة الجيل القادم مع{" "}
                 <span className="text-emerald-400 font-bold">تسليم تلقائي فوري</span>،{" "}
                 <span className="text-cyan-400 font-bold">تغطية عالمية</span>، و{" "}
                 <span className="text-purple-400 font-bold">دعم فني متخصص على مدار الساعة</span>.
@@ -85,17 +96,18 @@ export default function AmrrHeroSection({ lang }: AmrrHeroSectionProps) {
           >
             <Link
               href={`/${lang}/register`}
-              className="group relative overflow-hidden bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 text-slate-950 px-6 sm:px-8 py-3.5 sm:py-4 rounded-xl sm:rounded-2xl font-black text-sm sm:text-base shadow-xl hover:shadow-emerald-500/30 transition-all duration-300 transform hover:scale-[1.02] flex items-center justify-center gap-2 active:scale-95"
+              className="convex-pill group relative overflow-hidden bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 text-slate-950 px-6 sm:px-8 py-3.5 sm:py-4 font-black text-sm sm:text-base shadow-xl flex items-center justify-center gap-2"
             >
-              <i className="fas fa-rocket text-base sm:text-lg group-hover:rotate-12 transition-transform"></i>
+              <div className="absolute inset-0 w-1/2 h-full bg-gradient-to-r from-transparent via-white/40 to-transparent -skew-x-12 animate-shimmer pointer-events-none"></div>
+              <i className="fas fa-rocket text-base sm:text-lg group-hover:rotate-12 transition-transform animate-thruster"></i>
               <span>{isAr ? "ابدأ الفك والاشتراك الآن" : "Start Unlocking Now"}</span>
             </Link>
 
             <Link
               href={`/${lang}/pricing`}
-              className="border-2 border-white/20 backdrop-blur-md text-white px-6 sm:px-8 py-3.5 sm:py-4 rounded-xl sm:rounded-2xl font-bold text-sm sm:text-base hover:bg-white/10 hover:border-emerald-400/50 transition-all duration-300 flex items-center justify-center gap-2 active:scale-95"
+              className="convex-pill group bg-slate-900/85 hover:bg-slate-800 border-2 border-white/20 hover:border-cyan-400 text-white px-6 sm:px-8 py-3.5 sm:py-4 font-bold text-sm sm:text-base flex items-center justify-center gap-2"
             >
-              <i className="fas fa-eye text-emerald-400"></i>
+              <i className="fas fa-eye text-cyan-400 group-hover:scale-110 transition-transform"></i>
               <span>{isAr ? "عرض قائمة الأسعار والخدمات" : "View All Services"}</span>
             </Link>
           </div>
@@ -140,12 +152,12 @@ export default function AmrrHeroSection({ lang }: AmrrHeroSectionProps) {
             <div className="absolute inset-8 sm:inset-10 bg-gradient-to-tr from-emerald-500/20 via-cyan-500/25 to-purple-500/20 rounded-full blur-xl sm:blur-2xl animate-pulse-glow pointer-events-none"></div>
 
             {/* Central 3D Cyber Holographic Orb Visual (Customized per Language) */}
-            <div className="relative w-44 h-44 sm:w-56 sm:h-56 md:w-64 md:h-64 rounded-full overflow-hidden border-2 border-cyan-400/50 shadow-[0_0_50px_rgba(45,212,191,0.35)] flex items-center justify-center group bg-slate-950">
+            <div className="relative w-44 h-44 sm:w-56 sm:h-56 md:w-64 md:h-64 rounded-full overflow-hidden border-2 border-cyan-400/50 shadow-[0_0_50px_rgba(45,212,191,0.35)] flex items-center justify-center group bg-slate-950 cursor-pointer active:scale-95 transition-all duration-300">
               <picture className="w-full h-full">
                 <source srcSet={isAr ? "/images/hero_cyber_ar.webp" : "/images/hero_cyber_en.webp"} type="image/webp" />
                 <img
                   src={isAr ? "/images/hero_cyber_ar.jpg" : "/images/hero_cyber_en.jpg"}
-                  alt={isAr ? "عرب تك برو سيرفر" : "Arab Tech Pro Server"}
+                  alt={isAr ? "عرب تك برو سيرفر - عرب تيك سيرفر" : "Arab Tech Pro Server"}
                   width={256}
                   height={256}
                   className="w-full h-full object-cover rounded-full transform group-hover:scale-105 transition-transform duration-700"
@@ -173,45 +185,45 @@ export default function AmrrHeroSection({ lang }: AmrrHeroSectionProps) {
             </div>
 
             {/* Orbiting Floating Badge 1 - Top Left (Positioned safely within screen bounds) */}
-            <div className="absolute -top-2 left-0 sm:-left-4 bg-slate-900/95 backdrop-blur-md border border-emerald-500/40 px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl sm:rounded-2xl shadow-xl flex items-center gap-2 animate-float will-change-transform">
+            <div className="absolute -top-2 left-0 sm:-left-4 bg-[#070c1a]/95 backdrop-blur-md border-2 border-emerald-500/50 px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl sm:rounded-2xl shadow-[0_8px_25px_rgba(52,211,153,0.35)] flex items-center gap-2 animate-float will-change-transform z-20 cursor-pointer active:scale-95 transition-transform">
               <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xs sm:text-sm font-bold shrink-0">
-                <i className="fas fa-bolt"></i>
+                <i className="fas fa-bolt animate-pulse"></i>
               </div>
               <div>
                 <span className="block text-[10px] sm:text-[11px] font-bold text-white whitespace-nowrap">
                   {isAr ? "تسليم تلقائي ⚡" : "Instant Delivery"}
                 </span>
-                <span className="block text-[8px] sm:text-[9px] text-slate-400 whitespace-nowrap">
+                <span className="block text-[8px] sm:text-[9px] text-emerald-300 font-semibold whitespace-nowrap">
                   {isAr ? "خلال 1-5 دقائق" : "1 - 5 mins"}
                 </span>
               </div>
             </div>
 
             {/* Orbiting Floating Badge 2 - Bottom Right */}
-            <div className="absolute -bottom-2 right-0 sm:-right-4 bg-slate-900/95 backdrop-blur-md border border-cyan-500/40 px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl sm:rounded-2xl shadow-xl flex items-center gap-2 animate-float-delayed will-change-transform">
+            <div className="absolute -bottom-2 right-0 sm:-right-4 bg-[#070c1a]/95 backdrop-blur-md border-2 border-cyan-500/50 px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl sm:rounded-2xl shadow-[0_8px_25px_rgba(34,211,238,0.35)] flex items-center gap-2 animate-float-delayed will-change-transform z-20 cursor-pointer active:scale-95 transition-transform">
               <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-lg bg-cyan-500/20 text-cyan-400 flex items-center justify-center text-xs sm:text-sm font-bold shrink-0">
-                <i className="fas fa-shield-alt"></i>
+                <i className="fas fa-shield-alt animate-pulse"></i>
               </div>
               <div>
                 <span className="block text-[10px] sm:text-[11px] font-bold text-white whitespace-nowrap">
                   {isAr ? "حماية مشفرة 🛡️" : "100% Secure"}
                 </span>
-                <span className="block text-[8px] sm:text-[9px] text-slate-400 whitespace-nowrap">
+                <span className="block text-[8px] sm:text-[9px] text-cyan-300 font-semibold whitespace-nowrap">
                   {isAr ? "خوادم معتمدة" : "Verified servers"}
                 </span>
               </div>
             </div>
 
             {/* Orbiting Floating Badge 3 - Bottom Left */}
-            <div className="absolute bottom-4 -left-1 sm:-left-6 bg-slate-900/95 backdrop-blur-md border border-purple-500/40 px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl sm:rounded-2xl shadow-xl flex items-center gap-2 animate-float will-change-transform">
+            <div className="absolute bottom-4 -left-1 sm:-left-6 bg-[#070c1a]/95 backdrop-blur-md border-2 border-purple-500/50 px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl sm:rounded-2xl shadow-[0_8px_25px_rgba(168,85,247,0.35)] flex items-center gap-2 animate-float will-change-transform z-20 cursor-pointer active:scale-95 transition-transform">
               <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-lg bg-purple-500/20 text-purple-400 flex items-center justify-center text-xs sm:text-sm font-bold shrink-0">
-                <i className="fas fa-globe"></i>
+                <i className="fas fa-globe animate-spin-slow"></i>
               </div>
               <div>
                 <span className="block text-[10px] sm:text-[11px] font-bold text-white whitespace-nowrap">
                   {isAr ? "150+ دولة 🌐" : "Global Reach"}
                 </span>
-                <span className="block text-[8px] sm:text-[9px] text-slate-400 whitespace-nowrap">
+                <span className="block text-[8px] sm:text-[9px] text-purple-300 font-semibold whitespace-nowrap">
                   {isAr ? "كل الشبكات" : "All carriers"}
                 </span>
               </div>

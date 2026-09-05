@@ -36,24 +36,29 @@ export async function generateMetadata(props: { params: Promise<{ lang: Locale }
   const params = await props.params;
   const isAr = params.lang === "ar";
   const title = isAr
-    ? "عرب تك برو سيرفر | Arab Tech Pro Server - أفضل منصة لفك الهواتف وخدمات IMEI"
+    ? "عرب تك برو سيرفر | Arab Tech Pro Server - سيرفر عرب تيك لخدمات فك الهواتف وIMEI"
     : "Arab Tech Pro Server - The Best Platform for Remote Phone Unlocking & IMEI Services";
   const description = isAr 
-    ? "الموقع الرسمي لمنصة عرب تك برو سيرفر (Arab Tech Pro Server). خدمات فك شبكات الهواتف الرسمية، تخطي iCloud و FRP، وتفعيل بوكسات ودونجل وسيرفرات IMEI بأفضل الأسعار وأعلى سرعة."
-    : "Official Arab Tech Pro Server for phone network unlocking, iCloud & FRP bypass, box and dongle activations, and IMEI services worldwide.";
+    ? "الموقع الرسمي لمنصة عرب تك برو سيرفر | Arab Tech Pro Server (عرب تيك سيرفر). خدمات فك شبكات الهواتف الرسمية، تخطي iCloud و FRP، وتفعيل بوكسات ودونجل وسيرفرات IMEI بأفضل الأسعار وأعلى سرعة."
+    : "Official Arab Tech Pro Server (Arab Tech Server) for phone network unlocking, iCloud & FRP bypass, box and dongle activations, and IMEI services worldwide.";
 
   const shareImg = isAr 
     ? "https://arabtechproserver.tech/images/og_share_ar.png"
     : "https://arabtechproserver.tech/images/og_share_en.png";
 
   return {
+    metadataBase: new URL("https://arabtechproserver.tech"),
     title,
     description,
     keywords: [
-      "عرب تك برو سيرفر",
-      "عرب تيك برو سيرفر",
-      "عرب تك سيرفر",
       "عرب تيك سيرفر",
+      "عرب تك سيرفر",
+      "سيرفر عرب تيك",
+      "سيرفر عرب تك",
+      "عرب تيك برو سيرفر",
+      "عرب تك برو سيرفر",
+      "عرب تيك",
+      "عرب تك",
       "Arab Tech Pro Server",
       "Arab Tech Server Pro",
       "Arab Tech Server",
@@ -67,13 +72,13 @@ export async function generateMetadata(props: { params: Promise<{ lang: Locale }
       title,
       description,
       url: `https://arabtechproserver.tech/${params.lang}`,
-      siteName: "Arab Tech Pro Server",
+      siteName: isAr ? "عرب تك برو سيرفر (عرب تيك سيرفر) - Arab Tech Pro Server" : "Arab Tech Pro Server",
       images: [
         {
           url: shareImg,
           width: 1200,
           height: 630,
-          alt: "Arab Tech Pro Server",
+          alt: isAr ? "عرب تك برو سيرفر - عرب تيك سيرفر" : "Arab Tech Pro Server",
         },
       ],
       type: "website",
@@ -177,11 +182,24 @@ export default async function Home(props: { params: Promise<{ lang: Locale }> })
           __html: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "WebSite",
-            "name": "Arab Tech Pro Server",
+            "name": isAr ? "عرب تك برو سيرفر (عرب تيك سيرفر)" : "Arab Tech Pro Server",
+            "alternateName": [
+              "عرب تيك سيرفر",
+              "عرب تك سيرفر",
+              "سيرفر عرب تيك",
+              "سيرفر عرب تك",
+              "عرب تيك برو سيرفر",
+              "عرب تك برو سيرفر",
+              "عرب تيك",
+              "عرب تك",
+              "Arab Tech Pro Server",
+              "Arab Tech Server Pro",
+              "Arab Tech Server"
+            ],
             "url": "https://arabtechproserver.tech",
             "potentialAction": {
               "@type": "SearchAction",
-              "target": "https://arabtechproserver.tech/pricing?search={search_term_string}",
+              "target": `https://arabtechproserver.tech/${params.lang}/pricing?search={search_term_string}`,
               "query-input": "required name=search_term_string"
             }
           })
@@ -280,115 +298,119 @@ export default async function Home(props: { params: Promise<{ lang: Locale }> })
       </div>
 
       {/* --- Amrr Split-Screen Asymmetric Hero --- */}
-      <div className="container mx-auto px-4">
+      <div className="w-full cyber-container">
         <AmrrHeroSection lang={params.lang} />
       </div>
 
       {/* --- Ready to Unlock & Live Performance Metrics (Amrr Match) --- */}
-      <div className="container mx-auto px-4">
+      <div className="w-full">
         <AmrrStatsSection lang={params.lang} />
       </div>
 
       {/* --- Smart Unlock & Animated Counters (Amrr Match) --- */}
-      <div className="container mx-auto px-4">
+      <div className="w-full cyber-container">
         <AmrrCountersSection lang={params.lang} />
       </div>
 
       {/* --- Service Lanes --- */}
-      <section className="container mx-auto px-4">
+      <section className="w-full cyber-container">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-          <Link href={imeiUrl} data-aos="fade-up" data-aos-delay="100" className="glass-card p-5 sm:p-6 rounded-xl sm:rounded-2xl border border-outline-variant/30 hover:border-primary/50 group transition-all relative overflow-hidden flex flex-col gap-3 sm:gap-4">
+          <Link href={imeiUrl} data-aos="fade-up" data-aos-delay="100" className="glass-card p-5 sm:p-6 rounded-2xl border border-cyan-500/30 hover:border-emerald-400/80 active:border-emerald-400 active:scale-[0.97] active:shadow-[0_0_30px_rgba(52,211,153,0.5)] group transition-all relative overflow-hidden flex flex-col gap-3 sm:gap-4 shadow-xl">
             <div 
-              className="absolute inset-0 bg-cover bg-center opacity-50 group-hover:opacity-80 transition-opacity duration-500 z-0 pointer-events-none" 
+              className="absolute inset-0 bg-cover bg-center opacity-40 group-hover:opacity-75 transition-opacity duration-500 z-0 pointer-events-none" 
               style={{ backgroundImage: "url('/images/promo_imei.webp')" }}
             ></div>
-            <div className="absolute inset-0 bg-gradient-to-t from-[#0c1324]/90 via-[#0c1324]/40 to-transparent z-0 pointer-events-none"></div>
-            <div className="relative z-10 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary text-lg sm:text-xl group-hover:bg-primary group-hover:text-on-primary transition-colors">
+            <div className="absolute inset-0 bg-gradient-to-t from-[#070c1a]/95 via-[#070c1a]/50 to-transparent z-0 pointer-events-none"></div>
+            <div className="absolute top-3 end-3 w-2 h-2 rounded-full bg-emerald-400/40 group-hover:bg-emerald-400 group-hover:shadow-[0_0_8px_#34d399] transition-all"></div>
+            <div className="relative z-10 w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400 text-lg sm:text-xl group-hover:bg-emerald-500 group-hover:text-slate-950 group-hover:scale-110 group-active:scale-95 transition-all shadow-md">
               <i className="fas fa-fingerprint"></i>
             </div>
             <div className="relative z-10">
-              <h3 className="font-bold text-base sm:text-lg text-on-surface mb-1">{imeiTitle || "IMEI Services"}</h3>
-              <p className="text-xs sm:text-sm text-on-surface-variant">{imeiDesc || "Unlocks, checks, and device services"}</p>
+              <h3 className="font-bold text-base sm:text-lg text-white mb-1 group-hover:text-emerald-400 transition-colors">{imeiTitle || "IMEI Services"}</h3>
+              <p className="text-xs sm:text-sm text-slate-300">{imeiDesc || "Unlocks, checks, and device services"}</p>
             </div>
-            <i className="fas fa-arrow-right text-primary absolute bottom-5 sm:bottom-6 right-5 sm:right-6 opacity-0 group-hover:opacity-100 transform translate-x-[-10px] group-hover:translate-x-0 transition-all"></i>
+            <i className="fas fa-arrow-right text-emerald-400 absolute bottom-5 sm:bottom-6 right-5 sm:right-6 opacity-0 group-hover:opacity-100 transform translate-x-[-10px] group-hover:translate-x-0 transition-all"></i>
           </Link>
 
-          <Link href={serverUrl} data-aos="fade-up" data-aos-delay="200" className="glass-card p-5 sm:p-6 rounded-xl sm:rounded-2xl border border-outline-variant/30 hover:border-secondary/50 group transition-all relative overflow-hidden flex flex-col gap-3 sm:gap-4">
+          <Link href={serverUrl} data-aos="fade-up" data-aos-delay="200" className="glass-card p-5 sm:p-6 rounded-2xl border border-cyan-500/30 hover:border-cyan-400/80 active:border-cyan-400 active:scale-[0.97] active:shadow-[0_0_30px_rgba(34,211,238,0.5)] group transition-all relative overflow-hidden flex flex-col gap-3 sm:gap-4 shadow-xl">
             <div 
-              className="absolute inset-0 bg-cover bg-center opacity-50 group-hover:opacity-80 transition-opacity duration-500 z-0 pointer-events-none" 
+              className="absolute inset-0 bg-cover bg-center opacity-40 group-hover:opacity-75 transition-opacity duration-500 z-0 pointer-events-none" 
               style={{ backgroundImage: "url('/images/promo_server.webp')" }}
             ></div>
-            <div className="absolute inset-0 bg-gradient-to-t from-[#0c1324]/90 via-[#0c1324]/40 to-transparent z-0 pointer-events-none"></div>
-            <div className="relative z-10 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-secondary/10 flex items-center justify-center text-secondary text-lg sm:text-xl group-hover:bg-secondary group-hover:text-on-secondary transition-colors">
+            <div className="absolute inset-0 bg-gradient-to-t from-[#070c1a]/95 via-[#070c1a]/50 to-transparent z-0 pointer-events-none"></div>
+            <div className="absolute top-3 end-3 w-2 h-2 rounded-full bg-cyan-400/40 group-hover:bg-cyan-400 group-hover:shadow-[0_0_8px_#22d3ee] transition-all"></div>
+            <div className="relative z-10 w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-cyan-500/15 border border-cyan-500/30 flex items-center justify-center text-cyan-400 text-lg sm:text-xl group-hover:bg-cyan-500 group-hover:text-slate-950 group-hover:scale-110 group-active:scale-95 transition-all shadow-md">
               <i className="fas fa-server"></i>
             </div>
             <div className="relative z-10">
-              <h3 className="font-bold text-base sm:text-lg text-on-surface mb-1">{serverTitle || "Server Services"}</h3>
-              <p className="text-xs sm:text-sm text-on-surface-variant">{serverDesc || "Credits, activations, and tools"}</p>
+              <h3 className="font-bold text-base sm:text-lg text-white mb-1 group-hover:text-cyan-400 transition-colors">{serverTitle || "Server Services"}</h3>
+              <p className="text-xs sm:text-sm text-slate-300">{serverDesc || "Credits, activations, and tools"}</p>
             </div>
-            <i className="fas fa-arrow-right text-secondary absolute bottom-5 sm:bottom-6 right-5 sm:right-6 opacity-0 group-hover:opacity-100 transform translate-x-[-10px] group-hover:translate-x-0 transition-all"></i>
+            <i className="fas fa-arrow-right text-cyan-400 absolute bottom-5 sm:bottom-6 right-5 sm:right-6 opacity-0 group-hover:opacity-100 transform translate-x-[-10px] group-hover:translate-x-0 transition-all"></i>
           </Link>
 
-          <Link href={remoteUrl} data-aos="fade-up" data-aos-delay="300" className="glass-card p-5 sm:p-6 rounded-xl sm:rounded-2xl border border-outline-variant/30 hover:border-tertiary/50 group transition-all relative overflow-hidden flex flex-col gap-3 sm:gap-4">
+          <Link href={remoteUrl} data-aos="fade-up" data-aos-delay="300" className="glass-card p-5 sm:p-6 rounded-2xl border border-cyan-500/30 hover:border-purple-400/80 active:border-purple-400 active:scale-[0.97] active:shadow-[0_0_30px_rgba(168,85,247,0.5)] group transition-all relative overflow-hidden flex flex-col gap-3 sm:gap-4 shadow-xl">
             <div 
-              className="absolute inset-0 bg-cover bg-center opacity-50 group-hover:opacity-80 transition-opacity duration-500 z-0 pointer-events-none" 
+              className="absolute inset-0 bg-cover bg-center opacity-40 group-hover:opacity-75 transition-opacity duration-500 z-0 pointer-events-none" 
               style={{ backgroundImage: "url('/images/promo_remote.webp')" }}
             ></div>
-            <div className="absolute inset-0 bg-gradient-to-t from-[#0c1324]/90 via-[#0c1324]/40 to-transparent z-0 pointer-events-none"></div>
-            <div className="relative z-10 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-tertiary/10 flex items-center justify-center text-tertiary text-lg sm:text-xl group-hover:bg-tertiary group-hover:text-on-tertiary transition-colors">
+            <div className="absolute inset-0 bg-gradient-to-t from-[#070c1a]/95 via-[#070c1a]/50 to-transparent z-0 pointer-events-none"></div>
+            <div className="absolute top-3 end-3 w-2 h-2 rounded-full bg-purple-400/40 group-hover:bg-purple-400 group-hover:shadow-[0_0_8px_#c084fc] transition-all"></div>
+            <div className="relative z-10 w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-purple-500/15 border border-purple-500/30 flex items-center justify-center text-purple-400 text-lg sm:text-xl group-hover:bg-purple-500 group-hover:text-slate-950 group-hover:scale-110 group-active:scale-95 transition-all shadow-md">
               <i className="fas fa-broadcast-tower"></i>
             </div>
             <div className="relative z-10">
-              <h3 className="font-bold text-base sm:text-lg text-on-surface mb-1">{remoteTitle || "Remote Services"}</h3>
-              <p className="text-xs sm:text-sm text-on-surface-variant">{remoteDesc || "Assisted sessions and support"}</p>
+              <h3 className="font-bold text-base sm:text-lg text-white mb-1 group-hover:text-purple-400 transition-colors">{remoteTitle || "Remote Services"}</h3>
+              <p className="text-xs sm:text-sm text-slate-300">{remoteDesc || "Assisted sessions and support"}</p>
             </div>
-            <i className="fas fa-arrow-right text-tertiary absolute bottom-5 sm:bottom-6 right-5 sm:right-6 opacity-0 group-hover:opacity-100 transform translate-x-[-10px] group-hover:translate-x-0 transition-all"></i>
+            <i className="fas fa-arrow-right text-purple-400 absolute bottom-5 sm:bottom-6 right-5 sm:right-6 opacity-0 group-hover:opacity-100 transform translate-x-[-10px] group-hover:translate-x-0 transition-all"></i>
           </Link>
 
-          <Link href={storeUrl} data-aos="fade-up" data-aos-delay="400" className="glass-card p-5 sm:p-6 rounded-xl sm:rounded-2xl border border-outline-variant/30 hover:border-primary/50 group transition-all relative overflow-hidden flex flex-col gap-3 sm:gap-4">
+          <Link href={storeUrl} data-aos="fade-up" data-aos-delay="400" className="glass-card p-5 sm:p-6 rounded-2xl border border-cyan-500/30 hover:border-amber-400/80 active:border-amber-400 active:scale-[0.97] active:shadow-[0_0_30px_rgba(251,191,36,0.5)] group transition-all relative overflow-hidden flex flex-col gap-3 sm:gap-4 shadow-xl">
             <div 
-              className="absolute inset-0 bg-cover bg-center opacity-50 group-hover:opacity-80 transition-opacity duration-500 z-0 pointer-events-none" 
+              className="absolute inset-0 bg-cover bg-center opacity-40 group-hover:opacity-75 transition-opacity duration-500 z-0 pointer-events-none" 
               style={{ backgroundImage: "url('/images/promo_store.webp')" }}
             ></div>
-            <div className="absolute inset-0 bg-gradient-to-t from-[#0c1324]/90 via-[#0c1324]/40 to-transparent z-0 pointer-events-none"></div>
-            <div className="relative z-10 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-surface-container-highest flex items-center justify-center text-on-surface text-lg sm:text-xl group-hover:bg-on-surface group-hover:text-surface-container-lowest transition-colors">
+            <div className="absolute inset-0 bg-gradient-to-t from-[#070c1a]/95 via-[#070c1a]/50 to-transparent z-0 pointer-events-none"></div>
+            <div className="absolute top-3 end-3 w-2 h-2 rounded-full bg-amber-400/40 group-hover:bg-amber-400 group-hover:shadow-[0_0_8px_#fbbf24] transition-all"></div>
+            <div className="relative z-10 w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-400 text-lg sm:text-xl group-hover:bg-amber-500 group-hover:text-slate-950 group-hover:scale-110 group-active:scale-95 transition-all shadow-md">
               <i className="fas fa-shopping-bag"></i>
             </div>
             <div className="relative z-10">
-              <h3 className="font-bold text-base sm:text-lg text-on-surface mb-1">{storeTitle || "Tools & Store"}</h3>
-              <p className="text-xs sm:text-sm text-on-surface-variant">{storeDesc || "Licenses, products, and bundles"}</p>
+              <h3 className="font-bold text-base sm:text-lg text-white mb-1 group-hover:text-amber-400 transition-colors">{storeTitle || "Tools & Store"}</h3>
+              <p className="text-xs sm:text-sm text-slate-300">{storeDesc || "Licenses, products, and bundles"}</p>
             </div>
-            <i className="fas fa-arrow-right text-on-surface absolute bottom-5 sm:bottom-6 right-5 sm:right-6 opacity-0 group-hover:opacity-100 transform translate-x-[-10px] group-hover:translate-x-0 transition-all"></i>
+            <i className="fas fa-arrow-right text-amber-400 absolute bottom-5 sm:bottom-6 right-5 sm:right-6 opacity-0 group-hover:opacity-100 transform translate-x-[-10px] group-hover:translate-x-0 transition-all"></i>
           </Link>
         </div>
       </section>
 
       {/* --- Tool Marquee --- */}
-      <section data-aos="fade-up" className="border-y border-outline-variant/20 bg-surface-container-lowest/50 py-6 sm:py-8 overflow-hidden relative">
+      <section data-aos="fade-up" className="border-y border-cyan-500/20 bg-transparent py-6 sm:py-8 overflow-hidden relative">
         <div className="absolute top-0 left-0 w-16 sm:w-32 h-full bg-gradient-to-r from-background to-transparent z-10 pointer-events-none"></div>
         <div className="absolute top-0 right-0 w-16 sm:w-32 h-full bg-gradient-to-l from-background to-transparent z-10 pointer-events-none"></div>
         
-        <div className="container mx-auto px-4 mb-3 sm:mb-4 flex justify-center">
-          <span className="bg-surface-container border border-outline-variant/30 px-3 sm:px-4 py-1.5 rounded-full text-[10px] sm:text-xs font-bold uppercase tracking-widest text-on-surface-variant flex items-center gap-2">
-            <i className="fas fa-certificate text-primary"></i> Tool Network
+        <div className="cyber-container mb-3 sm:mb-4 flex justify-center">
+          <span className="bg-[#070c1a]/90 border border-cyan-500/30 px-3.5 sm:px-5 py-1.5 rounded-full text-[10px] sm:text-xs font-bold uppercase tracking-widest text-cyan-300 flex items-center gap-2 shadow-sm">
+            <i className="fas fa-certificate text-emerald-400"></i> Tool Network
           </span>
         </div>
 
         <div className="w-full flex whitespace-nowrap overflow-hidden" dir="ltr">
           <div className="flex w-max animate-marquee hover:[animation-play-state:paused] cursor-pointer select-none">
-            <div className="flex shrink-0 items-center gap-8 sm:gap-12 px-6 text-base sm:text-xl font-bold text-on-surface opacity-80">
+            <div className="flex shrink-0 items-center gap-8 sm:gap-12 px-6 text-base sm:text-xl font-bold text-white/90">
               {(hp?.toolMarquee || ["Chimera", "UnlockTool", "Borneo", "iRemoval Pro", "DFT Pro", "MobileSea Tool", "AMT", "Phoenix", "Cheetah", "FKey"]).map((tool: string, idx: number) => (
-                <span key={idx} className="flex items-center gap-3 text-primary shrink-0">
-                  <i className="fas fa-tools"></i> {tool}
+                <span key={idx} className="flex items-center gap-3 text-cyan-300 hover:text-emerald-400 transition-colors shrink-0">
+                  <i className="fas fa-tools text-emerald-400"></i> {tool}
                 </span>
               ))}
             </div>
 
             {/* Repeat exact clone for continuous seamless loop */}
-            <div className="flex shrink-0 items-center gap-8 sm:gap-12 px-6 text-base sm:text-xl font-bold text-on-surface opacity-80" aria-hidden="true">
+            <div className="flex shrink-0 items-center gap-8 sm:gap-12 px-6 text-base sm:text-xl font-bold text-white/90" aria-hidden="true">
               {(hp?.toolMarquee || ["Chimera", "UnlockTool", "Borneo", "iRemoval Pro", "DFT Pro", "MobileSea Tool", "AMT", "Phoenix", "Cheetah", "FKey"]).map((tool: string, idx: number) => (
-                <span key={`repeat-${idx}`} className="flex items-center gap-3 text-primary shrink-0">
-                  <i className="fas fa-tools"></i> {tool}
+                <span key={`repeat-${idx}`} className="flex items-center gap-3 text-cyan-300 hover:text-emerald-400 transition-colors shrink-0">
+                  <i className="fas fa-tools text-emerald-400"></i> {tool}
                 </span>
               ))}
             </div>
@@ -397,15 +419,15 @@ export default async function Home(props: { params: Promise<{ lang: Locale }> })
       </section>
 
       {/* --- Feature Ribbon --- */}
-      <section data-aos="fade-up" className="container mx-auto px-4">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 divide-y md:divide-y-0 md:divide-x md:rtl:divide-x-reverse divide-outline-variant/20 glass-panel rounded-2xl sm:rounded-3xl p-5 sm:p-8 border border-outline-variant/30 relative overflow-hidden backdrop-blur-xl">
+      <section data-aos="fade-up" className="w-full cyber-container">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 divide-y md:divide-y-0 md:divide-x md:rtl:divide-x-reverse divide-cyan-500/20 curved-cockpit rounded-2xl sm:rounded-3xl p-5 sm:p-8 border-2 border-cyan-500/30 relative overflow-hidden backdrop-blur-xl shadow-2xl">
           {/* Card 1: Official Distributor */}
-          <div className="group flex flex-col items-center text-center p-4 sm:p-5 rounded-2xl transition-all duration-300 hover:bg-surface-container-high/40 hover:-translate-y-1 relative">
+          <div className="group flex flex-col items-center text-center p-4 sm:p-5 rounded-2xl transition-all duration-300 hover:bg-surface-container-high/40 hover:-translate-y-1 active:scale-[0.97] relative">
             <div className="relative mb-4">
               {/* Outer Glow Pulse */}
               <div className="absolute -inset-2 bg-gradient-to-r from-emerald-500/30 to-cyan-500/30 rounded-full blur-md opacity-60 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500 animate-pulse"></div>
               {/* Icon Container */}
-              <div className="relative w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-emerald-500/20 via-surface-container to-cyan-500/10 flex items-center justify-center text-emerald-400 border border-emerald-500/40 shadow-[0_0_20px_rgba(16,185,129,0.25)] group-hover:rotate-6 group-hover:scale-105 transition-transform duration-300">
+              <div className="relative w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-emerald-500/20 via-surface-container to-cyan-500/10 flex items-center justify-center text-emerald-400 border border-emerald-500/40 shadow-[0_0_20px_rgba(16,185,129,0.25)] group-hover:rotate-6 group-hover:scale-105 group-active:scale-95 transition-transform duration-300">
                 <svg className="w-7 h-7 sm:w-8 sm:h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
                 </svg>
@@ -425,12 +447,12 @@ export default async function Home(props: { params: Promise<{ lang: Locale }> })
           </div>
 
           {/* Card 2: 100% Secure Payments */}
-          <div className="group flex flex-col items-center text-center p-4 sm:p-5 pt-6 md:pt-4 rounded-2xl transition-all duration-300 hover:bg-surface-container-high/40 hover:-translate-y-1 relative">
+          <div className="group flex flex-col items-center text-center p-4 sm:p-5 pt-6 md:pt-4 rounded-2xl transition-all duration-300 hover:bg-surface-container-high/40 hover:-translate-y-1 active:scale-[0.97] relative">
             <div className="relative mb-4">
               {/* Outer Glow Pulse */}
               <div className="absolute -inset-2 bg-gradient-to-r from-amber-500/30 to-secondary/30 rounded-full blur-md opacity-60 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500 animate-pulse"></div>
               {/* Icon Container */}
-              <div className="relative w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-secondary/20 via-surface-container to-amber-500/10 flex items-center justify-center text-secondary border border-secondary/40 shadow-[0_0_20px_rgba(45,212,191,0.25)] group-hover:-rotate-6 group-hover:scale-105 transition-transform duration-300">
+              <div className="relative w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-secondary/20 via-surface-container to-amber-500/10 flex items-center justify-center text-secondary border border-secondary/40 shadow-[0_0_20px_rgba(45,212,191,0.25)] group-hover:-rotate-6 group-hover:scale-105 group-active:scale-95 transition-transform duration-300">
                 <svg className="w-7 h-7 sm:w-8 sm:h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-6.75 4.5h16.5a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5H4.5A2.25 2.25 0 002.25 6.75v12a2.25 2.25 0 002.25 2.25z" />
                 </svg>
@@ -449,7 +471,7 @@ export default async function Home(props: { params: Promise<{ lang: Locale }> })
           </div>
 
           {/* Card 3: Dedicated Priority Support */}
-          <div className="group flex flex-col items-center text-center p-4 sm:p-5 pt-6 md:pt-4 rounded-2xl transition-all duration-300 hover:bg-surface-container-high/40 hover:-translate-y-1 relative">
+          <div className="group flex flex-col items-center text-center p-4 sm:p-5 pt-6 md:pt-4 rounded-2xl transition-all duration-300 hover:bg-surface-container-high/40 hover:-translate-y-1 active:scale-[0.97] relative">
             <div className="relative mb-4">
               {/* Outer Glow Pulse */}
               <div className="absolute -inset-2 bg-gradient-to-r from-purple-500/30 to-primary/30 rounded-full blur-md opacity-60 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500 animate-pulse"></div>
@@ -482,13 +504,13 @@ export default async function Home(props: { params: Promise<{ lang: Locale }> })
       <PackagesSlider lang={params.lang} />
 
       {/* --- Campaign Stage (Promotions) --- */}
-      <section data-aos="fade-up" className="container mx-auto px-4 relative">
+      <section data-aos="fade-up" className="w-full cyber-container relative">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-6 sm:mb-8 gap-4">
           <div>
-            <span className="text-primary text-xs sm:text-sm font-bold uppercase tracking-wider flex items-center gap-2 mb-2">
-              <i className="fas fa-certificate"></i> Official reseller campaigns
+            <span className="text-emerald-400 text-xs sm:text-sm font-bold uppercase tracking-wider flex items-center gap-2 mb-2">
+              <i className="fas fa-certificate text-cyan-400"></i> Official reseller campaigns
             </span>
-            <h2 className="font-display-lg-mobile text-xl sm:text-3xl font-bold text-on-surface">Fresh activations, unlocks, and tool offers</h2>
+            <h2 className="text-xl sm:text-3xl font-black text-white">Fresh activations, unlocks, and tool offers</h2>
           </div>
         </div>
 
@@ -496,7 +518,7 @@ export default async function Home(props: { params: Promise<{ lang: Locale }> })
           {campaigns.length > 0 ? (
             <CampaignSlider campaigns={campaigns} lang={params.lang} />
           ) : (
-            <div className="glass-card rounded-2xl sm:rounded-3xl p-8 border border-outline-variant/30 text-center text-on-surface-variant">
+            <div className="curved-cockpit rounded-2xl sm:rounded-3xl p-8 border-2 border-cyan-500/30 text-center text-slate-300 shadow-xl">
               {isAr ? "لا توجد عروض حالية." : "No active campaigns at the moment."}
             </div>
           )}
@@ -516,7 +538,7 @@ export default async function Home(props: { params: Promise<{ lang: Locale }> })
 
       {/* --- Real Interactive Newsletter Section --- */}
       <div data-aos="fade-up">
-        <NewsletterSection lang={params.lang} className="container mx-auto px-4" />
+        <NewsletterSection lang={params.lang} />
       </div>
 
     </div>

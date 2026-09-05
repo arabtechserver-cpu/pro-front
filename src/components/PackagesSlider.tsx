@@ -198,6 +198,9 @@ export default function PackagesSlider({ lang }: PackagesSliderProps) {
     return () => clearInterval(interval);
   }, [isPaused, total]);
 
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchEnd, setTouchEnd] = useState<number | null>(null);
+
   const handleNext = () => {
     setCurrentIndex((prev) => (prev + 1) % total);
   };
@@ -206,38 +209,65 @@ export default function PackagesSlider({ lang }: PackagesSliderProps) {
     setCurrentIndex((prev) => (prev - 1 + total) % total);
   };
 
-  // Display EXACTLY 2 packages visible at a time
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchEnd = () => {
+    if (touchStart === null || touchEnd === null) return;
+    const distance = touchStart - touchEnd;
+    if (Math.abs(distance) > 40) {
+      if (distance > 0) {
+        if (isAr) handlePrev();
+        else handleNext();
+      } else {
+        if (isAr) handleNext();
+        else handlePrev();
+      }
+    }
+  };
+
+  // Display 3 packages visible on desktop, 2 on tablet, 1 on mobile
   const visibleItems = [
     packages[currentIndex % total],
     packages[(currentIndex + 1) % total],
+    packages[(currentIndex + 2) % total],
   ];
 
   return (
     <section
-      className="relative py-20 lg:py-28 bg-gradient-to-b from-slate-950 via-[#0a1122] to-slate-950 overflow-hidden"
+      className="relative py-14 sm:py-20 bg-transparent overflow-hidden touch-pan-y"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
       data-aos="fade-up"
       suppressHydrationWarning
     >
       {/* Background Ambient Glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[350px] bg-primary/10 rounded-full blur-[140px] pointer-events-none"></div>
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-cyan-500/10 rounded-full blur-[150px] pointer-events-none"></div>
 
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      <div className="w-full cyber-container relative z-10">
         {/* Section Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 lg:mb-16 gap-6">
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 lg:mb-14 gap-6">
           <div>
-            <div className="inline-flex items-center gap-2 bg-primary/10 text-primary border border-primary/25 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider mb-4">
-              <i className="fas fa-layer-group text-primary"></i>
+            <div className="inline-flex items-center gap-2 bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider mb-4 shadow-sm">
+              <i className="fas fa-layer-group text-emerald-400"></i>
               <span>{isAr ? "باقات وخدمات السيرفر المباشرة" : "Live Catalog & Service Packages"}</span>
             </div>
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight">
               {isAr ? "تصفح باقات الخدمات " : "Explore Featured "}
-              <span className="bg-gradient-to-r from-primary via-cyan-300 to-blue-400 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-emerald-400 via-cyan-300 to-teal-200 bg-clip-text text-transparent">
                 {isAr ? "والتفعيلات الحصرية" : "Service Packages"}
               </span>
             </h2>
-            <p className="text-slate-300 text-sm sm:text-base mt-3 max-w-xl">
+            <p className="text-slate-300 text-sm sm:text-base mt-3 max-w-xl leading-relaxed">
               {isAr
                 ? "باقات وتفعيلات مستخرجة مباشرة من قائمة الأسعار مع تسليم تلقائي وأسعار جملة مخفضة."
                 : "Live packages and tool activations directly from our pricing catalog with automated 24/7 delivery."}
@@ -249,35 +279,40 @@ export default function PackagesSlider({ lang }: PackagesSliderProps) {
             <button
               onClick={handlePrev}
               aria-label={isAr ? "الباقة السابقة" : "Previous Package"}
-              className="w-12 h-12 rounded-xl bg-surface-container border border-outline-variant/30 text-white flex items-center justify-center hover:bg-primary hover:text-black transition-all shadow-md active:scale-95"
+              className="convex-pill w-12 h-12 bg-[#070c1a]/95 border border-cyan-400/50 text-white flex items-center justify-center hover:bg-cyan-500 hover:text-slate-950 transition-all shadow-lg active:scale-95"
             >
               <i className={`fas ${isAr ? "fa-arrow-right" : "fa-arrow-left"}`}></i>
             </button>
             <button
               onClick={handleNext}
               aria-label={isAr ? "الباقة التالية" : "Next Package"}
-              className="w-12 h-12 rounded-xl bg-surface-container border border-outline-variant/30 text-white flex items-center justify-center hover:bg-primary hover:text-black transition-all shadow-md active:scale-95"
+              className="convex-pill w-12 h-12 bg-[#070c1a]/95 border border-cyan-400/50 text-white flex items-center justify-center hover:bg-cyan-500 hover:text-slate-950 transition-all shadow-lg active:scale-95"
             >
               <i className={`fas ${isAr ? "fa-arrow-left" : "fa-arrow-right"}`}></i>
             </button>
           </div>
         </div>
 
-        {/* The 2-Card Visible Slider Container */}
-        <div className="relative pt-6 pb-2">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 transition-all duration-500">
+        {/* The Responsive Slider Container */}
+        <div className="relative pt-4 sm:pt-6 pb-2">
+          {/* Mobile Swipe Cue */}
+          <div className="md:hidden flex items-center justify-center gap-2 mb-3 text-xs text-cyan-400/80 font-medium select-none pointer-events-none animate-pulse">
+            <span className="text-sm">‹‹</span>
+            <span>{isAr ? "اسحب يميناً أو يساراً للتنقل بين الباقات" : "Swipe left or right to explore packages"}</span>
+            <span className="text-sm">››</span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 transition-all duration-500">
             {visibleItems.map((pkg, idx) => (
               <div
                 key={`${pkg.id}-${currentIndex}-${idx}`}
-                className={`relative rounded-3xl p-8 lg:p-10 transition-all duration-500 flex flex-col justify-between ${
-                  pkg.isPopular
-                    ? "bg-gradient-to-b from-slate-900/90 to-slate-950/95 border-2 border-primary/60 shadow-[0_0_40px_rgba(87,241,219,0.2)]"
-                    : "bg-slate-900/60 border border-slate-800 hover:border-slate-700 shadow-xl"
-                } backdrop-blur-xl group hover:-translate-y-1.5`}
+                className={`relative rounded-3xl p-6 sm:p-8 curved-cockpit border-2 border-cyan-500/30 hover:border-cyan-400/80 shadow-2xl transition-all duration-300 backdrop-blur-xl group hover:-translate-y-2 active:scale-[0.98] active:border-cyan-400 flex flex-col justify-between ${
+                  idx === 1 ? "hidden md:flex" : idx === 2 ? "hidden lg:flex" : "flex"
+                }`}
               >
                 {/* Popular / Promo Badge */}
                 {(pkg.badgeAr || pkg.badgeEn) && (
-                  <div className="absolute -top-3.5 right-6 sm:right-8 rtl:right-auto rtl:left-6 sm:rtl:left-8 z-30 bg-gradient-to-r from-primary via-cyan-300 to-emerald-400 text-slate-950 text-xs font-black px-4 py-1.5 rounded-full shadow-xl flex items-center gap-1.5 uppercase tracking-wide border border-white/20 whitespace-nowrap pointer-events-none">
+                  <div className="absolute -top-3.5 right-6 sm:right-8 rtl:right-auto rtl:left-6 sm:rtl:left-8 z-30 bg-gradient-to-r from-primary via-cyan-300 to-emerald-400 text-slate-950 text-xs font-black px-4 py-1.5 rounded-full shadow-xl flex items-center gap-1.5 uppercase tracking-wide border border-white/20 whitespace-nowrap pointer-events-none animate-mobile-badge">
                     <i className="fas fa-crown text-amber-950"></i>
                     <span>{isAr ? pkg.badgeAr : pkg.badgeEn}</span>
                   </div>
@@ -292,7 +327,7 @@ export default function PackagesSlider({ lang }: PackagesSliderProps) {
                     </span>
 
                     <span className="text-xs text-slate-400 flex items-center gap-1.5 font-medium">
-                      <i className="fas fa-clock text-cyan-400"></i>
+                      <i className="fas fa-clock text-cyan-400 animate-pulse"></i>
                       <span>{pkg.deliveryTime}</span>
                     </span>
                   </div>
@@ -337,11 +372,7 @@ export default function PackagesSlider({ lang }: PackagesSliderProps) {
                 <div className="space-y-3">
                   <Link
                     href={`/${lang}/pricing?section=${encodeURIComponent(pkg.groupName)}`}
-                    className={`w-full py-3.5 px-6 rounded-2xl font-bold text-center flex items-center justify-center gap-2 transition-all ${
-                      pkg.isPopular
-                        ? "bg-primary text-slate-950 hover:bg-primary-container shadow-[0_0_25px_rgba(87,241,219,0.3)] hover:scale-[1.02]"
-                        : "bg-surface-container border border-outline-variant/40 text-white hover:bg-surface-container-high hover:border-primary/50"
-                    }`}
+                    className="convex-pill w-full py-3.5 px-6 font-bold text-center flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-500 via-teal-400 to-cyan-500 text-slate-950 shadow-lg active:scale-95 active:shadow-[0_0_28px_rgba(45,212,191,0.8)]"
                   >
                     <span>{isAr ? "عرض خدمات وأسعار هذه الباقة" : "View Services & Live Prices"}</span>
                     <i className={`fas ${isAr ? "fa-arrow-left" : "fa-arrow-right"} text-xs`}></i>
@@ -364,10 +395,10 @@ export default function PackagesSlider({ lang }: PackagesSliderProps) {
               key={idx}
               onClick={() => setCurrentIndex(idx)}
               aria-label={`Go to slide ${idx + 1}`}
-              className={`h-2 rounded-full transition-all duration-300 ${
+              className={`h-2.5 rounded-full transition-all duration-300 active:scale-90 ${
                 idx === currentIndex % total
-                  ? "w-8 bg-primary shadow-[0_0_10px_rgba(87,241,219,0.5)]"
-                  : "w-2 bg-slate-700 hover:bg-slate-500"
+                  ? "w-10 bg-gradient-to-r from-emerald-400 via-cyan-400 to-teal-200 shadow-[0_0_15px_#22d3ee] animate-pulse"
+                  : "w-2.5 bg-slate-700/80 hover:bg-slate-500"
               }`}
             />
           ))}
@@ -377,9 +408,9 @@ export default function PackagesSlider({ lang }: PackagesSliderProps) {
         <div className="text-center mt-10">
           <Link
             href={`/${lang}/pricing`}
-            className="inline-flex items-center gap-2 text-primary hover:text-cyan-300 font-bold text-sm sm:text-base transition-colors"
+            className="convex-pill inline-flex items-center gap-2.5 px-8 py-3.5 bg-[#070c1a]/95 border-2 border-cyan-400/50 text-cyan-300 font-bold hover:bg-cyan-500 hover:text-slate-950 active:scale-95 transition-all shadow-xl text-sm sm:text-base"
           >
-            <span>{isAr ? "عرض جدول الأسعار الكامل لجميع الخدمات والبوكسات (Pricing)" : "View Complete Catalog & Price List"}</span>
+            <span>{isAr ? "استعراض كافة الباقات وقائمة الأسعار الكاملة (Pricing)" : "View Complete Catalog & Price List"}</span>
             <i className={`fas ${isAr ? "fa-arrow-left" : "fa-arrow-right"} text-sm`}></i>
           </Link>
         </div>

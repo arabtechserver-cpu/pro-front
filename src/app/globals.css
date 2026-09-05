@@ -7,15 +7,15 @@
 
 @layer base {
   :root {
-    --color-background: #0c1324;
-    --color-surface: #0c1324;
+    --color-background: #070c1a;
+    --color-surface: #070c1a;
     --color-primary: #57f1db;
     --color-primary-container: #2dd4bf;
   }
 }
 
 html, body {
-  background-color: #0c1324;
+  background-color: #070c1a;
   color: #dce1fb;
   font-family: 'Inter', sans-serif;
   overflow-x: hidden;
@@ -63,23 +63,23 @@ html, body {
 }
 
 .glass-card {
-  background: rgba(30, 41, 59, 0.45);
+  background: radial-gradient(120% 90% at 50% 0%, rgba(34, 211, 238, 0.08) 0%, rgba(12, 19, 40, 0.88) 55%, rgba(7, 12, 26, 0.96) 100%);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(133, 148, 144, 0.2);
+  border: 1px solid rgba(45, 212, 191, 0.25);
   transition: all 0.3s ease;
 }
 
 .glass-card:hover {
-  border-color: #2dd4bf;
-  box-shadow: 0 0 20px rgba(45, 212, 191, 0.15);
+  border-color: rgba(45, 212, 191, 0.65);
+  box-shadow: 0 0 25px rgba(45, 212, 191, 0.2);
 }
 
 .glass-panel {
-  background: rgba(15, 23, 42, 0.75);
+  background: radial-gradient(130% 90% at 50% 0%, rgba(45, 212, 191, 0.1) 0%, rgba(12, 19, 40, 0.88) 50%, rgba(7, 12, 26, 0.96) 100%);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(133, 148, 144, 0.15);
+  border: 1px solid rgba(45, 212, 191, 0.25);
 }
 
 /* Custom Modern Glowing Scrollbars */
@@ -363,4 +363,251 @@ html, body {
   animation: progressGlowPulse 2.5s ease infinite;
 }
 
+/* ==========================================================================
+   Curved 3D Cockpit, Convex Lens & Blast-off Pop-out Animations
+   ========================================================================== */
+
+@keyframes rocketPopOut {
+  0%, 100% {
+    transform: translateY(0) scale(1) translateZ(0);
+  }
+  50% {
+    transform: translateY(-12px) scale(1.06) translateZ(30px);
+  }
+}
+
+@keyframes thrusterFlame {
+  0%, 100% {
+    transform: scaleY(1);
+    opacity: 0.75;
+  }
+  50% {
+    transform: scaleY(1.35) scaleX(1.1);
+    opacity: 1;
+  }
+}
+
+@keyframes holographicRings {
+  0% {
+    transform: scale(0.85) rotate(0deg);
+    opacity: 0.7;
+  }
+  50% {
+    transform: scale(1.15) rotate(180deg);
+    opacity: 0.3;
+  }
+  100% {
+    transform: scale(0.85) rotate(360deg);
+    opacity: 0.7;
+  }
+}
+
+@keyframes soundwaveBar {
+  0%, 100% {
+    height: 4px;
+  }
+  50% {
+    height: 18px;
+  }
+}
+
+@keyframes curvedHorizonSweep {
+  0% {
+    transform: translateX(-100%) scaleX(0.3);
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+    transform: translateX(0%) scaleX(1);
+  }
+  100% {
+    transform: translateX(100%) scaleX(0.3);
+    opacity: 0;
+  }
+}
+
+@keyframes floatDrift {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  33% {
+    transform: translateY(-8px) rotate(1.5deg);
+  }
+  66% {
+    transform: translateY(4px) rotate(-1.5deg);
+  }
+}
+
+.animate-pop-out {
+  animation: rocketPopOut 4s ease-in-out infinite;
+}
+
+.animate-thruster {
+  animation: thrusterFlame 0.8s ease-in-out infinite;
+}
+
+.animate-holo-rings {
+  animation: holographicRings 6s linear infinite;
+}
+
+.animate-horizon-sweep {
+  animation: curvedHorizonSweep 4s ease-in-out infinite;
+}
+
+.animate-float-drift {
+  animation: floatDrift 6s ease-in-out infinite;
+}
+
+.animate-soundwave-1 {
+  animation: soundwaveBar 1s ease-in-out infinite 0.1s;
+}
+
+.animate-soundwave-2 {
+  animation: soundwaveBar 1s ease-in-out infinite 0.3s;
+}
+
+.animate-soundwave-3 {
+  animation: soundwaveBar 1s ease-in-out infinite 0.5s;
+}
+
+.animate-soundwave-4 {
+  animation: soundwaveBar 1s ease-in-out infinite 0.2s;
+}
+
+@keyframes pulseRingGlow {
+  0% {
+    transform: scale(0.96);
+    box-shadow: 0 0 0 0 rgba(34, 211, 238, 0.7);
+  }
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 14px rgba(34, 211, 238, 0);
+  }
+  100% {
+    transform: scale(0.96);
+    box-shadow: 0 0 0 0 rgba(34, 211, 238, 0);
+  }
+}
+
+@keyframes cyberBadgeFloat {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-6px) rotate(1.5deg);
+  }
+}
+
+@keyframes neonCardPulse {
+  0%, 100% {
+    border-color: rgba(34, 211, 238, 0.3);
+    box-shadow: 0 15px 35px -8px rgba(0, 0, 0, 0.7), 0 0 15px rgba(34, 211, 238, 0.15);
+  }
+  50% {
+    border-color: rgba(52, 211, 153, 0.6);
+    box-shadow: 0 20px 45px -8px rgba(0, 0, 0, 0.85), 0 0 28px rgba(52, 211, 153, 0.35);
+  }
+}
+
+.animate-pulse-ring {
+  animation: pulseRingGlow 2.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.animate-mobile-badge {
+  animation: cyberBadgeFloat 3.5s ease-in-out infinite;
+}
+
+.animate-neon-pulse {
+  animation: neonCardPulse 4s ease-in-out infinite;
+}
+
+/* 3D Convex Pill Buttons & Badges with Real Curvature */
+.convex-pill {
+  position: relative;
+  border-radius: 9999px;
+  box-shadow: 
+    inset 0 2px 4px rgba(255, 255, 255, 0.45),
+    inset 0 -2.5px 4px rgba(0, 0, 0, 0.4),
+    0 10px 25px -4px rgba(45, 212, 191, 0.45);
+  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.convex-pill:hover {
+  transform: translateY(-3px) scale(1.03);
+  box-shadow: 
+    inset 0 2px 4px rgba(255, 255, 255, 0.6),
+    inset 0 -3px 5px rgba(0, 0, 0, 0.45),
+    0 16px 36px -2px rgba(45, 212, 191, 0.7);
+}
+
+.convex-pill:active {
+  transform: scale(0.95);
+  box-shadow: 
+    inset 0 2px 3px rgba(0, 0, 0, 0.5),
+    0 0 28px rgba(45, 212, 191, 0.7);
+}
+
+/* 3D Curved Cockpit Container */
+.curved-cockpit {
+  position: relative;
+  background: radial-gradient(130% 90% at 50% 0%, rgba(45, 212, 191, 0.12) 0%, rgba(12, 19, 38, 0.92) 50%, rgba(7, 12, 26, 0.98) 100%);
+  box-shadow: 
+    0 20px 50px -10px rgba(0, 0, 0, 0.8),
+    0 0 35px -5px rgba(45, 212, 191, 0.18),
+    inset 0 1.5px 2px rgba(255, 255, 255, 0.15),
+    inset 0 -2px 3px rgba(0, 0, 0, 0.6);
+}
+
+/* 3D Convex Glass Card */
+.convex-card {
+  border-radius: 1.75rem;
+  background: radial-gradient(120% 90% at 50% 0%, rgba(20, 30, 55, 0.85) 0%, rgba(10, 16, 32, 0.96) 100%);
+  box-shadow: 
+    inset 0 1.5px 2px rgba(255, 255, 255, 0.15),
+    inset 0 -1.5px 2px rgba(0, 0, 0, 0.5),
+    0 15px 35px -8px rgba(0, 0, 0, 0.6),
+    0 0 25px rgba(45, 212, 191, 0.12);
+  border: 1px solid rgba(45, 212, 191, 0.25);
+  transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.convex-card:hover {
+  transform: translateY(-5px) scale(1.02);
+  border-color: rgba(45, 212, 191, 0.6);
+  box-shadow: 
+    inset 0 2px 3px rgba(255, 255, 255, 0.25),
+    0 20px 45px -5px rgba(0, 0, 0, 0.8),
+    0 0 35px rgba(45, 212, 191, 0.35);
+}
+
+.convex-card:active {
+  transform: scale(0.97);
+  border-color: rgba(45, 212, 191, 0.75);
+  box-shadow: 0 0 30px rgba(45, 212, 191, 0.45);
+}
+
+/* Unified Wide Cyber Section Container (Eliminates side gutters on large screens) */
+.cyber-container {
+  width: 100%;
+  max-width: 1650px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+}
+
+@media (min-width: 640px) {
+  .cyber-container {
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .cyber-container {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+}
 

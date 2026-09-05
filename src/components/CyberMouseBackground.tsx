@@ -132,7 +132,7 @@ export default function CyberMouseBackground() {
       </div>
 
       {/* 2. Full-Page Vertical Cyber Light Beams (Optimized for Mobile & Desktop) */}
-      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden opacity-40">
         {/* Track 1 - Visible on all devices */}
         <div className="absolute left-[6%] top-0 bottom-0 w-[1px] bg-gradient-to-b from-transparent via-cyan-500/15 to-transparent">
           <div className="w-full h-40 bg-gradient-to-b from-transparent via-cyan-400 to-transparent shadow-[0_0_12px_#22d3ee] animate-vertical-stream-1 will-change-transform"></div>

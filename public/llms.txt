@@ -1,7 +1,7 @@
-# Arab Tech Pro Server - عرب تك برو سيرفر
+# Arab Tech Pro Server - عرب تك برو سيرفر (عرب تيك سيرفر)
 
 > The premier official server for remote mobile phone unlocking, GSM tools activations, IMEI checks, FRP bypass, and instant server credits.
-> الموقع الرسمي المعتمد لخدمات فك شفرات الهواتف، تفعيل أدوات وبرامج السوفت وير، تخطي آيكلود وFRP، وخدمات IMEI والسيرفرات عن بعد.
+> الموقع الرسمي المعتمد لمنصة عرب تك برو سيرفر (عرب تيك سيرفر) لخدمات فك شفرات الهواتف، تفعيل أدوات وبرامج السوفت وير، تخطي آيكلود وFRP، وخدمات IMEI والسيرفرات عن بعد.
 
 - **Website**: https://arabtechproserver.tech
 - **Arabic Portal**: https://arabtechproserver.tech/ar
