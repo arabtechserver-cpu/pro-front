@@ -8,12 +8,11 @@ export default function AosInit() {
     // Delay AOS initialization slightly to allow React hydration to complete cleanly
     const initTimer = setTimeout(() => {
       AOS.init({
-        duration: 500,
+        duration: 600,
         once: true,
         easing: "ease-out-cubic",
         offset: 20,
         mirror: false,
-        disable: () => typeof window !== "undefined" && window.innerWidth < 768,
       });
       AOS.refresh();
     }, 100);

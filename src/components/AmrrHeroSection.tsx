@@ -21,7 +21,7 @@ export default function AmrrHeroSection({ lang }: AmrrHeroSectionProps) {
 
       {/* Laser Scanline */}
       <div className="absolute inset-0 overflow-hidden rounded-2xl sm:rounded-[2.75rem] pointer-events-none">
-        <div className="hidden sm:block absolute left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-cyan-400 to-transparent shadow-[0_0_15px_#22d3ee] animate-laser-scan"></div>
+        <div className="absolute left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-cyan-400 to-transparent shadow-[0_0_15px_#22d3ee] animate-laser-scan"></div>
       </div>
 
       {/* Vertical Cyber Light Beams (Desktop only to keep mobile 100% fluid) */}

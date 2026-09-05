@@ -246,7 +246,7 @@ html, body {
 
 @keyframes laserScanVertical {
   0% {
-    transform: translate3d(0, -100%, 0);
+    top: -20%;
     opacity: 0;
   }
   20% {
@@ -256,7 +256,7 @@ html, body {
     opacity: 0.9;
   }
   100% {
-    transform: translate3d(0, 650px, 0);
+    top: 110%;
     opacity: 0;
   }
 }
@@ -608,63 +608,6 @@ html, body {
   .cyber-container {
     padding-left: 2rem;
     padding-right: 2rem;
-  }
-}
-
-/* ==========================================================================
-   Mobile Performance Engine (علاج التقطيع وسلاسة 60-120fps على الموبايل)
-   ========================================================================== */
-@media (max-width: 768px) {
-  /* 1. Turn off expensive multi-pass backdrop-filter on mobile cards */
-  .curved-cockpit,
-  .convex-card,
-  .glass-card,
-  .glass-panel,
-  .backdrop-blur-xl,
-  .backdrop-blur-2xl,
-  .backdrop-blur-3xl,
-  .backdrop-blur-lg,
-  .backdrop-blur-md {
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-  }
-
-  /* 2. Freeze continuous box-shadow redraw loop on mobile */
-  .animate-neon-border {
-    animation: none !important;
-    border-color: rgba(34, 211, 238, 0.45) !important;
-    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.8), 0 0 16px rgba(34, 211, 238, 0.15) !important;
-  }
-
-  /* 3. Disable continuous laser scanline on mobile */
-  .animate-laser-scan {
-    display: none !important;
-  }
-
-  /* 4. Disable heavy full-card floating on mobile to keep scrolling silky smooth */
-  .animate-card-float,
-  .animate-card-float-delayed {
-    animation: none !important;
-    transform: none !important;
-  }
-
-  /* 5. Cap expensive Gaussian blur filters on mobile */
-  .blur-\[80px\],
-  .blur-\[120px\],
-  .blur-3xl,
-  .blur-2xl {
-    filter: blur(12px) !important;
-    -webkit-filter: blur(12px) !important;
-    opacity: 0.2 !important;
-  }
-
-  /* 6. Lightweight shadows on mobile */
-  .curved-cockpit {
-    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.8), 0 0 15px rgba(45, 212, 191, 0.12) !important;
-  }
-
-  .convex-card {
-    box-shadow: 0 8px 20px -5px rgba(0, 0, 0, 0.7) !important;
   }
 }
 
