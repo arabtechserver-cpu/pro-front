@@ -175,7 +175,7 @@ export default async function Home(props: { params: Promise<{ lang: Locale }> })
   const campaigns = Array.isArray(hp?.campaigns) ? hp.campaigns : [];
 
   return (
-    <div className="flex flex-col gap-10 sm:gap-16 lg:gap-20 pb-12 sm:pb-20 overflow-x-hidden">
+    <div className="flex flex-col gap-10 sm:gap-16 lg:gap-20 pb-12 sm:pb-20 overflow-x-clip">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{

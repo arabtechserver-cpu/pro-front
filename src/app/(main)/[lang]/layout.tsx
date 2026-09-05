@@ -305,7 +305,7 @@ export default async function RootLayout(
 
         <Navbar lang={lang} dict={dict.nav} />
         
-        <main className="flex-grow w-full pt-16 sm:pt-20 pb-12 overflow-x-hidden">
+        <main className="flex-grow w-full pt-16 sm:pt-20 pb-12 overflow-x-clip">
           {children}
         </main>
 

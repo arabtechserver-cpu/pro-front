@@ -13,6 +13,8 @@ export default function AosInit() {
         easing: "ease-out-cubic",
         offset: 20,
         mirror: false,
+        throttleDelay: 99,
+        debounceDelay: 50,
       });
       AOS.refresh();
     }, 100);

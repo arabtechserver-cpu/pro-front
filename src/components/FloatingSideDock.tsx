@@ -13,11 +13,15 @@ export default function FloatingSideDock({ lang = "ar" }: FloatingSideDockProps)
   const isAr = lang === "ar";
 
   useEffect(() => {
+    let ticking = false;
     const handleScroll = () => {
-      if (window.scrollY > 250) {
-        setShowScrollTop(true);
-      } else {
-        setShowScrollTop(false);
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const shouldShow = window.scrollY > 250;
+          setShowScrollTop((prev) => (prev !== shouldShow ? shouldShow : prev));
+          ticking = false;
+        });
+        ticking = true;
       }
     };
 

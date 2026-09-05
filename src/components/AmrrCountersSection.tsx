@@ -32,16 +32,20 @@ export default function AmrrCountersSection({ lang }: AmrrCountersSectionProps) 
           const duration = 1500;
           const startTime = performance.now();
 
+          let lastUpdate = 0;
           const animateCounts = (currentTime: number) => {
             const elapsed = currentTime - startTime;
             const progress = Math.min(elapsed / duration, 1);
             // Ease-out cubic
             const easeProgress = 1 - Math.pow(1 - progress, 3);
 
-            setCounts({
-              devices: Math.floor(easeProgress * end1),
-              services: Math.floor(easeProgress * 500),
-            });
+            if (currentTime - lastUpdate > 33 || progress === 1) {
+              lastUpdate = currentTime;
+              setCounts({
+                devices: Math.floor(easeProgress * end1),
+                services: Math.floor(easeProgress * 500),
+              });
+            }
 
             if (progress < 1) {
               requestAnimationFrame(animateCounts);
@@ -63,8 +67,9 @@ export default function AmrrCountersSection({ lang }: AmrrCountersSectionProps) 
     return () => observer.disconnect();
   }, []);
 
-  // Interactive 3D tilt tracking for ultra-immersive curvature
+  // Interactive 3D tilt tracking for ultra-immersive curvature (Desktop pointer only)
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (typeof window !== "undefined" && !window.matchMedia("(pointer: fine)").matches) return;
     if (!sectionRef.current) return;
     const rect = sectionRef.current.getBoundingClientRect();
     const x = e.clientX - rect.left;
