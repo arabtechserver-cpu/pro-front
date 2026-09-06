@@ -116,8 +116,10 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
       if (lower === 'sn or imei' || lower === 'imei/sn' || lower === 'sn / imeis' || lower === 'serial number or imei' || lower === 'imei or serial number' || lower === 'imei or sn') return 'رقم IMEI أو Serial Number';
       if (lower === 'model' || lower === 'model no') return 'موديل الجهاز (Model)';
       if (lower === 'lock code' || lower === 'code lock' || lower === 'keylock' || lower === 'lock code / imei') return 'رمز القفل (Lock Code)';
-      if (lower === 'order code' || lower === 'remove code' || lower === 'order_code' || lower === 'old code') return 'كود الطلب (Order Code)';
-      if (lower.includes('lock screen photo') || lower.includes('screenshot') || lower.includes('picture')) return 'رابط صورة الشاشة (Screenshot Link)';
+      if (lower.includes('battery') && (lower.includes('picture') || lower.includes('photo') || lower.includes('link') || lower.includes('image'))) return 'رابط صورة البطارية (Battery Picture Link)';
+      if (lower.includes('lock screen photo') || lower.includes('lock screen')) return 'رابط صورة شاشة القفل (Lock Screen Photo)';
+      if (lower.includes('screenshot') || lower.includes('screen shot')) return 'رابط لقطة الشاشة (Screenshot Link)';
+      if (lower.includes('picture') || lower.includes('photo') || lower.includes('image link')) return 'رابط الصورة المطلوبة (Image / Photo Link)';
       if (lower.includes('video link') || lower.includes('video')) return 'رابط فيديو الإثبات (Video Link)';
       if (lower === 'checker report' || lower === 'link proof') return 'تقرير الفحص أو الإثبات (Report / Proof)';
       if (lower === 'apple id' || lower === 'icloud email id' || lower === 'apple id email') return 'حساب أبل (Apple ID / iCloud Email)';
@@ -156,8 +158,8 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
     const identity = getFieldIdentityText(key, fieldObj);
     if (!identity) return false;
 
-    // حقول الروابط/الصور لا تُعتبر بديلاً عن حقل IMEI الأساسي.
-    if (/(link|url|http|https|screenshot|screen shot|image|photo|hint)/i.test(identity)) {
+    // حقول الروابط/الصور/التقارير لا تُعتبر بديلاً عن حقل IMEI الأساسي.
+    if (/(link|url|http|https|screenshot|screen shot|image|photo|picture|hint|report|proof)/i.test(identity)) {
       return false;
     }
 
@@ -316,7 +318,12 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
   const providerFieldsForImei = getProviderCustomFields(selectedService);
   const isImeiService = selectedServiceDetailsLoaded && shouldShowDefaultImeiField(
     selectedCategory?.name || selectedServiceDetails?.dhruCategory?.name,
-    providerFieldsForImei
+    providerFieldsForImei,
+    selectedService?.apiServiceType || selectedServiceDetails?.apiServiceType,
+    selectedService?.groupName || selectedServiceDetails?.groupName
+  );
+  const isBatteryExtractService = Boolean(
+    selectedService?.name && /(battery serial|extract.*battery|battery.*extract)/i.test(selectedService.name)
   );
 
   // استخراج حقول المزود
@@ -517,6 +524,17 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
         rawImeiStr = targetInput.trim();
       }
 
+      // إذا كانت خدمة IMEI ولا يوجد حقل IMEI في الحقول المخصصة، يجب إدخال السيريال/الـ IMEI في targetInput
+      if (isImeiService && !imeiKey && !targetInput.trim()) {
+        setSubmitFeedback({
+          type: "error",
+          text: isBatteryExtractService
+            ? (lang === 'ar' ? 'يرجى إدخال الرقم التسلسلي للبطارية أو الـ IMEI' : 'Please enter Battery Serial or IMEI')
+            : (lang === 'ar' ? 'يرجى إدخال رقم IMEI أو السيريال للجهاز' : 'Please enter the device IMEI or Serial number')
+        });
+        return;
+      }
+
       if (targetInput.trim() && customString) {
         payloadTarget = `${targetInput.trim()} | ${customString}`;
       } else {
@@ -526,7 +544,9 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
       if (!targetInput.trim()) {
         setSubmitFeedback({
           type: "error",
-          text: lang === 'ar' ? 'يرجى إدخال رقم IMEI أو السيريال للجهاز' : 'Please enter the device IMEI or Serial number'
+          text: isBatteryExtractService
+            ? (lang === 'ar' ? 'يرجى إدخال الرقم التسلسلي للبطارية أو الـ IMEI' : 'Please enter Battery Serial or IMEI')
+            : (lang === 'ar' ? 'يرجى إدخال رقم IMEI أو السيريال للجهاز' : 'Please enter the device IMEI or Serial number')
         });
         return;
       }
@@ -942,12 +962,8 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
               : [];
             const hasCustomFields = nonQuantityFields.length > 0;
             const hasImeiInCustom = nonQuantityFields.some(([key, fieldObj]: [string, any]) => {
-              return /(imei|ecid|serial number|sn\b)/i.test(key) || /(imei|ecid|serial number|sn\b)/i.test(fieldObj?.name || fieldObj?.field_id || fieldObj?.label || '');
+              return isPrimaryImeiProviderField(key, fieldObj);
             });
-
-            if (!hasCustomFields && !isImeiService) {
-              return null;
-            }
 
             return (
               <div className="space-y-6">
@@ -1077,7 +1093,11 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
                   {isImeiService && !hasImeiInCustom && (
                     <div className="space-y-2 p-5 rounded-2xl bg-surface-container-high/40 border border-primary/20">
                       <label className="text-xs font-bold text-on-surface-variant uppercase tracking-wider flex items-center justify-between">
-                        <span>{lang === 'ar' ? 'رقم IMEI أو السيريال للجهاز (Device IMEI / Serial):' : 'Device IMEI / Serial Number:'}</span>
+                        <span>
+                          {isBatteryExtractService
+                            ? (lang === 'ar' ? 'الرقم التسلسلي للبطارية أو IMEI (Battery Serial / IMEI):' : 'Battery Serial Number or IMEI:')
+                            : (lang === 'ar' ? 'رقم IMEI أو السيريال للجهاز (Device IMEI / Serial):' : 'Device IMEI / Serial Number:')}
+                        </span>
                         <span className="text-rose-400 font-bold text-[11px] flex items-center gap-0.5">
                           <span className="text-rose-500">*</span>
                           <span>{lang === 'ar' ? 'مطلوب' : 'Required'}</span>
@@ -1087,7 +1107,32 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
                         type="text"
                         value={targetInput}
                         onChange={(e) => setTargetInput(e.target.value)}
-                        placeholder={lang === 'ar' ? 'أدخل رقم IMEI المكون من 15 رقم أو Serial...' : 'Enter 15-digit IMEI or device Serial number...'}
+                        placeholder={
+                          isBatteryExtractService
+                            ? (lang === 'ar' ? 'أدخل الرقم التسلسلي المطبوع على البطارية (Battery Serial)...' : 'Enter Battery Serial Number...')
+                            : (lang === 'ar' ? 'أدخل رقم IMEI المكون من 15 رقم أو Serial...' : 'Enter 15-digit IMEI or device Serial number...')
+                        }
+                        className="w-full bg-surface-container-lowest border border-outline-variant/40 rounded-xl py-3.5 px-4 text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all font-mono text-sm dir-ltr"
+                      />
+                    </div>
+                  )}
+
+                  {/* ── حالة 3: خدمة Server أو Remote بدون حقول مخصصة ── */}
+                  {!isImeiService && !hasCustomFields && (
+                    <div className="space-y-2 p-5 rounded-2xl bg-surface-container-high/40 border border-primary/20">
+                      <label className="text-xs font-bold text-on-surface-variant uppercase tracking-wider flex items-center justify-between">
+                        <span>
+                          {lang === 'ar' ? 'بيانات الطلب / المعرف المطلوب (Target / Account / Link):' : 'Order Target / Account ID / Link:'}
+                        </span>
+                        <span className="text-on-surface-variant/60 text-[11px] font-normal">
+                          {lang === 'ar' ? '(اختياري إن لم يتطلب)' : '(Optional)'}
+                        </span>
+                      </label>
+                      <input
+                        type="text"
+                        value={targetInput}
+                        onChange={(e) => setTargetInput(e.target.value)}
+                        placeholder={lang === 'ar' ? 'أدخل المعرف أو الرابط أو اسم المستخدم...' : 'Enter account, username, or link...'}
                         className="w-full bg-surface-container-lowest border border-outline-variant/40 rounded-xl py-3.5 px-4 text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all font-mono text-sm dir-ltr"
                       />
                     </div>

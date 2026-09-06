@@ -1,7 +1,66 @@
-function shouldShowDefaultImeiField(categoryName, providerFields) {
-  const isImeiCategory = String(categoryName || '').toLowerCase().includes('imei');
-  if (!isImeiCategory) return false;
-  return !providerFields || Object.keys(providerFields).length === 0;
+function isImeiCategoryOrService(categoryName, serviceType, groupName) {
+  const text = [categoryName, serviceType, groupName].filter(Boolean).join(' ').toLowerCase();
+  return text.includes('imei');
+}
+
+function shouldShowDefaultImeiField(categoryName, providerFields, serviceType, groupName) {
+  const isImei = isImeiCategoryOrService(categoryName, serviceType, groupName);
+  if (!isImei) return false;
+  if (!providerFields || Object.keys(providerFields).length === 0) return true;
+
+  const fieldEntries = Object.entries(providerFields);
+
+  // If the provider explicitly defines a primary IMEI / SN custom field (not a link/photo/screenshot)
+  const hasImeiOrSnInCustom = fieldEntries.some(([key, field]) => {
+    const identity = [
+      key,
+      field?.label,
+      field?.fieldname,
+      field?.reqid,
+      field?.name,
+      field?.customname
+    ]
+      .filter(Boolean)
+      .join(' ')
+      .toLowerCase();
+
+    // Secondary fields (links, screenshots, pictures, reports) are NOT the primary IMEI field
+    if (/(link|url|http|https|screenshot|screen shot|image|photo|hint|picture|report|proof)/i.test(identity)) {
+      return false;
+    }
+
+    return /(imei|ecid|serial number|\bsn\b)/i.test(identity);
+  });
+
+  if (hasImeiOrSnInCustom) {
+    return false; // The provider already has a dedicated custom field for IMEI/SN
+  }
+
+  // If the service has a primary non-IMEI target field (e.g. PlayerID, UserID, AccountID)
+  // this occurs when gaming/account services were placed under an IMEI category by mistake
+  const hasNonImeiPrimaryTarget = fieldEntries.some(([key, field]) => {
+    const identity = [
+      key,
+      field?.label,
+      field?.fieldname,
+      field?.reqid,
+      field?.name,
+      field?.customname
+    ]
+      .filter(Boolean)
+      .join(' ')
+      .toLowerCase();
+
+    return /(playerid|player_id|user_id|account_id|targetlogin)/i.test(identity);
+  });
+
+  if (hasNonImeiPrimaryTarget) {
+    return false;
+  }
+
+  // In all other cases (e.g. Battery Picture Link, Model, Carrier, Current Country),
+  // the default IMEI / Serial field MUST be shown!
+  return true;
 }
 
 function getProviderCustomFields(service) {
