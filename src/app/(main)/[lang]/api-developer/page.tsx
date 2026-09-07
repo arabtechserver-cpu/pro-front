@@ -175,47 +175,22 @@ export default function ApiDeveloperPage(props: { params: Promise<{ lang: string
         </div>
       </div>
 
-      {userSession?.role === "admin" ? (
-        <div className="glass-card rounded-3xl p-8 border border-amber-500/30 bg-amber-500/5 text-center max-w-2xl mx-auto space-y-5">
-          <div className="w-16 h-16 rounded-3xl bg-amber-500/20 text-amber-400 flex items-center justify-center mx-auto shadow-lg">
-            <span className="material-symbols-outlined text-3xl">shield_lock</span>
-          </div>
-          <h2 className="text-2xl font-bold text-on-surface">
-            {lang === "ar" ? "حساب الإدارة محمي بالكامل" : "Admin Account is Protected"}
-          </h2>
-          <div className="p-4 rounded-2xl bg-surface-container-high/80 border border-outline-variant/20 text-xs sm:text-sm text-on-surface-variant leading-relaxed text-right sm:text-center space-y-2">
-            <p className="font-bold text-amber-400">
+      {userSession?.role === "admin" && (
+        <div className="mb-6 rounded-2xl p-4 border border-amber-500/30 bg-amber-500/10 flex items-start gap-4">
+          <span className="material-symbols-outlined text-amber-400 text-2xl shrink-0 mt-0.5">shield</span>
+          <div className="text-sm space-y-1">
+            <p className="font-bold text-amber-300">
+              {lang === "ar" ? "وضع المدير العام (Master Admin Mode)" : "Master Admin Mode"}
+            </p>
+            <p className="text-on-surface-variant text-xs leading-relaxed">
               {lang === "ar" 
-                ? "⚠️ حساب المدير العام (Admin) محمي أمنياً ولا يمكن استخراج أو استخدام مفاتيح API له." 
-                : "⚠️ The Master Admin account is strictly protected and cannot generate or use API keys."}
+                ? "أنت مسجل حالياً بحساب الإدارة. يمكنك الاطلاع على بيانات التوثيق والأكواد والروابط أدناه، أو تفعيل الـ API لحسابك للاختبار والتجربة، أو استخدام حساب عميل عادي للربط الفعلي."
+                : "You are logged in as Master Admin. You can view all documentation and endpoints below, or enable API for testing, or use a client account for production."}
             </p>
-            <p>
-              {lang === "ar"
-                ? "سحب الـ API مخصص حصرياً للموزعين والعملاء برصيدهم الفعلي. لربط موقعك وسحب الخدمات، يرجى تسجيل الخروج والدخول بحسابك الشخصي كعميل (مثل حساب Mina samir) واستخراج المفتاح منه بأمان."
-                : "The Reseller API is restricted exclusively to client accounts. To connect your website, please log out and log in with your client account to get your unique API key."}
-            </p>
-          </div>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
-            <button
-              onClick={() => {
-                localStorage.removeItem("user_token");
-                localStorage.removeItem("user_session");
-                router.push(`/${lang}/login`);
-              }}
-              className="w-full sm:w-auto px-6 py-3 rounded-xl bg-purple-500 hover:bg-purple-600 text-white font-bold text-sm transition-all flex items-center justify-center gap-2 shadow-md"
-            >
-              <span className="material-symbols-outlined text-base">logout</span>
-              <span>{lang === "ar" ? "تسجيل الخروج والتبديل لحساب عميل" : "Log out & Switch to Client"}</span>
-            </button>
-            <button
-              onClick={() => router.push(`/${lang}`)}
-              className="w-full sm:w-auto px-6 py-3 rounded-xl border border-outline-variant/30 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high font-bold text-sm transition-all"
-            >
-              {lang === "ar" ? "العودة للرئيسية" : "Back to Home"}
-            </button>
           </div>
         </div>
-      ) : (
+      )}
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-1 space-y-6">
           {/* Status Card */}
@@ -548,7 +523,6 @@ export default function ApiDeveloperPage(props: { params: Promise<{ lang: string
           </div>
         </div>
       </div>
-      )}
     </div>
   );
 }
