@@ -34,7 +34,8 @@ export default function ApiDeveloperPage(props: { params: Promise<{ lang: string
         const res = await fetch("/api/users/profile", {
           headers: {
             "Authorization": `Bearer ${token}`
-          }
+          },
+          credentials: "omit"
         });
         
         const data = await res.json();
@@ -71,6 +72,7 @@ export default function ApiDeveloperPage(props: { params: Promise<{ lang: string
           "Content-Type": "application/json",
           "Authorization": `Bearer ${token}`
         },
+        credentials: "omit",
         body: JSON.stringify(buildApiActivationPayload(siteName, siteUrl))
       });
 
@@ -109,7 +111,8 @@ export default function ApiDeveloperPage(props: { params: Promise<{ lang: string
         method: "POST",
         headers: {
           "Authorization": `Bearer ${token}`
-        }
+        },
+        credentials: "omit"
       });
 
       const data = await res.json();
