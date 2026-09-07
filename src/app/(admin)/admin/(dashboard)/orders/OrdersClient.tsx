@@ -47,12 +47,26 @@ interface OrderItem {
     desc: string;
   }[];
   rawNotes?: string | null;
+  apiDetails?: {
+    username?: string;
+    email?: string;
+    fullName?: string;
+    siteName?: string | null;
+    siteUrl?: string | null;
+    apiKey?: string | null;
+    margin?: number;
+  } | null;
   user?: {
     fullName: string;
     email: string;
     username: string;
     phone?: string;
     balance: number;
+    apiEnabled?: boolean;
+    apiSiteName?: string | null;
+    apiSiteUrl?: string | null;
+    apiKey?: string | null;
+    apiMargin?: number;
   };
 }
 
@@ -146,16 +160,19 @@ export default function OrdersClient() {
     const processing = orders.filter((o) => o.status === "processing").length;
     const pending = orders.filter((o) => o.status === "pending").length;
     const rejected = orders.filter((o) => o.status === "rejected" || o.status === "cancelled" || o.status === "failed").length;
-    return { total, completed, processing, pending, rejected };
+    const apiOrders = orders.filter((o) => o.source === "api" || Boolean(o.apiDetails) || Boolean(o.user?.apiSiteName)).length;
+    return { total, completed, processing, pending, rejected, apiOrders };
   }, [orders]);
 
   const filteredOrders = useMemo(() => {
     return orders.filter((order) => {
       if (statusFilter !== "all") {
-        if (statusFilter === "pending" && order.status !== "pending") return false;
-        if (statusFilter === "processing" && order.status !== "processing") return false;
-        if (statusFilter === "completed" && order.status !== "completed") return false;
-        if (statusFilter === "rejected" && order.status !== "rejected" && order.status !== "cancelled" && order.status !== "failed") return false;
+        if (statusFilter === "api") {
+          if (order.source !== "api" && !order.apiDetails && !order.user?.apiSiteName) return false;
+        } else if (statusFilter === "pending" && order.status !== "pending") return false;
+        else if (statusFilter === "processing" && order.status !== "processing") return false;
+        else if (statusFilter === "completed" && order.status !== "completed") return false;
+        else if (statusFilter === "rejected" && order.status !== "rejected" && order.status !== "cancelled" && order.status !== "failed") return false;
       }
       if (!searchQuery.trim()) return true;
       const q = searchQuery.toLowerCase();
@@ -167,7 +184,11 @@ export default function OrdersClient() {
         (order.apiOrderId && order.apiOrderId.toLowerCase().includes(q)) ||
         (order.user?.fullName && order.user.fullName.toLowerCase().includes(q)) ||
         (order.user?.email && order.user.email.toLowerCase().includes(q)) ||
-        (order.user?.username && order.user.username.toLowerCase().includes(q))
+        (order.user?.username && order.user.username.toLowerCase().includes(q)) ||
+        (order.user?.apiSiteName && order.user.apiSiteName.toLowerCase().includes(q)) ||
+        (order.user?.apiSiteUrl && order.user.apiSiteUrl.toLowerCase().includes(q)) ||
+        (order.apiDetails?.siteName && order.apiDetails.siteName.toLowerCase().includes(q)) ||
+        (order.apiDetails?.username && order.apiDetails.username.toLowerCase().includes(q))
       );
     });
   }, [orders, searchQuery, statusFilter]);
@@ -457,6 +478,15 @@ export default function OrdersClient() {
           >
             الملغاة ({stats.rejected})
           </button>
+          <button
+            onClick={() => setStatusFilter("api")}
+            className={`px-3 py-1.5 rounded-lg transition-all border border-purple-500/40 flex items-center gap-1 ${
+              statusFilter === "api" ? "bg-purple-600 text-white shadow" : "bg-purple-500/10 text-purple-400 hover:bg-purple-500/20"
+            }`}
+          >
+            <span className="material-symbols-outlined text-[13px]">api</span>
+            <span>طلبات الـ API ({stats.apiOrders})</span>
+          </button>
         </div>
       </div>
 
@@ -519,10 +549,51 @@ export default function OrdersClient() {
                         </div>
                       </td>
 
-                      {/* Customer */}
+                      {/* Customer & API Consumer Details */}
                       <td className="p-4">
-                        <div className="font-bold text-on-surface">{order.user?.fullName || "عميل مسجل"}</div>
-                        <div className="text-[10px] text-on-surface-variant font-mono">{order.user?.email || order.userId}</div>
+                        <div className="flex flex-col gap-1">
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            <span className="font-bold text-on-surface text-xs">{order.user?.fullName || "عميل مسجل"}</span>
+                            {order.user?.username && (
+                              <span className="text-[11px] font-mono text-primary font-bold dir-ltr">
+                                @{order.user.username}
+                              </span>
+                            )}
+                          </div>
+                          <div className="text-[10px] text-on-surface-variant font-mono">{order.user?.email || order.userId}</div>
+
+                          {/* If API Order, display API Site and consumer details */}
+                          {(order.source === "api" || order.apiDetails || order.user?.apiSiteName) && (
+                            <div className="mt-1.5 p-2 rounded-xl bg-purple-500/10 border border-purple-500/25 flex flex-col gap-1 text-[11px]">
+                              <div className="flex items-center gap-1.5 text-purple-300 font-bold">
+                                <span className="material-symbols-outlined text-[13px] text-purple-400">webhook</span>
+                                <span>مستهلك API:</span>
+                                <span className="text-white font-medium">
+                                  {order.apiDetails?.siteName || order.user?.apiSiteName || "موقع بدون اسم"}
+                                </span>
+                              </div>
+                              {(order.apiDetails?.siteUrl || order.user?.apiSiteUrl) && (
+                                <a
+                                  href={order.apiDetails?.siteUrl || order.user?.apiSiteUrl || "#"}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-[10px] text-purple-400 hover:text-purple-300 underline dir-ltr text-right truncate max-w-[200px]"
+                                  title={order.apiDetails?.siteUrl || order.user?.apiSiteUrl || ""}
+                                >
+                                  {order.apiDetails?.siteUrl || order.user?.apiSiteUrl}
+                                </a>
+                              )}
+                              <div className="flex items-center justify-between text-[10px] text-purple-300/80 pt-0.5 border-t border-purple-500/20">
+                                <span>الربح المطبق: <b>%{order.apiDetails?.margin || order.user?.apiMargin || 8}</b></span>
+                                {order.user?.apiKey && (
+                                  <span className="font-mono text-[9px] text-purple-400/70" title="مفتاح العميل">
+                                    {order.user.apiKey.slice(0, 8)}...
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          )}
+                        </div>
                       </td>
 
                       {/* Service & Provider */}
@@ -944,6 +1015,65 @@ export default function OrdersClient() {
                   )}
                 </div>
               </div>
+
+              {/* API Client Details Card */}
+              {(selectedOrder.source === "api" || selectedOrder.apiDetails || selectedOrder.user?.apiSiteName) && (
+                <div className="p-4 rounded-2xl bg-purple-500/10 border border-purple-500/30 space-y-2.5">
+                  <div className="font-bold text-purple-400 flex items-center justify-between">
+                    <div className="flex items-center gap-1.5">
+                      <span className="material-symbols-outlined text-sm">webhook</span>
+                      <span>بيانات مستهلك الـ API (API Consumer):</span>
+                    </div>
+                    <span className="px-2 py-0.5 rounded-md bg-purple-500/20 text-purple-300 text-[10px] font-bold">
+                      طلب وارد عبر الـ API
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-on-surface text-xs">
+                    <div>
+                      <span className="text-on-surface-variant">اسم موقع العميل: </span>
+                      <span className="font-bold text-white">
+                        {selectedOrder.apiDetails?.siteName || selectedOrder.user?.apiSiteName || "غير محدد"}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-on-surface-variant">رابط موقع العميل: </span>
+                      {(selectedOrder.apiDetails?.siteUrl || selectedOrder.user?.apiSiteUrl) ? (
+                        <a
+                          href={selectedOrder.apiDetails?.siteUrl || selectedOrder.user?.apiSiteUrl || "#"}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="font-mono text-purple-400 hover:underline font-bold dir-ltr inline-block"
+                        >
+                          {selectedOrder.apiDetails?.siteUrl || selectedOrder.user?.apiSiteUrl}
+                        </a>
+                      ) : (
+                        <span className="text-on-surface-variant">غير متوفر</span>
+                      )}
+                    </div>
+                    <div>
+                      <span className="text-on-surface-variant">اسم المستخدم: </span>
+                      <span className="font-mono font-bold text-primary">
+                        @{selectedOrder.apiDetails?.username || selectedOrder.user?.username}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-on-surface-variant">نسبة الربح المطبقة: </span>
+                      <span className="font-bold text-emerald-400">
+                        %{selectedOrder.apiDetails?.margin || selectedOrder.user?.apiMargin || 8} فوق التكلفة
+                      </span>
+                    </div>
+                    {selectedOrder.user?.apiKey && (
+                      <div className="sm:col-span-2">
+                        <span className="text-on-surface-variant">مفتاح الـ API المستخدم: </span>
+                        <span className="font-mono text-[11px] text-purple-300 select-all bg-surface-container-lowest px-2 py-1 rounded border border-purple-500/20">
+                          {selectedOrder.user.apiKey}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
 
               {/* Service & Provider Info Card */}
               <div className="p-4 rounded-2xl bg-surface-container-high border border-outline-variant/20 space-y-2">

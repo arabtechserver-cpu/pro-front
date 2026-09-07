@@ -411,11 +411,41 @@ export default function ApiDeveloperPage(props: { params: Promise<{ lang: string
               <div className="bg-surface-container-high rounded-xl p-4 border-l-4 border-amber-500 flex items-start gap-3">
                 <span className="material-symbols-outlined text-amber-500 shrink-0">warning</span>
                 <p className="text-xs leading-relaxed">
-                  <strong className="text-on-surface">{lang === "ar" ? "ملاحظة هامة:" : "Important Note:"}</strong><br/>
+                  <strong className="text-on-surface">{lang === "ar" ? "ملاحظة هامة عن الأسعار والرصيد:" : "Important Note on Pricing & Balance:"}</strong><br/>
                   {lang === "ar" 
-                    ? "يجب أن تمتلك رصيداً كافياً في محفظتك هنا لكي يتم تنفيذ طلبات عملائك القادمة عبر الـ API بنجاح، وإلا سيتم إرجاع خطأ (Insufficient Balance)."
-                    : "You must have a sufficient balance in your wallet here for your customers' API orders to be processed successfully, otherwise an 'Insufficient Balance' error will be returned."}
+                    ? "تظهر جميع أسعار الخدمات والباقات تلقائياً بسعر تكلفة المزود مضافاً إليها نسبة ربح 8% فقط. كما يجب أن تمتلك رصيداً كافياً في محفظتك ليتم قبول الطلبات، وتدخل الطلبات إلى الداشبورد لموافقة الإدارة عليها فوراً."
+                    : "All services and packages are priced automatically at provider cost plus an 8% profit margin only. You must have a sufficient wallet balance to place orders, which are sent to the admin dashboard for verification and approval."}
                 </p>
+              </div>
+
+              {/* Supported Endpoints Table */}
+              <div className="bg-surface-container-lowest border border-outline-variant/20 rounded-2xl p-5 space-y-3">
+                <h3 className="font-bold text-on-surface text-base flex items-center gap-2">
+                  <span className="material-symbols-outlined text-primary text-base">code</span>
+                  <span>{lang === "ar" ? "الإجراءات البرمجية المدعومة (Supported API Actions)" : "Supported API Actions"}</span>
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs font-mono">
+                  <div className="p-2.5 rounded-xl bg-surface-container-high/60 border border-outline-variant/20">
+                    <span className="text-primary font-bold">accountinfo</span>
+                    <p className="text-[11px] font-sans text-on-surface-variant mt-0.5">{lang === "ar" ? "استعلام عن الرصيد وحالة الحساب" : "Check balance and account status"}</p>
+                  </div>
+                  <div className="p-2.5 rounded-xl bg-surface-container-high/60 border border-outline-variant/20">
+                    <span className="text-primary font-bold">serverservicelist</span>
+                    <p className="text-[11px] font-sans text-on-surface-variant mt-0.5">{lang === "ar" ? "قائمة خدمات السيرفر والباقات والحقول" : "Server services, packages, and custom fields"}</p>
+                  </div>
+                  <div className="p-2.5 rounded-xl bg-surface-container-high/60 border border-outline-variant/20">
+                    <span className="text-primary font-bold">imeiservicelist</span>
+                    <p className="text-[11px] font-sans text-on-surface-variant mt-0.5">{lang === "ar" ? "قائمة خدمات IMEI والوقت والأسعار" : "IMEI services, time, and prices"}</p>
+                  </div>
+                  <div className="p-2.5 rounded-xl bg-surface-container-high/60 border border-outline-variant/20">
+                    <span className="text-primary font-bold">placeserverorder / placeimeiorder</span>
+                    <p className="text-[11px] font-sans text-on-surface-variant mt-0.5">{lang === "ar" ? "إرسال طلب جديد مع الحقول المخصصة" : "Place order with custom fields & quantity"}</p>
+                  </div>
+                  <div className="p-2.5 rounded-xl bg-surface-container-high/60 border border-outline-variant/20 sm:col-span-2">
+                    <span className="text-emerald-400 font-bold">getserverorder / getimeiorder</span>
+                    <p className="text-[11px] font-sans text-on-surface-variant mt-0.5">{lang === "ar" ? "فحص حالة الطلب واستلام الكود / النتيجة فور اعتمادها من الإدارة" : "Check order status and receive code/voucher once approved"}</p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

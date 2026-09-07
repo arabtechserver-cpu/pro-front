@@ -17,7 +17,7 @@ async function fetchPricingServices(): Promise<any[]> {
   for (const base of backendCandidates) {
     try {
       const res = await fetch(`${base}/api/dhru/services?view=pricing`, {
-        next: { revalidate: 60 },
+        cache: "no-store",
         signal: AbortSignal.timeout(2500)
       });
       if (res.ok) {

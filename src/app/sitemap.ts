@@ -40,7 +40,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // 3. Dynamic Services from API for Google Indexing
   try {
     const apiUrl = process.env.INTERNAL_API_URL || process.env.NEXT_PUBLIC_API_URL || "https://arabtechproserver.tech";
-    const res = await fetch(`${apiUrl}/api/dhru/services`, { next: { revalidate: 3600 } });
+    const res = await fetch(`${apiUrl}/api/dhru/services?view=pricing`, { cache: "no-store" });
     if (res.ok) {
       const categories = await res.json();
       if (Array.isArray(categories)) {
