@@ -302,16 +302,46 @@ export default function ApiDeveloperPage(props: { params: Promise<{ lang: string
           {/* API Credentials */}
           {isApiEnabled && (
             <div className="glass-card rounded-3xl p-6 md:p-8 border border-outline-variant/30">
-              <h2 className="text-xl font-bold text-on-surface flex items-center gap-2 mb-6">
-                <span className="material-symbols-outlined text-primary">key</span>
-                {lang === "ar" ? "بيانات الربط والاعتماد" : "API Credentials"}
-              </h2>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                <h2 className="text-xl font-bold text-on-surface flex items-center gap-2">
+                  <span className="material-symbols-outlined text-primary">key</span>
+                  {lang === "ar" ? "بيانات الربط والاعتماد (Dhru API)" : "API Credentials"}
+                </h2>
+                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-primary/10 border border-primary/20 text-xs font-bold text-primary">
+                  <span className="material-symbols-outlined text-sm">account_balance_wallet</span>
+                  <span>{lang === "ar" ? "رصيدك المتاح للـ API:" : "Available Balance:"}</span>
+                  <span className="font-mono text-sm font-black text-emerald-400">${Number(userSession?.balance || 0).toFixed(2)}</span>
+                </div>
+              </div>
+
+              {/* Account Identity Alert */}
+              <div className="mb-5 p-4 rounded-2xl bg-surface-container-high/60 border border-outline-variant/20 flex items-center justify-between gap-3 flex-wrap">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center font-bold text-sm">
+                    {userSession?.fullName?.[0] || userSession?.username?.[0] || "U"}
+                  </div>
+                  <div>
+                    <p className="font-bold text-on-surface text-sm">{userSession?.fullName || userSession?.username || "Client"}</p>
+                    <p className="text-xs text-on-surface-variant font-mono">{userSession?.email}</p>
+                  </div>
+                </div>
+                <span className={`text-[11px] font-bold px-3 py-1 rounded-full border ${
+                  userSession?.role === 'admin' 
+                    ? 'bg-amber-500/10 border-amber-500/30 text-amber-400' 
+                    : 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400'
+                }`}>
+                  {userSession?.role === 'admin' 
+                    ? (lang === "ar" ? "حساب الإدارة (Admin)" : "Master Admin Account") 
+                    : (lang === "ar" ? "حساب عميل / موزع معتمد" : "Verified Client / Reseller")}
+                </span>
+              </div>
 
               <div className="space-y-4">
+                {/* API URL */}
                 <div className="bg-surface-container-lowest border border-outline-variant/20 rounded-2xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
                   <div>
                     <p className="text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-1">
-                      API URL (الرابط)
+                      1. API URL (رابط السيرفر)
                     </p>
                     <p className="text-on-surface font-mono font-medium text-sm sm:text-base dir-ltr select-all">
                       {window.location.origin}/api/v1/provider
@@ -319,28 +349,54 @@ export default function ApiDeveloperPage(props: { params: Promise<{ lang: string
                   </div>
                   <button 
                     onClick={() => navigator.clipboard.writeText(`${window.location.origin}/api/v1/provider`)}
-                    className="p-2 rounded-xl bg-surface-container-high hover:bg-surface-container-highest text-on-surface transition-all flex items-center gap-2"
+                    className="p-2 rounded-xl bg-surface-container-high hover:bg-surface-container-highest text-on-surface transition-all flex items-center gap-2 shrink-0"
                   >
                     <span className="material-symbols-outlined text-sm">content_copy</span>
-                    <span className="text-xs font-bold">{lang === "ar" ? "نسخ" : "Copy"}</span>
+                    <span className="text-xs font-bold">{lang === "ar" ? "نسخ الرابط" : "Copy URL"}</span>
                   </button>
                 </div>
 
+                {/* API USERNAME */}
                 <div className="bg-surface-container-lowest border border-outline-variant/20 rounded-2xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
                   <div>
                     <p className="text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-1">
-                      API KEY (المفتاح السري)
+                      2. API USERNAME (اسم المستخدم المطلوب في الربط)
+                    </p>
+                    <p className="text-emerald-400 font-mono font-bold text-sm sm:text-base dir-ltr select-all">
+                      {userSession?.username || userSession?.email}
+                    </p>
+                    {userSession?.username && userSession?.email && (
+                      <p className="text-[11px] text-on-surface-variant mt-1">
+                        {lang === "ar" ? `ملاحظة: يمكنك أيضاً استخدام البريد (${userSession.email}) كاسم مستخدم.` : `Tip: You can also use (${userSession.email}) as username.`}
+                      </p>
+                    )}
+                  </div>
+                  <button 
+                    onClick={() => navigator.clipboard.writeText(userSession?.username || userSession?.email || "")}
+                    className="p-2 rounded-xl bg-surface-container-high hover:bg-surface-container-highest text-on-surface transition-all flex items-center gap-2 shrink-0"
+                  >
+                    <span className="material-symbols-outlined text-sm">content_copy</span>
+                    <span className="text-xs font-bold">{lang === "ar" ? "نسخ اسم المستخدم" : "Copy Username"}</span>
+                  </button>
+                </div>
+
+                {/* API KEY */}
+                <div className="bg-surface-container-lowest border border-outline-variant/20 rounded-2xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                  <div>
+                    <p className="text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-1">
+                      3. API KEY / ACCESS KEY (المفتاح السري)
                     </p>
                     <p className="text-primary font-mono font-bold text-sm sm:text-base dir-ltr select-all blur-sm hover:blur-none transition-all duration-300">
                       {userSession?.apiKey || "********************************"}
                     </p>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 shrink-0">
                     <button 
                       onClick={() => navigator.clipboard.writeText(userSession?.apiKey || "")}
                       className="p-2 rounded-xl bg-surface-container-high hover:bg-surface-container-highest text-on-surface transition-all flex items-center gap-2"
                     >
                       <span className="material-symbols-outlined text-sm">content_copy</span>
+                      <span className="text-xs font-bold">{lang === "ar" ? "نسخ المفتاح" : "Copy Key"}</span>
                     </button>
                     <button 
                       onClick={handleRegenerateKey}
