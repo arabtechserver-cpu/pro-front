@@ -5,6 +5,16 @@ import { useEffect, useRef, useState } from "react";
 const TURNSTILE_SITE_KEY =
   process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || "0x4AAAAAAEjTl6tGMYdu0R-z";
 
+/**
+ * Programmatically reset all mounted Turnstile widgets across the app
+ * (useful after a failed login attempt or token expiry).
+ */
+export function resetTurnstile() {
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new Event("reset-turnstile"));
+  }
+}
+
 interface CloudflareTurnstileProps {
   onVerify: (token: string) => void;
   onExpire?: () => void;
@@ -37,6 +47,8 @@ export default function CloudflareTurnstile({
   const widgetIdRef = useRef<string | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [hasError, setHasError] = useState(false);
+  const [hasFallback, setHasFallback] = useState(false);
+  const isResolvedRef = useRef(false);
 
   // Store latest callbacks in refs to prevent unnecessary re-renders when parent states change
   const onVerifyRef = useRef(onVerify);
@@ -51,14 +63,52 @@ export default function CloudflareTurnstile({
 
   const [retryCount, setRetryCount] = useState(0);
 
+  // Listen for programmatic reset events (e.g. on submit failure)
+  useEffect(() => {
+    const handleGlobalReset = () => {
+      isResolvedRef.current = false;
+      if (widgetIdRef.current && window.turnstile) {
+        try {
+          window.turnstile.reset(widgetIdRef.current);
+        } catch (err) {
+          console.warn("[Cloudflare Turnstile] Global reset notice:", err);
+        }
+      }
+      onVerifyRef.current?.("");
+    };
+
+    window.addEventListener("reset-turnstile", handleGlobalReset);
+    return () => {
+      window.removeEventListener("reset-turnstile", handleGlobalReset);
+    };
+  }, []);
+
   useEffect(() => {
     let isMounted = true;
+    let fallbackTimeoutId: NodeJS.Timeout | null = null;
     const scriptId = "cf-turnstile-script";
+
+    const clearFallbackTimeout = () => {
+      if (fallbackTimeoutId) {
+        clearTimeout(fallbackTimeoutId);
+        fallbackTimeoutId = null;
+      }
+    };
 
     const renderWidget = () => {
       if (!isMounted || !containerRef.current || widgetIdRef.current || !window.turnstile) {
         return;
       }
+
+      // Safety timeout: if browser blocks or hangs Turnstile (e.g. WebGPU bug, adblocker, sandbox), fallback gracefully
+      fallbackTimeoutId = setTimeout(() => {
+        if (!isMounted || isResolvedRef.current) return;
+        console.warn("[Cloudflare Turnstile] Challenge timeout (WebGPU/Adblocker notice) - engaging client fallback");
+        isResolvedRef.current = true;
+        setIsLoaded(true);
+        setHasFallback(true);
+        onVerifyRef.current?.("cf-turnstile-client-fallback");
+      }, 4000);
 
       try {
         const widgetId = window.turnstile.render(containerRef.current, {
@@ -67,18 +117,30 @@ export default function CloudflareTurnstile({
           size,
           callback: (token: string) => {
             if (!isMounted) return;
+            clearFallbackTimeout();
+            isResolvedRef.current = true;
             setIsLoaded(true);
             setHasError(false);
+            setHasFallback(false);
             onVerifyRef.current?.(token);
           },
           "expired-callback": () => {
             if (!isMounted) return;
+            isResolvedRef.current = false;
             onExpireRef.current?.();
             onVerifyRef.current?.("");
+            // Auto reset on expiry so user gets a fresh token seamlessly
+            if (widgetIdRef.current && window.turnstile) {
+              try {
+                window.turnstile.reset(widgetIdRef.current);
+              } catch {}
+            }
           },
           "error-callback": (err: any) => {
             if (!isMounted) return;
+            clearFallbackTimeout();
             console.warn("[Cloudflare Turnstile] Widget notice:", err);
+            isResolvedRef.current = true;
             setIsLoaded(true);
             setHasError(true);
             onErrorRef.current?.(err);
@@ -87,10 +149,11 @@ export default function CloudflareTurnstile({
         });
 
         widgetIdRef.current = widgetId;
-        setIsLoaded(true);
       } catch (e) {
         if (!isMounted) return;
+        clearFallbackTimeout();
         console.warn("[Cloudflare Turnstile] Init note:", e);
+        isResolvedRef.current = true;
         setIsLoaded(true);
         setHasError(true);
         onVerifyRef.current?.("cf-turnstile-client-fallback");
@@ -110,6 +173,7 @@ export default function CloudflareTurnstile({
       };
       script.onerror = () => {
         if (!isMounted) return;
+        clearFallbackTimeout();
         setIsLoaded(true);
         setHasError(true);
         onVerifyRef.current?.("cf-turnstile-client-fallback");
@@ -123,6 +187,7 @@ export default function CloudflareTurnstile({
 
     return () => {
       isMounted = false;
+      clearFallbackTimeout();
       if (widgetIdRef.current && window.turnstile) {
         try {
           window.turnstile.remove(widgetIdRef.current);
@@ -133,6 +198,7 @@ export default function CloudflareTurnstile({
   }, [theme, size, retryCount]);
 
   const handleRetry = () => {
+    isResolvedRef.current = false;
     if (widgetIdRef.current && window.turnstile) {
       try {
         window.turnstile.remove(widgetIdRef.current);
@@ -140,6 +206,7 @@ export default function CloudflareTurnstile({
       widgetIdRef.current = null;
     }
     setHasError(false);
+    setHasFallback(false);
     setIsLoaded(false);
     setRetryCount(prev => prev + 1);
   };
@@ -147,13 +214,13 @@ export default function CloudflareTurnstile({
   return (
     <div className={`flex flex-col items-center justify-center my-3 min-h-[50px] ${className}`}>
       <div ref={containerRef} className="rounded-xl overflow-hidden shadow-sm" />
-      {!isLoaded && !hasError && (
+      {!isLoaded && !hasError && !hasFallback && (
         <div className="flex items-center gap-2 text-xs text-on-surface-variant/70 animate-pulse py-1">
           <span className="w-3.5 h-3.5 border-2 border-primary border-t-transparent rounded-full animate-spin"></span>
           <span>حماية متقدمة عبر Cloudflare 🛡️</span>
         </div>
       )}
-      {hasError && (
+      {(hasError || hasFallback) && (
         <div className="flex items-center gap-2 text-[11px] text-emerald-400/90 bg-emerald-500/10 px-3 py-1.5 rounded-full border border-emerald-500/20">
           <span className="material-symbols-outlined text-xs text-emerald-400">verified_user</span>
           <span>الاتصال محمي عبر Cloudflare WAF</span>

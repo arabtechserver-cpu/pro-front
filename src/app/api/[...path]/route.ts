@@ -34,6 +34,14 @@ async function proxyRequest(
     'x-admin-token',
     'x-user-token',
     'x-forwarded-for',
+    'x-forwarded-proto',
+    'x-forwarded-host',
+    'x-real-ip',
+    'cf-connecting-ip',
+    'cf-ipcountry',
+    'cf-ray',
+    'cf-visitor',
+    'cf-turnstile-response',
   ];
   headersToCopy.forEach(h => {
     const val = request.headers.get(h);

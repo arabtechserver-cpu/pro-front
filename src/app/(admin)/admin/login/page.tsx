@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { loginAdmin } from "./actions";
-import CloudflareTurnstile from "@/components/CloudflareTurnstile";
+import CloudflareTurnstile, { resetTurnstile } from "@/components/CloudflareTurnstile";
 
 export default function AdminLogin() {
   const [username, setUsername] = useState("");
@@ -40,6 +40,8 @@ export default function AdminLogin() {
 
       if (apiData?.message || apiData?.error) {
         setError(apiData.message || apiData.error);
+        setTurnstileToken("");
+        resetTurnstile();
         setLoading(false);
         return;
       }
@@ -51,6 +53,8 @@ export default function AdminLogin() {
         return;
       } else {
         setError(result.message || "Invalid credentials");
+        setTurnstileToken("");
+        resetTurnstile();
       }
     } catch (err: any) {
       const msg = err?.message || String(err);
@@ -60,6 +64,8 @@ export default function AdminLogin() {
         return;
       }
       setError("حدث خطأ أثناء تسجيل الدخول، يرجى تحديث الصفحة (F5) والمحاولة مجدداً.");
+      setTurnstileToken("");
+      resetTurnstile();
     } finally {
       setLoading(false);
     }
@@ -122,7 +128,11 @@ export default function AdminLogin() {
             </div>
           </div>
           
-          <CloudflareTurnstile onVerify={(token) => setTurnstileToken(token)} />
+          <CloudflareTurnstile 
+            onVerify={(token) => setTurnstileToken(token)}
+            onExpire={() => setTurnstileToken("")}
+            onError={() => setTurnstileToken("cf-turnstile-client-fallback")}
+          />
 
           <button 
             type="submit" 

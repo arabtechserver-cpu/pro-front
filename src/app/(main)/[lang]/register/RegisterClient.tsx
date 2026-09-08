@@ -5,7 +5,7 @@ import Link from "next/link";
 import Script from "next/script";
 import { Locale } from "@/i18n/config";
 import TermsModal from "@/components/TermsModal";
-import CloudflareTurnstile from "@/components/CloudflareTurnstile";
+import CloudflareTurnstile, { resetTurnstile } from "@/components/CloudflareTurnstile";
 
 const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || "540676912586-vifo9ogu2gjud3d00efv1khd9r7tcajb.apps.googleusercontent.com";
 
@@ -462,9 +462,13 @@ export default function RegisterClient({ lang, dict }: { lang: Locale; dict: any
       } else {
         const errorMsg = data.error || data.message || (lang === "ar" ? "حدث خطأ أثناء عملية التسجيل!" : "Registration failed!");
         setErrorMessage(errorMsg);
+        setTurnstileToken("");
+        resetTurnstile();
       }
     } catch {
       setErrorMessage(lang === "ar" ? "تعذر الاتصال بالسيرفر! يرجى المحاولة لاحقاً." : "Network error! Please try again.");
+      setTurnstileToken("");
+      resetTurnstile();
     } finally {
       setIsLoading(false);
     }
@@ -821,7 +825,11 @@ export default function RegisterClient({ lang, dict }: { lang: Locale; dict: any
 
           {/* Cloudflare Turnstile CAPTCHA Protection */}
           <div className="col-span-1 md:col-span-2">
-            <CloudflareTurnstile onVerify={(token) => setTurnstileToken(token)} />
+            <CloudflareTurnstile 
+              onVerify={(token) => setTurnstileToken(token)}
+              onExpire={() => setTurnstileToken("")}
+              onError={() => setTurnstileToken("cf-turnstile-client-fallback")}
+            />
           </div>
 
           {/* FAST DIRECT SUBMIT BUTTON */}
