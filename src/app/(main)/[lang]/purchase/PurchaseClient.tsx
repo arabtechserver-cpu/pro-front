@@ -41,9 +41,10 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
   const [validatingCoupon, setValidatingCoupon] = useState<boolean>(false);
   const [couponFeedback, setCouponFeedback] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
-  // Live Active Viewers & Fake 10% Discount States (متغير واقعي ومؤقت خصم)
-  const [activeViewers, setActiveViewers] = useState<number>(18);
+  // Live Active Viewers & Fake 10% Discount States (متغير واقعي وسريع حول 60)
+  const [activeViewers, setActiveViewers] = useState<number>(60);
   const [viewerTrend, setViewerTrend] = useState<"up" | "down" | null>(null);
+  const [viewerDelta, setViewerDelta] = useState<number>(1);
   const [discountTimeLeft, setDiscountTimeLeft] = useState<{ minutes: number; seconds: number }>({ minutes: 14, seconds: 35 });
   const [copiedCode, setCopiedCode] = useState<boolean>(false);
 
@@ -206,15 +207,15 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
     }
   }, []);
 
-  // Real-time Active Viewers Fluctuation Effect (صعود وهبوط واقعي ومباشر لعدد المتصفحين)
+  // Real-time Active Viewers Fluctuation Effect (يبدأ عند 60 ويصعد ويهبط بسرعة)
   useEffect(() => {
-    let base = 19;
+    let base = 60;
     if (selectedServiceId) {
       let hash = 0;
       for (let i = 0; i < selectedServiceId.length; i++) {
         hash = (hash << 5) - hash + selectedServiceId.charCodeAt(i);
       }
-      base = 15 + (Math.abs(hash) % 10); // 15 to 24
+      base = 58 + (Math.abs(hash) % 5); // 58 to 62
     }
     setActiveViewers(base);
 
@@ -222,25 +223,28 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
     let timerId: any = null;
 
     const tick = () => {
-      const delay = Math.floor(Math.random() * 3000) + 3800; // 3.8s to 6.8s
+      // سرعة التحديث سريعة وحية: بين 1.1 إلى 2.0 ثانية
+      const delay = Math.floor(Math.random() * 900) + 1100;
       timerId = setTimeout(() => {
-        let delta = 0;
-        const rand = Math.random();
-        if (current <= 13) {
-          delta = Math.random() > 0.3 ? 1 : 2;
-        } else if (current >= 28) {
-          delta = Math.random() > 0.3 ? -1 : -2;
+        // خطوة التغير السريع: 1 أو 2 أو 3
+        const randSize = Math.random();
+        const step = randSize < 0.55 ? 1 : randSize < 0.88 ? 2 : 3;
+
+        let direction = 1;
+        const randDir = Math.random();
+        if (current <= 51) {
+          direction = randDir > 0.15 ? 1 : -1;
+        } else if (current >= 73) {
+          direction = randDir > 0.15 ? -1 : 1;
         } else {
-          if (rand < 0.44) delta = 1;
-          else if (rand < 0.82) delta = -1;
-          else if (rand < 0.92) delta = 2;
-          else delta = -2;
+          direction = randDir < 0.5 ? 1 : -1;
         }
 
-        current = Math.max(12, Math.min(31, current + delta));
+        current = Math.max(48, Math.min(76, current + step * direction));
         setActiveViewers(current);
-        setViewerTrend(delta > 0 ? "up" : delta < 0 ? "down" : null);
-        setTimeout(() => setViewerTrend(null), 900);
+        setViewerDelta(step);
+        setViewerTrend(direction > 0 ? "up" : "down");
+        setTimeout(() => setViewerTrend(null), 650);
 
         tick();
       }, delay);
@@ -895,7 +899,7 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
                         : "text-amber-400 bg-amber-500/20 border border-amber-500/30"
                     }`}
                   >
-                    {viewerTrend === "up" ? "▲ +1" : "▼ -1"}
+                    {viewerTrend === "up" ? `▲ +${viewerDelta}` : `▼ -${viewerDelta}`}
                   </span>
                 )}
               </div>
