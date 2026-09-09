@@ -41,6 +41,12 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
   const [validatingCoupon, setValidatingCoupon] = useState<boolean>(false);
   const [couponFeedback, setCouponFeedback] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
+  // Live Active Viewers & Fake 10% Discount States (متغير واقعي ومؤقت خصم)
+  const [activeViewers, setActiveViewers] = useState<number>(18);
+  const [viewerTrend, setViewerTrend] = useState<"up" | "down" | null>(null);
+  const [discountTimeLeft, setDiscountTimeLeft] = useState<{ minutes: number; seconds: number }>({ minutes: 14, seconds: 35 });
+  const [copiedCode, setCopiedCode] = useState<boolean>(false);
+
   // Success Confirmation Modal Data
   const [successOrderModalData, setSuccessOrderModalData] = useState<{
     orderId: string;
@@ -198,6 +204,95 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
         }
       } catch (e) {}
     }
+  }, []);
+
+  // Real-time Active Viewers Fluctuation Effect (صعود وهبوط واقعي ومباشر لعدد المتصفحين)
+  useEffect(() => {
+    let base = 19;
+    if (selectedServiceId) {
+      let hash = 0;
+      for (let i = 0; i < selectedServiceId.length; i++) {
+        hash = (hash << 5) - hash + selectedServiceId.charCodeAt(i);
+      }
+      base = 15 + (Math.abs(hash) % 10); // 15 to 24
+    }
+    setActiveViewers(base);
+
+    let current = base;
+    let timerId: any = null;
+
+    const tick = () => {
+      const delay = Math.floor(Math.random() * 3000) + 3800; // 3.8s to 6.8s
+      timerId = setTimeout(() => {
+        let delta = 0;
+        const rand = Math.random();
+        if (current <= 13) {
+          delta = Math.random() > 0.3 ? 1 : 2;
+        } else if (current >= 28) {
+          delta = Math.random() > 0.3 ? -1 : -2;
+        } else {
+          if (rand < 0.44) delta = 1;
+          else if (rand < 0.82) delta = -1;
+          else if (rand < 0.92) delta = 2;
+          else delta = -2;
+        }
+
+        current = Math.max(12, Math.min(31, current + delta));
+        setActiveViewers(current);
+        setViewerTrend(delta > 0 ? "up" : delta < 0 ? "down" : null);
+        setTimeout(() => setViewerTrend(null), 900);
+
+        tick();
+      }, delay);
+    };
+
+    tick();
+
+    return () => {
+      if (timerId) clearTimeout(timerId);
+    };
+  }, [selectedServiceId]);
+
+  // Fake 10% Discount Countdown Timer (مؤقت تنازلي ذكي متصل بـ sessionStorage)
+  useEffect(() => {
+    const STORAGE_KEY = "arabtech_discount_10_timer";
+    let targetTime: number;
+    try {
+      const stored = sessionStorage.getItem(STORAGE_KEY);
+      const now = Date.now();
+      if (stored) {
+        targetTime = parseInt(stored, 10);
+        if (isNaN(targetTime) || targetTime <= now) {
+          targetTime = now + (14 * 60 + 45) * 1000;
+          sessionStorage.setItem(STORAGE_KEY, targetTime.toString());
+        }
+      } else {
+        targetTime = now + (14 * 60 + 45) * 1000;
+        sessionStorage.setItem(STORAGE_KEY, targetTime.toString());
+      }
+    } catch {
+      targetTime = Date.now() + (14 * 60 + 45) * 1000;
+    }
+
+    const updateTimer = () => {
+      const remainingMs = targetTime - Date.now();
+      if (remainingMs <= 0) {
+        const nextTarget = Date.now() + (8 * 60 + 30) * 1000;
+        try {
+          sessionStorage.setItem(STORAGE_KEY, nextTarget.toString());
+        } catch {}
+        setDiscountTimeLeft({ minutes: 8, seconds: 30 });
+      } else {
+        const totalSec = Math.floor(remainingMs / 1000);
+        const m = Math.floor(totalSec / 60);
+        const s = totalSec % 60;
+        setDiscountTimeLeft({ minutes: m, seconds: s });
+      }
+    };
+
+    updateTimer();
+    const interval = setInterval(updateTimer, 1000);
+    return () => clearInterval(interval);
   }, []);
 
   // 2. Fetch Available Services & Groups from Backend API
@@ -398,6 +493,20 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
       });
       return;
     }
+
+    const cleanInput = couponInput.trim().toUpperCase();
+
+    // التحقق من أكواد العرض الوهمي الترويجي المطبقة مسبقاً
+    if (["PRO10", "SAVE10", "ARAB10", "DISCOUNT10", "OFFER10", "SPECIAL10"].includes(cleanInput)) {
+      setCouponFeedback({
+        type: "success",
+        text: lang === "ar"
+          ? "🎉 كود الخصم (10%) مفعّل ومطبّق بالفعل وتلقائياً على السعر المعروض للخدمة!"
+          : "🎉 Promo code (10% OFF) is already automatically included in the displayed rate!"
+      });
+      return;
+    }
+
     setValidatingCoupon(true);
     setCouponFeedback(null);
     try {
@@ -732,6 +841,126 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
         </div>
       )}
 
+      {/* ── TOP URGENCY & SOCIAL PROOF BANNER: LIVE VIEWERS & FAKE 10% DISCOUNT ── */}
+      <div className="rounded-3xl p-4 sm:p-5 border border-amber-500/35 bg-gradient-to-r from-amber-500/10 via-surface-container-low/95 to-primary/10 shadow-[0_0_35px_rgba(245,158,11,0.14)] backdrop-blur-xl relative overflow-hidden transition-all">
+        {/* Glowing ambient background auras */}
+        <div className="absolute -top-12 -right-12 w-48 h-48 bg-amber-500/15 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-12 -left-12 w-48 h-48 bg-emerald-500/15 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="relative z-10 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
+          
+          {/* Section 1: Realistic Fluctuating Live Viewers (عداد المتصفحين الحي والواقعي) */}
+          <div className="flex items-center gap-3.5 flex-1 border-b md:border-b-0 md:border-l rtl:md:border-l-0 rtl:md:border-r border-outline-variant/30 pb-3 md:pb-0 md:pe-5">
+            {/* Live Indicator Icon with Glowing Pulse */}
+            <div className="relative shrink-0 flex items-center justify-center w-12 h-12 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.25)]">
+              <span className="material-symbols-outlined text-2xl">group</span>
+              <span className="absolute -top-1 -right-1 flex h-3.5 w-3.5">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-emerald-500 border-2 border-surface-container-lowest"></span>
+              </span>
+            </div>
+
+            <div className="space-y-0.5">
+              <div className="flex items-center gap-2">
+                <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-extrabold text-[10px] tracking-wider uppercase border border-emerald-500/40 flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                  <span>{lang === 'ar' ? 'مباشر الآن' : 'LIVE NOW'}</span>
+                </span>
+                <span className="text-[11px] text-on-surface-variant font-medium flex items-center gap-1">
+                  <span>🔥</span>
+                  <span>{lang === 'ar' ? 'إقبال شراء مرتفع' : 'High Buying Demand'}</span>
+                </span>
+              </div>
+
+              <div className="flex items-baseline gap-2 flex-wrap">
+                <span
+                  className={`text-2xl sm:text-3xl font-black font-mono transition-all duration-300 ${
+                    viewerTrend === "up"
+                      ? "text-emerald-400 scale-110 drop-shadow-[0_0_12px_rgba(52,211,153,0.8)]"
+                      : viewerTrend === "down"
+                      ? "text-amber-300 scale-95"
+                      : "text-white"
+                  }`}
+                >
+                  {activeViewers}
+                </span>
+                <span className="text-xs sm:text-sm font-bold text-on-surface">
+                  {lang === 'ar' ? 'شخص يتصفحون ويطلبون هذه الخدمة الآن' : 'people viewing & ordering this service now'}
+                </span>
+                {viewerTrend && (
+                  <span
+                    className={`text-xs font-mono font-bold px-1.5 py-0.2 rounded transition-all duration-300 ${
+                      viewerTrend === "up" 
+                        ? "text-emerald-400 bg-emerald-500/20 border border-emerald-500/30" 
+                        : "text-amber-400 bg-amber-500/20 border border-amber-500/30"
+                    }`}
+                  >
+                    {viewerTrend === "up" ? "▲ +1" : "▼ -1"}
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Section 2: Fake 10% Discount Offer with Real-time Countdown Timer */}
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 shrink-0">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <span className="px-2.5 py-0.5 rounded-full bg-gradient-to-r from-amber-500 to-rose-500 text-white font-black text-[11px] shadow-sm flex items-center gap-1 animate-pulse">
+                  <span className="material-symbols-outlined text-xs">local_fire_department</span>
+                  <span>{lang === 'ar' ? 'خصم خاص 10% مفعّل' : 'Special 10% OFF'}</span>
+                </span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (navigator.clipboard) {
+                      navigator.clipboard.writeText("PRO10");
+                    }
+                    setCopiedCode(true);
+                    setTimeout(() => setCopiedCode(false), 2200);
+                  }}
+                  title={lang === 'ar' ? 'اضغط لنسخ الكود' : 'Click to copy code'}
+                  className="px-2 py-0.5 rounded-lg bg-amber-500/15 border border-amber-500/30 text-amber-300 hover:text-white hover:bg-amber-500/25 transition-all text-xs font-mono font-bold flex items-center gap-1 cursor-pointer active:scale-95"
+                >
+                  <span>كود: PRO10</span>
+                  <span className="material-symbols-outlined text-xs">
+                    {copiedCode ? "check" : "content_copy"}
+                  </span>
+                  {copiedCode && (
+                    <span className="text-[10px] text-emerald-400 font-sans">
+                      {lang === 'ar' ? 'تم النسخ!' : 'Copied!'}
+                    </span>
+                  )}
+                </button>
+              </div>
+              <p className="text-[11px] text-on-surface-variant font-medium">
+                {lang === 'ar'
+                  ? 'تم تطبيق خصم 10% تلقائياً لكافة الخدمات المعروضة!'
+                  : '10% discount already applied automatically to displayed rates!'}
+              </p>
+            </div>
+
+            {/* Live Countdown Clock Widget */}
+            <div className="flex items-center gap-2 bg-black/50 border border-amber-500/35 px-3.5 py-2 rounded-2xl shadow-inner shrink-0">
+              <span className="material-symbols-outlined text-amber-400 text-base animate-pulse">timer</span>
+              <div className="flex items-center gap-1 font-mono text-sm sm:text-base font-black text-amber-300">
+                <span className="w-6 text-center bg-amber-500/10 px-1 py-0.5 rounded border border-amber-500/20">
+                  {String(discountTimeLeft.minutes).padStart(2, "0")}
+                </span>
+                <span className="animate-pulse text-amber-400">:</span>
+                <span className="w-6 text-center bg-amber-500/10 px-1 py-0.5 rounded border border-amber-500/20">
+                  {String(discountTimeLeft.seconds).padStart(2, "0")}
+                </span>
+              </div>
+              <span className="text-[10px] text-amber-300/80 font-medium ms-0.5">
+                {lang === 'ar' ? 'دقيقة' : 'min'}
+              </span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
       {/* PAGE HEADER */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-outline-variant/20 pb-5">
         <div>
@@ -927,11 +1156,24 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
               </div>
 
               <div className="text-start sm:text-end shrink-0">
-                <span className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider block">سعر الخدمة</span>
+                <span className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider block">
+                  {lang === 'ar' ? 'سعر الخدمة' : 'Service Price'}
+                </span>
                 {unitPrice > 0 ? (
-                  <span className="text-2xl font-bold font-mono text-primary glow-cyan">
-                    ${unitPrice.toFixed(2)} USD
-                  </span>
+                  <div className="flex flex-col items-start sm:items-end gap-1 mt-0.5">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-on-surface-variant/70 line-through font-mono">
+                        ${(unitPrice / 0.9).toFixed(2)} USD
+                      </span>
+                      <span className="text-2xl font-bold font-mono text-primary glow-cyan">
+                        ${unitPrice.toFixed(2)} USD
+                      </span>
+                    </div>
+                    <span className="text-[10px] font-bold text-emerald-400 bg-emerald-500/15 border border-emerald-500/30 px-2 py-0.5 rounded-full flex items-center gap-1">
+                      <span className="material-symbols-outlined text-[12px]">local_offer</span>
+                      <span>{lang === 'ar' ? 'خصم 10% مطبق ⚡' : '10% OFF Applied ⚡'}</span>
+                    </span>
+                  </div>
                 ) : isFreeService ? (
                   <span className="text-sm font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-3 py-1 rounded-xl inline-block mt-1">
                     {lang === 'ar' ? 'خدمة مجانية 🎁' : 'Free Service 🎁'}
@@ -1336,19 +1578,30 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
               </div>
               <div>
                 <p className="text-xs font-bold text-on-surface-variant">{lang === 'ar' ? 'إجمالي التكلفة المطلوبة:' : 'Total Cost Required:'}</p>
-                <div className="flex items-baseline gap-2 flex-wrap">
-                  <p className="text-xl font-bold font-mono text-primary dir-ltr">${totalPrice.toFixed(2)} USD</p>
-                  {appliedCoupon && (
-                    <span className="text-xs line-through text-on-surface-variant/70 font-mono dir-ltr">
-                      ${rawTotalPrice.toFixed(2)} USD
+                <div className="flex items-baseline gap-2.5 flex-wrap">
+                  {rawTotalPrice > 0 && (
+                    <span className="text-sm line-through text-on-surface-variant/60 font-mono dir-ltr">
+                      ${(rawTotalPrice / 0.9).toFixed(2)} USD
+                    </span>
+                  )}
+                  <p className="text-xl font-bold font-mono text-primary glow-cyan dir-ltr">${totalPrice.toFixed(2)} USD</p>
+                  {rawTotalPrice > 0 && (
+                    <span className="text-[11px] font-bold text-emerald-400 bg-emerald-500/15 border border-emerald-500/30 px-2 py-0.5 rounded-md flex items-center gap-1 dir-ltr">
+                      <span>⚡ -10% (${((rawTotalPrice / 0.9) - rawTotalPrice).toFixed(2)})</span>
                     </span>
                   )}
                   {appliedCoupon && (
-                    <span className="text-[11px] font-bold text-emerald-400 bg-emerald-500/15 border border-emerald-500/30 px-2 py-0.5 rounded-md dir-ltr">
-                      -{appliedCoupon.discountPercent}% (-${couponDiscount.toFixed(2)})
+                    <span className="text-[11px] font-bold text-secondary bg-secondary/15 border border-secondary/30 px-2 py-0.5 rounded-md dir-ltr">
+                      -{appliedCoupon.discountPercent}% كود إضافي
                     </span>
                   )}
                 </div>
+                {rawTotalPrice > 0 && (
+                  <p className="text-[11px] text-emerald-400/90 mt-1 flex items-center gap-1">
+                    <span className="material-symbols-outlined text-xs">verified</span>
+                    <span>{lang === 'ar' ? 'تم تطبيق خصم 10% الترويجي تلقائياً على هذا الطلب' : '10% promotional discount automatically applied'}</span>
+                  </p>
+                )}
               </div>
             </div>
 
@@ -1396,7 +1649,9 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
                 <span>
                   {isFreeService
                     ? (lang === 'ar' ? 'تأكيد وإرسال الطلب (مجاناً 🎁)' : 'Confirm & Send Order (Free 🎁)')
-                    : (lang === 'ar' ? `تأكيد وإرسال الطلب ($${totalPrice.toFixed(2)} USD)` : `Confirm & Send Order ($${totalPrice.toFixed(2)} USD)`)}
+                    : (lang === 'ar' 
+                        ? `تأكيد وإرسال الطلب ($${totalPrice.toFixed(2)} USD) - شامل خصم 10% ⚡` 
+                        : `Confirm & Send Order ($${totalPrice.toFixed(2)} USD) - 10% OFF Included ⚡`)}
                 </span>
               </>
             )}
