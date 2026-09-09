@@ -104,6 +104,35 @@ export default function AdminHomepageManager() {
         const res = await fetch("/api/homepage");
         if (res.ok) {
           const data = await res.json();
+          let campaignsArray = Array.isArray(data.campaigns) ? data.campaigns : [];
+          if (campaignsArray.length === 0 && data.campaigns && typeof data.campaigns === 'object') {
+            const c = data.campaigns;
+            if (c.promo1Image || c.promo1TitleAr || c.promo1TitleEn) {
+              campaignsArray.push({
+                tagEn: c.promo1TagEn || "Hot Offer",
+                tagAr: c.promo1TagAr || "عرض خاص",
+                titleEn: c.promo1TitleEn || "Samsung FRP Remove",
+                titleAr: c.promo1TitleAr || "حذف حساب جوجل لسامسونج",
+                descEn: c.promo1DescEn || "",
+                descAr: c.promo1DescAr || "",
+                image: c.promo1Image || "/images/promo_samsung.png",
+                url: c.promo1Url || "/pricing"
+              });
+            }
+            if (c.promo2Image || c.promo2TitleAr || c.promo2TitleEn) {
+              campaignsArray.push({
+                tagEn: c.promo2TagEn || "Official Reseller",
+                tagAr: c.promo2TagAr || "ترخيص رسمي",
+                titleEn: c.promo2TitleEn || "Chimera Tool",
+                titleAr: c.promo2TitleAr || "أداة شيميراChimera",
+                descEn: c.promo2DescEn || "",
+                descAr: c.promo2DescAr || "",
+                image: c.promo2Image || "/images/promo_chimera.png",
+                url: c.promo2Url || "/pricing"
+              });
+            }
+          }
+          data.campaigns = campaignsArray;
           setConfig(data);
         }
       } catch (err) {
@@ -118,18 +147,25 @@ export default function AdminHomepageManager() {
   const handleSave = async () => {
     setSaving(true);
     try {
+      const token = typeof window !== "undefined" ? (localStorage.getItem("admin_token") || localStorage.getItem("token")) : null;
       const res = await fetch("/api/homepage", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          ...(token ? { "Authorization": `Bearer ${token}`, "x-admin-token": token } : {})
+        },
         body: JSON.stringify(config)
       });
       if (res.ok) {
         setToastMessage("تم حفظ تعديلات الصفحة الرئيسية بنجاح!");
         setTimeout(() => setToastMessage(null), 4000);
+      } else {
+        const errData = await res.json().catch(() => ({}));
+        alert(errData.error || "فشل حفظ التعديلات. يرجى التأكد من تسجيل دخولك كمسؤول.");
       }
     } catch (err) {
       console.error(err);
-      alert("حدث خطأ أثناء حفظ التغيرات.");
+      alert("حدث خطأ أثناء الاتصال بالسيرفر لحفظ التغييرات.");
     } finally {
       setSaving(false);
     }

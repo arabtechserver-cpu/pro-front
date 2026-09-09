@@ -1,4 +1,6 @@
-import React from "react";
+"use client";
+
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 
 interface AmrrHeroSectionProps {
@@ -7,6 +9,16 @@ interface AmrrHeroSectionProps {
 
 export default function AmrrHeroSection({ lang }: AmrrHeroSectionProps) {
   const isAr = lang === "ar";
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    try {
+      const token = localStorage.getItem("user_token") || localStorage.getItem("token");
+      if (token && token !== "null" && token !== "undefined") {
+        setIsLoggedIn(true);
+      }
+    } catch {}
+  }, []);
 
   return (
     <section className="relative min-h-[580px] lg:min-h-[700px] curved-cockpit overflow-visible rounded-2xl sm:rounded-[2.75rem] border-y-2 sm:border-2 border-cyan-500/30 shadow-2xl mb-8 animate-neon-border">
@@ -95,12 +107,16 @@ export default function AmrrHeroSection({ lang }: AmrrHeroSectionProps) {
             data-aos-delay="400"
           >
             <Link
-              href={`/${lang}/register`}
+              href={isLoggedIn ? `/${lang}/pricing` : `/${lang}/register`}
               className="convex-pill group relative overflow-hidden bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 text-slate-950 px-6 sm:px-8 py-3.5 sm:py-4 font-black text-sm sm:text-base shadow-xl flex items-center justify-center gap-2"
             >
               <div className="absolute inset-0 w-1/2 h-full bg-gradient-to-r from-transparent via-white/40 to-transparent -skew-x-12 animate-shimmer pointer-events-none"></div>
               <i className="fas fa-rocket text-base sm:text-lg group-hover:rotate-12 transition-transform animate-thruster"></i>
-              <span>{isAr ? "ابدأ الفك والاشتراك الآن" : "Start Unlocking Now"}</span>
+              <span>
+                {isAr
+                  ? (isLoggedIn ? "طلب فك وتفعيل فوري ⚡" : "ابدأ الفك والاشتراك الآن")
+                  : (isLoggedIn ? "Order Unlock & Activation ⚡" : "Start Unlocking Now")}
+              </span>
             </Link>
 
             <Link

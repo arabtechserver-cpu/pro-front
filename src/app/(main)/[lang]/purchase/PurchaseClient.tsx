@@ -41,10 +41,8 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
   const [validatingCoupon, setValidatingCoupon] = useState<boolean>(false);
   const [couponFeedback, setCouponFeedback] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
-  // Live Active Viewers & Fake 10% Discount States (متغير واقعي وسريع حول 60)
+  // Live Active Viewers & Fake 10% Discount States (رقم ثابت ومريح بدون اهتزاز)
   const [activeViewers, setActiveViewers] = useState<number>(60);
-  const [viewerTrend, setViewerTrend] = useState<"up" | "down" | null>(null);
-  const [viewerDelta, setViewerDelta] = useState<number>(1);
   const [discountTimeLeft, setDiscountTimeLeft] = useState<{ minutes: number; seconds: number }>({ minutes: 14, seconds: 35 });
   const [copiedCode, setCopiedCode] = useState<boolean>(false);
 
@@ -207,7 +205,7 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
     }
   }, []);
 
-  // Real-time Active Viewers Fluctuation Effect (يبدأ عند 60 ويصعد ويهبط بسرعة)
+  // Real-time Active Viewers (تحديث هادئ ومتباعد دون اهتزاز أو تحريك للشاشة)
   useEffect(() => {
     let base = 60;
     if (selectedServiceId) {
@@ -223,28 +221,22 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
     let timerId: any = null;
 
     const tick = () => {
-      // سرعة التحديث سريعة وحية: بين 1.1 إلى 2.0 ثانية
-      const delay = Math.floor(Math.random() * 900) + 1100;
+      // سرعة التحديث هادئة ومتباعدة: كل 12 إلى 20 ثانية لتجنب أي إزعاج أو اهتزاز
+      const delay = Math.floor(Math.random() * 8000) + 12000;
       timerId = setTimeout(() => {
-        // خطوة التغير السريع: 1 أو 2 أو 3
-        const randSize = Math.random();
-        const step = randSize < 0.55 ? 1 : randSize < 0.88 ? 2 : 3;
-
+        const step = Math.random() < 0.7 ? 1 : 2;
         let direction = 1;
         const randDir = Math.random();
-        if (current <= 51) {
-          direction = randDir > 0.15 ? 1 : -1;
-        } else if (current >= 73) {
-          direction = randDir > 0.15 ? -1 : 1;
+        if (current <= 52) {
+          direction = 1;
+        } else if (current >= 72) {
+          direction = -1;
         } else {
           direction = randDir < 0.5 ? 1 : -1;
         }
 
-        current = Math.max(48, Math.min(76, current + step * direction));
+        current = Math.max(50, Math.min(74, current + step * direction));
         setActiveViewers(current);
-        setViewerDelta(step);
-        setViewerTrend(direction > 0 ? "up" : "down");
-        setTimeout(() => setViewerTrend(null), 650);
 
         tick();
       }, delay);
@@ -588,6 +580,7 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
   // 3. Handle Submitting a New Order
   const handleOrderSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (submittingOrder) return;
     setSubmitFeedback(null);
 
     if (!userSession) {
@@ -877,31 +870,12 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
               </div>
 
               <div className="flex items-baseline gap-2 flex-wrap">
-                <span
-                  className={`text-2xl sm:text-3xl font-black font-mono transition-all duration-300 ${
-                    viewerTrend === "up"
-                      ? "text-emerald-400 scale-110 drop-shadow-[0_0_12px_rgba(52,211,153,0.8)]"
-                      : viewerTrend === "down"
-                      ? "text-amber-300 scale-95"
-                      : "text-white"
-                  }`}
-                >
+                <span className="text-2xl sm:text-3xl font-black font-mono text-white tabular-nums">
                   {activeViewers}
                 </span>
                 <span className="text-xs sm:text-sm font-bold text-on-surface">
                   {lang === 'ar' ? 'شخص يتصفحون ويطلبون هذه الخدمة الآن' : 'people viewing & ordering this service now'}
                 </span>
-                {viewerTrend && (
-                  <span
-                    className={`text-xs font-mono font-bold px-1.5 py-0.2 rounded transition-all duration-300 ${
-                      viewerTrend === "up" 
-                        ? "text-emerald-400 bg-emerald-500/20 border border-emerald-500/30" 
-                        : "text-amber-400 bg-amber-500/20 border border-amber-500/30"
-                    }`}
-                  >
-                    {viewerTrend === "up" ? `▲ +${viewerDelta}` : `▼ -${viewerDelta}`}
-                  </span>
-                )}
               </div>
             </div>
           </div>

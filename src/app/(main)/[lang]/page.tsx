@@ -19,15 +19,27 @@ const NewsletterSection = dynamic(() => import("@/components/NewsletterSection")
 });
 
 async function getHomepageConfig() {
-  try {
-    const res = await fetch("https://api.arabtechproserver.tech/api/homepage", {
-      next: { revalidate: 60 }
-    });
-    if (res.ok) {
-      return await res.json();
+  const candidates = [
+    process.env.INTERNAL_API_URL,
+    "http://pro-b-i0r2xu:5000",
+    "http://backend:5000",
+    "http://localhost:5000",
+    process.env.NEXT_PUBLIC_API_URL,
+    "https://arabtechproserver.tech"
+  ].filter(Boolean) as string[];
+
+  for (const baseUrl of candidates) {
+    try {
+      const cleanBase = baseUrl.replace(/\/$/, "");
+      const res = await fetch(`${cleanBase}/api/homepage`, {
+        next: { revalidate: 20 }
+      });
+      if (res.ok) {
+        return await res.json();
+      }
+    } catch {
+      // try next candidate
     }
-  } catch (err) {
-    console.error("Failed to fetch homepage config:", err);
   }
   return null;
 }
@@ -172,7 +184,61 @@ export default async function Home(props: { params: Promise<{ lang: Locale }> })
   const feat3Title = isAr ? hp?.featureRibbon?.feat3TitleAr : hp?.featureRibbon?.feat3TitleEn;
   const feat3Desc = isAr ? hp?.featureRibbon?.feat3DescAr : hp?.featureRibbon?.feat3DescEn;
 
-  const campaigns = Array.isArray(hp?.campaigns) ? hp.campaigns : [];
+  let campaigns: any[] = [];
+  if (Array.isArray(hp?.campaigns) && hp.campaigns.length > 0) {
+    campaigns = hp.campaigns;
+  } else if (hp?.campaigns && typeof hp.campaigns === 'object') {
+    const c = hp.campaigns;
+    if (c.promo1Image || c.promo1TitleAr || c.promo1TitleEn) {
+      campaigns.push({
+        tagEn: c.promo1TagEn || "Hot Offer",
+        tagAr: c.promo1TagAr || "عرض خاص",
+        titleEn: c.promo1TitleEn || "Samsung FRP Remove",
+        titleAr: c.promo1TitleAr || "حذف حساب جوجل لسامسونج",
+        descEn: c.promo1DescEn || "",
+        descAr: c.promo1DescAr || "",
+        image: c.promo1Image || "/images/promo_samsung.png",
+        url: c.promo1Url || "/pricing"
+      });
+    }
+    if (c.promo2Image || c.promo2TitleAr || c.promo2TitleEn) {
+      campaigns.push({
+        tagEn: c.promo2TagEn || "Official Reseller",
+        tagAr: c.promo2TagAr || "ترخيص رسمي",
+        titleEn: c.promo2TitleEn || "Chimera Tool",
+        titleAr: c.promo2TitleAr || "أداة شيميراChimera",
+        descEn: c.promo2DescEn || "",
+        descAr: c.promo2DescAr || "",
+        image: c.promo2Image || "/images/promo_chimera.png",
+        url: c.promo2Url || "/pricing"
+      });
+    }
+  }
+
+  if (campaigns.length === 0) {
+    campaigns = [
+      {
+        tagEn: "Hot Offer",
+        tagAr: "عرض خاص",
+        titleEn: "Samsung FRP Remove",
+        titleAr: "حذف حساب جوجل لسامسونج",
+        descEn: "Instant via IMEI. Support all models.",
+        descAr: "فك فوري لجميع موديلات سامسونج.",
+        image: "/images/promo_samsung.png",
+        url: "/pricing"
+      },
+      {
+        tagEn: "Official Reseller",
+        tagAr: "ترخيص رسمي",
+        titleEn: "Chimera Tool",
+        titleAr: "أداة شيميراChimera",
+        descEn: "Activations and credits available instantly.",
+        descAr: "تراخيص وأرصدة سريعة ومتاحة فوراً.",
+        image: "/images/promo_chimera.png",
+        url: "/pricing"
+      }
+    ];
+  }
 
   return (
     <div className="flex flex-col gap-10 sm:gap-16 lg:gap-20 pb-12 sm:pb-20 overflow-x-clip">

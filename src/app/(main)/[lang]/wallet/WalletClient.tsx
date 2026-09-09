@@ -359,6 +359,7 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
 
   const handleDepositSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isLoading) return;
     setErrorMessage("");
     setSuccessMessage("");
 
@@ -877,8 +878,8 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
               ) : (
                 <button
                   type="submit"
-                  disabled={isLoading}
-                  className="w-full bg-gradient-to-r from-primary to-secondary text-on-primary py-4 rounded-2xl font-bold text-sm hover:shadow-xl hover:shadow-primary/30 transition-all flex items-center justify-center gap-2 shadow-lg disabled:opacity-50 active:scale-95"
+                  disabled={isLoading || !transactionRef.trim() || !depositAmount || parseFloat(depositAmount) <= 0}
+                  className="w-full bg-gradient-to-r from-primary to-secondary text-on-primary py-4 rounded-2xl font-bold text-sm hover:shadow-xl hover:shadow-primary/30 transition-all flex items-center justify-center gap-2 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
                 >
                   {isLoading ? (
                     <>

@@ -1,4 +1,6 @@
-import React from "react";
+"use client";
+
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 
 interface AmrrStatsSectionProps {
@@ -7,6 +9,16 @@ interface AmrrStatsSectionProps {
 
 export default function AmrrStatsSection({ lang }: AmrrStatsSectionProps) {
   const isAr = lang === "ar";
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    try {
+      const token = localStorage.getItem("user_token") || localStorage.getItem("token");
+      if (token && token !== "null" && token !== "undefined") {
+        setIsLoggedIn(true);
+      }
+    } catch {}
+  }, []);
 
   return (
     <section className="relative my-6 sm:my-10 cyber-container">
@@ -41,12 +53,16 @@ export default function AmrrStatsSection({ lang }: AmrrStatsSectionProps) {
             <div className="flex flex-col gap-3 mb-6">
               {/* Primary Action Button with 3D Convex Curvature */}
               <Link
-                href={`/${lang}/register`}
+                href={isLoggedIn ? `/${lang}/pricing` : `/${lang}/register`}
                 className="convex-pill group relative overflow-hidden bg-gradient-to-r from-emerald-600 via-teal-500 to-cyan-500 hover:from-emerald-500 hover:to-cyan-400 text-white px-5 sm:px-6 py-3.5 sm:py-4 font-bold text-sm sm:text-base flex items-center justify-center gap-2 shadow-lg"
               >
                 <div className="absolute inset-0 w-1/2 h-full bg-gradient-to-r from-transparent via-white/30 to-transparent -skew-x-12 animate-shimmer pointer-events-none"></div>
                 <i className="fas fa-rocket text-lg text-yellow-300 animate-thruster"></i>
-                <span className="tracking-wide">{isAr ? "ابدأ الفك والتفعيل الآن" : "Start Unlocking Now"}</span>
+                <span className="tracking-wide">
+                  {isAr
+                    ? (isLoggedIn ? "طلب فك وتفعيل فوري ⚡" : "ابدأ الفك والتفعيل الآن")
+                    : (isLoggedIn ? "Order Unlock & Activation ⚡" : "Start Unlocking Now")}
+                </span>
                 <i className={`fas ${isAr ? "fa-arrow-left" : "fa-arrow-right"} text-xs transition-transform group-hover:translate-x-1`}></i>
               </Link>
 

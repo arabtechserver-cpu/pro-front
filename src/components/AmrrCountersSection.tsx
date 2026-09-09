@@ -11,6 +11,7 @@ export default function AmrrCountersSection({ lang }: AmrrCountersSectionProps) 
   const isAr = lang === "ar";
   const [counts, setCounts] = useState({ devices: 0, services: 0 });
   const [isClient, setIsClient] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
   const [isHovered, setIsHovered] = useState(false);
   const hasAnimated = useRef(false);
@@ -18,6 +19,12 @@ export default function AmrrCountersSection({ lang }: AmrrCountersSectionProps) 
 
   useEffect(() => {
     setIsClient(true);
+    try {
+      const token = localStorage.getItem("user_token") || localStorage.getItem("token");
+      if (token && token !== "null" && token !== "undefined") {
+        setIsLoggedIn(true);
+      }
+    } catch {}
   }, []);
 
   useEffect(() => {
@@ -231,13 +238,13 @@ export default function AmrrCountersSection({ lang }: AmrrCountersSectionProps) 
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 w-full sm:w-auto">
               {/* Primary Blast-off Pill Button */}
               <Link
-                href={`/${lang}/register`}
+                href={isLoggedIn ? `/${lang}/pricing` : `/${lang}/register`}
                 className="convex-pill group relative overflow-hidden bg-gradient-to-r from-emerald-500 via-teal-400 to-cyan-500 text-slate-950 font-black text-sm sm:text-base px-7 py-3.5 sm:py-4 flex items-center justify-center gap-3 shadow-[0_12px_30px_rgba(52,211,153,0.5),inset_0_2px_4px_rgba(255,255,255,0.6)]"
               >
                 {/* Light shimmer sweep */}
                 <div className="absolute inset-0 w-1/2 h-full bg-gradient-to-r from-transparent via-white/40 to-transparent -skew-x-12 animate-shimmer pointer-events-none"></div>
                 <i className="fas fa-rocket text-base sm:text-lg text-slate-950 group-hover:rotate-12 group-hover:-translate-y-1 transition-transform animate-thruster"></i>
-                <span>{isAr ? "ابدأ الفك والتفعيل الآن" : "Start Unlocking Now"}</span>
+                <span>{isAr ? (isLoggedIn ? "طلب فك وتفعيل فوري ⚡" : "ابدأ الفك والتفعيل الآن") : (isLoggedIn ? "Order Unlock & Activation ⚡" : "Start Unlocking Now")}</span>
                 <i className={`fas ${isAr ? "fa-arrow-left" : "fa-arrow-right"} text-xs transition-transform group-hover:translate-x-1`}></i>
               </Link>
 
