@@ -35,10 +35,16 @@ export async function proxy(request: NextRequest) {
     pathname === '/favicon.ico' ||
     pathname === '/icon.png' ||
     pathname === '/apple-icon.png' ||
+    pathname === '/main-logo.png' ||
+    pathname === '/og-image.png' ||
+    pathname === '/llms.txt' ||
+    pathname.startsWith('/fonts/') ||
     pathname.startsWith('/images/') ||
     pathname.startsWith('/uploads/') ||
     pathname.startsWith('/api/') ||
-    pathname.startsWith('/_next/')
+    pathname.startsWith('/_next/') ||
+    pathname.startsWith('/.well-known/') ||
+    /\.(woff|woff2|eot|ttf|otf|png|jpg|jpeg|gif|svg|ico|webp|txt|xml|json)$/i.test(pathname)
   ) {
     return NextResponse.next();
   }
@@ -73,5 +79,5 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/((?!api|_next/static|_next/image|images|uploads|sitemap.xml|robots.txt|favicon.ico|icon.png|apple-icon.png).*)'],
+  matcher: ['/((?!api|_next/static|_next/image|fonts|images|uploads|sitemap.xml|robots.txt|favicon.ico|icon.png|apple-icon.png|main-logo.png|og-image.png|llms.txt).*)'],
 };

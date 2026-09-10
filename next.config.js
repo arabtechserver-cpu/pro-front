@@ -68,11 +68,15 @@ const nextConfig = {
         ],
       },
       {
-        source: '/fonts/:all*(woff|woff2|eot|ttf|otf)',
+        source: '/fonts/:path*',
         headers: [
           {
             key: 'Cache-Control',
             value: 'public, max-age=31536000, immutable',
+          },
+          {
+            key: 'Access-Control-Allow-Origin',
+            value: '*',
           },
         ],
       },

@@ -257,16 +257,6 @@ export default async function RootLayout(
         <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
         <link rel="canonical" href={`https://arabtechproserver.tech/${lang}`} />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        {/* Preload High-Priority LCP Hero Image */}
-        <link
-          rel="preload"
-          as="image"
-          href={isAr ? "/images/hero_cyber_ar.webp" : "/images/hero_cyber_en.webp"}
-          type="image/webp"
-          // @ts-ignore
-          fetchPriority="high"
-        />
         {/* Preload Local Material Symbols Font for Instant Zero-Render-Blocking Display */}
         <link
           rel="preload"
