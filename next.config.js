@@ -68,6 +68,15 @@ const nextConfig = {
         ],
       },
       {
+        source: '/fonts/:all*(woff|woff2|eot|ttf|otf)',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+      {
         source: '/images/:all*(svg|jpg|jpeg|png|webp|avif|gif|ico)',
         headers: [
           {

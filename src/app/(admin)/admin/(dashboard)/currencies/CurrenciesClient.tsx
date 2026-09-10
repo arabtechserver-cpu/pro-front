@@ -173,7 +173,7 @@ export default function CurrenciesClient() {
           <div className="flex items-center justify-between pb-4 border-b border-outline-variant/20 flex-wrap gap-3">
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 rounded-2xl bg-primary/20 text-primary flex items-center justify-center text-2xl font-bold">
-                🇸🇩
+                <span className="material-symbols-outlined text-primary text-2xl">account_balance</span>
               </div>
               <div>
                 <h3 className="text-lg font-bold text-on-surface font-display flex items-center gap-2">
@@ -335,7 +335,7 @@ export default function CurrenciesClient() {
             {/* Egyptian Pound */}
             <div className="p-4 rounded-2xl bg-surface-container-lowest border border-outline-variant/20 space-y-2">
               <div className="flex items-center gap-2">
-                <span className="text-xl">🇪🇬</span>
+                <span className="material-symbols-outlined text-primary text-xl">payments</span>
                 <label className="text-xs font-bold text-on-surface">الجنيه المصري (EGP):</label>
               </div>
               <div className="relative">
@@ -356,7 +356,7 @@ export default function CurrenciesClient() {
             {/* Saudi Riyal */}
             <div className="p-4 rounded-2xl bg-surface-container-lowest border border-outline-variant/20 space-y-2">
               <div className="flex items-center gap-2">
-                <span className="text-xl">🇸🇦</span>
+                <span className="material-symbols-outlined text-emerald-400 text-xl">payments</span>
                 <label className="text-xs font-bold text-on-surface">الريال السعودي (SAR):</label>
               </div>
               <div className="relative">
@@ -377,7 +377,7 @@ export default function CurrenciesClient() {
             {/* UAE Dirham */}
             <div className="p-4 rounded-2xl bg-surface-container-lowest border border-outline-variant/20 space-y-2">
               <div className="flex items-center gap-2">
-                <span className="text-xl">🇦🇪</span>
+                <span className="material-symbols-outlined text-secondary text-xl">payments</span>
                 <label className="text-xs font-bold text-on-surface">الدرهم الإماراتي (AED):</label>
               </div>
               <div className="relative">
@@ -412,7 +412,7 @@ export default function CurrenciesClient() {
             <div className="p-4 rounded-2xl bg-surface-container-lowest border border-outline-variant/20 space-y-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <span className="text-lg">📱</span>
+                  <span className="material-symbols-outlined text-primary text-lg">smartphone</span>
                   <span className="font-bold text-xs text-on-surface">فودافون كاش (Vodafone Cash)</span>
                 </div>
                 <input
@@ -448,7 +448,7 @@ export default function CurrenciesClient() {
             <div className="p-4 rounded-2xl bg-surface-container-lowest border border-outline-variant/20 space-y-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <span className="text-lg">🔶</span>
+                  <span className="material-symbols-outlined text-amber-400 text-lg">currency_bitcoin</span>
                   <span className="font-bold text-xs text-on-surface">باينانس باي (Binance Pay)</span>
                 </div>
                 <input
@@ -484,7 +484,7 @@ export default function CurrenciesClient() {
             <div className="p-4 rounded-2xl bg-surface-container-lowest border border-outline-variant/20 space-y-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <span className="text-lg">🟡</span>
+                  <span className="material-symbols-outlined text-yellow-400 text-lg">token</span>
                   <span className="font-bold text-xs text-on-surface">BNB Smart Chain (BEP20 Address)</span>
                 </div>
                 <input
@@ -520,7 +520,7 @@ export default function CurrenciesClient() {
             <div className="p-4 rounded-2xl bg-surface-container-lowest border border-outline-variant/20 space-y-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <span className="text-lg">🅿️</span>
+                  <span className="material-symbols-outlined text-blue-400 text-lg">credit_card</span>
                   <span className="font-bold text-xs text-on-surface">باي بال (PayPal Email)</span>
                 </div>
                 <input

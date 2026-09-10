@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo, useRef, useDeferredValue } from "react";
 import { categoryMatchesFilter, createInitialCollapsedGroups, sortDisplayGroups } from "../../../../lib/pricing-groups";
 import Link from "next/link";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
+import { stripEmojis } from "@/utils/cleanHtml";
 
 function getServicePriceInfo(service: any) {
   const credit = typeof service.credit === 'number' ? service.credit : parseFloat(service.credit) || 0;
@@ -75,7 +76,7 @@ function ServicesListRenderer({ servicesList, lang, dict, discountPercent = 0 }:
         {displayedServices.map((service: any) => (
           <div key={service.id} className="p-4 flex flex-col gap-3 hover:bg-surface-container-high/40 transition-colors">
             <div className="font-semibold text-on-surface text-sm sm:text-base leading-snug">
-              {service.name}
+              {stripEmojis(service.name)}
             </div>
             <div className="flex items-center justify-between gap-2 pt-2 border-t border-outline-variant/10">
               <div className="flex flex-col">
@@ -113,7 +114,7 @@ function ServicesListRenderer({ servicesList, lang, dict, discountPercent = 0 }:
               <tr key={service.id} className="hover:bg-surface-container-high/40 transition-colors group">
                 <td className="py-4 px-6">
                   <span className="text-on-surface font-semibold flex items-center gap-2 text-base">
-                    {service.name}
+                    {stripEmojis(service.name)}
                   </span>
                 </td>
                 <td className="py-4 px-6 text-on-surface-variant text-sm whitespace-nowrap">{service.time || "1-24 Hours"}</td>
@@ -508,12 +509,12 @@ export default function PricingClient({
               </div>
               <h2 className="text-xl sm:text-4xl font-bold text-on-surface flex items-center gap-3">
                 <span className="material-symbols-outlined text-primary text-2xl sm:text-4xl">folder</span>
-                {singleSectionData.groupName}
+                {stripEmojis(singleSectionData.groupName)}
               </h2>
               <p className="text-xs sm:text-sm text-on-surface-variant mt-1">
                 {lang === 'ar' 
-                  ? `عرض مستقل لخدمات قسم ${singleSectionData.groupName} (${singleSectionData.servicesList.length} خدمات مجهزة)`
-                  : `Standalone view for ${singleSectionData.groupName} (${singleSectionData.servicesList.length} services)`}
+                  ? `عرض مستقل لخدمات قسم ${stripEmojis(singleSectionData.groupName)} (${singleSectionData.servicesList.length} خدمات مجهزة)`
+                  : `Standalone view for ${stripEmojis(singleSectionData.groupName)} (${singleSectionData.servicesList.length} services)`}
               </p>
             </div>
 
@@ -541,7 +542,7 @@ export default function PricingClient({
             <div className="bg-surface-container/90 px-5 sm:px-6 py-4 sm:py-5 border-b border-outline-variant/40 flex items-center justify-between">
               <h3 className="text-lg sm:text-xl font-bold text-on-surface flex items-center gap-3">
                 <span className="material-symbols-outlined text-primary">folder_open</span>
-                {singleSectionData.groupName}
+                {stripEmojis(singleSectionData.groupName)}
               </h3>
               <span className="text-xs font-bold text-primary bg-primary/10 px-3 py-1 rounded-full border border-primary/30">
                 {singleSectionData.servicesList.length} {lang === 'ar' ? 'خدمات' : 'services'}
@@ -724,7 +725,7 @@ export default function PricingClient({
                             <span className="material-symbols-outlined text-primary text-2xl group-hover/head:scale-110 transition-transform">folder</span>
                             <div>
                               <h3 className="text-lg sm:text-xl font-bold text-on-surface group-hover/head:text-primary transition-colors flex items-center gap-2">
-                                {groupName}
+                                {stripEmojis(groupName)}
                                 <span className="text-xs font-normal text-on-surface-variant bg-surface-container-highest px-2.5 py-0.5 rounded-full border border-outline-variant/20">
                                   {groupServicesList.length} {lang === 'ar' ? 'خدمات' : 'services'}
                                 </span>

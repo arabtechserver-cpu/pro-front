@@ -162,22 +162,22 @@ export default function AdminNewsletterPage() {
   const applyTemplate = (type: "tool" | "discount" | "server" | "blog") => {
     if (type === "tool") {
       setCategory("Tool Offer");
-      setTitle("⚡ توفر تفعيل رسمي فوري لأداة جديدة!");
-      setSubject("🔥 أداة جديدة وتفعيل فوري على سيرفر عرب تك برو");
+      setTitle("توفر تفعيل رسمي فوري لأداة جديدة!");
+      setSubject("أداة جديدة وتفعيل فوري على سيرفر عرب تك برو");
       setMessage("يسرنا إعلامكم بتوفر تراخيص وتفعيلات رسمية جديدة لأقوى أدوات السوفت وير بأسعار حصرية وتسليم فوري تلقائي عبر السيرفر. تفضل بالطلب الآن واستمتع بأعلى سرعة وأفضل دعم فني.");
       setActionUrl("https://arabtechproserver.tech/ar/pricing");
       setActionText("طلب وتفعيل الأداة فوراً");
     } else if (type === "discount") {
       setCategory("Hot Offer");
-      setTitle("🏷️ تخفيضات خاصة وعروض جملة لفترة محدودة!");
-      setSubject("🎁 خصم خاص على باقات وتفعيلات السيرفر للوكلاء");
+      setTitle("تخفيضات خاصة وعروض جملة لفترة محدودة!");
+      setSubject("خصم خاص على باقات وتفعيلات السيرفر للوكلاء");
       setMessage("عرض خاص لجميع عملائنا ووكلائنا الكرام! تخفيضات حصرية على أرصدة السيرفرات وفك الشفرات وتخطي الحسابات لفترة محدودة. اشحن محفظتك الآن واستفد من العرض قبل انتهائه.");
       setActionUrl("https://arabtechproserver.tech/ar/pricing");
       setActionText("استعراض العروض المخفضة");
     } else if (type === "server") {
       setCategory("Service Update");
-      setTitle("🔓 تحديث جديد: دعم فك شفرات موديلات إضافية");
-      setSubject("⚡ تحديث جديد لسيرفر فك الشفرات وتخطي الحسابات");
+      setTitle("تحديث جديد: دعم فك شفرات موديلات إضافية");
+      setSubject("تحديث جديد لسيرفر فك الشفرات وتخطي الحسابات");
       setMessage("تم تحديث خدمات الـ IMEI والسيرفر لدعم أحدث الحمايات والموديلات العالمية لفك الشبكات وتخطي FRP و iCloud بكفاءة عالية وبأسرع وقت تسليم.");
       setActionUrl("https://arabtechproserver.tech/ar/pricing?cat=imei");
       setActionText("عرض قائمة الخدمات المحدثة");

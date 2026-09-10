@@ -4,7 +4,7 @@ import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { shouldShowDefaultImeiField, getProviderCustomFields, isProviderQuantityField as isQuantityField, supportsProviderQuantity } from "../../../../lib/purchase-service-fields";
-import { cleanHtmlToText } from "@/utils/cleanHtml";
+import { cleanHtmlToText, stripEmojis } from "@/utils/cleanHtml";
 
 function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
   const searchParams = useSearchParams();
@@ -1041,7 +1041,7 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
                 ) : (
                   categoriesList.map((cat) => (
                     <option key={cat.id} value={cat.id}>
-                      {cat.name} ({cat.services?.length || 0} خدمة)
+                      {stripEmojis(cat.name)} ({cat.services?.length || 0} {lang === 'ar' ? 'خدمة' : 'services'})
                     </option>
                   ))
                 )}
@@ -1076,10 +1076,11 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
                       : pNum > 0 
                       ? `$${pNum.toFixed(2)} USD` 
                       : (lang === 'ar' ? 'سعر خاص' : 'Special Price');
-                    const groupPrefix = srv.groupName ? `[${srv.groupName}] ` : '';
+                    const cleanGroupName = srv.groupName ? stripEmojis(srv.groupName) : '';
+                    const groupPrefix = cleanGroupName ? `[${cleanGroupName}] ` : '';
                     return (
                       <option key={srv.id} value={srv.id}>
-                        {groupPrefix}{srv.name} — ({priceLabel})
+                        {groupPrefix}{stripEmojis(srv.name)} — ({priceLabel})
                       </option>
                     );
                   })
@@ -1097,18 +1098,18 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
                   <div className="flex flex-wrap items-center gap-2">
                     <span className="px-2.5 py-0.5 rounded-lg bg-primary/10 border border-primary/20 text-primary text-[11px] font-bold flex items-center gap-1.5">
                       <span className="material-symbols-outlined text-xs">folder_open</span>
-                      <span>القسم: {selectedCategory?.name || (lang === 'ar' ? 'القسم الرئيسي' : 'Main Category')}</span>
+                      <span>القسم: {stripEmojis(selectedCategory?.name || (lang === 'ar' ? 'القسم الرئيسي' : 'Main Category'))}</span>
                     </span>
 
                     {selectedService.groupName && (
                       <span className="px-2.5 py-0.5 rounded-lg bg-secondary/10 border border-secondary/20 text-secondary text-[11px] font-bold flex items-center gap-1.5">
                         <span className="material-symbols-outlined text-xs">package_2</span>
-                        <span>الباقة: {selectedService.groupName}</span>
+                        <span>الباقة: {stripEmojis(selectedService.groupName)}</span>
                       </span>
                     )}
                   </div>
 
-                  <h3 className="font-bold text-sm text-on-surface">{selectedService.name}</h3>
+                  <h3 className="font-bold text-sm text-on-surface">{stripEmojis(selectedService.name)}</h3>
                   <div className="flex items-center gap-4 text-xs text-on-surface-variant">
                     <span className="flex items-center gap-1">
                       <span className="material-symbols-outlined text-sm text-secondary">schedule</span>

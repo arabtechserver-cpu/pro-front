@@ -1276,12 +1276,12 @@ export default function OrdersClient() {
                     <div className="font-bold text-on-surface text-xs">
                       الحالة الحالية:{" "}
                       {selectedOrder.status === "completed"
-                        ? "مكتمل بنجاح ✅"
+                        ? "مكتمل بنجاح"
                         : selectedOrder.status === "processing"
-                        ? "قيد التنفيذ لدى المزود 🚀"
+                        ? "قيد التنفيذ لدى المزود"
                         : selectedOrder.status === "pending"
-                        ? "في انتظار الموافقة ⏳"
-                        : "ملغي ومسترجع ❌"}
+                        ? "في انتظار الموافقة"
+                        : "ملغي ومسترجع"}
                     </div>
                   </div>
                 </div>

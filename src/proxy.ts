@@ -25,6 +25,10 @@ function getLocale(request: NextRequest): string | undefined {
 export async function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
+  if (pathname === '/api-docs' || pathname.startsWith('/api-docs')) {
+    return new NextResponse(null, { status: 404 });
+  }
+
   if (
     pathname === '/sitemap.xml' ||
     pathname === '/robots.txt' ||
