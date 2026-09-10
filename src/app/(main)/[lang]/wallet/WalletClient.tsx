@@ -167,7 +167,7 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
       id: "bankak",
       nameAr: "بنك الخرطوم (بنكك)",
       nameEn: "Bank of Khartoum (Bankak)",
-      badge: "🇸🇩",
+      badge: "SD",
       icon: "account_balance",
       color: "from-emerald-600 to-teal-700",
       copyValue: currencyConfig?.bankak?.accountNumber || "",
@@ -489,7 +489,6 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
                   </span>
                   <span className="text-xs font-bold text-emerald-400 bg-emerald-500/15 border border-emerald-500/30 px-2.5 py-0.5 rounded-lg font-mono flex items-center gap-1">
                     <span>≈ {userBalanceSdg.toLocaleString("en-US")} SDG</span>
-                    <span>🇸🇩</span>
                   </span>
                 </div>
               </div>
@@ -592,7 +591,7 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
                 <div className="p-5 rounded-2xl bg-gradient-to-br from-emerald-500/15 via-surface-container-high to-teal-500/15 border-2 border-emerald-500/50 shadow-xl space-y-4 animate-in fade-in slide-in-from-top-2">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2 font-bold text-sm text-emerald-400">
-                      <span className="text-xl">🇸🇩</span>
+                      <span className="text-xs font-mono font-bold px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300">SD</span>
                       <span>{lang === "ar" ? "التحويل بالجنيه السوداني عبر بنكك (سعر الصرف المعتمد)" : "Bankak Sudanese Transfer"}</span>
                     </div>
 
@@ -916,7 +915,7 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
               <div className="space-y-2.5 text-xs">
                 <div className="p-3 rounded-xl bg-surface-container-high border border-outline-variant/20 flex items-center justify-between">
                   <span className="font-bold text-on-surface flex items-center gap-1.5">
-                    <span>🇸🇩</span>
+                    <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-surface-container-highest text-primary">SD</span>
                     <span>الجنيه السوداني (SDG)</span>
                   </span>
                   <span className="font-mono font-bold text-primary">1$ = {sdgRate.toLocaleString()} SDG</span>
@@ -924,7 +923,7 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
 
                 <div className="p-3 rounded-xl bg-surface-container-high border border-outline-variant/20 flex items-center justify-between">
                   <span className="font-bold text-on-surface flex items-center gap-1.5">
-                    <span>🇪🇬</span>
+                    <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-surface-container-highest text-primary">EG</span>
                     <span>الجنيه المصري (EGP)</span>
                   </span>
                   <span className="font-mono font-bold text-on-surface-variant">1$ = {currencyConfig?.usdToEgp || 50} EGP</span>
@@ -932,7 +931,7 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
 
                 <div className="p-3 rounded-xl bg-surface-container-high border border-outline-variant/20 flex items-center justify-between">
                   <span className="font-bold text-on-surface flex items-center gap-1.5">
-                    <span>🇸🇦</span>
+                    <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-surface-container-highest text-primary">SA</span>
                     <span>الريال السعودي (SAR)</span>
                   </span>
                   <span className="font-mono font-bold text-on-surface-variant">1$ = {currencyConfig?.usdToSar || 3.75} SAR</span>

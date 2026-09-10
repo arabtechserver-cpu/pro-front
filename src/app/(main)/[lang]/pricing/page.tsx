@@ -52,7 +52,7 @@ export async function generateMetadata(
     section = section.replace(/^%20/, '').trim();
   }
 
-  let title = isAr ? "قائمة الأسعار والخدمات | عرب تك برو سيرفر" : "Services & Price List | Arab Tech Pro Server";
+  let title = isAr ? "قائمة الأسعار والخدمات" : "Services & Price List";
   let description = isAr
     ? "تصفح قائمة أسعار وخدمات عرب تك برو سيرفر لفك الشفرات وتخطي حسابات FRP وتنشيط البوكسات بأفضل الأسعار وأسرع تسليم."
     : "Browse Arab Tech Pro Server complete catalog and live price list for phone unlocking, FRP bypass, and software tool activations.";
@@ -76,14 +76,14 @@ export async function generateMetadata(
     if (matchingServices.length > 0) {
       const count = matchingServices.length;
       title = isAr
-        ? `${section} (${count} خدمة) | عرب تك برو سيرفر`
-        : `${section} (${count} Services) | Arab Tech Pro Server`;
+        ? `${section} (${count} خدمة)`
+        : `${section} (${count} Services)`;
 
       description = isAr
         ? `أسعار باقة ${section} (${count} خدمة): تسليم فوري وتفعيل تلقائي 24/7 عبر سيرفر عرب تك برو بأفضل الأسعار المعتمدة.`
         : `Live prices for ${section} (${count} services): instant 24/7 delivery and activation on Arab Tech Pro Server.`;
     } else {
-      title = isAr ? `${section} | أسعار وخدمات عرب تك برو سيرفر` : `${section} | Services & Prices`;
+      title = `${section}`;
       description = isAr
         ? `تصفح أسعار وخدمات باقة ${section} على منصة عرب تك برو سيرفر مع التسليم الفوري وأقوى عروض الموزعين.`
         : `Explore ${section} services and real-time live prices on Arab Tech Pro Server with instant 24/7 delivery.`;

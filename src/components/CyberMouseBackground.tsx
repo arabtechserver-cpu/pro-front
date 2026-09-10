@@ -20,6 +20,15 @@ export default function CyberMouseBackground() {
     let isVisible = false;
     let rafId: number | null = null;
 
+    let isLoopRunning = false;
+
+    const startLoop = () => {
+      if (!isLoopRunning) {
+        isLoopRunning = true;
+        rafId = requestAnimationFrame(renderLoop);
+      }
+    };
+
     const handleMouseMove = (e: MouseEvent) => {
       mouseX = e.clientX;
       mouseY = e.clientY;
@@ -31,7 +40,6 @@ export default function CyberMouseBackground() {
         if (auraRef.current) auraRef.current.style.opacity = "1";
       }
 
-      // Check if hovering clickable
       const target = e.target as HTMLElement | null;
       if (target) {
         const clickable =
@@ -44,7 +52,6 @@ export default function CyberMouseBackground() {
         isHovering = !!clickable;
       }
 
-      // Direct DOM update for instant dot & aura (No React re-renders!)
       if (dotRef.current) {
         dotRef.current.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0) translate(-50%, -50%) ${
           isHovering ? "scale(1.5)" : "scale(1)"
@@ -56,37 +63,49 @@ export default function CyberMouseBackground() {
       if (auraRef.current) {
         auraRef.current.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0) translate(-50%, -50%)`;
       }
+
+      startLoop();
     };
 
     const handleMouseLeave = () => {
       isVisible = false;
+      isLoopRunning = false;
+      if (rafId) cancelAnimationFrame(rafId);
       if (dotRef.current) dotRef.current.style.opacity = "0";
       if (ringRef.current) ringRef.current.style.opacity = "0";
       if (auraRef.current) auraRef.current.style.opacity = "0";
     };
 
-    // Smooth lerp for outer ring via RAF without React state re-renders
     const renderLoop = () => {
-      if (isVisible) {
-        ringX += (mouseX - ringX) * 0.18;
-        ringY += (mouseY - ringY) * 0.18;
-
-        if (ringRef.current) {
-          ringRef.current.style.transform = `translate3d(${ringX}px, ${ringY}px, 0) translate(-50%, -50%) ${
-            isHovering ? "scale(1.4)" : "scale(1)"
-          }`;
-          ringRef.current.style.borderColor = isHovering ? "#34d399" : "rgba(34, 211, 238, 0.8)";
-          ringRef.current.style.boxShadow = isHovering
-            ? "0 0 20px rgba(52, 211, 153, 0.8), inset 0 0 10px rgba(52, 211, 153, 0.4)"
-            : "0 0 14px rgba(34, 211, 238, 0.6)";
-        }
+      if (!isVisible) {
+        isLoopRunning = false;
+        return;
       }
-      rafId = requestAnimationFrame(renderLoop);
+
+      const dx = mouseX - ringX;
+      const dy = mouseY - ringY;
+      ringX += dx * 0.18;
+      ringY += dy * 0.18;
+
+      if (ringRef.current) {
+        ringRef.current.style.transform = `translate3d(${ringX}px, ${ringY}px, 0) translate(-50%, -50%) ${
+          isHovering ? "scale(1.4)" : "scale(1)"
+        }`;
+        ringRef.current.style.borderColor = isHovering ? "#34d399" : "rgba(34, 211, 238, 0.8)";
+        ringRef.current.style.boxShadow = isHovering
+          ? "0 0 20px rgba(52, 211, 153, 0.8), inset 0 0 10px rgba(52, 211, 153, 0.4)"
+          : "0 0 14px rgba(34, 211, 238, 0.6)";
+      }
+
+      if (Math.abs(dx) > 0.2 || Math.abs(dy) > 0.2) {
+        rafId = requestAnimationFrame(renderLoop);
+      } else {
+        isLoopRunning = false;
+      }
     };
 
     window.addEventListener("mousemove", handleMouseMove, { passive: true });
     document.addEventListener("mouseleave", handleMouseLeave);
-    rafId = requestAnimationFrame(renderLoop);
 
     return () => {
       window.removeEventListener("mousemove", handleMouseMove);

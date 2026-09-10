@@ -1,19 +1,28 @@
 import { Metadata } from "next";
+import { notFound } from "next/navigation";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import { getDictionary } from "@/i18n/get-dictionary";
-import { Locale } from "@/i18n/config";
-import CampaignSlider from "@/components/CampaignSlider";
-import PackagesSlider from "@/components/PackagesSlider";
+import { Locale, i18n } from "@/i18n/config";
 import AmrrHeroSection from "@/components/AmrrHeroSection";
 import AmrrStatsSection from "@/components/AmrrStatsSection";
 import AmrrCountersSection from "@/components/AmrrCountersSection";
 
-import HexagonalFeatures from "@/components/HexagonalFeatures";
-import FaqSection from "@/components/FaqSection";
-import SupportCtaSection from "@/components/SupportCtaSection";
-
-// Lazy load below-the-fold newsletter section
+const HexagonalFeatures = dynamic(() => import("@/components/HexagonalFeatures"), {
+  loading: () => <div className="h-64" />
+});
+const PackagesSlider = dynamic(() => import("@/components/PackagesSlider"), {
+  loading: () => <div className="h-64" />
+});
+const CampaignSlider = dynamic(() => import("@/components/CampaignSlider"), {
+  loading: () => <div className="h-48" />
+});
+const FaqSection = dynamic(() => import("@/components/FaqSection"), {
+  loading: () => <div className="h-64" />
+});
+const SupportCtaSection = dynamic(() => import("@/components/SupportCtaSection"), {
+  loading: () => <div className="h-48" />
+});
 const NewsletterSection = dynamic(() => import("@/components/NewsletterSection"), {
   loading: () => <div className="h-40" />
 });
@@ -47,6 +56,9 @@ async function getHomepageConfig() {
 
 export async function generateMetadata(props: { params: Promise<{ lang: Locale }> }): Promise<Metadata> {
   const params = await props.params;
+  if (!i18n.locales.includes(params.lang as Locale)) {
+    notFound();
+  }
   const isAr = params.lang === "ar";
   const title = isAr
     ? "عرب تك برو سيرفر | منصة فك شفرات وتفعيل الهواتف"
@@ -107,6 +119,9 @@ export async function generateMetadata(props: { params: Promise<{ lang: Locale }
 
 export default async function Home(props: { params: Promise<{ lang: Locale }> }) {
   const params = await props.params;
+  if (!i18n.locales.includes(params.lang as Locale)) {
+    notFound();
+  }
   const dict = await getDictionary(params.lang);
   const hp = await getHomepageConfig();
 
@@ -243,6 +258,14 @@ export default async function Home(props: { params: Promise<{ lang: Locale }> })
 
   return (
     <div className="flex flex-col gap-10 sm:gap-16 lg:gap-20 pb-12 sm:pb-20 overflow-x-clip">
+      <link
+        rel="preload"
+        as="image"
+        href={isAr ? "/images/hero_cyber_ar.webp" : "/images/hero_cyber_en.webp"}
+        type="image/webp"
+        // @ts-ignore
+        fetchPriority="high"
+      />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{

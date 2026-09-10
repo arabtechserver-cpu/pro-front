@@ -40,7 +40,7 @@ export async function generateMetadata(props: Props, parent: ResolvingMetadata):
       const groupName = service.groupName || service.category?.name || "";
 
       const priceDisplayForTitle = isFree ? (isAr ? "مجاناً" : "Free") : priceNum > 0 ? `$${priceNum.toFixed(2)}` : (isAr ? "سعر خاص" : "Special Price");
-      const title = `${serviceName} - ${priceDisplayForTitle} | ${isAr ? "عرب تك برو سيرفر" : "Arab Tech Pro Server"}`;
+      const title = `${serviceName} - ${priceDisplayForTitle}`;
       const description = isAr
         ? `اطلب خدمة ${serviceName} بسعر ${priceStr} فقط. وقت التسليم: ${deliveryTime}. قسم: ${groupName}. فك رسمي وسريع عبر منصة عرب تك برو سيرفر.`
         : `Order ${serviceName} for only ${priceStr}. Delivery time: ${deliveryTime}. Category: ${groupName}. Fast & official remote phone unlocking from Arab Tech Pro Server.`;
@@ -77,7 +77,7 @@ export async function generateMetadata(props: Props, parent: ResolvingMetadata):
   }
 
   // Default Purchase Page Metadata
-  const defaultTitle = isAr ? "طلب خدمة جديدة | عرب تك برو سيرفر (عرب تيك)" : "Order New Service | Arab Tech Pro Server";
+  const defaultTitle = isAr ? "طلب خدمة وتفعيل فوري" : "Order New Service";
   const defaultDesc = isAr
     ? "اختر واطلب خدمات فك الشبكات، تخطي الآيكلود وFRP، وشراء رصيد البوكسات والدونجلات عبر سيرفر عرب تك برو (عرب تيك سيرفر) بأفضل الأسعار وأسرع وقت."
     : "Choose and order network unlock services, iCloud & FRP bypass, and server credits at the best rates.";

@@ -208,8 +208,16 @@ export default function AiChatWidget() {
       {!isOpen && (
         <div
           ref={containerRef}
+          role="button"
+          tabIndex={0}
           onPointerDown={handlePointerDown}
           onClick={handleToggleClick}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              handleToggleClick();
+            }
+          }}
           className={`fixed z-[9999] flex flex-col sm:flex-row items-center gap-1.5 sm:gap-2.5 group select-none touch-none ${
             dragPos ? "" : "bottom-5 right-3 sm:bottom-8 sm:right-6"
           } ${

@@ -458,7 +458,7 @@ export default function ProfileClient({ lang, dict }: { lang: string; dict: any 
                 </div>
               </div>
               <span className="absolute -bottom-1 -end-1 w-6 h-6 rounded-full bg-emerald-500 border-2 border-surface flex items-center justify-center text-white text-xs shadow-md" title="Active">
-                ✓
+                <span className="material-symbols-outlined text-[14px]">check</span>
               </span>
             </div>
 
@@ -592,9 +592,15 @@ export default function ProfileClient({ lang, dict }: { lang: string; dict: any 
             <p className="text-3xl font-black text-on-surface font-mono tracking-tight">
               {orders.length}
             </p>
-            <div className="flex items-center gap-2 mt-2 pt-2 border-t border-outline-variant/15 text-[11px] font-bold">
-              <span className="text-emerald-400 font-mono">✓ {completedOrdersCount} {isAr ? "مكتمل" : "done"}</span>
-              <span className="text-amber-400 font-mono">⏳ {pendingOrdersCount} {isAr ? "قيد التنفيذ" : "pending"}</span>
+            <div className="flex items-center gap-3 mt-2 pt-2 border-t border-outline-variant/15 text-[11px] font-bold">
+              <span className="text-emerald-400 font-mono flex items-center gap-1">
+                <span className="material-symbols-outlined text-xs">check_circle</span>
+                <span>{completedOrdersCount} {isAr ? "مكتمل" : "done"}</span>
+              </span>
+              <span className="text-amber-400 font-mono flex items-center gap-1">
+                <span className="material-symbols-outlined text-xs">schedule</span>
+                <span>{pendingOrdersCount} {isAr ? "قيد التنفيذ" : "pending"}</span>
+              </span>
             </div>
           </div>
         </div>
@@ -738,7 +744,7 @@ export default function ProfileClient({ lang, dict }: { lang: string; dict: any 
                   onClick={() => setOrderFilter("processing")}
                   className={`px-3 py-1.5 rounded-lg transition-all ${orderFilter === "processing" ? "bg-amber-500 text-white shadow-sm" : "text-on-surface-variant hover:text-on-surface"}`}
                 >
-                  {isAr ? "جاري التنفيذ ⏳" : "Processing"}
+                  {isAr ? "جاري التنفيذ" : "Processing"}
                 </button>
                 <button
                   onClick={() => setOrderFilter("completed")}

@@ -43,40 +43,40 @@ interface CurrencyInfo {
 }
 
 const CURRENCIES: CurrencyInfo[] = [
-  { code: "USD", nameAr: "دولار أمريكي", nameEn: "US Dollar", symbolAr: "$", symbolEn: "$", rate: 1.0, flag: "🇺🇸" },
-  { code: "EGP", nameAr: "جنيه مصري", nameEn: "Egyptian Pound", symbolAr: "ج.م", symbolEn: "EGP", rate: 50.0, flag: "🇪🇬" },
-  { code: "SAR", nameAr: "ريال سعودي", nameEn: "Saudi Riyal", symbolAr: "ر.س", symbolEn: "SAR", rate: 3.75, flag: "🇸🇦" },
-  { code: "AED", nameAr: "درهم إماراتي", nameEn: "UAE Dirham", symbolAr: "د.إ", symbolEn: "AED", rate: 3.67, flag: "🇦🇪" },
-  { code: "SDG", nameAr: "جنيه سوداني", nameEn: "Sudanese Pound", symbolAr: "ج.س", symbolEn: "SDG", rate: 600.0, flag: "🇸🇩" },
-  { code: "EUR", nameAr: "يورو أوروبي", nameEn: "Euro", symbolAr: "€", symbolEn: "€", rate: 0.92, flag: "🇪🇺" },
-  { code: "GBP", nameAr: "جنيه إسترليني", nameEn: "British Pound", symbolAr: "£", symbolEn: "£", rate: 0.78, flag: "🇬🇧" }
+  { code: "USD", nameAr: "دولار أمريكي", nameEn: "US Dollar", symbolAr: "$", symbolEn: "$", rate: 1.0, flag: "USD" },
+  { code: "EGP", nameAr: "جنيه مصري", nameEn: "Egyptian Pound", symbolAr: "ج.م", symbolEn: "EGP", rate: 50.0, flag: "EGP" },
+  { code: "SAR", nameAr: "ريال سعودي", nameEn: "Saudi Riyal", symbolAr: "ر.س", symbolEn: "SAR", rate: 3.75, flag: "SAR" },
+  { code: "AED", nameAr: "درهم إماراتي", nameEn: "UAE Dirham", symbolAr: "د.إ", symbolEn: "AED", rate: 3.67, flag: "AED" },
+  { code: "SDG", nameAr: "جنيه سوداني", nameEn: "Sudanese Pound", symbolAr: "ج.س", symbolEn: "SDG", rate: 600.0, flag: "SDG" },
+  { code: "EUR", nameAr: "يورو أوروبي", nameEn: "Euro", symbolAr: "€", symbolEn: "€", rate: 0.92, flag: "EUR" },
+  { code: "GBP", nameAr: "جنيه إسترليني", nameEn: "British Pound", symbolAr: "£", symbolEn: "£", rate: 0.78, flag: "GBP" }
 ];
 
 const COUNTRY_FLAGS: Record<string, string> = {
-  EG: "🇪🇬",
-  SA: "🇸🇦",
-  AE: "🇦🇪",
-  SD: "🇸🇩",
-  KW: "🇰🇼",
-  QA: "🇶🇦",
-  JO: "🇯🇴",
-  IQ: "🇮🇶",
-  DZ: "🇩🇿",
-  MA: "🇲🇦",
-  TN: "🇹🇳",
-  LY: "🇱🇾",
-  OM: "🇴🇲",
-  BH: "🇧🇭",
-  PS: "🇵🇸",
-  YE: "🇾🇪",
-  SY: "🇸🇾",
-  LB: "🇱🇧",
-  TR: "🇹🇷",
-  US: "🇺🇸",
-  GB: "🇬🇧",
-  DE: "🇩🇪",
-  FR: "🇫🇷",
-  CA: "🇨🇦"
+  EG: "EG",
+  SA: "SA",
+  AE: "AE",
+  SD: "SD",
+  KW: "KW",
+  QA: "QA",
+  JO: "JO",
+  IQ: "IQ",
+  DZ: "DZ",
+  MA: "MA",
+  TN: "TN",
+  LY: "LY",
+  OM: "OM",
+  BH: "BH",
+  PS: "PS",
+  YE: "YE",
+  SY: "SY",
+  LB: "LB",
+  TR: "TR",
+  US: "US",
+  GB: "GB",
+  DE: "DE",
+  FR: "FR",
+  CA: "CA"
 };
 
 export default function Navbar({ lang, dict }: NavbarProps) {
@@ -233,6 +233,7 @@ export default function Navbar({ lang, dict }: NavbarProps) {
               {/* Reseller Pricing Dropdown */}
               <div className="relative group">
                 <button 
+                  aria-label={dict.resellerPricing || (lang === "ar" ? "قائمة الأسعار والخدمات" : "Reseller Pricing")}
                   className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
                     isActive("/pricing") 
                       ? "bg-primary text-on-primary font-bold shadow-[0_0_12px_rgba(45,212,191,0.3)]" 
@@ -325,6 +326,7 @@ export default function Navbar({ lang, dict }: NavbarProps) {
             {/* Language Switcher Pill */}
             <Link 
               href={switchLanguage()} 
+              aria-label={lang === "ar" ? "Switch language to English" : "التبديل إلى اللغة العربية"}
               className="flex items-center gap-1.5 px-3.5 py-2 rounded-full border border-outline-variant/30 bg-surface-container-low/60 text-on-surface-variant hover:text-primary hover:border-primary/50 hover:bg-primary/10 transition-all duration-200 group text-xs font-bold"
               title={lang === "ar" ? "Switch to English" : "التبديل للعربية"}
             >
@@ -337,13 +339,16 @@ export default function Navbar({ lang, dict }: NavbarProps) {
               <div className="relative">
                 <button
                   type="button"
+                  aria-label={userSession.fullName || userSession.username || (lang === "ar" ? "قائمة الحساب الشخصي" : "User Profile Menu")}
                   onClick={() => setUserDropdownOpen(!userDropdownOpen)}
                   className="flex items-center gap-3 p-1.5 pr-4 rounded-full bg-surface-container-high/80 border border-primary/40 hover:border-primary text-on-surface transition-all shadow-[0_0_15px_rgba(45,212,191,0.15)] group"
                 >
                   <div className="flex flex-col text-end">
                     <span className="text-xs font-bold text-on-surface flex items-center gap-1.5 justify-end">
                       {COUNTRY_FLAGS[userSession.country || "EG"] && (
-                        <span>{COUNTRY_FLAGS[userSession.country || "EG"]}</span>
+                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-surface-container-highest font-mono text-primary font-bold">
+                          {COUNTRY_FLAGS[userSession.country || "EG"]}
+                        </span>
                       )}
                       <span>{userSession.fullName || userSession.username}</span>
                     </span>
@@ -492,6 +497,7 @@ export default function Navbar({ lang, dict }: NavbarProps) {
           <div className="lg:hidden flex items-center gap-2.5">
             <Link 
               href={switchLanguage()} 
+              aria-label={lang === "ar" ? "Switch language to English" : "التبديل إلى اللغة العربية"}
               className="flex items-center gap-1 px-3 py-1.5 rounded-full border border-outline-variant/30 bg-surface-container-low text-on-surface-variant hover:text-primary transition-colors text-xs font-bold"
             >
               <span className="material-symbols-outlined text-xs text-primary">language</span>

@@ -1091,7 +1091,13 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
 
           {/* Selected Service Details Card */}
           <div className="min-h-[110px]">
-            {selectedService ? (
+            {loadingServices ? (
+              <div className="p-5 rounded-2xl bg-surface-container-high/40 border border-outline-variant/20 animate-pulse space-y-3">
+                <div className="h-4 bg-surface-container-highest/60 rounded w-1/3" />
+                <div className="h-6 bg-surface-container-highest/60 rounded w-2/3" />
+                <div className="h-4 bg-surface-container-highest/60 rounded w-1/2" />
+              </div>
+            ) : selectedService ? (
               <div className="p-5 rounded-2xl bg-surface-container-high/60 border border-outline-variant/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div className="space-y-2">
                   {/* Category & Group/Package Badges */}
@@ -1407,9 +1413,9 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
                       <span className="material-symbols-outlined text-lg">pin</span>
                     </span>
                     <div>
-                      <h5 className="text-xs font-bold text-on-surface uppercase tracking-wider">
+                      <h4 className="text-xs font-bold text-on-surface uppercase tracking-wider">
                         {lang === 'ar' ? 'الكمية المطلوبة (Quantity)' : 'Required Quantity'}
-                      </h5>
+                      </h4>
                       <p className="text-[11px] text-on-surface-variant">
                         {lang === 'ar'
                           ? `أقل كمية: ${minQty} ${maxQty > 0 ? `| أقصى كمية: ${maxQty}` : '| بدون حد أقصى'}`

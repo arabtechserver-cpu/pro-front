@@ -24,7 +24,7 @@ const ALL_COUNTRIES: Country[] = [
     code: "EG",
     nameAr: "مصر",
     nameEn: "Egypt",
-    flag: "🇪🇬",
+    flag: "EG",
     dialCode: "+20",
     walletsAr: ["فودافون كاش (Vodafone Cash)", "إنستا باي (InstaPay)", "أورنج كاش (Orange Cash)", "اتصالات كاش (Etisalat Cash)", "وي باي (WE Pay)", "تحويل بنكي مصري"],
     walletsEn: ["Vodafone Cash", "InstaPay", "Orange Cash", "Etisalat Cash", "WE Pay", "Egyptian Bank Transfer"]
@@ -33,7 +33,7 @@ const ALL_COUNTRIES: Country[] = [
     code: "SA",
     nameAr: "السعودية",
     nameEn: "Saudi Arabia",
-    flag: "🇸🇦",
+    flag: "SA",
     dialCode: "+966",
     walletsAr: ["STC Pay", "Urpay", "بطاقة مدى (Mada)", "Apple Pay", "تحويل بنكي محلي (راجحي/أهلي)"],
     walletsEn: ["STC Pay", "Urpay", "Mada Card", "Apple Pay", "Local Bank Transfer (Rajhi/SNB)"]
@@ -42,7 +42,7 @@ const ALL_COUNTRIES: Country[] = [
     code: "AE",
     nameAr: "الإمارات العربية المتحدة",
     nameEn: "United Arab Emirates",
-    flag: "🇦🇪",
+    flag: "AE",
     dialCode: "+971",
     walletsAr: ["Binance Pay", "Apple Pay", "بطاقات فيزا / ماستركارد", "تحويل بنكي إماراتي"],
     walletsEn: ["Binance Pay", "Apple Pay", "Visa / Mastercard", "UAE Bank Transfer"]
@@ -51,7 +51,7 @@ const ALL_COUNTRIES: Country[] = [
     code: "SD",
     nameAr: "السودان",
     nameEn: "Sudan",
-    flag: "🇸🇩",
+    flag: "SD",
     dialCode: "+249",
     walletsAr: ["بنكك (بنك الخرطوم - Bankak)", "فوري (Fawry Sudan)", "USDT كريبتو"],
     walletsEn: ["Bankak (Bank of Khartoum)", "Fawry Sudan", "USDT Crypto"]
@@ -60,7 +60,7 @@ const ALL_COUNTRIES: Country[] = [
     code: "KW",
     nameAr: "الكويت",
     nameEn: "Kuwait",
-    flag: "🇰🇼",
+    flag: "KW",
     dialCode: "+965",
     walletsAr: ["K-Net (كي نت)", "Apple Pay", "تحويل بنكي كويتي"],
     walletsEn: ["K-Net", "Apple Pay", "Kuwaiti Bank Transfer"]
@@ -69,7 +69,7 @@ const ALL_COUNTRIES: Country[] = [
     code: "QA",
     nameAr: "قطر",
     nameEn: "Qatar",
-    flag: "🇶🇦",
+    flag: "QA",
     dialCode: "+974",
     walletsAr: ["iPay Qatar", "Apple Pay", "بطاقة فيزا/ماستر", "تحويل بنكي قطري"],
     walletsEn: ["iPay Qatar", "Apple Pay", "Visa / Mastercard", "Qatari Bank Transfer"]
@@ -78,7 +78,7 @@ const ALL_COUNTRIES: Country[] = [
     code: "JO",
     nameAr: "الأردن",
     nameEn: "Jordan",
-    flag: "🇯🇴",
+    flag: "JO",
     dialCode: "+962",
     walletsAr: ["زين كاش الأردن (Zain Cash JO)", "اي فواتيركم (eFAWATEERcom)", "دينارك (Dinarak)", "محفظة أورانج كاش"],
     walletsEn: ["Zain Cash JO", "eFAWATEERcom", "Dinarak", "Orange Money JO"]
@@ -87,7 +87,7 @@ const ALL_COUNTRIES: Country[] = [
     code: "IQ",
     nameAr: "العراق",
     nameEn: "Iraq",
-    flag: "🇮🇶",
+    flag: "IQ",
     dialCode: "+964",
     walletsAr: ["زين كاش العراق (Zain Cash IQ)", "آسيا حوالة (Asiahawala)", "ماستركارد النخيل / كي كارد", "محفظة FastPay"],
     walletsEn: ["Zain Cash IQ", "Asiahawala", "Qi Card / Qi Master", "FastPay Wallet"]
@@ -96,7 +96,7 @@ const ALL_COUNTRIES: Country[] = [
     code: "DZ",
     nameAr: "الجزائر",
     nameEn: "Algeria",
-    flag: "🇩🇿",
+    flag: "DZ",
     dialCode: "+213",
     walletsAr: ["بريدي موب (BaridiMob)", "CCP الجزائر", "Wise / Paysera"],
     walletsEn: ["BaridiMob", "Algeria CCP", "Wise / Paysera"]
@@ -105,7 +105,7 @@ const ALL_COUNTRIES: Country[] = [
     code: "MA",
     nameAr: "المغرب",
     nameEn: "Morocco",
-    flag: "🇲🇦",
+    flag: "MA",
     dialCode: "+212",
     walletsAr: ["Wafacash (وفاكاش)", "CIH Bank (بنك CIH)", "التجاري وفا بنك", "BMCE Direct"],
     walletsEn: ["Wafacash", "CIH Bank", "Attijariwafa Bank", "BMCE Direct"]
@@ -114,7 +114,7 @@ const ALL_COUNTRIES: Country[] = [
     code: "TN",
     nameAr: "تونس",
     nameEn: "Tunisia",
-    flag: "🇹🇳",
+    flag: "TN",
     dialCode: "+216",
     walletsAr: ["D17 البريد التونسي", "Sobflous", "تحويل بنكي تونسي"],
     walletsEn: ["D17 La Poste Tunisienne", "Sobflous", "Tunisian Bank Transfer"]
@@ -123,7 +123,7 @@ const ALL_COUNTRIES: Country[] = [
     code: "LY",
     nameAr: "ليبيا",
     nameEn: "Libya",
-    flag: "🇱🇾",
+    flag: "LY",
     dialCode: "+218",
     walletsAr: ["سداد (Sadad Libya)", "تداول (Tadawul)", "موبي كاش (MobiCash)", "كروت مدار / ليبيانا"],
     walletsEn: ["Sadad Libya", "Tadawul", "MobiCash", "Madar / Libyana Cards"]
@@ -132,7 +132,7 @@ const ALL_COUNTRIES: Country[] = [
     code: "OM",
     nameAr: "عُمان",
     nameEn: "Oman",
-    flag: "🇴🇲",
+    flag: "OM",
     dialCode: "+968",
     walletsAr: ["Thawani Pay (محفظة ثواني)", "BenefitPay Oman", "تحويل بنكي عماني"],
     walletsEn: ["Thawani Pay", "BenefitPay Oman", "Omani Bank Transfer"]
@@ -141,7 +141,7 @@ const ALL_COUNTRIES: Country[] = [
     code: "BH",
     nameAr: "البحرين",
     nameEn: "Bahrain",
-    flag: "🇧🇭",
+    flag: "BH",
     dialCode: "+973",
     walletsAr: ["BenefitPay (بنفت باي)", "STC Pay Bahrain", "Apple Pay"],
     walletsEn: ["BenefitPay", "STC Pay Bahrain", "Apple Pay"]
@@ -150,7 +150,7 @@ const ALL_COUNTRIES: Country[] = [
     code: "PS",
     nameAr: "فلسطين",
     nameEn: "Palestine",
-    flag: "🇵🇸",
+    flag: "PS",
     dialCode: "+970",
     walletsAr: ["محفظة جوال باي (Jawwal Pay)", "محفظة بال باي (PalPay)", "تحويل بنك فلسطين"],
     walletsEn: ["Jawwal Pay", "PalPay", "Bank of Palestine Transfer"]
@@ -159,7 +159,7 @@ const ALL_COUNTRIES: Country[] = [
     code: "YE",
     nameAr: "اليمن",
     nameEn: "Yemen",
-    flag: "🇾🇪",
+    flag: "YE",
     dialCode: "+967",
     walletsAr: ["جوال سبأ (Kuraimi / الكريمي)", "محفظة كاش", "جيب (Jeeb)"],
     walletsEn: ["Kuraimi Express", "Cash Wallet Yemen", "Jeeb Wallet"]
@@ -168,7 +168,7 @@ const ALL_COUNTRIES: Country[] = [
     code: "SY",
     nameAr: "سوريا",
     nameEn: "Syria",
-    flag: "🇸🇾",
+    flag: "SY",
     dialCode: "+963",
     walletsAr: ["سيريتل كاش (Syriatel Cash)", "كاش موبايل (MTN Cash)", "USDT الرقمي"],
     walletsEn: ["Syriatel Cash", "MTN Cash Syria", "USDT Crypto"]
@@ -177,7 +177,7 @@ const ALL_COUNTRIES: Country[] = [
     code: "LB",
     nameAr: "لبنان",
     nameEn: "Lebanon",
-    flag: "🇱🇧",
+    flag: "LB",
     dialCode: "+961",
     walletsAr: ["Whish Money", "OMT Card / Cash", "USDT الرقمي"],
     walletsEn: ["Whish Money", "OMT Cash", "USDT Crypto"]
@@ -186,7 +186,7 @@ const ALL_COUNTRIES: Country[] = [
     code: "TR",
     nameAr: "تركيا",
     nameEn: "Turkey",
-    flag: "🇹🇷",
+    flag: "TR",
     dialCode: "+90",
     walletsAr: ["Papara (بابارا)", "Ininal Card", "تحويل زراعات بنك (Ziraat Bank)"],
     walletsEn: ["Papara", "Ininal Card", "Ziraat Bank Transfer"]
@@ -195,7 +195,7 @@ const ALL_COUNTRIES: Country[] = [
     code: "US",
     nameAr: "الولايات المتحدة",
     nameEn: "United States",
-    flag: "🇺🇸",
+    flag: "US",
     dialCode: "+1",
     walletsAr: ["Zelle", "Venmo", "CashApp", "Apple Pay", "Credit Card / Stripe"],
     walletsEn: ["Zelle", "Venmo", "CashApp", "Apple Pay", "Credit Card / Stripe"]
@@ -204,7 +204,7 @@ const ALL_COUNTRIES: Country[] = [
     code: "GB",
     nameAr: "المملكة المتحدة",
     nameEn: "United Kingdom",
-    flag: "🇬🇧",
+    flag: "GB",
     dialCode: "+44",
     walletsAr: ["Revolut", "Monzo", "Faster Payments UK", "Apple Pay"],
     walletsEn: ["Revolut", "Monzo", "Faster Payments UK", "Apple Pay"]
@@ -213,7 +213,7 @@ const ALL_COUNTRIES: Country[] = [
     code: "DE",
     nameAr: "ألمانيا",
     nameEn: "Germany",
-    flag: "🇩🇪",
+    flag: "DE",
     dialCode: "+49",
     walletsAr: ["SEPA Instant Transfer", "PayPal Europe", "Revolut / N26"],
     walletsEn: ["SEPA Instant Transfer", "PayPal Europe", "Revolut / N26"]
@@ -222,7 +222,7 @@ const ALL_COUNTRIES: Country[] = [
     code: "FR",
     nameAr: "فرنسا",
     nameEn: "France",
-    flag: "🇫🇷",
+    flag: "FR",
     dialCode: "+33",
     walletsAr: ["Lydia Pay", "SEPA Instant Transfer", "Carte Bancaire"],
     walletsEn: ["Lydia Pay", "SEPA Instant Transfer", "Carte Bancaire"]
@@ -231,7 +231,7 @@ const ALL_COUNTRIES: Country[] = [
     code: "CA",
     nameAr: "كندا",
     nameEn: "Canada",
-    flag: "🇨🇦",
+    flag: "CA",
     dialCode: "+1",
     walletsAr: ["Interac e-Transfer", "Apple Pay", "Credit Card"],
     walletsEn: ["Interac e-Transfer", "Apple Pay", "Credit Card"]
@@ -240,7 +240,7 @@ const ALL_COUNTRIES: Country[] = [
     code: "OTHER",
     nameAr: "باقي دول العالم",
     nameEn: "Other International Countries",
-    flag: "",
+    flag: "INTL",
     dialCode: "+0",
     walletsAr: ["USDT TRC20 / BEP20 (Cryptocurrency)", "Binance Pay", "Perfect Money", "Payeer", "Credit / Debit Card"],
     walletsEn: ["USDT TRC20 / BEP20 (Cryptocurrency)", "Binance Pay", "Perfect Money", "Payeer", "Credit / Debit Card"]
@@ -572,8 +572,8 @@ export default function RegisterClient({ lang, dict }: { lang: Locale; dict: any
                 <label htmlFor="reg-phone" className="text-xs font-label-sm text-on-surface-variant uppercase tracking-wider">
                   {dict.register.phone || (lang === "ar" ? "رقم الهاتف / الواتساب" : "Phone / WhatsApp Number")}
                 </label>
-                <span className="text-[11px] text-primary font-mono font-bold flex items-center gap-1 dir-ltr bg-primary/10 px-2 py-0.5 rounded border border-primary/20">
-                  <span>{selectedCountry.flag}</span>
+                <span className="text-[11px] text-primary font-mono font-bold flex items-center gap-1.5 dir-ltr bg-primary/10 px-2 py-0.5 rounded border border-primary/20">
+                  <span className="px-1 rounded bg-primary/20 text-[10px]">{selectedCountry.flag}</span>
                   <span>{selectedCountry.dialCode}</span>
                 </span>
               </div>
@@ -694,7 +694,7 @@ export default function RegisterClient({ lang, dict }: { lang: Locale; dict: any
                 className="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-lg py-3 px-4 text-on-surface flex items-center justify-between hover:border-primary/50 focus:outline-none transition-all"
               >
                 <div className="flex items-center gap-2 text-sm font-medium">
-                  <span className="text-xl">{selectedCountry.flag}</span>
+                  <span className="px-2 py-0.5 rounded bg-surface-container-high border border-outline-variant/30 text-primary font-mono text-xs font-bold">{selectedCountry.flag}</span>
                   <span>{lang === "ar" ? selectedCountry.nameAr : selectedCountry.nameEn}</span>
                   <span className="text-xs text-on-surface-variant">({selectedCountry.dialCode})</span>
                 </div>
@@ -741,7 +741,7 @@ export default function RegisterClient({ lang, dict }: { lang: Locale; dict: any
                           }`}
                         >
                           <div className="flex items-center gap-2.5">
-                            <span className="text-lg">{country.flag}</span>
+                            <span className="px-1.5 py-0.5 rounded bg-surface-container-high border border-outline-variant/30 text-primary font-mono text-xs font-bold">{country.flag}</span>
                             <span>{lang === "ar" ? country.nameAr : country.nameEn}</span>
                           </div>
                           <span className="text-[10px] text-on-surface-variant">{country.dialCode}</span>

@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import { Inter, Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google";
 import "../../globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { getDictionary } from "@/i18n/get-dictionary";
-import { Locale } from "@/i18n/config";
+import { Locale, i18n } from "@/i18n/config";
 import ClientWidgets from "@/components/ClientWidgets";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
@@ -13,6 +14,9 @@ const jetbrains = JetBrains_Mono({ subsets: ["latin"], variable: "--font-jetbrai
 
 export async function generateMetadata(props: { params: Promise<{ lang: string }> }): Promise<Metadata> {
   const params = await props.params;
+  if (!i18n.locales.includes(params.lang as Locale)) {
+    notFound();
+  }
   const isAr = params.lang === "ar";
   const siteTitle = isAr
     ? "عرب تك برو سيرفر | منصة فك شفرات وتفعيل الهواتف"
@@ -101,10 +105,11 @@ export async function generateMetadata(props: { params: Promise<{ lang: string }
       ],
     },
     alternates: {
-      canonical: "https://arabtechproserver.tech",
+      canonical: `https://arabtechproserver.tech/${params.lang}`,
       languages: {
         "ar": "https://arabtechproserver.tech/ar",
         "en": "https://arabtechproserver.tech/en",
+        "x-default": "https://arabtechproserver.tech",
       },
     },
     icons: {
@@ -128,6 +133,9 @@ export default async function RootLayout(
   }>
 ) {
   const params = await props.params;
+  if (!i18n.locales.includes(params.lang as Locale)) {
+    notFound();
+  }
 
   const {
     children
@@ -255,7 +263,6 @@ export default async function RootLayout(
       <head>
         <meta name="google-site-verification" content="N34n3oI-P5elZmLFHgFqp_BK93EijixhnIHEj_2oGnI" />
         <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
-        <link rel="canonical" href={`https://arabtechproserver.tech/${lang}`} />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         {/* Preload Local Material Symbols Font for Instant Zero-Render-Blocking Display */}
         <link

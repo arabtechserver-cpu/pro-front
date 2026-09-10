@@ -18,6 +18,7 @@ export default async function Contact(props: { params: Promise<{ lang: Locale }>
         </p>
       </div>
 
+      <h2 className="sr-only">{params.lang === "ar" ? "قنوات الدعم الفني المباشر" : "Direct Support Channels"}</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         {/* Support Channel 1 */}
         <a href="https://wa.me/16728972935" target="_blank" rel="noopener noreferrer" className="glass-card rounded-2xl p-5 text-center flex flex-col items-center gap-3 hover:-translate-y-1.5 hover:border-emerald-500/50 transition-all duration-300 shadow-md group">
