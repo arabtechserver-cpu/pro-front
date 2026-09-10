@@ -97,7 +97,7 @@ async function handler(
       // Cache the recovered URL as well, so the next request skips a stale target.
       if (cachedBackendUrl !== baseUrl) {
         cachedBackendUrl = baseUrl;
-        console.log(`[API Proxy] ✅ Backend found at: ${baseUrl} — caching for future requests`);
+        console.log(`[API Proxy] Backend found at: ${baseUrl} - caching for future requests`);
       }
 
       const responseBody = await res.arrayBuffer();
@@ -109,18 +109,18 @@ async function handler(
       lastError = err;
       const msg = err instanceof Error ? err.message : String(err);
       if (!msg.includes('ECONNREFUSED') && !msg.includes('ENOTFOUND')) {
-        console.warn(`[API Proxy] ⚠️ ${baseUrl} failed: ${msg}`);
+        console.warn(`[API Proxy] ${baseUrl} failed: ${msg}`);
       }
     }
   }
 
   // If cached URL failed (backend restarted?), clear cache and let next request retry
   if (cachedBackendUrl) {
-    console.warn(`[API Proxy] ⚠️ Cached backend ${cachedBackendUrl} is down — resetting cache`);
+    console.warn(`[API Proxy] Cached backend ${cachedBackendUrl} is down - resetting cache`);
     cachedBackendUrl = null;
   }
 
-  console.error(`[API Proxy] ❌ All backend URLs failed for /api/${path}`);
+  console.error(`[API Proxy] All backend URLs failed for /api/${path}`);
   return NextResponse.json(
     {
       error: 'Backend unavailable',

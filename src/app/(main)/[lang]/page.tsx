@@ -1,31 +1,17 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import dynamic from "next/dynamic";
 import { getDictionary } from "@/i18n/get-dictionary";
 import { Locale, i18n } from "@/i18n/config";
 import AmrrHeroSection from "@/components/AmrrHeroSection";
 import AmrrStatsSection from "@/components/AmrrStatsSection";
 import AmrrCountersSection from "@/components/AmrrCountersSection";
-
-const HexagonalFeatures = dynamic(() => import("@/components/HexagonalFeatures"), {
-  loading: () => <div className="h-64" />
-});
-const PackagesSlider = dynamic(() => import("@/components/PackagesSlider"), {
-  loading: () => <div className="h-64" />
-});
-const CampaignSlider = dynamic(() => import("@/components/CampaignSlider"), {
-  loading: () => <div className="h-48" />
-});
-const FaqSection = dynamic(() => import("@/components/FaqSection"), {
-  loading: () => <div className="h-64" />
-});
-const SupportCtaSection = dynamic(() => import("@/components/SupportCtaSection"), {
-  loading: () => <div className="h-48" />
-});
-const NewsletterSection = dynamic(() => import("@/components/NewsletterSection"), {
-  loading: () => <div className="h-40" />
-});
+import HexagonalFeatures from "@/components/HexagonalFeatures";
+import PackagesSlider from "@/components/PackagesSlider";
+import CampaignSlider from "@/components/CampaignSlider";
+import FaqSection from "@/components/FaqSection";
+import SupportCtaSection from "@/components/SupportCtaSection";
+import NewsletterSection from "@/components/NewsletterSection";
 
 async function getHomepageConfig() {
   const candidates = [
@@ -76,17 +62,17 @@ export async function generateMetadata(props: { params: Promise<{ lang: Locale }
     title,
     description,
     keywords: [
-      "عرب تيك سيرفر",
-      "عرب تك سيرفر",
-      "سيرفر عرب تيك",
-      "سيرفر عرب تك",
-      "عرب تيك برو سيرفر",
       "عرب تك برو سيرفر",
-      "عرب تيك",
+      "عرب تك سيرفر",
+      "سيرفر عرب تك",
+      "سيرفر عرب تك",
+      "عرب تك برو سيرفر",
+      "عرب تك برو سيرفر",
+      "عرب تك",
       "عرب تك",
       "Arab Tech Pro Server",
-      "Arab Tech Server Pro",
-      "Arab Tech Server",
+      "Arab Tech Pro Server Pro",
+      "Arab Tech Pro Server",
       "arabtechproserver.tech",
       "سيرفر فك الهواتف",
       "فك شبكات",
@@ -97,13 +83,13 @@ export async function generateMetadata(props: { params: Promise<{ lang: Locale }
       title,
       description,
       url: `https://arabtechproserver.tech/${params.lang}`,
-      siteName: isAr ? "عرب تك برو سيرفر (عرب تيك سيرفر) - Arab Tech Pro Server" : "Arab Tech Pro Server",
+      siteName: isAr ? "عرب تك برو سيرفر (عرب تك برو سيرفر) - Arab Tech Pro Server" : "Arab Tech Pro Server",
       images: [
         {
           url: shareImg,
           width: 1200,
           height: 630,
-          alt: isAr ? "عرب تك برو سيرفر - عرب تيك سيرفر" : "Arab Tech Pro Server",
+          alt: isAr ? "عرب تك برو سيرفر - عرب تك برو سيرفر" : "Arab Tech Pro Server",
         },
       ],
       type: "website",
@@ -272,19 +258,19 @@ export default async function Home(props: { params: Promise<{ lang: Locale }> })
           __html: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "WebSite",
-            "name": isAr ? "عرب تك برو سيرفر (عرب تيك سيرفر)" : "Arab Tech Pro Server",
+            "name": isAr ? "عرب تك برو سيرفر (عرب تك برو سيرفر)" : "Arab Tech Pro Server",
             "alternateName": [
-              "عرب تيك سيرفر",
-              "عرب تك سيرفر",
-              "سيرفر عرب تيك",
-              "سيرفر عرب تك",
-              "عرب تيك برو سيرفر",
               "عرب تك برو سيرفر",
-              "عرب تيك",
+              "عرب تك سيرفر",
+              "سيرفر عرب تك",
+              "سيرفر عرب تك",
+              "عرب تك برو سيرفر",
+              "عرب تك برو سيرفر",
+              "عرب تك",
               "عرب تك",
               "Arab Tech Pro Server",
-              "Arab Tech Server Pro",
-              "Arab Tech Server"
+              "Arab Tech Pro Server Pro",
+              "Arab Tech Pro Server"
             ],
             "url": "https://arabtechproserver.tech",
             "potentialAction": {
@@ -323,7 +309,7 @@ export default async function Home(props: { params: Promise<{ lang: Locale }> })
                 <span>{isAr ? "فك شفرات رسمي وتخطي iCloud & FRP لجميع الشبكات والموديلات" : "Official factory unlock & iCloud / FRP bypass worldwide"}</span>
               </span>
 
-              <span className="flex items-center gap-2 text-emerald-400 font-semibold shrink-0">
+              <span className="flex items-center gap-2 text-violet-400 font-semibold shrink-0">
                 <i className="fas fa-tags"></i>
                 <span>{isAr ? "أسعار جملة وتخفيضات خاصة لأصحاب المحلات والوكلاء" : "Exclusive wholesale pricing for resellers & repair shops"}</span>
               </span>
@@ -364,7 +350,7 @@ export default async function Home(props: { params: Promise<{ lang: Locale }> })
                 <span>{isAr ? "فك شفرات رسمي وتخطي iCloud & FRP لجميع الشبكات والموديلات" : "Official factory unlock & iCloud / FRP bypass worldwide"}</span>
               </span>
 
-              <span className="flex items-center gap-2 text-emerald-400 font-semibold shrink-0">
+              <span className="flex items-center gap-2 text-violet-400 font-semibold shrink-0">
                 <i className="fas fa-tags"></i>
                 <span>{isAr ? "أسعار جملة وتخفيضات خاصة لأصحاب المحلات والوكلاء" : "Exclusive wholesale pricing for resellers & repair shops"}</span>
               </span>
@@ -406,29 +392,29 @@ export default async function Home(props: { params: Promise<{ lang: Locale }> })
       <section className="w-full cyber-container">
         <h2 className="sr-only">{isAr ? "مسارات الخدمات الرئيسية" : "Main Service Lanes"}</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-          <Link href={imeiUrl} data-aos="fade-up" data-aos-delay="100" className="glass-card p-5 sm:p-6 rounded-2xl border border-cyan-500/30 hover:border-emerald-400/80 active:border-emerald-400 active:scale-[0.97] active:shadow-[0_0_30px_rgba(52,211,153,0.5)] group transition-all relative overflow-hidden flex flex-col gap-3 sm:gap-4 shadow-xl">
+          <Link href={imeiUrl} data-aos="fade-up" data-aos-delay="100" suppressHydrationWarning className="glass-card p-5 sm:p-6 rounded-2xl border border-cyan-500/30 hover:border-violet-400/80 active:border-violet-400 active:scale-[0.97] active:shadow-[0_0_30px_rgba(139,92,246,0.5)] group transition-all relative overflow-hidden flex flex-col gap-3 sm:gap-4 shadow-xl">
             <div 
               className="absolute inset-0 bg-cover bg-center opacity-40 group-hover:opacity-75 transition-opacity duration-500 z-0 pointer-events-none" 
               style={{ backgroundImage: "url('/images/promo_imei.webp')" }}
             ></div>
-            <div className="absolute inset-0 bg-gradient-to-t from-[#070c1a]/95 via-[#070c1a]/50 to-transparent z-0 pointer-events-none"></div>
-            <div className="absolute top-3 end-3 w-2 h-2 rounded-full bg-emerald-400/40 group-hover:bg-emerald-400 group-hover:shadow-[0_0_8px_#34d399] transition-all"></div>
-            <div className="relative z-10 w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400 text-lg sm:text-xl group-hover:bg-emerald-500 group-hover:text-slate-950 group-hover:scale-110 group-active:scale-95 transition-all shadow-md">
+            <div className="absolute inset-0 bg-gradient-to-t from-[#050814]/95 via-[#050814]/50 to-transparent z-0 pointer-events-none"></div>
+            <div className="absolute top-3 end-3 w-2 h-2 rounded-full bg-violet-400/40 group-hover:bg-violet-400 group-hover:shadow-[0_0_8px_#a78bfa] transition-all"></div>
+            <div className="relative z-10 w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-violet-500/15 border border-violet-500/30 flex items-center justify-center text-violet-400 text-lg sm:text-xl group-hover:bg-violet-500 group-hover:text-slate-950 group-hover:scale-110 group-active:scale-95 transition-all shadow-md">
               <i className="fas fa-fingerprint"></i>
             </div>
             <div className="relative z-10">
-              <h3 className="font-bold text-base sm:text-lg text-white mb-1 group-hover:text-emerald-400 transition-colors">{imeiTitle || "IMEI Services"}</h3>
+              <h3 className="font-bold text-base sm:text-lg text-white mb-1 group-hover:text-violet-400 transition-colors">{imeiTitle || "IMEI Services"}</h3>
               <p className="text-xs sm:text-sm text-slate-300">{imeiDesc || "Unlocks, checks, and device services"}</p>
             </div>
-            <i className="fas fa-arrow-right text-emerald-400 absolute bottom-5 sm:bottom-6 right-5 sm:right-6 opacity-0 group-hover:opacity-100 transform translate-x-[-10px] group-hover:translate-x-0 transition-all"></i>
+            <i className="fas fa-arrow-right text-violet-400 absolute bottom-5 sm:bottom-6 right-5 sm:right-6 opacity-0 group-hover:opacity-100 transform translate-x-[-10px] group-hover:translate-x-0 transition-all"></i>
           </Link>
 
-          <Link href={serverUrl} data-aos="fade-up" data-aos-delay="200" className="glass-card p-5 sm:p-6 rounded-2xl border border-cyan-500/30 hover:border-cyan-400/80 active:border-cyan-400 active:scale-[0.97] active:shadow-[0_0_30px_rgba(34,211,238,0.5)] group transition-all relative overflow-hidden flex flex-col gap-3 sm:gap-4 shadow-xl">
+          <Link href={serverUrl} data-aos="fade-up" data-aos-delay="200" suppressHydrationWarning className="glass-card p-5 sm:p-6 rounded-2xl border border-cyan-500/30 hover:border-cyan-400/80 active:border-cyan-400 active:scale-[0.97] active:shadow-[0_0_30px_rgba(34,211,238,0.5)] group transition-all relative overflow-hidden flex flex-col gap-3 sm:gap-4 shadow-xl">
             <div 
               className="absolute inset-0 bg-cover bg-center opacity-40 group-hover:opacity-75 transition-opacity duration-500 z-0 pointer-events-none" 
               style={{ backgroundImage: "url('/images/promo_server.webp')" }}
             ></div>
-            <div className="absolute inset-0 bg-gradient-to-t from-[#070c1a]/95 via-[#070c1a]/50 to-transparent z-0 pointer-events-none"></div>
+            <div className="absolute inset-0 bg-gradient-to-t from-[#050814]/95 via-[#050814]/50 to-transparent z-0 pointer-events-none"></div>
             <div className="absolute top-3 end-3 w-2 h-2 rounded-full bg-cyan-400/40 group-hover:bg-cyan-400 group-hover:shadow-[0_0_8px_#22d3ee] transition-all"></div>
             <div className="relative z-10 w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-cyan-500/15 border border-cyan-500/30 flex items-center justify-center text-cyan-400 text-lg sm:text-xl group-hover:bg-cyan-500 group-hover:text-slate-950 group-hover:scale-110 group-active:scale-95 transition-all shadow-md">
               <i className="fas fa-server"></i>
@@ -440,12 +426,12 @@ export default async function Home(props: { params: Promise<{ lang: Locale }> })
             <i className="fas fa-arrow-right text-cyan-400 absolute bottom-5 sm:bottom-6 right-5 sm:right-6 opacity-0 group-hover:opacity-100 transform translate-x-[-10px] group-hover:translate-x-0 transition-all"></i>
           </Link>
 
-          <Link href={remoteUrl} data-aos="fade-up" data-aos-delay="300" className="glass-card p-5 sm:p-6 rounded-2xl border border-cyan-500/30 hover:border-purple-400/80 active:border-purple-400 active:scale-[0.97] active:shadow-[0_0_30px_rgba(168,85,247,0.5)] group transition-all relative overflow-hidden flex flex-col gap-3 sm:gap-4 shadow-xl">
+          <Link href={remoteUrl} data-aos="fade-up" data-aos-delay="300" suppressHydrationWarning className="glass-card p-5 sm:p-6 rounded-2xl border border-cyan-500/30 hover:border-purple-400/80 active:border-purple-400 active:scale-[0.97] active:shadow-[0_0_30px_rgba(168,85,247,0.5)] group transition-all relative overflow-hidden flex flex-col gap-3 sm:gap-4 shadow-xl">
             <div 
               className="absolute inset-0 bg-cover bg-center opacity-40 group-hover:opacity-75 transition-opacity duration-500 z-0 pointer-events-none" 
               style={{ backgroundImage: "url('/images/promo_remote.webp')" }}
             ></div>
-            <div className="absolute inset-0 bg-gradient-to-t from-[#070c1a]/95 via-[#070c1a]/50 to-transparent z-0 pointer-events-none"></div>
+            <div className="absolute inset-0 bg-gradient-to-t from-[#050814]/95 via-[#050814]/50 to-transparent z-0 pointer-events-none"></div>
             <div className="absolute top-3 end-3 w-2 h-2 rounded-full bg-purple-400/40 group-hover:bg-purple-400 group-hover:shadow-[0_0_8px_#c084fc] transition-all"></div>
             <div className="relative z-10 w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-purple-500/15 border border-purple-500/30 flex items-center justify-center text-purple-400 text-lg sm:text-xl group-hover:bg-purple-500 group-hover:text-slate-950 group-hover:scale-110 group-active:scale-95 transition-all shadow-md">
               <i className="fas fa-broadcast-tower"></i>
@@ -457,12 +443,12 @@ export default async function Home(props: { params: Promise<{ lang: Locale }> })
             <i className="fas fa-arrow-right text-purple-400 absolute bottom-5 sm:bottom-6 right-5 sm:right-6 opacity-0 group-hover:opacity-100 transform translate-x-[-10px] group-hover:translate-x-0 transition-all"></i>
           </Link>
 
-          <Link href={storeUrl} data-aos="fade-up" data-aos-delay="400" className="glass-card p-5 sm:p-6 rounded-2xl border border-cyan-500/30 hover:border-amber-400/80 active:border-amber-400 active:scale-[0.97] active:shadow-[0_0_30px_rgba(251,191,36,0.5)] group transition-all relative overflow-hidden flex flex-col gap-3 sm:gap-4 shadow-xl">
+          <Link href={storeUrl} data-aos="fade-up" data-aos-delay="400" suppressHydrationWarning className="glass-card p-5 sm:p-6 rounded-2xl border border-cyan-500/30 hover:border-amber-400/80 active:border-amber-400 active:scale-[0.97] active:shadow-[0_0_30px_rgba(251,191,36,0.5)] group transition-all relative overflow-hidden flex flex-col gap-3 sm:gap-4 shadow-xl">
             <div 
               className="absolute inset-0 bg-cover bg-center opacity-40 group-hover:opacity-75 transition-opacity duration-500 z-0 pointer-events-none" 
               style={{ backgroundImage: "url('/images/promo_store.webp')" }}
             ></div>
-            <div className="absolute inset-0 bg-gradient-to-t from-[#070c1a]/95 via-[#070c1a]/50 to-transparent z-0 pointer-events-none"></div>
+            <div className="absolute inset-0 bg-gradient-to-t from-[#050814]/95 via-[#050814]/50 to-transparent z-0 pointer-events-none"></div>
             <div className="absolute top-3 end-3 w-2 h-2 rounded-full bg-amber-400/40 group-hover:bg-amber-400 group-hover:shadow-[0_0_8px_#fbbf24] transition-all"></div>
             <div className="relative z-10 w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-400 text-lg sm:text-xl group-hover:bg-amber-500 group-hover:text-slate-950 group-hover:scale-110 group-active:scale-95 transition-all shadow-md">
               <i className="fas fa-shopping-bag"></i>
@@ -477,13 +463,13 @@ export default async function Home(props: { params: Promise<{ lang: Locale }> })
       </section>
 
       {/* --- Tool Marquee --- */}
-      <section data-aos="fade-up" className="border-y border-cyan-500/20 bg-transparent py-6 sm:py-8 overflow-hidden relative">
+      <section data-aos="fade-up" suppressHydrationWarning className="border-y border-cyan-500/20 bg-transparent py-6 sm:py-8 overflow-hidden relative">
         <div className="absolute top-0 left-0 w-16 sm:w-32 h-full bg-gradient-to-r from-background to-transparent z-10 pointer-events-none"></div>
         <div className="absolute top-0 right-0 w-16 sm:w-32 h-full bg-gradient-to-l from-background to-transparent z-10 pointer-events-none"></div>
         
         <div className="cyber-container mb-3 sm:mb-4 flex justify-center">
-          <span className="bg-[#070c1a]/90 border border-cyan-500/30 px-3.5 sm:px-5 py-1.5 rounded-full text-[10px] sm:text-xs font-bold uppercase tracking-widest text-cyan-300 flex items-center gap-2 shadow-sm">
-            <i className="fas fa-certificate text-emerald-400"></i> Tool Network
+          <span className="bg-[#050814]/90 border border-cyan-500/30 px-3.5 sm:px-5 py-1.5 rounded-full text-[10px] sm:text-xs font-bold uppercase tracking-widest text-cyan-300 flex items-center gap-2 shadow-sm">
+            <i className="fas fa-certificate text-violet-400"></i> Tool Network
           </span>
         </div>
 
@@ -491,8 +477,8 @@ export default async function Home(props: { params: Promise<{ lang: Locale }> })
           <div className="flex w-max animate-marquee hover:[animation-play-state:paused] cursor-pointer select-none">
             <div className="flex shrink-0 items-center gap-8 sm:gap-12 px-6 text-base sm:text-xl font-bold text-white/90">
               {(hp?.toolMarquee || ["Chimera", "UnlockTool", "Borneo", "iRemoval Pro", "DFT Pro", "MobileSea Tool", "AMT", "Phoenix", "Cheetah", "FKey"]).map((tool: string, idx: number) => (
-                <span key={idx} className="flex items-center gap-3 text-cyan-300 hover:text-emerald-400 transition-colors shrink-0">
-                  <i className="fas fa-tools text-emerald-400"></i> {tool}
+                <span key={idx} className="flex items-center gap-3 text-cyan-300 hover:text-violet-400 transition-colors shrink-0">
+                  <i className="fas fa-tools text-violet-400"></i> {tool}
                 </span>
               ))}
             </div>
@@ -500,8 +486,8 @@ export default async function Home(props: { params: Promise<{ lang: Locale }> })
             {/* Repeat exact clone for continuous seamless loop */}
             <div className="flex shrink-0 items-center gap-8 sm:gap-12 px-6 text-base sm:text-xl font-bold text-white/90" aria-hidden="true">
               {(hp?.toolMarquee || ["Chimera", "UnlockTool", "Borneo", "iRemoval Pro", "DFT Pro", "MobileSea Tool", "AMT", "Phoenix", "Cheetah", "FKey"]).map((tool: string, idx: number) => (
-                <span key={`repeat-${idx}`} className="flex items-center gap-3 text-cyan-300 hover:text-emerald-400 transition-colors shrink-0">
-                  <i className="fas fa-tools text-emerald-400"></i> {tool}
+                <span key={`repeat-${idx}`} className="flex items-center gap-3 text-cyan-300 hover:text-violet-400 transition-colors shrink-0">
+                  <i className="fas fa-tools text-violet-400"></i> {tool}
                 </span>
               ))}
             </div>
@@ -510,80 +496,65 @@ export default async function Home(props: { params: Promise<{ lang: Locale }> })
       </section>
 
       {/* --- Feature Ribbon --- */}
-      <section data-aos="fade-up" className="w-full cyber-container">
+      <section data-aos="fade-up" suppressHydrationWarning className="w-full cyber-container">
         <h2 className="sr-only">{isAr ? "مميزات وموثوقية المنصة" : "Platform Trust & Features"}</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 divide-y md:divide-y-0 md:divide-x md:rtl:divide-x-reverse divide-cyan-500/20 curved-cockpit rounded-2xl sm:rounded-3xl p-5 sm:p-8 border-2 border-cyan-500/30 relative overflow-hidden backdrop-blur-xl shadow-2xl">
-          {/* Card 1: Official Distributor */}
-          <div className="group flex flex-col items-center text-center p-4 sm:p-5 rounded-2xl transition-all duration-300 hover:bg-surface-container-high/40 hover:-translate-y-1 active:scale-[0.97] relative">
+          {/* Card 1: Specialized Support Team */}
+          <div className="group flex flex-col items-center text-center p-4 sm:p-5 rounded-2xl transition-all duration-300 hover:bg-white/[0.03] hover:-translate-y-1 active:scale-[0.97] relative">
             <div className="relative mb-4">
-              {/* Outer Glow Pulse */}
-              <div className="absolute -inset-2 bg-gradient-to-r from-emerald-500/30 to-cyan-500/30 rounded-full blur-md opacity-60 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500 animate-pulse"></div>
-              {/* Icon Container */}
-              <div className="relative w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-emerald-500/20 via-surface-container to-cyan-500/10 flex items-center justify-center text-emerald-400 border border-emerald-500/40 shadow-[0_0_20px_rgba(16,185,129,0.25)] group-hover:rotate-6 group-hover:scale-105 group-active:scale-95 transition-transform duration-300">
-                <svg className="w-7 h-7 sm:w-8 sm:h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
-                </svg>
-                {/* Verified mini badge */}
+              <div className="absolute -inset-2 bg-gradient-to-r from-purple-500/30 to-violet-500/30 rounded-full blur-md opacity-60 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500 animate-pulse"></div>
+              <div className="relative w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-purple-500/20 via-[#0a0f24] to-purple-500/10 flex items-center justify-center text-purple-400 border border-purple-500/40 shadow-[0_0_20px_rgba(168,85,247,0.3)] group-hover:rotate-6 group-hover:scale-105 group-active:scale-95 transition-transform duration-300">
+                <i className="fas fa-headset text-2xl"></i>
                 <span className="absolute -top-1 -right-1 flex h-3.5 w-3.5">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-emerald-500 border border-surface"></span>
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-purple-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-purple-500 border border-[#060814]"></span>
                 </span>
               </div>
             </div>
-            <h3 className="font-bold text-lg sm:text-xl text-on-surface mb-1.5 group-hover:text-emerald-400 transition-colors">
-              {feat1Title || (isAr ? "موزع رسمي معتمد" : "Official distributor")}
+            <h3 className="font-bold text-lg sm:text-xl text-white mb-1.5 group-hover:text-purple-400 transition-colors">
+              {feat1Title || (isAr ? "فريق دعم متخصص" : "Specialized Support Team")}
             </h3>
-            <p className="text-on-surface-variant text-xs sm:text-sm max-w-xs leading-relaxed">
-              {feat1Desc || (isAr ? "وصول مباشر لأهم أدوات السوفت وير العالمية وباقات الجملة." : "Global tool access with reseller-ready bundles and transparent SLAs.")}
+            <p className="text-slate-300 text-xs sm:text-sm max-w-xs leading-relaxed">
+              {feat1Desc || (isAr ? "فريق دعم فني متواجد لمساعدتك والرد على كافة استفساراتك 24/7." : "Dedicated technical support team ready to assist you 24/7.")}
             </p>
           </div>
 
-          {/* Card 2: 100% Secure Payments */}
-          <div className="group flex flex-col items-center text-center p-4 sm:p-5 pt-6 md:pt-4 rounded-2xl transition-all duration-300 hover:bg-surface-container-high/40 hover:-translate-y-1 active:scale-[0.97] relative">
+          {/* Card 2: 100% Safe Commission & Security */}
+          <div className="group flex flex-col items-center text-center p-4 sm:p-5 pt-6 md:pt-4 rounded-2xl transition-all duration-300 hover:bg-white/[0.03] hover:-translate-y-1 active:scale-[0.97] relative">
             <div className="relative mb-4">
-              {/* Outer Glow Pulse */}
-              <div className="absolute -inset-2 bg-gradient-to-r from-amber-500/30 to-secondary/30 rounded-full blur-md opacity-60 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500 animate-pulse"></div>
-              {/* Icon Container */}
-              <div className="relative w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-secondary/20 via-surface-container to-amber-500/10 flex items-center justify-center text-secondary border border-secondary/40 shadow-[0_0_20px_rgba(45,212,191,0.25)] group-hover:-rotate-6 group-hover:scale-105 group-active:scale-95 transition-transform duration-300">
-                <svg className="w-7 h-7 sm:w-8 sm:h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-6.75 4.5h16.5a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5H4.5A2.25 2.25 0 002.25 6.75v12a2.25 2.25 0 002.25 2.25z" />
-                </svg>
-                {/* Instant flash badge */}
-                <span className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-secondary flex items-center justify-center text-surface text-[10px] font-bold border border-surface shadow">
-                  <span className="material-symbols-outlined text-[10px]">bolt</span>
+              <div className="absolute -inset-2 bg-gradient-to-r from-cyan-500/30 to-purple-500/30 rounded-full blur-md opacity-60 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500 animate-pulse"></div>
+              <div className="relative w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-cyan-500/20 via-[#0a0f24] to-purple-500/10 flex items-center justify-center text-cyan-400 border border-cyan-500/40 shadow-[0_0_20px_rgba(34,211,238,0.25)] group-hover:-rotate-6 group-hover:scale-105 group-active:scale-95 transition-transform duration-300">
+                <i className="fas fa-shield-alt text-2xl"></i>
+                <span className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-cyan-400 flex items-center justify-center text-[#060814] text-[10px] font-bold border border-[#060814] shadow">
+                  <i className="fas fa-check text-[9px]"></i>
                 </span>
               </div>
             </div>
-            <h3 className="font-bold text-lg sm:text-xl text-on-surface mb-1.5 group-hover:text-secondary transition-colors">
-              {feat2Title || (isAr ? "مدفوعات آمنة 100%" : "Secure payments")}
+            <h3 className="font-bold text-lg sm:text-xl text-white mb-1.5 group-hover:text-cyan-400 transition-colors">
+              {feat2Title || (isAr ? "عمولة أمنة 100%" : "100% Safe Commission")}
             </h3>
-            <p className="text-on-surface-variant text-xs sm:text-sm max-w-xs leading-relaxed">
-              {feat2Desc || (isAr ? "وسائل دفع متعددة وشحن فوري للمحفظة الرقمية." : "Multiple gateways, wallet topups, and receipts for every transaction.")}
+            <p className="text-slate-300 text-xs sm:text-sm max-w-xs leading-relaxed">
+              {feat2Desc || (isAr ? "معاملات إلكترونية سريعة ومحمية بأعلى معايير الأمان والحماية التامة." : "Fast and secure electronic transactions protected with top safety protocols.")}
             </p>
           </div>
 
-          {/* Card 3: Dedicated Priority Support */}
-          <div className="group flex flex-col items-center text-center p-4 sm:p-5 pt-6 md:pt-4 rounded-2xl transition-all duration-300 hover:bg-surface-container-high/40 hover:-translate-y-1 active:scale-[0.97] relative">
+          {/* Card 3: Continuous Support & Development */}
+          <div className="group flex flex-col items-center text-center p-4 sm:p-5 pt-6 md:pt-4 rounded-2xl transition-all duration-300 hover:bg-white/[0.03] hover:-translate-y-1 active:scale-[0.97] relative">
             <div className="relative mb-4">
-              {/* Outer Glow Pulse */}
-              <div className="absolute -inset-2 bg-gradient-to-r from-purple-500/30 to-primary/30 rounded-full blur-md opacity-60 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500 animate-pulse"></div>
-              {/* Icon Container */}
-              <div className="relative w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-primary/20 via-surface-container to-purple-500/10 flex items-center justify-center text-primary border border-primary/40 shadow-[0_0_20px_rgba(99,102,241,0.25)] group-hover:rotate-6 group-hover:scale-105 transition-transform duration-300">
-                <svg className="w-7 h-7 sm:w-8 sm:h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z" />
-                </svg>
-                {/* 24/7 Live Support badge */}
+              <div className="absolute -inset-2 bg-gradient-to-r from-violet-500/30 to-purple-500/30 rounded-full blur-md opacity-60 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500 animate-pulse"></div>
+              <div className="relative w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-violet-500/20 via-[#0a0f24] to-violet-500/10 flex items-center justify-center text-violet-400 border border-violet-500/40 shadow-[0_0_20px_rgba(139,92,246,0.3)] group-hover:rotate-6 group-hover:scale-105 transition-transform duration-300">
+                <i className="fas fa-sync-alt text-2xl"></i>
                 <span className="absolute -top-1 -right-1 flex h-3.5 w-3.5">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-cyan-500 border border-surface"></span>
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-violet-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-violet-500 border border-[#060814]"></span>
                 </span>
               </div>
             </div>
-            <h3 className="font-bold text-lg sm:text-xl text-on-surface mb-1.5 group-hover:text-primary transition-colors">
-              {feat3Title || (isAr ? "دعم مخصص ذو أولوية" : "Priority support")}
+            <h3 className="font-bold text-lg sm:text-xl text-white mb-1.5 group-hover:text-violet-400 transition-colors">
+              {feat3Title || (isAr ? "دعم مستمر وتطوير" : "Continuous Updates & Development")}
             </h3>
-            <p className="text-on-surface-variant text-xs sm:text-sm max-w-xs leading-relaxed">
-              {feat3Desc || (isAr ? "فريق دعم بشري متواجد على التيليجرام والواتساب لمساعدتك." : "Live chat and Telegram admin with priority lanes for resellers.")}
+            <p className="text-slate-300 text-xs sm:text-sm max-w-xs leading-relaxed">
+              {feat3Desc || (isAr ? "تحديثات مستمرة لأحدث برامج السوفت وير ودعم مستمر لكافة الأجهزة." : "Continuous updates for the latest GSM software and full device support.")}
             </p>
           </div>
         </div>
@@ -596,10 +567,10 @@ export default async function Home(props: { params: Promise<{ lang: Locale }> })
       <PackagesSlider lang={params.lang} />
 
       {/* --- Campaign Stage (Promotions) --- */}
-      <section data-aos="fade-up" className="w-full cyber-container relative">
+      <section data-aos="fade-up" suppressHydrationWarning className="w-full cyber-container relative">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-6 sm:mb-8 gap-4">
           <div>
-            <span className="text-emerald-400 text-xs sm:text-sm font-bold uppercase tracking-wider flex items-center gap-2 mb-2">
+            <span className="text-violet-400 text-xs sm:text-sm font-bold uppercase tracking-wider flex items-center gap-2 mb-2">
               <i className="fas fa-certificate text-cyan-400"></i> Official reseller campaigns
             </span>
             <h2 className="text-xl sm:text-3xl font-black text-white">Fresh activations, unlocks, and tool offers</h2>
@@ -629,7 +600,7 @@ export default async function Home(props: { params: Promise<{ lang: Locale }> })
       />
 
       {/* --- Real Interactive Newsletter Section --- */}
-      <div data-aos="fade-up">
+      <div data-aos="fade-up" suppressHydrationWarning>
         <NewsletterSection lang={params.lang} />
       </div>
 

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useEffect, useRef } from "react";
 
@@ -56,8 +56,8 @@ export default function CyberMouseBackground() {
         dotRef.current.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0) translate(-50%, -50%) ${
           isHovering ? "scale(1.5)" : "scale(1)"
         }`;
-        dotRef.current.style.backgroundColor = isHovering ? "#34d399" : "#22d3ee";
-        dotRef.current.style.boxShadow = isHovering ? "0 0 14px #34d399, 0 0 24px #34d399" : "0 0 10px #22d3ee, 0 0 20px #22d3ee";
+        dotRef.current.style.backgroundColor = isHovering ? "#a78bfa" : "#8b5cf6";
+        dotRef.current.style.boxShadow = isHovering ? "0 0 14px #a78bfa, 0 0 24px #a78bfa" : "0 0 10px #8b5cf6, 0 0 20px #8b5cf6";
       }
 
       if (auraRef.current) {
@@ -91,9 +91,9 @@ export default function CyberMouseBackground() {
         ringRef.current.style.transform = `translate3d(${ringX}px, ${ringY}px, 0) translate(-50%, -50%) ${
           isHovering ? "scale(1.4)" : "scale(1)"
         }`;
-        ringRef.current.style.borderColor = isHovering ? "#34d399" : "rgba(34, 211, 238, 0.8)";
+        ringRef.current.style.borderColor = isHovering ? "#a78bfa" : "rgba(34, 211, 238, 0.8)";
         ringRef.current.style.boxShadow = isHovering
-          ? "0 0 20px rgba(52, 211, 153, 0.8), inset 0 0 10px rgba(52, 211, 153, 0.4)"
+          ? "0 0 20px rgba(139, 92, 246, 0.8), inset 0 0 10px rgba(139, 92, 246, 0.4)"
           : "0 0 14px rgba(34, 211, 238, 0.6)";
       }
 
@@ -123,7 +123,7 @@ export default function CyberMouseBackground() {
           ref={auraRef}
           className="absolute w-[280px] h-[280px] rounded-full pointer-events-none transition-opacity duration-300 opacity-0 will-change-transform"
           style={{
-            background: "radial-gradient(circle, rgba(34, 211, 238, 0.18) 0%, rgba(52, 211, 153, 0.10) 40%, transparent 70%)",
+            background: "radial-gradient(circle, rgba(34, 211, 238, 0.18) 0%, rgba(139, 92, 246, 0.10) 40%, transparent 70%)",
             filter: "blur(25px)",
             mixBlendMode: "screen",
           }}
@@ -145,7 +145,7 @@ export default function CyberMouseBackground() {
           ref={dotRef}
           className="absolute w-2 h-2 rounded-full pointer-events-none bg-cyan-400 transition-opacity duration-300 opacity-0 will-change-transform"
           style={{
-            boxShadow: "0 0 10px #22d3ee, 0 0 20px #22d3ee",
+            boxShadow: "0 0 10px #8b5cf6, 0 0 20px #8b5cf6",
           }}
         />
       </div>
@@ -154,17 +154,17 @@ export default function CyberMouseBackground() {
       <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden opacity-40">
         {/* Track 1 - Visible on all devices */}
         <div className="absolute left-[6%] top-0 bottom-0 w-[1px] bg-gradient-to-b from-transparent via-cyan-500/15 to-transparent">
-          <div className="w-full h-40 bg-gradient-to-b from-transparent via-cyan-400 to-transparent shadow-[0_0_12px_#22d3ee] animate-vertical-stream-1 will-change-transform"></div>
+          <div className="w-full h-40 bg-gradient-to-b from-transparent via-cyan-400 to-transparent shadow-[0_0_12px_#8b5cf6] animate-vertical-stream-1 will-change-transform"></div>
         </div>
 
         {/* Track 2 - Desktop only to save mobile GPU */}
-        <div className="hidden sm:block absolute left-[22%] top-0 bottom-0 w-[1px] bg-gradient-to-b from-transparent via-emerald-500/15 to-transparent">
-          <div className="w-full h-48 bg-gradient-to-b from-transparent via-emerald-400 to-transparent shadow-[0_0_15px_#34d399] animate-vertical-stream-2 will-change-transform"></div>
+        <div className="hidden sm:block absolute left-[22%] top-0 bottom-0 w-[1px] bg-gradient-to-b from-transparent via-violet-500/15 to-transparent">
+          <div className="w-full h-48 bg-gradient-to-b from-transparent via-violet-400 to-transparent shadow-[0_0_15px_#a78bfa] animate-vertical-stream-2 will-change-transform"></div>
         </div>
 
         {/* Track 3 - Visible on all devices (center-ish) */}
         <div className="absolute left-[48%] sm:left-[50%] top-0 bottom-0 w-[1px] bg-gradient-to-b from-transparent via-cyan-500/15 to-transparent">
-          <div className="w-full h-44 bg-gradient-to-b from-transparent via-teal-300 to-transparent shadow-[0_0_14px_#5eead4] animate-vertical-stream-3 will-change-transform"></div>
+          <div className="w-full h-44 bg-gradient-to-b from-transparent via-purple-300 to-transparent shadow-[0_0_14px_#5eead4] animate-vertical-stream-3 will-change-transform"></div>
         </div>
 
         {/* Track 4 - Desktop only to save mobile GPU */}
@@ -174,7 +174,7 @@ export default function CyberMouseBackground() {
 
         {/* Track 5 - Visible on all devices (right side) */}
         <div className="absolute right-[6%] top-0 bottom-0 w-[1px] bg-gradient-to-b from-transparent via-cyan-500/15 to-transparent">
-          <div className="w-full h-36 bg-gradient-to-b from-transparent via-cyan-400 to-transparent shadow-[0_0_12px_#22d3ee] animate-vertical-stream-2 will-change-transform"></div>
+          <div className="w-full h-36 bg-gradient-to-b from-transparent via-cyan-400 to-transparent shadow-[0_0_12px_#8b5cf6] animate-vertical-stream-2 will-change-transform"></div>
         </div>
       </div>
     </>

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useDeferredValue, useEffect, useMemo, useRef, useCallback } from "react";
 import { getServiceRequiredFields } from "../providers/ProvidersClient";
@@ -652,7 +652,7 @@ export default function ServicesPage() {
                       setBulkMarginValue("1.50");
                     }}
                     className={`py-2.5 rounded-lg transition-all ${
-                      bulkMarginType === "fixed" ? "bg-emerald-500 text-white shadow" : "text-on-surface-variant hover:text-on-surface"
+                      bulkMarginType === "fixed" ? "bg-violet-500 text-white shadow" : "text-on-surface-variant hover:text-on-surface"
                     }`}
                   >
                     إضافة مبلغ (+ $)
@@ -899,7 +899,7 @@ export default function ServicesPage() {
             <button
               onClick={() => setIsBulkMarginModalOpen(true)}
               disabled={loading || totalServicesCount === 0}
-              className="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2.5 rounded-xl font-bold text-xs transition-all flex items-center gap-1.5 shadow-md active:scale-95 disabled:opacity-50"
+              className="bg-violet-500 hover:bg-violet-600 text-white px-4 py-2.5 rounded-xl font-bold text-xs transition-all flex items-center gap-1.5 shadow-md active:scale-95 disabled:opacity-50"
               title="إضافة أو تعديل هامش الربح لجميع الخدمات دفعة واحدة"
             >
               <span className="material-symbols-outlined text-sm">trending_up</span>
@@ -972,7 +972,7 @@ export default function ServicesPage() {
             onClick={() => setFilterType("active")}
             className={`px-3.5 py-1.5 rounded-xl font-bold text-xs transition-all flex items-center gap-1.5 ${
               filterType === "active"
-                ? "bg-emerald-500 text-white shadow-md"
+                ? "bg-violet-500 text-white shadow-md"
                 : "bg-surface-container border border-outline-variant/30 text-on-surface-variant hover:text-on-surface"
             }`}
           >

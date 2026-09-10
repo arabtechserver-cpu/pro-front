@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
 
@@ -131,7 +131,7 @@ export default function CurrenciesClient() {
       {toastMessage && (
         <div
           className={`fixed bottom-8 left-8 z-50 px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-3 animate-in fade-in slide-in-from-bottom-4 text-white font-bold ${
-            toastMessage.type === "success" ? "bg-emerald-600 border border-emerald-400/40" : "bg-red-600 border border-red-400/40"
+            toastMessage.type === "success" ? "bg-violet-600 border border-violet-400/40" : "bg-red-600 border border-red-400/40"
           }`}
         >
           <span className="material-symbols-outlined text-2xl">
@@ -356,7 +356,7 @@ export default function CurrenciesClient() {
             {/* Saudi Riyal */}
             <div className="p-4 rounded-2xl bg-surface-container-lowest border border-outline-variant/20 space-y-2">
               <div className="flex items-center gap-2">
-                <span className="material-symbols-outlined text-emerald-400 text-xl">payments</span>
+                <span className="material-symbols-outlined text-violet-400 text-xl">payments</span>
                 <label className="text-xs font-bold text-on-surface">الريال السعودي (SAR):</label>
               </div>
               <div className="relative">

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { Inter, Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google";
+import { Cairo, Inter, Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google";
 import "../../globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -8,6 +8,12 @@ import { getDictionary } from "@/i18n/get-dictionary";
 import { Locale, i18n } from "@/i18n/config";
 import ClientWidgets from "@/components/ClientWidgets";
 
+const cairo = Cairo({
+  subsets: ["arabic", "latin"],
+  variable: "--font-cairo",
+  weight: ["300", "400", "500", "600", "700", "800", "900"],
+  display: "swap",
+});
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
 const jakarta = Plus_Jakarta_Sans({ subsets: ["latin"], variable: "--font-jakarta", display: "swap" });
 const jetbrains = JetBrains_Mono({ subsets: ["latin"], variable: "--font-jetbrains", display: "swap" });
@@ -32,17 +38,17 @@ export async function generateMetadata(props: { params: Promise<{ lang: string }
     },
     description: siteDesc,
     keywords: [
-      "عرب تيك سيرفر",
-      "عرب تك سيرفر",
-      "سيرفر عرب تيك",
-      "سيرفر عرب تك",
-      "عرب تيك برو سيرفر",
       "عرب تك برو سيرفر",
-      "عرب تيك",
+      "عرب تك سيرفر",
+      "سيرفر عرب تك",
+      "سيرفر عرب تك",
+      "عرب تك برو سيرفر",
+      "عرب تك برو سيرفر",
+      "عرب تك",
       "عرب تك",
       "Arab Tech Pro Server",
-      "Arab Tech Server Pro",
-      "Arab Tech Server",
+      "Arab Tech Pro Server Pro",
+      "Arab Tech Pro Server",
       "arabtechproserver.tech",
       "سيرفر فك الهواتف",
       "فك شبكات",
@@ -78,7 +84,7 @@ export async function generateMetadata(props: { params: Promise<{ lang: string }
       title: siteTitle,
       description: siteDesc,
       url: `https://arabtechproserver.tech/${params.lang}`,
-      siteName: isAr ? "عرب تك برو سيرفر (عرب تيك سيرفر) - Arab Tech Pro Server" : "Arab Tech Pro Server",
+      siteName: isAr ? "عرب تك برو سيرفر (عرب تك برو سيرفر) - Arab Tech Pro Server" : "Arab Tech Pro Server",
       images: [
         {
           url: isAr
@@ -86,7 +92,7 @@ export async function generateMetadata(props: { params: Promise<{ lang: string }
             : "https://arabtechproserver.tech/images/og_share_en.png",
           width: 1200,
           height: 630,
-          alt: isAr ? "عرب تك برو سيرفر - عرب تيك سيرفر" : "Arab Tech Pro Server Logo",
+          alt: isAr ? "عرب تك برو سيرفر - عرب تك برو سيرفر" : "Arab Tech Pro Server Logo",
         },
       ],
       locale: isAr ? "ar_AR" : "en_US",
@@ -153,20 +159,20 @@ export default async function RootLayout(
     "alternateName": [
       "عرب تك برو سيرفر",
       "Arab Tech Pro Server",
-      "عرب تيك سيرفر",
+      "عرب تك برو سيرفر",
       "عرب تك سيرفر",
-      "سيرفر عرب تيك",
       "سيرفر عرب تك",
-      "عرب تيك برو سيرفر",
-      "عرب تيك",
+      "سيرفر عرب تك",
+      "عرب تك برو سيرفر",
       "عرب تك",
-      "Arab Tech Server Pro",
-      "Arab Tech Server"
+      "عرب تك",
+      "Arab Tech Pro Server Pro",
+      "Arab Tech Pro Server"
     ],
     "url": "https://arabtechproserver.tech",
     "inLanguage": ["ar", "en"],
     "description": isAr
-      ? "الموقع الرسمي لمنصة عرب تك برو سيرفر | Arab Tech Pro Server (عرب تيك سيرفر) لخدمات فك الهواتف، تخطي iCloud وFRP، وخدمات IMEI والسيرفر عن بعد."
+      ? "الموقع الرسمي لمنصة عرب تك برو سيرفر | Arab Tech Pro Server لخدمات فك الهواتف، تخطي iCloud وFRP، وخدمات IMEI والسيرفر عن بعد."
       : "Official Arab Tech Pro Server for remote phone unlocking, iCloud & FRP bypass, and IMEI server services.",
     "potentialAction": {
       "@type": "SearchAction",
@@ -183,11 +189,11 @@ export default async function RootLayout(
     "alternateName": [
       "Arab Tech Pro Server",
       "عرب تك برو سيرفر",
-      "عرب تيك سيرفر",
+      "عرب تك برو سيرفر",
       "عرب تك سيرفر",
-      "عرب تيك برو سيرفر",
-      "سيرفر عرب تيك",
-      "Arab Tech Server"
+      "عرب تك برو سيرفر",
+      "سيرفر عرب تك",
+      "Arab Tech Pro Server"
     ],
     "url": "https://arabtechproserver.tech",
     "logo": "https://arabtechproserver.tech/images/logo_en.png",
@@ -259,7 +265,7 @@ export default async function RootLayout(
   };
 
   return (
-    <html lang={lang} dir={dir}>
+    <html lang={lang} dir={dir} className="dark" style={{ backgroundColor: "#050814", colorScheme: "dark" }}>
       <head>
         <meta name="google-site-verification" content="N34n3oI-P5elZmLFHgFqp_BK93EijixhnIHEj_2oGnI" />
         <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
@@ -297,13 +303,16 @@ export default async function RootLayout(
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdFaq) }}
         />
       </head>
-      <body className={`${inter.variable} ${jakarta.variable} ${jetbrains.variable} bg-background text-on-surface antialiased min-h-screen flex flex-col relative`}>
+      <body
+        className={`${cairo.variable} ${inter.variable} ${jakarta.variable} ${jetbrains.variable} bg-[#060814] text-on-surface antialiased min-h-screen flex flex-col relative`}
+        style={{ backgroundColor: "#060814", colorScheme: "dark" }}
+      >
         {/* Client Enhancement Widgets (Lazy loaded, non-blocking) */}
         <ClientWidgets lang={lang} />
 
         <Navbar lang={lang} dict={dict.nav} />
         
-        <main className="flex-grow w-full pt-16 sm:pt-20 pb-12 overflow-x-clip">
+        <main className="flex-grow w-full pt-16 sm:pt-20 pb-12 overflow-x-clip bg-[#050814]">
           {children}
         </main>
 

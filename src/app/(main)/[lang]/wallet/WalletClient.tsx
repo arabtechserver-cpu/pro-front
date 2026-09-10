@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
@@ -169,7 +169,7 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
       nameEn: "Bank of Khartoum (Bankak)",
       badge: "SD",
       icon: "account_balance",
-      color: "from-emerald-600 to-teal-700",
+      color: "from-violet-600 to-purple-700",
       copyValue: currencyConfig?.bankak?.accountNumber || "",
       detailLabelAr: currencyConfig?.bankak?.accountName ? `رقم حساب بنكك (باسم: ${currencyConfig.bankak.accountName}):` : "رقم حساب بنكك:",
       detailLabelEn: currencyConfig?.bankak?.accountName ? `Bankak Account # (Name: ${currencyConfig.bankak.accountName}):` : "Bankak Account #:",
@@ -487,7 +487,7 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
                   <span className="text-2xl sm:text-3xl font-bold text-primary font-mono dir-ltr">
                     ${userBalanceUsd.toFixed(2)} USD
                   </span>
-                  <span className="text-xs font-bold text-emerald-400 bg-emerald-500/15 border border-emerald-500/30 px-2.5 py-0.5 rounded-lg font-mono flex items-center gap-1">
+                  <span className="text-xs font-bold text-violet-400 bg-violet-500/15 border border-violet-500/30 px-2.5 py-0.5 rounded-lg font-mono flex items-center gap-1">
                     <span>≈ {userBalanceSdg.toLocaleString("en-US")} SDG</span>
                   </span>
                 </div>
@@ -500,8 +500,8 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
                     {userSession.membershipTier.nameAr || userSession.membershipTier.name} (-{userSession.membershipTier.discountPercentage}%)
                   </span>
                 ) : (
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-xs font-bold">
-                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-violet-500/15 border border-violet-500/30 text-violet-400 text-xs font-bold">
+                    <span className="w-2 h-2 rounded-full bg-violet-400 animate-pulse"></span>
                     {lang === "ar" ? "حساب فعال" : "Active"}
                   </span>
                 )}
@@ -532,8 +532,8 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
             )}
 
             {successMessage && (
-              <div className="p-4 rounded-xl bg-emerald-500/20 border-2 border-emerald-500/50 text-emerald-200 text-sm font-bold flex items-center gap-2.5 shadow-lg">
-                <span className="material-symbols-outlined text-lg shrink-0 text-emerald-400">check_circle</span>
+              <div className="p-4 rounded-xl bg-violet-500/20 border-2 border-violet-500/50 text-violet-200 text-sm font-bold flex items-center gap-2.5 shadow-lg">
+                <span className="material-symbols-outlined text-lg shrink-0 text-violet-400">check_circle</span>
                 <span>{successMessage}</span>
               </div>
             )}
@@ -588,14 +588,14 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
 
               {/* SPECIAL SPOTLIGHT FOR BANKAK (SUDANESE POUND) CALCULATION */}
               {activeMethod.isBankak && (
-                <div className="p-5 rounded-2xl bg-gradient-to-br from-emerald-500/15 via-surface-container-high to-teal-500/15 border-2 border-emerald-500/50 shadow-xl space-y-4 animate-in fade-in slide-in-from-top-2">
+                <div className="p-5 rounded-2xl bg-gradient-to-br from-violet-500/15 via-surface-container-high to-purple-500/15 border-2 border-violet-500/50 shadow-xl space-y-4 animate-in fade-in slide-in-from-top-2">
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2 font-bold text-sm text-emerald-400">
-                      <span className="text-xs font-mono font-bold px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300">SD</span>
+                    <div className="flex items-center gap-2 font-bold text-sm text-violet-400">
+                      <span className="text-xs font-mono font-bold px-1.5 py-0.5 rounded bg-violet-500/20 text-violet-300">SD</span>
                       <span>{lang === "ar" ? "التحويل بالجنيه السوداني عبر بنكك (سعر الصرف المعتمد)" : "Bankak Sudanese Transfer"}</span>
                     </div>
 
-                    <span className="text-xs font-mono font-bold text-emerald-300 bg-emerald-500/20 px-2.5 py-1 rounded-lg border border-emerald-500/30">
+                    <span className="text-xs font-mono font-bold text-violet-300 bg-violet-500/20 px-2.5 py-1 rounded-lg border border-violet-500/30">
                       1 USD = {sdgRate.toLocaleString()} SDG
                     </span>
                   </div>
@@ -605,14 +605,14 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
                     <div className="space-y-1.5">
                       <label className="text-[11px] font-bold text-slate-200">المبلغ بالدولار ($ USD):</label>
                       <div className="relative">
-                        <span className="absolute left-3 top-1/2 -translate-y-1/2 font-bold text-emerald-400">$</span>
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 font-bold text-violet-400">$</span>
                         <input
                           type="number"
                           step="0.5"
                           min="1"
                           value={depositAmount}
                           onChange={(e) => setDepositAmount(e.target.value)}
-                          className="w-full bg-[#0f172a] border border-emerald-500/50 rounded-xl py-2.5 pl-8 pr-3 text-white font-mono font-bold text-sm focus:border-emerald-400 outline-none"
+                          className="w-full bg-[#0f172a] border border-violet-500/50 rounded-xl py-2.5 pl-8 pr-3 text-white font-mono font-bold text-sm focus:border-violet-400 outline-none"
                         />
                       </div>
                     </div>
@@ -621,22 +621,22 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
                     <div className="space-y-1.5">
                       <label className="text-[11px] font-bold text-slate-200">المعادل المطلوب بالجنيه السوداني (SDG):</label>
                       <div className="relative">
-                        <span className="absolute left-3 top-1/2 -translate-y-1/2 font-bold text-emerald-400 text-xs font-mono">SDG</span>
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 font-bold text-violet-400 text-xs font-mono">SDG</span>
                         <input
                           type="number"
                           value={depositSdgAmount}
                           onChange={(e) => handleSdgAmountChange(e.target.value)}
-                          className="w-full bg-[#0f172a] border border-emerald-500/50 rounded-xl py-2.5 pl-12 pr-3 text-emerald-300 font-mono font-bold text-sm focus:border-emerald-400 outline-none"
+                          className="w-full bg-[#0f172a] border border-violet-500/50 rounded-xl py-2.5 pl-12 pr-3 text-violet-300 font-mono font-bold text-sm focus:border-violet-400 outline-none"
                         />
                       </div>
                     </div>
                   </div>
 
                   {/* Beneficiary Account Details */}
-                  <div className="p-3.5 rounded-xl bg-[#0f172a] border border-emerald-500/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                  <div className="p-3.5 rounded-xl bg-[#0f172a] border border-violet-500/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                     <div>
                       <div className="text-[11px] text-slate-400">رقم حساب بنك الخرطوم (بنكك):</div>
-                      <div className="text-base font-mono font-bold text-emerald-300 select-all">{activeMethod.copyValue}</div>
+                      <div className="text-base font-mono font-bold text-violet-300 select-all">{activeMethod.copyValue}</div>
                       <div className="text-xs text-slate-300 font-semibold mt-0.5">
                         باسم: {currencyConfig?.bankak?.accountName || "حسن"}
                       </div>
@@ -646,7 +646,7 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
                       type="button"
                       onClick={() => handleCopy(activeMethod.copyValue, activeMethod.id)}
                       className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-md active:scale-95 ${
-                        copiedId === activeMethod.id ? "bg-emerald-500 text-white" : "bg-emerald-600 hover:bg-emerald-500 text-white"
+                        copiedId === activeMethod.id ? "bg-violet-500 text-white" : "bg-violet-600 hover:bg-violet-500 text-white"
                       }`}
                     >
                       <span className="material-symbols-outlined text-sm">
@@ -675,7 +675,7 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
                       type="button"
                       onClick={() => handleCopy(activeMethod.copyValue, activeMethod.id)}
                       className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all shadow-md active:scale-95 ${
-                        copiedId === activeMethod.id ? "bg-emerald-500 text-white" : "bg-primary text-on-primary hover:bg-primary-container"
+                        copiedId === activeMethod.id ? "bg-violet-500 text-white" : "bg-primary text-on-primary hover:bg-primary-container"
                       }`}
                     >
                       <span className="material-symbols-outlined text-sm">
@@ -747,7 +747,7 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
                     value={transactionRef}
                     onChange={(e) => setTransactionRef(e.target.value)}
                     placeholder="مثال: رقم العملية في إشعار بنكك أو رقم حسابك المحول منه"
-                    className="w-full bg-[#0f172a] border-2 border-emerald-500/50 rounded-xl py-3 px-4 text-white font-mono text-sm focus:border-emerald-400 outline-none"
+                    className="w-full bg-[#0f172a] border-2 border-violet-500/50 rounded-xl py-3 px-4 text-white font-mono text-sm focus:border-violet-400 outline-none"
                   />
                 </div>
               )}
@@ -774,7 +774,7 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
                           alt="Receipt Preview"
                           className="h-28 w-auto object-contain rounded-xl border-2 border-primary shadow-lg"
                         />
-                        <div className="flex items-center gap-2 text-xs font-bold text-emerald-400">
+                        <div className="flex items-center gap-2 text-xs font-bold text-violet-400">
                           <span className="material-symbols-outlined text-base">check_circle</span>
                           <span>{receiptFileName || "تم إرفاق صورة الإيصال بنجاح!"}</span>
                           <button
@@ -942,7 +942,7 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
             {/* Quick Support Card */}
             <div className="glass-card rounded-3xl p-6 border border-outline-variant/30 shadow-xl space-y-3">
               <h3 className="font-bold text-sm text-on-surface flex items-center gap-2">
-                <span className="material-symbols-outlined text-emerald-400 text-lg">support_agent</span>
+                <span className="material-symbols-outlined text-violet-400 text-lg">support_agent</span>
                 <span>{lang === "ar" ? "تحتاج مساعدة في الشحن؟" : "Need help with deposit?"}</span>
               </h3>
               <p className="text-xs text-on-surface-variant leading-relaxed">
@@ -954,7 +954,7 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
                 href="https://wa.me/16728972935"
                 target="_blank"
                 rel="noreferrer"
-                className="w-full py-2.5 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-400 font-bold text-xs flex items-center justify-center gap-2 transition-all"
+                className="w-full py-2.5 rounded-xl bg-violet-500/15 hover:bg-violet-500/25 border border-violet-500/30 text-violet-400 font-bold text-xs flex items-center justify-center gap-2 transition-all"
               >
                 <span className="material-symbols-outlined text-base">chat</span>
                 <span>{lang === "ar" ? "تواصل معنا عبر واتساب" : "Contact us on WhatsApp"}</span>
@@ -1010,10 +1010,10 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
                       <td className="p-3.5 font-mono font-bold text-primary">{tx.refNo || `#${tx.id.slice(-6)}`}</td>
                       <td className="p-3.5 font-bold text-on-surface">{tx.type}</td>
                       <td className="p-3.5 text-on-surface-variant">{tx.method}</td>
-                      <td className="p-3.5 font-mono font-bold text-emerald-400">${(tx.amount || 0).toFixed(2)} USD</td>
+                      <td className="p-3.5 font-mono font-bold text-violet-400">${(tx.amount || 0).toFixed(2)} USD</td>
                       <td className="p-3.5">
                         {tx.status === "completed" ? (
-                          <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-[10px] font-bold">
+                          <span className="px-2.5 py-0.5 rounded-full bg-violet-500/15 border border-violet-500/30 text-violet-400 text-[10px] font-bold">
                             مكتمل
                           </span>
                         ) : tx.status === "pending" ? (

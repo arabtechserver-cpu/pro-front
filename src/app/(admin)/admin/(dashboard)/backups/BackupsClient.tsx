@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect, useRef } from "react";
 
@@ -372,7 +372,7 @@ export default function BackupsClient() {
         <div
           className={`p-4 rounded-2xl text-sm font-bold flex items-center justify-between gap-3 shadow-md ${
             alertMessage.type === "success"
-              ? "bg-emerald-500/15 text-emerald-400 border border-emerald-500/30"
+              ? "bg-violet-500/15 text-violet-400 border border-violet-500/30"
               : "bg-red-500/15 text-red-400 border border-red-500/30"
           }`}
         >
@@ -455,7 +455,7 @@ export default function BackupsClient() {
                         <button
                           onClick={() => handleOpenServerFileModal(backup.filename)}
                           disabled={isActioning}
-                          className="px-3 py-1.5 rounded-xl bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 text-xs font-bold hover:bg-emerald-500 hover:text-white transition-all flex items-center gap-1 cursor-pointer disabled:opacity-50"
+                          className="px-3 py-1.5 rounded-xl bg-violet-500/15 text-violet-400 border border-violet-500/30 text-xs font-bold hover:bg-violet-500 hover:text-white transition-all flex items-center gap-1 cursor-pointer disabled:opacity-50"
                           title="تحديد واسترجاع بيانات محددة من هذه النسخة"
                         >
                           <span className="material-symbols-outlined text-sm">checklist</span>
@@ -550,16 +550,16 @@ export default function BackupsClient() {
                 {/* Balances */}
                 {selectedOptions.customers && (
                   <label className={`flex items-start gap-3 p-4 pr-8 rounded-2xl border transition-all cursor-pointer mr-4 ${
-                    selectedOptions.updateBalances ? "bg-emerald-500/10 border-emerald-500/40" : "bg-surface-container/20 border-outline-variant/20 opacity-70"
+                    selectedOptions.updateBalances ? "bg-violet-500/10 border-violet-500/40" : "bg-surface-container/20 border-outline-variant/20 opacity-70"
                   }`}>
                     <input
                       type="checkbox"
                       checked={selectedOptions.updateBalances}
                       onChange={(e) => setSelectedOptions({ ...selectedOptions, updateBalances: e.target.checked })}
-                      className="mt-1 w-4 h-4 rounded text-emerald-500 focus:ring-emerald-500 accent-emerald-500"
+                      className="mt-1 w-4 h-4 rounded text-violet-500 focus:ring-violet-500 accent-violet-500"
                     />
                     <div>
-                      <span className="font-bold text-sm text-emerald-400">تحديث وتعيين أرصدة المحافظ (Balances)</span>
+                      <span className="font-bold text-sm text-violet-400">تحديث وتعيين أرصدة المحافظ (Balances)</span>
                       <p className="text-xs text-on-surface-variant mt-0.5">
                         تعيين رصيد كل عميل بناءً على الرصيد المسجل في ملف النسخة الاحتياطية.
                       </p>

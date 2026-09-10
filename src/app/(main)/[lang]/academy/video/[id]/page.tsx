@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
@@ -178,7 +178,7 @@ export default async function VideoPage(props: { params: Promise<{ lang: string;
               <div className="flex flex-wrap items-start justify-between gap-4 pb-5 border-b border-gray-800">
                 <div className="space-y-2">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold ${video.isFreePreview ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30' : 'bg-amber-500/15 text-amber-400 border border-amber-500/30'}`}>
+                    <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold ${video.isFreePreview ? 'bg-violet-500/15 text-violet-400 border border-violet-500/30' : 'bg-amber-500/15 text-amber-400 border border-amber-500/30'}`}>
                       {video.isFreePreview ? (isAr ? 'معاينة مجانية' : 'Free Preview') : (isAr ? 'كورس مدفوع' : 'Paid')}
                     </span>
                     {video.category && (
@@ -255,7 +255,7 @@ export default async function VideoPage(props: { params: Promise<{ lang: string;
                           isCurrent
                             ? 'bg-indigo-600 text-white'
                             : itemFree
-                              ? 'bg-[#1E1E35] text-emerald-400'
+                              ? 'bg-[#1E1E35] text-violet-400'
                               : 'bg-[#1E1E35] text-amber-400'
                         }`}>
                           {isCurrent ? (
@@ -272,7 +272,7 @@ export default async function VideoPage(props: { params: Promise<{ lang: string;
                           </h4>
                           <span className="text-[10px] text-gray-500 flex items-center gap-1 mt-0.5">
                             {itemFree ? (
-                              <span className="text-emerald-400 font-semibold">{isAr ? 'معاينة مجانية' : 'Free Preview'}</span>
+                              <span className="text-violet-400 font-semibold">{isAr ? 'معاينة مجانية' : 'Free Preview'}</span>
                             ) : (
                               <span className="text-amber-400 font-semibold">{isAr ? 'مقفل' : 'Locked'}</span>
                             )}

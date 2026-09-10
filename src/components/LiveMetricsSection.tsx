@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 
@@ -43,7 +43,7 @@ export default function LiveMetricsSection({ lang }: LiveMetricsSectionProps) {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 pt-2">
             <Link
               href={`${langPrefix}/pricing`}
-              className="w-full sm:w-auto px-7 py-3.5 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-white font-bold text-sm sm:text-base shadow-[0_4px_25px_rgba(16,185,129,0.4)] flex items-center justify-center gap-2.5 transition-all duration-300 hover:scale-[1.02] active:scale-95"
+              className="w-full sm:w-auto px-7 py-3.5 rounded-2xl bg-gradient-to-r from-violet-500 to-purple-500 hover:from-violet-400 hover:to-purple-400 text-white font-bold text-sm sm:text-base shadow-[0_4px_25px_rgba(124,58,237,0.4)] flex items-center justify-center gap-2.5 transition-all duration-300 hover:scale-[1.02] active:scale-95"
             >
               <span className="material-symbols-outlined text-lg">rocket_launch</span>
               <span>{isAr ? "ابدأ بفك القفل الآن" : "Start Unlocking Now"}</span>
@@ -60,7 +60,7 @@ export default function LiveMetricsSection({ lang }: LiveMetricsSectionProps) {
 
           {/* Trust Indicators Strip */}
           <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-8 pt-4 text-xs font-semibold text-on-surface-variant border-t border-outline-variant/15">
-            <span className="flex items-center gap-1.5 text-emerald-400">
+            <span className="flex items-center gap-1.5 text-violet-400">
               <span className="material-symbols-outlined text-base">bolt</span>
               <span>{isAr ? "تنفيذ فوري تلقائي" : "Instant Delivery"}</span>
             </span>
@@ -81,10 +81,10 @@ export default function LiveMetricsSection({ lang }: LiveMetricsSectionProps) {
         {/* Header Block */}
         <div className="flex flex-col items-center text-center space-y-3">
           {/* Live Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#0a1224] border border-emerald-500/30 text-emerald-400 text-xs font-black tracking-widest uppercase shadow-[0_0_15px_rgba(16,185,129,0.15)]">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#0a1224] border border-violet-500/30 text-violet-400 text-xs font-black tracking-widest uppercase shadow-[0_0_15px_rgba(124,58,237,0.15)]">
             <span className="relative flex h-2.5 w-2.5">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-violet-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-violet-500"></span>
             </span>
             <span>{isAr ? "مؤشرات الأداء اللحظية" : "LIVE PERFORMANCE METRICS"}</span>
           </div>
@@ -103,17 +103,17 @@ export default function LiveMetricsSection({ lang }: LiveMetricsSectionProps) {
         {/* The 3 Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6">
           {/* Card 1: Devices Unlocked */}
-          <div className="relative group overflow-hidden rounded-3xl bg-gradient-to-b from-[#0e172e]/80 via-[#0a1122]/90 to-[#070b16] border border-emerald-500/20 hover:border-emerald-500/50 p-6 sm:p-8 flex flex-col items-center text-center transition-all duration-300 hover:shadow-[0_10px_35px_rgba(16,185,129,0.15)] hover:-translate-y-1">
+          <div className="relative group overflow-hidden rounded-3xl bg-gradient-to-b from-[#0e172e]/80 via-[#0a1122]/90 to-[#070b16] border border-violet-500/20 hover:border-violet-500/50 p-6 sm:p-8 flex flex-col items-center text-center transition-all duration-300 hover:shadow-[0_10px_35px_rgba(124,58,237,0.15)] hover:-translate-y-1">
             {/* Top Glowing Ambient Orb */}
-            <div className="absolute top-0 w-32 h-20 bg-emerald-500/10 rounded-full blur-2xl pointer-events-none group-hover:bg-emerald-500/20 transition-all"></div>
+            <div className="absolute top-0 w-32 h-20 bg-violet-500/10 rounded-full blur-2xl pointer-events-none group-hover:bg-violet-500/20 transition-all"></div>
 
             {/* Icon Box */}
-            <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 mb-5 shadow-[0_0_25px_rgba(16,185,129,0.2)] group-hover:scale-110 transition-transform">
+            <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-violet-500/10 border border-violet-500/30 flex items-center justify-center text-violet-400 mb-5 shadow-[0_0_25px_rgba(124,58,237,0.2)] group-hover:scale-110 transition-transform">
               <span className="material-symbols-outlined text-3xl sm:text-4xl">lock_open</span>
             </div>
 
             {/* Value */}
-            <div className="text-3xl sm:text-5xl font-black text-emerald-400 tracking-tight mb-2 font-display">
+            <div className="text-3xl sm:text-5xl font-black text-violet-400 tracking-tight mb-2 font-display">
               500K+
             </div>
 
@@ -124,7 +124,7 @@ export default function LiveMetricsSection({ lang }: LiveMetricsSectionProps) {
 
             {/* Subtext Trend Pill */}
             <div className="mt-auto pt-2">
-              <span className="inline-flex items-center gap-1 text-[11px] sm:text-xs font-semibold text-emerald-300 bg-emerald-500/10 border border-emerald-500/25 px-3 py-1 rounded-full">
+              <span className="inline-flex items-center gap-1 text-[11px] sm:text-xs font-semibold text-violet-300 bg-violet-500/10 border border-violet-500/25 px-3 py-1 rounded-full">
                 <span className="material-symbols-outlined text-xs">trending_up</span>
                 <span>{isAr ? "+12% نمو هذا الشهر" : "+12% this month"}</span>
               </span>

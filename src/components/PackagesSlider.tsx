@@ -32,38 +32,12 @@ export default function PackagesSlider({ lang }: PackagesSliderProps) {
   // Real Top Packages from /pricing catalog
   const packages: RealPricingPackage[] = [
     {
-      id: "borneo",
-      groupName: "Borneo Schematic 1 Month / 3 Month / 6 Months / - Direct Source Services",
-      nameAr: "باقة اشتراكات ومخططات بورنيو (Borneo)",
-      nameEn: "Borneo Schematics Official Licenses",
-      badgeAr: "الأكثر طلباً للفنيين ⭐",
-      badgeEn: "Technician Top Pick ⭐",
-      isPopular: true,
-      startingPrice: "$12.06",
-      categoryAr: "تفعيل بوكسات ودونجل",
-      categoryEn: "Server Activations",
-      deliveryTime: "تسليم فوري - 24 ساعة",
-      icon: "fas fa-microchip",
-      servicesAr: [
-        "Borneo Schematic 3 Months 1PC New Activation",
-        "Borneo Schematic 6 Months 1PC License",
-        "Borneo Schematic 1 Year 2PC Multi-Device",
-        "تحديث يومي لمخططات هواتف iPhone & Android",
-      ],
-      servicesEn: [
-        "Borneo Schematic 3 Months 1PC New Activation",
-        "Borneo Schematic 6 Months 1PC License",
-        "Borneo Schematic 1 Year 2PC Multi-Device",
-        "Daily updated hardware schematics & PCB bitmaps",
-      ],
-    },
-    {
       id: "chimera",
       groupName: "Chimera Tool - Direct Source Services",
       nameAr: "باقة تفعيل وسيرفر أداة شيميرا (Chimera)",
       nameEn: "Chimera Tool Pro & Samsung Activations",
-      badgeAr: "موزع رسمي معتمد",
-      badgeEn: "Official Reseller",
+      badgeAr: "الأكثر طلباً",
+      badgeEn: "Most Popular",
       isPopular: true,
       startingPrice: "$106.59",
       categoryAr: "أدوات السوفت وير الاحترافية",
@@ -131,6 +105,32 @@ export default function PackagesSlider({ lang }: PackagesSliderProps) {
         "PASSCODE A12/A13 (SIGNAL) USBLITER8 iPhone 11",
         "PASSCODE A12/A13 (SIGNAL) USBLITER8 iPhone 11 PRO / PRO MAX",
         "Full cellular calls, FaceTime, iCloud & data enabled",
+      ],
+    },
+    {
+      id: "borneo",
+      groupName: "Borneo Schematic 1 Month / 3 Month / 6 Months / - Direct Source Services",
+      nameAr: "باقة اشتراكات ومخططات بورنيو (Borneo)",
+      nameEn: "Borneo Schematics Official Licenses",
+      badgeAr: "الأكثر طلباً للفنيين",
+      badgeEn: "Technician Top Pick",
+      isPopular: true,
+      startingPrice: "$12.06",
+      categoryAr: "تفعيل بوكسات ودونجل",
+      categoryEn: "Server Activations",
+      deliveryTime: "تسليم فوري - 24 ساعة",
+      icon: "fas fa-microchip",
+      servicesAr: [
+        "Borneo Schematic 3 Months 1PC New Activation",
+        "Borneo Schematic 6 Months 1PC License",
+        "Borneo Schematic 1 Year 2PC Multi-Device",
+        "تحديث يومي لمخططات هواتف iPhone & Android",
+      ],
+      servicesEn: [
+        "Borneo Schematic 3 Months 1PC New Activation",
+        "Borneo Schematic 6 Months 1PC License",
+        "Borneo Schematic 1 Year 2PC Multi-Device",
+        "Daily updated hardware schematics & PCB bitmaps",
       ],
     },
     {
@@ -257,13 +257,13 @@ export default function PackagesSlider({ lang }: PackagesSliderProps) {
         {/* Section Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 lg:mb-14 gap-6">
           <div>
-            <div className="inline-flex items-center gap-2 bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider mb-4 shadow-sm">
-              <i className="fas fa-layer-group text-emerald-400"></i>
+            <div className="inline-flex items-center gap-2 bg-violet-500/15 text-violet-300 border border-violet-500/30 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider mb-4 shadow-sm">
+              <i className="fas fa-layer-group text-violet-400"></i>
               <span>{isAr ? "باقات وخدمات السيرفر المباشرة" : "Live Catalog & Service Packages"}</span>
             </div>
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight">
               {isAr ? "تصفح باقات الخدمات " : "Explore Featured "}
-              <span className="bg-gradient-to-r from-emerald-400 via-cyan-300 to-teal-200 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-violet-400 via-cyan-300 to-purple-200 bg-clip-text text-transparent">
                 {isAr ? "والتفعيلات الحصرية" : "Service Packages"}
               </span>
             </h2>
@@ -279,14 +279,14 @@ export default function PackagesSlider({ lang }: PackagesSliderProps) {
             <button
               onClick={handlePrev}
               aria-label={isAr ? "الباقة السابقة" : "Previous Package"}
-              className="convex-pill w-12 h-12 bg-[#070c1a]/95 border border-cyan-400/50 text-white flex items-center justify-center hover:bg-cyan-500 hover:text-slate-950 transition-all shadow-lg active:scale-95"
+              className="convex-pill w-12 h-12 bg-[#050814]/95 border border-cyan-400/50 text-white flex items-center justify-center hover:bg-cyan-500 hover:text-slate-950 transition-all shadow-lg active:scale-95"
             >
               <i className={`fas ${isAr ? "fa-arrow-right" : "fa-arrow-left"}`}></i>
             </button>
             <button
               onClick={handleNext}
               aria-label={isAr ? "الباقة التالية" : "Next Package"}
-              className="convex-pill w-12 h-12 bg-[#070c1a]/95 border border-cyan-400/50 text-white flex items-center justify-center hover:bg-cyan-500 hover:text-slate-950 transition-all shadow-lg active:scale-95"
+              className="convex-pill w-12 h-12 bg-[#050814]/95 border border-cyan-400/50 text-white flex items-center justify-center hover:bg-cyan-500 hover:text-slate-950 transition-all shadow-lg active:scale-95"
             >
               <i className={`fas ${isAr ? "fa-arrow-left" : "fa-arrow-right"}`}></i>
             </button>
@@ -298,7 +298,7 @@ export default function PackagesSlider({ lang }: PackagesSliderProps) {
           {/* Mobile Swipe Cue */}
           <div className="md:hidden flex items-center justify-center gap-2 mb-3 text-xs text-cyan-400/80 font-medium select-none pointer-events-none animate-pulse">
             <span className="text-sm">‹‹</span>
-            <span>{isAr ? "اسحب يميناً أو يساراً للتنقل بين الباقات" : "Swipe left or right to explore packages"}</span>
+            <span>{isAr ? "اسحب يعرب تكً أو يساراً للتنقل بين الباقات" : "Swipe left or right to explore packages"}</span>
             <span className="text-sm">››</span>
           </div>
 
@@ -312,7 +312,7 @@ export default function PackagesSlider({ lang }: PackagesSliderProps) {
               >
                 {/* Popular / Promo Badge */}
                 {(pkg.badgeAr || pkg.badgeEn) && (
-                  <div className="absolute -top-3.5 right-6 sm:right-8 rtl:right-auto rtl:left-6 sm:rtl:left-8 z-30 bg-gradient-to-r from-primary via-cyan-300 to-emerald-400 text-slate-950 text-xs font-black px-4 py-1.5 rounded-full shadow-xl flex items-center gap-1.5 uppercase tracking-wide border border-white/20 whitespace-nowrap pointer-events-none animate-mobile-badge">
+                  <div className="absolute -top-3.5 right-6 sm:right-8 rtl:right-auto rtl:left-6 sm:rtl:left-8 z-30 bg-gradient-to-r from-primary via-cyan-300 to-violet-400 text-slate-950 text-xs font-black px-4 py-1.5 rounded-full shadow-xl flex items-center gap-1.5 uppercase tracking-wide border border-violet-400/25 whitespace-nowrap pointer-events-none animate-mobile-badge">
                     <i className="fas fa-crown text-amber-950"></i>
                     <span>{isAr ? pkg.badgeAr : pkg.badgeEn}</span>
                   </div>
@@ -347,7 +347,7 @@ export default function PackagesSlider({ lang }: PackagesSliderProps) {
                       <span className="text-xs text-slate-400 block font-medium">
                         {isAr ? "يبدأ من" : "Starts at"}
                       </span>
-                      <span className="text-3xl lg:text-4xl font-black text-emerald-400 tracking-tight">
+                      <span className="text-3xl lg:text-4xl font-black text-violet-400 tracking-tight">
                         {pkg.startingPrice}
                       </span>
                     </div>
@@ -359,7 +359,7 @@ export default function PackagesSlider({ lang }: PackagesSliderProps) {
                   <ul className="space-y-3 mb-8">
                     {(isAr ? pkg.servicesAr : pkg.servicesEn).map((srv, sIdx) => (
                       <li key={sIdx} className="flex items-start gap-3 text-sm text-slate-200">
-                        <span className="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xs shrink-0 mt-0.5 border border-emerald-500/30">
+                        <span className="w-5 h-5 rounded-full bg-violet-500/20 text-violet-400 flex items-center justify-center text-xs shrink-0 mt-0.5 border border-violet-500/30">
                           <i className="fas fa-check"></i>
                         </span>
                         <span className="line-clamp-1">{srv}</span>
@@ -372,14 +372,14 @@ export default function PackagesSlider({ lang }: PackagesSliderProps) {
                 <div className="space-y-3">
                   <Link
                     href={`/${lang}/pricing?section=${encodeURIComponent(pkg.groupName)}`}
-                    className="convex-pill w-full py-3.5 px-6 font-bold text-center flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-500 via-teal-400 to-cyan-500 text-slate-950 shadow-lg active:scale-95 active:shadow-[0_0_28px_rgba(45,212,191,0.8)]"
+                    className="btn-purple-glow w-full py-3.5 px-6 font-black text-center flex items-center justify-center gap-2 group"
                   >
-                    <span>{isAr ? "عرض خدمات وأسعار هذه الباقة" : "View Services & Live Prices"}</span>
-                    <i className={`fas ${isAr ? "fa-arrow-left" : "fa-arrow-right"} text-xs`}></i>
+                    <span>{isAr ? "اطلب الآن وابدأ التفعيل" : "Order & Activate Now"}</span>
+                    <i className={`fas ${isAr ? "fa-arrow-left" : "fa-arrow-right"} text-xs transition-transform group-hover:-translate-x-1`}></i>
                   </Link>
 
                   <p className="text-center text-xs text-slate-400 flex items-center justify-center gap-1.5">
-                    <i className="fas fa-shield-alt text-[10px] text-emerald-400"></i>
+                    <i className="fas fa-shield-alt text-[10px] text-violet-400"></i>
                     <span>{isAr ? "تنفيذ مؤتمت عبر الـ API مع استرجاع الرصيد في حال الفشل" : "Automated API delivery with refund guarantee"}</span>
                   </p>
                 </div>
@@ -397,7 +397,7 @@ export default function PackagesSlider({ lang }: PackagesSliderProps) {
               aria-label={`Go to slide ${idx + 1}`}
               className={`h-2.5 rounded-full transition-all duration-300 active:scale-90 ${
                 idx === currentIndex % total
-                  ? "w-10 bg-gradient-to-r from-emerald-400 via-cyan-400 to-teal-200 shadow-[0_0_15px_#22d3ee] animate-pulse"
+                  ? "w-10 bg-gradient-to-r from-violet-400 via-cyan-400 to-purple-200 shadow-[0_0_15px_#8b5cf6] animate-pulse"
                   : "w-2.5 bg-slate-700/80 hover:bg-slate-500"
               }`}
             />
@@ -408,10 +408,10 @@ export default function PackagesSlider({ lang }: PackagesSliderProps) {
         <div className="text-center mt-10">
           <Link
             href={`/${lang}/pricing`}
-            className="convex-pill inline-flex items-center gap-2.5 px-8 py-3.5 bg-[#070c1a]/95 border-2 border-cyan-400/50 text-cyan-300 font-bold hover:bg-cyan-500 hover:text-slate-950 active:scale-95 transition-all shadow-xl text-sm sm:text-base"
+            className="btn-dark-pill inline-flex items-center gap-2.5 px-8 py-3.5 border border-cyan-400/50 text-cyan-300 hover:border-cyan-400 text-sm sm:text-base group"
           >
-            <span>{isAr ? "استعراض كافة الباقات وقائمة الأسعار الكاملة (Pricing)" : "View Complete Catalog & Price List"}</span>
-            <i className={`fas ${isAr ? "fa-arrow-left" : "fa-arrow-right"} text-sm`}></i>
+            <span>{isAr ? "استعراض كافة الباقات والخدمات المتوفرة (أكثر من 500+ خدمة)" : "Explore All Packages & Services (500+)"}</span>
+            <i className={`fas ${isAr ? "fa-arrow-left" : "fa-arrow-right"} text-sm transition-transform group-hover:-translate-x-1`}></i>
           </Link>
         </div>
 

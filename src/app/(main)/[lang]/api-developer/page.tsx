@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect, use } from "react";
 import { useRouter } from "next/navigation";
@@ -154,7 +154,7 @@ export default function ApiDeveloperPage(props: { params: Promise<{ lang: string
       {toastMessage && (
         <div className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-50 p-4 rounded-xl shadow-2xl flex items-center gap-3 animate-in fade-in slide-in-from-bottom-4 duration-300 border ${
           toastMessage.type === "success" 
-            ? "bg-emerald-500/10 border-emerald-500/40 text-emerald-500" 
+            ? "bg-violet-500/10 border-violet-500/40 text-violet-500" 
             : "bg-red-500/10 border-red-500/40 text-red-500"
         }`}>
           <span className="material-symbols-outlined text-xl">
@@ -204,14 +204,14 @@ export default function ApiDeveloperPage(props: { params: Promise<{ lang: string
             </h2>
 
             {isApiEnabled ? (
-              <div className="flex flex-col items-center justify-center p-6 text-center rounded-2xl bg-emerald-500/10 border border-emerald-500/30">
-                <div className="w-12 h-12 rounded-full bg-emerald-500/20 flex items-center justify-center mb-3">
-                  <span className="material-symbols-outlined text-2xl text-emerald-400">check_circle</span>
+              <div className="flex flex-col items-center justify-center p-6 text-center rounded-2xl bg-violet-500/10 border border-violet-500/30">
+                <div className="w-12 h-12 rounded-full bg-violet-500/20 flex items-center justify-center mb-3">
+                  <span className="material-symbols-outlined text-2xl text-violet-400">check_circle</span>
                 </div>
-                <p className="text-sm font-bold text-emerald-400 mb-1">
+                <p className="text-sm font-bold text-violet-400 mb-1">
                   {lang === "ar" ? "تم تفعيل الـ API" : "API is Enabled"}
                 </p>
-                <p className="text-xs text-emerald-400/80">
+                <p className="text-xs text-violet-400/80">
                   {lang === "ar" ? "يمكنك الآن سحب الخدمات بأمان." : "You can now fetch services securely."}
                 </p>
               </div>
@@ -329,7 +329,7 @@ export default function ApiDeveloperPage(props: { params: Promise<{ lang: string
                 <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-primary/10 border border-primary/20 text-xs font-bold text-primary">
                   <span className="material-symbols-outlined text-sm">account_balance_wallet</span>
                   <span>{lang === "ar" ? "رصيدك المتاح للـ API:" : "Available Balance:"}</span>
-                  <span className="font-mono text-sm font-black text-emerald-400">${Number(userSession?.balance || 0).toFixed(2)}</span>
+                  <span className="font-mono text-sm font-black text-violet-400">${Number(userSession?.balance || 0).toFixed(2)}</span>
                 </div>
               </div>
 
@@ -347,7 +347,7 @@ export default function ApiDeveloperPage(props: { params: Promise<{ lang: string
                 <span className={`text-[11px] font-bold px-3 py-1 rounded-full border ${
                   userSession?.role === 'admin' 
                     ? 'bg-amber-500/10 border-amber-500/30 text-amber-400' 
-                    : 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400'
+                    : 'bg-violet-500/10 border-violet-500/30 text-violet-400'
                 }`}>
                   {userSession?.role === 'admin' 
                     ? (lang === "ar" ? "حساب الإدارة (Admin)" : "Master Admin Account") 
@@ -381,7 +381,7 @@ export default function ApiDeveloperPage(props: { params: Promise<{ lang: string
                     <p className="text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-1">
                       2. API USERNAME (اسم المستخدم المطلوب في الربط)
                     </p>
-                    <p className="text-emerald-400 font-mono font-bold text-sm sm:text-base dir-ltr select-all">
+                    <p className="text-violet-400 font-mono font-bold text-sm sm:text-base dir-ltr select-all">
                       {userSession?.username || userSession?.email}
                     </p>
                     {userSession?.username && userSession?.email && (
@@ -517,7 +517,7 @@ export default function ApiDeveloperPage(props: { params: Promise<{ lang: string
                     <p className="text-[11px] font-sans text-on-surface-variant mt-0.5">{lang === "ar" ? "إرسال طلب جديد مع الحقول المخصصة" : "Place order with custom fields & quantity"}</p>
                   </div>
                   <div className="p-2.5 rounded-xl bg-surface-container-high/60 border border-outline-variant/20 sm:col-span-2">
-                    <span className="text-emerald-400 font-bold">getserverorder / getimeiorder</span>
+                    <span className="text-violet-400 font-bold">getserverorder / getimeiorder</span>
                     <p className="text-[11px] font-sans text-on-surface-variant mt-0.5">{lang === "ar" ? "فحص حالة الطلب واستلام الكود / النتيجة فور اعتمادها من الإدارة" : "Check order status and receive code/voucher once approved"}</p>
                   </div>
                 </div>

@@ -58,12 +58,12 @@ export default function NewsletterSection({ lang = "ar", className = "" }: Newsl
     <section className={`w-full cyber-container ${className}`}>
       <div className="curved-cockpit p-6 sm:p-8 lg:p-12 rounded-3xl border-2 border-cyan-500/30 shadow-2xl relative overflow-hidden flex flex-col md:flex-row items-center gap-6 sm:gap-8 backdrop-blur-xl animate-neon-border">
         {/* Top & Bottom Arched Line Accents */}
-        <div className="absolute -top-[2px] left-0 right-0 h-[2.5px] bg-gradient-to-r from-transparent via-cyan-400 to-transparent shadow-[0_0_15px_#22d3ee] pointer-events-none"></div>
-        <div className="absolute -bottom-[2px] left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-emerald-400/60 to-transparent pointer-events-none"></div>
+        <div className="absolute -top-[2px] left-0 right-0 h-[2.5px] bg-gradient-to-r from-transparent via-cyan-400 to-transparent shadow-[0_0_15px_#8b5cf6] pointer-events-none"></div>
+        <div className="absolute -bottom-[2px] left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-violet-400/60 to-transparent pointer-events-none"></div>
 
         {/* Decorative background glows */}
         <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-500/15 rounded-bl-full pointer-events-none z-0 blur-2xl"></div>
-        <div className="absolute bottom-0 left-0 w-48 h-48 bg-emerald-500/10 rounded-tr-full pointer-events-none z-0 blur-xl"></div>
+        <div className="absolute bottom-0 left-0 w-48 h-48 bg-violet-500/10 rounded-tr-full pointer-events-none z-0 blur-xl"></div>
 
         {/* Content text */}
         <div className="flex-1 relative z-10 text-center md:text-start space-y-2">
@@ -101,20 +101,20 @@ export default function NewsletterSection({ lang = "ar", className = "" }: Newsl
         {/* Form or Success State */}
         <div className="w-full md:w-auto relative z-10 min-w-[280px] sm:min-w-[360px]">
           {success ? (
-            <div className="p-4 sm:p-5 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 flex items-start gap-3 animate-in fade-in zoom-in-95 duration-300">
-              <span className="material-symbols-outlined text-2xl text-emerald-400 shrink-0">check_circle</span>
+            <div className="p-4 sm:p-5 rounded-2xl bg-violet-500/15 border border-violet-500/30 text-violet-300 flex items-start gap-3 animate-in fade-in zoom-in-95 duration-300">
+              <span className="material-symbols-outlined text-2xl text-violet-400 shrink-0">check_circle</span>
               <div className="space-y-1">
-                <p className="font-bold text-sm text-emerald-200">
+                <p className="font-bold text-sm text-violet-200">
                   {isAr ? "شكراً لاشتراكك معنا!" : "Thank you for subscribing!"}
                 </p>
-                <p className="text-xs text-emerald-300/90 leading-relaxed">{message}</p>
+                <p className="text-xs text-violet-300/90 leading-relaxed">{message}</p>
                 <button
                   type="button"
                   onClick={() => {
                     setSuccess(false);
                     setMessage(null);
                   }}
-                  className="text-[11px] font-bold text-emerald-400 hover:underline pt-1 block"
+                  className="text-[11px] font-bold text-violet-400 hover:underline pt-1 block"
                 >
                   {isAr ? "اشتراك ببريد آخر" : "Subscribe another email"}
                 </button>
@@ -140,14 +140,14 @@ export default function NewsletterSection({ lang = "ar", className = "" }: Newsl
                     type="email"
                     required
                     disabled={loading}
-                    className="w-full px-4 py-3 sm:py-3.5 pl-10 rtl:pl-4 rtl:pr-10 bg-[#070c1a]/90 border border-cyan-500/35 rounded-xl focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 outline-none transition-all text-white text-sm placeholder:text-slate-400 shadow-inner"
+                    className="w-full px-4 py-3 sm:py-3.5 pl-10 rtl:pl-4 rtl:pr-10 bg-[#050814]/90 border border-cyan-500/35 rounded-xl focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 outline-none transition-all text-white text-sm placeholder:text-slate-400 shadow-inner"
                   />
                 </div>
 
                 <button
                   type="submit"
                   disabled={loading}
-                  className="convex-pill py-3 sm:py-3.5 px-7 font-black text-slate-950 bg-gradient-to-r from-emerald-500 via-teal-400 to-cyan-500 flex items-center justify-center gap-2 shrink-0 shadow-lg active:scale-95 active:shadow-[0_0_25px_rgba(45,212,191,0.8)] disabled:opacity-60 cursor-pointer"
+                  className="btn-purple-glow py-3 sm:py-3.5 px-8 font-black flex items-center justify-center gap-2 shrink-0 disabled:opacity-60 cursor-pointer"
                 >
                   {loading ? (
                     <>

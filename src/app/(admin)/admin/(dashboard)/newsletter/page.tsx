@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
 
@@ -219,13 +219,13 @@ export default function AdminNewsletterPage() {
           </div>
         </div>
 
-        <div className="glass-card p-5 rounded-2xl border border-emerald-500/30 flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-400 text-2xl">
+        <div className="glass-card p-5 rounded-2xl border border-violet-500/30 flex items-center gap-4">
+          <div className="w-12 h-12 rounded-xl bg-violet-500/10 flex items-center justify-center text-violet-400 text-2xl">
             <span className="material-symbols-outlined">mark_email_read</span>
           </div>
           <div>
-            <p className="text-xs text-emerald-400 font-bold">مشتركون نشطون</p>
-            <p className="text-2xl font-bold text-emerald-300">{stats.active}</p>
+            <p className="text-xs text-violet-400 font-bold">مشتركون نشطون</p>
+            <p className="text-2xl font-bold text-violet-300">{stats.active}</p>
           </div>
         </div>
 
@@ -327,9 +327,9 @@ export default function AdminNewsletterPage() {
                 <button
                   type="button"
                   onClick={() => applyTemplate("server")}
-                  className="px-3 py-1.5 rounded-lg bg-surface-container hover:bg-emerald-500/20 text-xs font-medium border border-outline-variant/30 transition-all flex items-center gap-1"
+                  className="px-3 py-1.5 rounded-lg bg-surface-container hover:bg-violet-500/20 text-xs font-medium border border-outline-variant/30 transition-all flex items-center gap-1"
                 >
-                  <span className="material-symbols-outlined text-xs text-emerald-400">lock_open</span>
+                  <span className="material-symbols-outlined text-xs text-violet-400">lock_open</span>
                   <span>تحديث خدمات فك شفرات</span>
                 </button>
               </div>
@@ -447,7 +447,7 @@ export default function AdminNewsletterPage() {
               {/* Mockup Email Container */}
               <div className="bg-[#0b1329] border border-outline-variant/30 rounded-2xl p-5 space-y-4 shadow-inner">
                 {/* Header Logo */}
-                <div className="flex items-center justify-between pb-3 border-b border-white/10">
+                <div className="flex items-center justify-between pb-3 border-b border-violet-400/15">
                   <span className="font-bold text-xs text-primary font-mono tracking-wider">ARAB TECH PRO SERVER</span>
                   <span className="text-[10px] text-white/50">إشعار رسمي</span>
                 </div>
@@ -457,7 +457,7 @@ export default function AdminNewsletterPage() {
                     {title || "عنوان الإشعار يظهر هنا..."}
                   </h4>
 
-                  <p className="text-xs text-white/70 leading-relaxed whitespace-pre-line bg-surface-container/30 p-3 rounded-xl border border-white/5">
+                  <p className="text-xs text-white/70 leading-relaxed whitespace-pre-line bg-surface-container/30 p-3 rounded-xl border border-violet-400/8">
                     {message || "محتوى ونصوص النشرة البريدية التوضيحية ستظهر هنا للعميل بشكل منسق وجذاب..."}
                   </p>
 
@@ -473,7 +473,7 @@ export default function AdminNewsletterPage() {
                   </div>
                 </div>
 
-                <div className="pt-4 border-t border-white/10 text-[10px] text-white/40 text-center space-y-1">
+                <div className="pt-4 border-t border-violet-400/15 text-[10px] text-white/40 text-center space-y-1">
                   <p>تصلك هذه الرسالة لاشتراكك في نشرة عرب تك برو سيرفر.</p>
                   <p>https://arabtechproserver.tech</p>
                 </div>
@@ -558,11 +558,11 @@ export default function AdminNewsletterPage() {
                         <span
                           className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
                             sub.isActive
-                              ? "bg-emerald-500/15 text-emerald-300 border border-emerald-500/30"
+                              ? "bg-violet-500/15 text-violet-300 border border-violet-500/30"
                               : "bg-error/15 text-error border border-error/30"
                           }`}
                         >
-                          <span className={`w-1.5 h-1.5 rounded-full ${sub.isActive ? "bg-emerald-400" : "bg-error"}`}></span>
+                          <span className={`w-1.5 h-1.5 rounded-full ${sub.isActive ? "bg-violet-400" : "bg-error"}`}></span>
                           {sub.isActive ? "نشط" : "معطل"}
                         </span>
                       </td>
@@ -626,7 +626,7 @@ export default function AdminNewsletterPage() {
                   </div>
 
                   <div className="flex items-center justify-between pt-2 border-t border-outline-variant/10 text-xs">
-                    <span className="text-emerald-400 font-bold flex items-center gap-1">
+                    <span className="text-violet-400 font-bold flex items-center gap-1">
                       <span className="material-symbols-outlined text-sm">send</span>
                       تم الإرسال لـ {b.sentCount} مشترك
                     </span>

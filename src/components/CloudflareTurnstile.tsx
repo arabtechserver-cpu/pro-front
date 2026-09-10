@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useRef, useState } from "react";
 
@@ -221,8 +221,8 @@ export default function CloudflareTurnstile({
         </div>
       )}
       {(hasError || hasFallback) && (
-        <div className="flex items-center gap-2 text-[11px] text-emerald-400/90 bg-emerald-500/10 px-3 py-1.5 rounded-full border border-emerald-500/20">
-          <span className="material-symbols-outlined text-xs text-emerald-400">verified_user</span>
+        <div className="flex items-center gap-2 text-[11px] text-violet-400/90 bg-violet-500/10 px-3 py-1.5 rounded-full border border-violet-500/20">
+          <span className="material-symbols-outlined text-xs text-violet-400">verified_user</span>
           <span>الاتصال محمي عبر Cloudflare WAF</span>
           <button
             type="button"

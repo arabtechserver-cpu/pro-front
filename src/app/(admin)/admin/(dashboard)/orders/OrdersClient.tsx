@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { getOrderFieldRows, getOrderServiceTypeLabel } from "../../../../../lib/order-details";
@@ -344,7 +344,7 @@ export default function OrdersClient() {
       {toastMessage && (
         <div
           className={`fixed bottom-8 left-8 z-50 px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-3 animate-in fade-in slide-in-from-bottom-4 text-white font-bold ${
-            toastMessage.type === "success" ? "bg-emerald-600 border border-emerald-400/40" : "bg-red-600 border border-red-400/40"
+            toastMessage.type === "success" ? "bg-violet-600 border border-violet-400/40" : "bg-red-600 border border-red-400/40"
           }`}
         >
           <span className="material-symbols-outlined text-2xl">
@@ -405,12 +405,12 @@ export default function OrdersClient() {
           <span className="material-symbols-outlined text-blue-400 text-3xl">rocket_launch</span>
         </div>
 
-        <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-between">
+        <div className="p-4 rounded-2xl bg-violet-500/10 border border-violet-500/30 flex items-center justify-between">
           <div>
-            <p className="text-[11px] font-bold text-emerald-300">الطلبات المكتملة</p>
-            <p className="text-2xl font-bold text-emerald-400 font-mono mt-1">{stats.completed}</p>
+            <p className="text-[11px] font-bold text-violet-300">الطلبات المكتملة</p>
+            <p className="text-2xl font-bold text-violet-400 font-mono mt-1">{stats.completed}</p>
           </div>
-          <span className="material-symbols-outlined text-emerald-400 text-3xl">task_alt</span>
+          <span className="material-symbols-outlined text-violet-400 text-3xl">task_alt</span>
         </div>
 
         <div className="p-4 rounded-2xl bg-red-500/10 border border-red-500/30 flex items-center justify-between">
@@ -465,7 +465,7 @@ export default function OrdersClient() {
           <button
             onClick={() => setStatusFilter("completed")}
             className={`px-3 py-1.5 rounded-lg transition-all ${
-              statusFilter === "completed" ? "bg-emerald-500 text-white shadow" : "bg-surface-container-high text-on-surface-variant hover:text-on-surface"
+              statusFilter === "completed" ? "bg-violet-500 text-white shadow" : "bg-surface-container-high text-on-surface-variant hover:text-on-surface"
             }`}
           >
             المكتملة ({stats.completed})
@@ -639,8 +639,8 @@ export default function OrdersClient() {
                       {/* Status Badge */}
                       <td className="p-4">
                         {order.status === "completed" && (
-                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 font-bold text-[11px]">
-                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-violet-500/15 border border-violet-500/30 text-violet-400 font-bold text-[11px]">
+                            <span className="w-1.5 h-1.5 rounded-full bg-violet-400"></span>
                             مكتمل
                           </span>
                         )}
@@ -699,7 +699,7 @@ export default function OrdersClient() {
                                 setManualCompleteOrder(order);
                                 setManualReplyCode(order.reply || "");
                               }}
-                              className="px-2.5 py-1.5 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-400 text-[11px] font-bold transition-all flex items-center gap-1"
+                              className="px-2.5 py-1.5 rounded-xl bg-violet-500/15 hover:bg-violet-500/25 border border-violet-500/30 text-violet-400 text-[11px] font-bold transition-all flex items-center gap-1"
                               title="إكمال الطلب يدوياً وإرسال كود التفعيل للعميل"
                             >
                               <span className="material-symbols-outlined text-xs">key</span>
@@ -784,10 +784,10 @@ export default function OrdersClient() {
       {/* MANUAL COMPLETE & SEND CODE MODAL */}
       {manualCompleteOrder && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in">
-          <div className="bg-surface-container w-full max-w-lg rounded-3xl p-6 sm:p-7 border border-emerald-500/40 shadow-2xl space-y-5">
+          <div className="bg-surface-container w-full max-w-lg rounded-3xl p-6 sm:p-7 border border-violet-500/40 shadow-2xl space-y-5">
             <div className="flex items-center justify-between pb-3 border-b border-outline-variant/20">
-              <div className="flex items-center gap-3 text-emerald-400">
-                <div className="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold">
+              <div className="flex items-center gap-3 text-violet-400">
+                <div className="w-10 h-10 rounded-xl bg-violet-500/20 text-violet-400 flex items-center justify-center font-bold">
                   <span className="material-symbols-outlined text-xl">key</span>
                 </div>
                 <div>
@@ -826,7 +826,7 @@ export default function OrdersClient() {
                   placeholder="اكتب كود فك القفل، كود الشحن، أو بيانات الحساب وكلمة المرور..."
                   value={manualReplyCode}
                   onChange={(e) => setManualReplyCode(e.target.value)}
-                  className="w-full px-4 py-3 bg-surface-container-lowest border border-emerald-500/40 rounded-xl focus:border-emerald-500 outline-none font-mono text-xs text-on-surface transition-all dir-ltr"
+                  className="w-full px-4 py-3 bg-surface-container-lowest border border-violet-500/40 rounded-xl focus:border-violet-500 outline-none font-mono text-xs text-on-surface transition-all dir-ltr"
                 />
                 <p className="text-[11px] text-on-surface-variant/80 mt-1">
                   سيظهر هذا الكود في حساب العميل مباشرة مع زر للنسخ الفوري.
@@ -839,7 +839,7 @@ export default function OrdersClient() {
                 type="button"
                 onClick={handleManualCompleteSubmit}
                 disabled={isCompletingManual || !manualReplyCode.trim()}
-                className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-black py-3 rounded-xl font-bold text-xs transition-all flex items-center justify-center gap-2 shadow-lg disabled:opacity-50"
+                className="flex-1 bg-violet-500 hover:bg-violet-600 text-black py-3 rounded-xl font-bold text-xs transition-all flex items-center justify-center gap-2 shadow-lg disabled:opacity-50"
               >
                 {isCompletingManual ? (
                   <span className="material-symbols-outlined animate-spin text-sm">refresh</span>
@@ -971,7 +971,7 @@ export default function OrdersClient() {
                 </div>
                 <div className="p-3 rounded-2xl bg-surface-container-high border border-outline-variant/20">
                   <div className="text-[10px] font-bold text-on-surface-variant mb-1">إجمالي البيع</div>
-                  <div className="font-mono font-bold text-emerald-400">${(selectedOrder.price || 0).toFixed(2)} USD</div>
+                  <div className="font-mono font-bold text-violet-400">${(selectedOrder.price || 0).toFixed(2)} USD</div>
                 </div>
                 <div className="p-3 rounded-2xl bg-surface-container-high border border-outline-variant/20">
                   <div className="text-[10px] font-bold text-on-surface-variant mb-1">تاريخ الطلب</div>
@@ -1007,7 +1007,7 @@ export default function OrdersClient() {
                         href={`https://wa.me/${selectedOrder.user.phone.replace(/[^0-9]/g, "")}`}
                         target="_blank"
                         rel="noreferrer"
-                        className="font-mono text-emerald-400 hover:underline font-bold dir-ltr inline-block"
+                        className="font-mono text-violet-400 hover:underline font-bold dir-ltr inline-block"
                       >
                         {selectedOrder.user.phone}
                       </a>
@@ -1059,7 +1059,7 @@ export default function OrdersClient() {
                     </div>
                     <div>
                       <span className="text-on-surface-variant">نسبة الربح المطبقة: </span>
-                      <span className="font-bold text-emerald-400">
+                      <span className="font-bold text-violet-400">
                         %{selectedOrder.apiDetails?.margin || selectedOrder.user?.apiMargin || 8} فوق التكلفة
                       </span>
                     </div>
@@ -1122,7 +1122,7 @@ export default function OrdersClient() {
                   </div>
                   <div>
                     <span className="text-on-surface-variant">سعر البيع: </span>
-                    <span className="font-mono font-bold text-emerald-400">${(selectedOrder.price || 0).toFixed(2)} USD</span>
+                    <span className="font-mono font-bold text-violet-400">${(selectedOrder.price || 0).toFixed(2)} USD</span>
                   </div>
                   <div>
                     <span className="text-on-surface-variant">التكلفة والربح: </span>
@@ -1174,7 +1174,7 @@ export default function OrdersClient() {
                                   ? "bg-red-500/15 border-red-500/30 text-red-400"
                                   : field.required
                                   ? "bg-amber-500/15 border-amber-500/30 text-amber-400"
-                                  : "bg-emerald-500/10 border-emerald-500/20 text-emerald-400"
+                                  : "bg-violet-500/10 border-violet-500/20 text-violet-400"
                               }`}>
                                 {field.missing ? "إجباري وناقص" : field.required ? "إجباري ومكتمل" : "اختياري"}
                               </span>
@@ -1203,8 +1203,8 @@ export default function OrdersClient() {
 
               {/* Code / Received Reply Card */}
               {selectedOrder.reply && (
-                <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 space-y-2">
-                  <div className="font-bold text-emerald-400 flex items-center justify-between">
+                <div className="p-4 rounded-2xl bg-violet-500/10 border border-violet-500/30 space-y-2">
+                  <div className="font-bold text-violet-400 flex items-center justify-between">
                     <span className="flex items-center gap-1.5">
                       <span className="material-symbols-outlined text-sm">key</span>
                       <span>الكود أو الرد المُسلّم للعميل:</span>
@@ -1215,13 +1215,13 @@ export default function OrdersClient() {
                         navigator.clipboard.writeText(selectedOrder.reply || "");
                         showToast("تم نسخ الكود بنجاح!");
                       }}
-                      className="px-2.5 py-1 rounded-lg bg-emerald-500 text-black font-bold text-[10px] hover:bg-emerald-400 transition-all flex items-center gap-1"
+                      className="px-2.5 py-1 rounded-lg bg-violet-500 text-black font-bold text-[10px] hover:bg-violet-400 transition-all flex items-center gap-1"
                     >
                       <span className="material-symbols-outlined text-xs">content_copy</span>
                       <span>نسخ</span>
                     </button>
                   </div>
-                  <p className="font-mono text-emerald-300 font-bold bg-black/50 p-3 rounded-xl whitespace-pre-wrap dir-ltr text-start block">
+                  <p className="font-mono text-violet-300 font-bold bg-black/50 p-3 rounded-xl whitespace-pre-wrap dir-ltr text-start block">
                     {cleanHtmlToText(selectedOrder.reply)}
                   </p>
                 </div>
@@ -1265,7 +1265,7 @@ export default function OrdersClient() {
                     <span
                       className={`absolute -right-6 top-0.5 w-3 h-3 rounded-full ring-4 ${
                         selectedOrder.status === "completed"
-                          ? "bg-emerald-400 ring-emerald-400/20"
+                          ? "bg-violet-400 ring-violet-400/20"
                           : selectedOrder.status === "processing"
                           ? "bg-blue-400 ring-blue-400/20"
                           : selectedOrder.status === "pending"
@@ -1307,7 +1307,7 @@ export default function OrdersClient() {
                       setManualCompleteOrder(selectedOrder);
                       setManualReplyCode(selectedOrder.reply || "");
                     }}
-                    className="px-4 py-2 rounded-xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-bold text-xs"
+                    className="px-4 py-2 rounded-xl bg-violet-500/20 text-violet-400 border border-violet-500/30 font-bold text-xs"
                   >
                     إكمال يدوياً وإرسال كود
                   </button>

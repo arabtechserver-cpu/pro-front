@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 
@@ -176,14 +176,14 @@ export default function CustomerLogsClient() {
                     <td className="p-4 font-bold text-on-surface">
                       <div>{order.user?.fullName || order.user?.email || "بدون اسم"}</div>
                       {order.user?.phone && (
-                        <div className="text-[10px] text-emerald-400 font-mono font-normal dir-ltr mt-0.5">{order.user.phone}</div>
+                        <div className="text-[10px] text-violet-400 font-mono font-normal dir-ltr mt-0.5">{order.user.phone}</div>
                       )}
                     </td>
                     <td className="p-4 text-on-surface">{order.serviceName || order.serviceId}</td>
                     <td className="p-4 text-primary font-bold font-mono">${(order.price || 0).toFixed(2)}</td>
                     <td className="p-4">
                       <span className={`px-2.5 py-1 rounded-full text-[11px] font-bold ${
-                        order.status === "completed" ? "bg-emerald-500/15 text-emerald-400 border border-emerald-500/30" :
+                        order.status === "completed" ? "bg-violet-500/15 text-violet-400 border border-violet-500/30" :
                         order.status === "pending" ? "bg-amber-500/15 text-amber-400 border border-amber-500/30" :
                         "bg-red-500/15 text-red-400 border border-red-500/30"
                       }`}>
@@ -221,14 +221,14 @@ export default function CustomerLogsClient() {
                     <td className="p-4 font-bold text-on-surface">
                       <div>{tx.user?.fullName || tx.user?.email || "بدون اسم"}</div>
                       {tx.user?.phone && (
-                        <div className="text-[10px] text-emerald-400 font-mono font-normal dir-ltr mt-0.5">{tx.user.phone}</div>
+                        <div className="text-[10px] text-violet-400 font-mono font-normal dir-ltr mt-0.5">{tx.user.phone}</div>
                       )}
                     </td>
-                    <td className="p-4 text-emerald-400 font-bold font-mono dir-ltr">+${(tx.amount || 0).toFixed(2)}</td>
+                    <td className="p-4 text-violet-400 font-bold font-mono dir-ltr">+${(tx.amount || 0).toFixed(2)}</td>
                     <td className="p-4 text-on-surface-variant">{tx.method}</td>
                     <td className="p-4">
                       <span className={`px-2.5 py-1 rounded-full text-[11px] font-bold ${
-                        tx.status === "completed" ? "bg-emerald-500/15 text-emerald-400 border border-emerald-500/30" :
+                        tx.status === "completed" ? "bg-violet-500/15 text-violet-400 border border-violet-500/30" :
                         tx.status === "pending" ? "bg-amber-500/15 text-amber-400 border border-amber-500/30" :
                         "bg-red-500/15 text-red-400 border border-red-500/30"
                       }`}>

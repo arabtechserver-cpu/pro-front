@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
@@ -777,8 +777,8 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
       {/* CELEBRATION ORDER SUCCESS MODAL */}
       {successOrderModalData && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-xl animate-in fade-in duration-300">
-          <div className="glass-card w-full max-w-lg rounded-3xl p-6 sm:p-8 border border-emerald-500/50 shadow-2xl relative overflow-hidden space-y-6 text-center bg-surface-container-low">
-            <div className="w-20 h-20 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 flex items-center justify-center mx-auto shadow-xl ring-8 ring-emerald-500/10">
+          <div className="glass-card w-full max-w-lg rounded-3xl p-6 sm:p-8 border border-violet-500/50 shadow-2xl relative overflow-hidden space-y-6 text-center bg-surface-container-low">
+            <div className="w-20 h-20 rounded-full bg-violet-500/20 text-violet-400 border border-violet-500/40 flex items-center justify-center mx-auto shadow-xl ring-8 ring-violet-500/10">
               <span className="material-symbols-outlined text-4xl animate-bounce">check_circle</span>
             </div>
 
@@ -809,7 +809,7 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-on-surface-variant font-bold">المبلغ المخصوم:</span>
-                <span className="font-mono font-bold text-emerald-400">${successOrderModalData.price.toFixed(2)} USD</span>
+                <span className="font-mono font-bold text-violet-400">${successOrderModalData.price.toFixed(2)} USD</span>
               </div>
               <div className="flex justify-between items-center pt-2 border-t border-outline-variant/15">
                 <span className="text-on-surface-variant font-bold">رصيد محفظتك الجديد:</span>
@@ -821,7 +821,7 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
             <div className="flex flex-col sm:flex-row gap-3 pt-2">
               <Link
                 href={`/${lang}/orders`}
-                className="flex-1 bg-gradient-to-r from-emerald-500 to-teal-600 text-black py-3.5 rounded-2xl font-bold text-xs shadow-lg hover:shadow-emerald-500/30 transition-all flex items-center justify-center gap-2 active:scale-95"
+                className="flex-1 bg-gradient-to-r from-violet-500 to-purple-600 text-black py-3.5 rounded-2xl font-bold text-xs shadow-lg hover:shadow-violet-500/30 transition-all flex items-center justify-center gap-2 active:scale-95"
               >
                 <span className="material-symbols-outlined text-base">receipt_long</span>
                 <span>{lang === 'ar' ? 'الانتقال لسجل طلباتي' : 'View in My Orders'}</span>
@@ -842,25 +842,25 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
       <div className="rounded-3xl p-4 sm:p-5 border border-amber-500/35 bg-gradient-to-r from-amber-500/10 via-surface-container-low/95 to-primary/10 shadow-[0_0_35px_rgba(245,158,11,0.14)] backdrop-blur-xl relative overflow-hidden transition-all">
         {/* Glowing ambient background auras */}
         <div className="absolute -top-12 -right-12 w-48 h-48 bg-amber-500/15 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-12 -left-12 w-48 h-48 bg-emerald-500/15 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-12 -left-12 w-48 h-48 bg-violet-500/15 rounded-full blur-3xl pointer-events-none" />
 
         <div className="relative z-10 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
           
           {/* Section 1: Realistic Fluctuating Live Viewers (عداد المتصفحين الحي والواقعي) */}
           <div className="flex items-center gap-3.5 flex-1 border-b md:border-b-0 md:border-l rtl:md:border-l-0 rtl:md:border-r border-outline-variant/30 pb-3 md:pb-0 md:pe-5">
             {/* Live Indicator Icon with Glowing Pulse */}
-            <div className="relative shrink-0 flex items-center justify-center w-12 h-12 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.25)]">
+            <div className="relative shrink-0 flex items-center justify-center w-12 h-12 rounded-2xl bg-violet-500/15 border border-violet-500/30 text-violet-400 shadow-[0_0_15px_rgba(109,40,217,0.25)]">
               <span className="material-symbols-outlined text-2xl">group</span>
               <span className="absolute -top-1 -right-1 flex h-3.5 w-3.5">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-emerald-500 border-2 border-surface-container-lowest"></span>
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-violet-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-violet-500 border-2 border-surface-container-lowest"></span>
               </span>
             </div>
 
             <div className="space-y-0.5">
               <div className="flex items-center gap-2">
-                <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-extrabold text-[10px] tracking-wider uppercase border border-emerald-500/40 flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span className="px-2 py-0.5 rounded-full bg-violet-500/20 text-violet-300 font-extrabold text-[10px] tracking-wider uppercase border border-violet-500/40 flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-violet-400 animate-pulse"></span>
                   <span>{lang === 'ar' ? 'مباشر الآن' : 'LIVE NOW'}</span>
                 </span>
                 <span className="text-[11px] text-on-surface-variant font-medium flex items-center gap-1">
@@ -905,7 +905,7 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
                     {copiedCode ? "check" : "content_copy"}
                   </span>
                   {copiedCode && (
-                    <span className="text-[10px] text-emerald-400 font-sans">
+                    <span className="text-[10px] text-violet-400 font-sans">
                       {lang === 'ar' ? 'تم النسخ!' : 'Copied!'}
                     </span>
                   )}
@@ -998,7 +998,7 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
           <div
             className={`p-4 rounded-2xl text-xs font-bold flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
               submitFeedback.type === "success"
-                ? "bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 glow-cyan"
+                ? "bg-violet-500/15 border border-violet-500/30 text-violet-300 glow-cyan"
                 : "bg-red-500/15 border border-red-500/30 text-red-300"
             }`}
           >
@@ -1012,7 +1012,7 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
             {submitFeedback.type === "success" && (
               <Link
                 href={`/${lang}/orders`}
-                className="px-4 py-2 rounded-xl bg-emerald-500 text-black font-bold text-xs hover:bg-emerald-400 transition-all shrink-0 text-center"
+                className="px-4 py-2 rounded-xl bg-violet-500 text-black font-bold text-xs hover:bg-violet-400 transition-all shrink-0 text-center"
               >
                 {lang === 'ar' ? 'عرض ومتابعة طلباتي' : 'Track My Orders'}
               </Link>
@@ -1164,13 +1164,13 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
                           ${unitPrice.toFixed(2)} USD
                         </span>
                       </div>
-                      <span className="text-[10px] font-bold text-emerald-400 bg-emerald-500/15 border border-emerald-500/30 px-2 py-0.5 rounded-full flex items-center gap-1">
+                      <span className="text-[10px] font-bold text-violet-400 bg-violet-500/15 border border-violet-500/30 px-2 py-0.5 rounded-full flex items-center gap-1">
                         <span className="material-symbols-outlined text-[12px]">local_offer</span>
                         <span>{lang === 'ar' ? 'خصم 10% مطبق' : '10% OFF Applied'}</span>
                       </span>
                     </div>
                   ) : isFreeService ? (
-                    <span className="text-sm font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-3 py-1 rounded-xl inline-block mt-1">
+                    <span className="text-sm font-bold text-violet-400 bg-violet-500/10 border border-violet-500/30 px-3 py-1 rounded-xl inline-block mt-1">
                       {lang === 'ar' ? 'خدمة مجانية' : 'Free Service'}
                     </span>
                   ) : (
@@ -1575,7 +1575,7 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
                     <span>{lang === 'ar' ? 'تطبيق الخصم' : 'Apply'}</span>
                   </button>
                 ) : (
-                  <div className="px-4 py-3 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 font-bold text-xs shrink-0 flex items-center gap-1">
+                  <div className="px-4 py-3 rounded-xl bg-violet-500/20 border border-violet-500/40 text-violet-400 font-bold text-xs shrink-0 flex items-center gap-1">
                     <span className="material-symbols-outlined text-sm">verified</span>
                     <span>{appliedCoupon.discountPercent}% OFF</span>
                   </div>
@@ -1586,7 +1586,7 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
                 <div
                   className={`p-2.5 rounded-xl text-xs font-bold flex items-center gap-2 ${
                     couponFeedback.type === 'success'
-                      ? 'bg-emerald-500/15 border border-emerald-500/30 text-emerald-300'
+                      ? 'bg-violet-500/15 border border-violet-500/30 text-violet-300'
                       : 'bg-red-500/15 border border-red-500/30 text-red-300'
                   }`}
                 >
@@ -1615,7 +1615,7 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
                   )}
                   <p className="text-xl font-bold font-mono text-primary glow-cyan dir-ltr">${totalPrice.toFixed(2)} USD</p>
                   {rawTotalPrice > 0 && (
-                    <span className="text-[11px] font-bold text-emerald-400 bg-emerald-500/15 border border-emerald-500/30 px-2 py-0.5 rounded-md flex items-center gap-1 dir-ltr">
+                    <span className="text-[11px] font-bold text-violet-400 bg-violet-500/15 border border-violet-500/30 px-2 py-0.5 rounded-md flex items-center gap-1 dir-ltr">
                       <span>-10% (${((rawTotalPrice / 0.9) - rawTotalPrice).toFixed(2)})</span>
                     </span>
                   )}
@@ -1626,7 +1626,7 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
                   )}
                 </div>
                 {rawTotalPrice > 0 && (
-                  <p className="text-[11px] text-emerald-400/90 mt-1 flex items-center gap-1">
+                  <p className="text-[11px] text-violet-400/90 mt-1 flex items-center gap-1">
                     <span className="material-symbols-outlined text-xs">verified</span>
                     <span>{lang === 'ar' ? 'تم تطبيق خصم 10% الترويجي تلقائياً على هذا الطلب' : '10% promotional discount automatically applied'}</span>
                   </p>
@@ -1636,8 +1636,8 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
 
             <div className="text-center sm:text-end">
               {hasEnoughBalance ? (
-                <span className="px-3.5 py-1.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 font-bold text-xs inline-flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
+                <span className="px-3.5 py-1.5 rounded-full bg-violet-500/15 border border-violet-500/30 text-violet-400 font-bold text-xs inline-flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-violet-400"></span>
                   <span>{lang === 'ar' ? `رصيدك كافٍ ($${userBalance.toFixed(2)})` : `Sufficient balance ($${userBalance.toFixed(2)})`}</span>
                 </span>
               ) : (
@@ -1664,7 +1664,7 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
             className={`w-full py-4 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 transition-all shadow-xl active:scale-[0.99] ${
               !hasEnoughBalance || !selectedService
                 ? "bg-surface-container-high border border-outline-variant/30 text-on-surface-variant/50 cursor-not-allowed"
-                : "bg-gradient-to-r from-primary to-secondary text-on-primary hover:shadow-[0_0_25px_rgba(45,212,191,0.4)]"
+                : "bg-gradient-to-r from-primary to-secondary text-on-primary hover:shadow-[0_0_25px_rgba(124,58,237,0.4)]"
             }`}
           >
             {submittingOrder ? (

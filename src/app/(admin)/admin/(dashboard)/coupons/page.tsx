@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
 
@@ -173,10 +173,10 @@ export default function AdminCouponsPage() {
           <h3 className="text-2xl font-bold font-mono text-on-surface">{totalCoupons}</h3>
           <p className="text-[11px] text-on-surface-variant">كود مسجل بالداتابيز</p>
         </div>
-        <div className="glass-card p-5 rounded-2xl border border-emerald-500/20 shadow-lg space-y-1 bg-emerald-500/5">
-          <p className="text-xs font-bold text-emerald-400">الكوبونات النشطة</p>
-          <h3 className="text-2xl font-bold font-mono text-emerald-400">{activeCoupons}</h3>
-          <p className="text-[11px] text-emerald-300/80">صالحة للاستخدام الآن</p>
+        <div className="glass-card p-5 rounded-2xl border border-violet-500/20 shadow-lg space-y-1 bg-violet-500/5">
+          <p className="text-xs font-bold text-violet-400">الكوبونات النشطة</p>
+          <h3 className="text-2xl font-bold font-mono text-violet-400">{activeCoupons}</h3>
+          <p className="text-[11px] text-violet-300/80">صالحة للاستخدام الآن</p>
         </div>
         <div className="glass-card p-5 rounded-2xl border border-primary/20 shadow-lg space-y-1 bg-primary/5">
           <p className="text-xs font-bold text-primary">إجمالي مرات الاستخدام</p>
@@ -204,7 +204,7 @@ export default function AdminCouponsPage() {
           <div
             className={`p-4 rounded-2xl text-xs font-bold flex items-center gap-2 ${
               feedback.type === "success"
-                ? "bg-emerald-500/15 border border-emerald-500/30 text-emerald-300"
+                ? "bg-violet-500/15 border border-violet-500/30 text-violet-300"
                 : "bg-red-500/15 border border-red-500/30 text-red-300"
             }`}
           >
@@ -299,7 +299,7 @@ export default function AdminCouponsPage() {
           <button
             type="submit"
             disabled={submitting || !code.trim()}
-            className="w-full sm:w-auto px-8 py-3.5 rounded-2xl bg-gradient-to-r from-primary to-secondary text-on-primary font-bold text-sm hover:shadow-[0_0_25px_rgba(45,212,191,0.4)] transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:pointer-events-none"
+            className="w-full sm:w-auto px-8 py-3.5 rounded-2xl bg-gradient-to-r from-primary to-secondary text-on-primary font-bold text-sm hover:shadow-[0_0_25px_rgba(124,58,237,0.4)] transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:pointer-events-none"
           >
             {submitting ? (
               <>
@@ -394,7 +394,7 @@ export default function AdminCouponsPage() {
                       </td>
 
                       {/* Discount % */}
-                      <td className="p-4 text-center font-mono font-bold text-sm text-emerald-400">
+                      <td className="p-4 text-center font-mono font-bold text-sm text-violet-400">
                         {c.discountPercent}% OFF
                       </td>
 
@@ -451,8 +451,8 @@ export default function AdminCouponsPage() {
                             <span>منتهي المدة</span>
                           </span>
                         ) : c.isActive ? (
-                          <span className="px-2.5 py-1 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 text-[11px] font-bold inline-flex items-center gap-1">
-                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                          <span className="px-2.5 py-1 rounded-full bg-violet-500/15 text-violet-400 border border-violet-500/30 text-[11px] font-bold inline-flex items-center gap-1">
+                            <span className="w-1.5 h-1.5 rounded-full bg-violet-400 animate-pulse"></span>
                             <span>نشط وشغال</span>
                           </span>
                         ) : (
@@ -472,7 +472,7 @@ export default function AdminCouponsPage() {
                             className={`px-3 py-1.5 rounded-xl text-[11px] font-bold transition-all cursor-pointer flex items-center gap-1 border ${
                               c.isActive
                                 ? "bg-amber-500/10 border-amber-500/30 text-amber-300 hover:bg-amber-500/20"
-                                : "bg-emerald-500/10 border-emerald-500/30 text-emerald-300 hover:bg-emerald-500/20"
+                                : "bg-violet-500/10 border-violet-500/30 text-violet-300 hover:bg-violet-500/20"
                             }`}
                           >
                             <span className="material-symbols-outlined text-xs">

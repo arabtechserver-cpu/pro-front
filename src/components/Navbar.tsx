@@ -209,7 +209,7 @@ export default function Navbar({ lang, dict }: NavbarProps) {
                 <source srcSet={lang === "ar" ? "/images/logo_ar.webp" : "/images/logo_en.webp"} type="image/webp" />
                 <img 
                   src={lang === "ar" ? "/images/logo_ar.png" : "/images/logo_en.png"} 
-                  alt={lang === "ar" ? "عرب تك برو سيرفر | Arab Tech Pro Server (عرب تيك سيرفر)" : "Arab Tech Pro Server Logo"} 
+                  alt={lang === "ar" ? "عرب تك برو سيرفر | Arab Tech Pro Server" : "Arab Tech Pro Server Logo"} 
                   width={240}
                   height={60}
                   className="relative z-10 h-10 sm:h-13 md:h-16 lg:h-18 w-auto max-w-[200px] sm:max-w-[290px] md:max-w-[380px] lg:max-w-[440px] object-contain transition-transform duration-300 group-hover:scale-105 drop-shadow-[0_0_15px_rgba(255,255,255,0.35)]" 
@@ -223,7 +223,7 @@ export default function Navbar({ lang, dict }: NavbarProps) {
                 href={`/${lang}`} 
                 className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
                   isActive("/") 
-                    ? "bg-primary text-on-primary font-bold shadow-[0_0_12px_rgba(45,212,191,0.3)]" 
+                    ? "bg-primary text-on-primary font-bold shadow-[0_0_12px_rgba(139,92,246,0.3)]" 
                     : "text-on-surface-variant hover:text-primary hover:bg-surface-container-high/50"
                 }`}
               >
@@ -236,7 +236,7 @@ export default function Navbar({ lang, dict }: NavbarProps) {
                   aria-label={dict.resellerPricing || (lang === "ar" ? "قائمة الأسعار والخدمات" : "Reseller Pricing")}
                   className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
                     isActive("/pricing") 
-                      ? "bg-primary text-on-primary font-bold shadow-[0_0_12px_rgba(45,212,191,0.3)]" 
+                      ? "bg-primary text-on-primary font-bold shadow-[0_0_12px_rgba(139,92,246,0.3)]" 
                       : "text-on-surface-variant hover:text-primary hover:bg-surface-container-high/50"
                   }`}
                 >
@@ -265,7 +265,7 @@ export default function Navbar({ lang, dict }: NavbarProps) {
                 href={`/${lang}/orders`} 
                 className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 flex items-center gap-1.5 ${
                   isActive("/orders") 
-                    ? "bg-primary text-on-primary font-bold shadow-[0_0_12px_rgba(45,212,191,0.3)]" 
+                    ? "bg-primary text-on-primary font-bold shadow-[0_0_12px_rgba(139,92,246,0.3)]" 
                     : "text-on-surface-variant hover:text-primary hover:bg-surface-container-high/50"
                 }`}
               >
@@ -278,7 +278,7 @@ export default function Navbar({ lang, dict }: NavbarProps) {
                 href={`/${lang}/wallet`} 
                 className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 flex items-center gap-1.5 ${
                   isActive("/wallet") 
-                    ? "bg-primary text-on-primary font-bold shadow-[0_0_12px_rgba(45,212,191,0.3)]" 
+                    ? "bg-primary text-on-primary font-bold shadow-[0_0_12px_rgba(139,92,246,0.3)]" 
                     : "text-on-surface-variant hover:text-primary hover:bg-surface-container-high/50"
                 }`}
               >
@@ -290,7 +290,7 @@ export default function Navbar({ lang, dict }: NavbarProps) {
                 href={`/${lang}/blog`} 
                 className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
                   isActive("/blog") 
-                    ? "bg-primary text-on-primary font-bold shadow-[0_0_12px_rgba(45,212,191,0.3)]" 
+                    ? "bg-primary text-on-primary font-bold shadow-[0_0_12px_rgba(139,92,246,0.3)]" 
                     : "text-on-surface-variant hover:text-primary hover:bg-surface-container-high/50"
                 }`}
               >
@@ -301,7 +301,7 @@ export default function Navbar({ lang, dict }: NavbarProps) {
                 href={`/${lang}/tutorials`} 
                 className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
                   isActive("/tutorials") 
-                    ? "bg-primary text-on-primary font-bold shadow-[0_0_12px_rgba(45,212,191,0.3)]" 
+                    ? "bg-primary text-on-primary font-bold shadow-[0_0_12px_rgba(139,92,246,0.3)]" 
                     : "text-on-surface-variant hover:text-primary hover:bg-surface-container-high/50"
                 }`}
               >
@@ -312,7 +312,7 @@ export default function Navbar({ lang, dict }: NavbarProps) {
                 href={`/${lang}/contact`} 
                 className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
                   isActive("/contact") 
-                    ? "bg-primary text-on-primary font-bold shadow-[0_0_12px_rgba(45,212,191,0.3)]" 
+                    ? "bg-primary text-on-primary font-bold shadow-[0_0_12px_rgba(139,92,246,0.3)]" 
                     : "text-on-surface-variant hover:text-primary hover:bg-surface-container-high/50"
                 }`}
               >
@@ -341,7 +341,7 @@ export default function Navbar({ lang, dict }: NavbarProps) {
                   type="button"
                   aria-label={userSession.fullName || userSession.username || (lang === "ar" ? "قائمة الحساب الشخصي" : "User Profile Menu")}
                   onClick={() => setUserDropdownOpen(!userDropdownOpen)}
-                  className="flex items-center gap-3 p-1.5 pr-4 rounded-full bg-surface-container-high/80 border border-primary/40 hover:border-primary text-on-surface transition-all shadow-[0_0_15px_rgba(45,212,191,0.15)] group"
+                  className="flex items-center gap-3 p-1.5 pr-4 rounded-full bg-surface-container-high/80 border border-primary/40 hover:border-primary text-on-surface transition-all shadow-[0_0_15px_rgba(139,92,246,0.15)] group"
                 >
                   <div className="flex flex-col text-end">
                     <span className="text-xs font-bold text-on-surface flex items-center gap-1.5 justify-end">
@@ -375,14 +375,14 @@ export default function Navbar({ lang, dict }: NavbarProps) {
                       <div className="mt-2 pt-2 border-t border-primary/20 flex items-center justify-between">
                         <span 
                           className="text-[10px] font-bold px-2 py-0.5 rounded-md text-white flex items-center gap-1 shadow-sm"
-                          style={{ backgroundColor: userSession.membershipTier?.badgeColor || "#2dd4bf" }}
+                          style={{ backgroundColor: userSession.membershipTier?.badgeColor || "#7c3aed" }}
                         >
                           <span className="material-symbols-outlined text-xs">workspace_premium</span>
                           <span>{userSession.membershipTier?.nameAr || userSession.membershipTier?.name || (lang === "ar" ? "عضوية أساسية" : "Standard")}</span>
                         </span>
                         
                         {(userSession.effectiveDiscount || (userSession.membershipTier?.discountPercentage || 0) > 0 || (userSession.customDiscount || 0) > 0) ? (
-                          <span className="text-[11px] font-extrabold text-emerald-400 font-mono">
+                          <span className="text-[11px] font-extrabold text-violet-400 font-mono">
                             {lang === "ar" ? `خصم ${userSession.effectiveDiscount || userSession.membershipTier?.discountPercentage || userSession.customDiscount}%` : `${userSession.effectiveDiscount || userSession.membershipTier?.discountPercentage || userSession.customDiscount}% OFF`}
                           </span>
                         ) : (
@@ -484,10 +484,9 @@ export default function Navbar({ lang, dict }: NavbarProps) {
             ) : (
               <Link 
                 href={`/${lang}/login`} 
-                className="relative flex items-center gap-2 px-6 py-2.5 rounded-full bg-gradient-to-r from-primary to-secondary text-on-primary font-bold text-sm hover:shadow-[0_0_20px_rgba(45,212,191,0.4)] hover:scale-[1.03] active:scale-95 transition-all duration-300 group overflow-hidden"
+                className="btn-purple-glow flex items-center gap-2 px-6 py-2 rounded-full text-white font-bold text-sm hover:scale-[1.03] active:scale-95 transition-all duration-300"
               >
-                <span className="absolute inset-0 bg-white/20 transform -translate-x-full group-hover:translate-x-full transition-transform duration-700"></span>
-                <span className="material-symbols-outlined text-lg group-hover:rotate-12 transition-transform duration-300">lock</span>
+                <span className="material-symbols-outlined text-lg">lock</span>
                 <span>{dict.login}</span>
               </Link>
             )}
@@ -650,7 +649,7 @@ export default function Navbar({ lang, dict }: NavbarProps) {
               <Link 
                 href={`/${lang}/login`} 
                 onClick={() => setMobileMenuOpen(false)} 
-                className="p-3.5 rounded-xl bg-gradient-to-r from-primary to-secondary text-on-primary font-bold text-center flex items-center justify-center gap-2 shadow-lg hover:opacity-95 transition-all"
+                className="btn-purple-glow p-3.5 rounded-full text-white font-bold text-center flex items-center justify-center gap-2"
               >
                 <span className="material-symbols-outlined text-lg">lock</span>
                 {dict.login}

@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import { Inter, Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google";
 import "../../globals.css";
 
@@ -26,7 +26,7 @@ export default function AdminRootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="en" className="dark" style={{ backgroundColor: "#050814", colorScheme: "dark" }}>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
@@ -38,7 +38,10 @@ export default function AdminRootLayout({
           crossOrigin="anonymous"
         />
       </head>
-      <body className={`${inter.variable} ${jakarta.variable} ${jetbrains.variable} bg-surface text-on-surface antialiased`}>
+      <body
+        className={`${inter.variable} ${jakarta.variable} ${jetbrains.variable} bg-surface text-on-surface antialiased`}
+        style={{ backgroundColor: "#050814", colorScheme: "dark" }}
+      >
         {children}
       </body>
     </html>

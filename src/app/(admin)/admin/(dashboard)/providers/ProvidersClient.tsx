@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect, useRef, useCallback, useDeferredValue, useMemo } from "react";
 import Link from "next/link";
@@ -841,7 +841,7 @@ export default function ProvidersClient() {
       {toastMessage && (
         <div
           className={`fixed bottom-8 left-8 z-50 px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-3 animate-in fade-in slide-in-from-bottom-4 text-white font-bold ${
-            toastMessage.type === "success" ? "bg-emerald-600 border border-emerald-400/40" : "bg-red-600 border border-red-400/40"
+            toastMessage.type === "success" ? "bg-violet-600 border border-violet-400/40" : "bg-red-600 border border-red-400/40"
           }`}
         >
           <span className="material-symbols-outlined text-2xl">
@@ -867,10 +867,10 @@ export default function ProvidersClient() {
           <button
             onClick={handleExportAllProvidersJson}
             disabled={isExportingAll}
-            className="px-4 py-3 rounded-2xl bg-surface-container-high hover:bg-surface-container-highest text-on-surface text-xs font-bold border border-outline-variant/30 hover:border-emerald-500/40 transition-all flex items-center justify-center gap-2 shadow-sm"
+            className="px-4 py-3 rounded-2xl bg-surface-container-high hover:bg-surface-container-highest text-on-surface text-xs font-bold border border-outline-variant/30 hover:border-violet-500/40 transition-all flex items-center justify-center gap-2 shadow-sm"
             title="تحميل كافة بيانات المزودين والخدمات والباقات كملف JSON شامل"
           >
-            <span className={`material-symbols-outlined text-base text-emerald-400 ${isExportingAll ? "animate-spin" : ""}`}>
+            <span className={`material-symbols-outlined text-base text-violet-400 ${isExportingAll ? "animate-spin" : ""}`}>
               {isExportingAll ? "refresh" : "download_for_offline"}
             </span>
             <span>{isExportingAll ? "جاري تجهيز البيانات..." : "تصدير كل المزودين (JSON)"}</span>
@@ -930,7 +930,7 @@ export default function ProvidersClient() {
                         <span
                           className={`text-[11px] px-2.5 py-0.5 rounded-full font-bold border ${
                             provider.isActive
-                              ? "bg-emerald-500/15 text-emerald-400 border-emerald-500/30"
+                              ? "bg-violet-500/15 text-violet-400 border-violet-500/30"
                               : "bg-red-500/15 text-red-400 border-red-500/30"
                           }`}
                         >
@@ -993,7 +993,7 @@ export default function ProvidersClient() {
                   <div className="flex items-center justify-end gap-2.5 flex-wrap">
                     <button
                       onClick={() => setRawExportModalProvider(provider)}
-                      className="px-3.5 py-2 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-400 text-xs font-bold transition-all flex items-center gap-1.5 border border-emerald-500/30 shadow-sm"
+                      className="px-3.5 py-2 rounded-xl bg-violet-500/15 hover:bg-violet-500/25 text-violet-400 text-xs font-bold transition-all flex items-center gap-1.5 border border-violet-500/30 shadow-sm"
                       title="تحميل محتوى المزود الأصلي بالكامل بدون أي إضافات منا (Raw JSON)"
                     >
                       <span className="material-symbols-outlined text-sm">download_for_offline</span>
@@ -1003,10 +1003,10 @@ export default function ProvidersClient() {
                     <button
                       onClick={() => handleExportProviderJson(provider)}
                       disabled={exportingProviderId === provider.id}
-                      className="px-3.5 py-2 rounded-xl bg-surface-container-high hover:bg-surface-container-highest text-on-surface text-xs font-bold transition-all flex items-center gap-1.5 border border-outline-variant/30 hover:border-emerald-500/40"
+                      className="px-3.5 py-2 rounded-xl bg-surface-container-high hover:bg-surface-container-highest text-on-surface text-xs font-bold transition-all flex items-center gap-1.5 border border-outline-variant/30 hover:border-violet-500/40"
                       title="تحميل كل داتا المزود والتفاصيل والباقات والحقول كملف JSON شامل"
                     >
-                      <span className={`material-symbols-outlined text-sm text-emerald-400 ${exportingProviderId === provider.id ? "animate-spin" : ""}`}>
+                      <span className={`material-symbols-outlined text-sm text-violet-400 ${exportingProviderId === provider.id ? "animate-spin" : ""}`}>
                         {exportingProviderId === provider.id ? "refresh" : "download"}
                       </span>
                       <span>{exportingProviderId === provider.id ? "جاري التجهيز..." : "تصدير شامل"}</span>
@@ -1166,7 +1166,7 @@ export default function ProvidersClient() {
                   <div
                     className={`p-3 rounded-xl text-xs font-bold flex items-center gap-2 ${
                       testResult.success
-                        ? "bg-emerald-500/10 border border-emerald-500/30 text-emerald-400"
+                        ? "bg-violet-500/10 border border-violet-500/30 text-violet-400"
                         : "bg-red-500/10 border border-red-500/30 text-red-400"
                     }`}
                   >
@@ -1178,15 +1178,15 @@ export default function ProvidersClient() {
                 )}
               </div>
 
-              <div className="flex items-center gap-3 p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
+              <div className="flex items-center gap-3 p-3.5 rounded-xl bg-violet-500/10 border border-violet-500/20">
                 <input
                   id="providerActiveToggle"
                   type="checkbox"
                   checked={formData.isActive}
                   onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
-                  className="w-4 h-4 accent-emerald-500 cursor-pointer"
+                  className="w-4 h-4 accent-violet-500 cursor-pointer"
                 />
-                <label htmlFor="providerActiveToggle" className="text-xs font-bold text-emerald-400 cursor-pointer select-none">
+                <label htmlFor="providerActiveToggle" className="text-xs font-bold text-violet-400 cursor-pointer select-none">
                   تفعيل السيرفر واستقبال وتنفيذ الطلبات والتفعيلات آلياً
                 </label>
               </div>
@@ -1409,7 +1409,7 @@ export default function ProvidersClient() {
                     type="button"
                     onClick={() => setRawExportModalProvider(browseProvider)}
                     disabled={loadingServices}
-                    className="px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-xl text-[11px] sm:text-xs font-bold transition-all flex items-center gap-1.5 bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-400 border border-emerald-500/30 shadow-sm"
+                    className="px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-xl text-[11px] sm:text-xs font-bold transition-all flex items-center gap-1.5 bg-violet-500/15 hover:bg-violet-500/25 text-violet-400 border border-violet-500/30 shadow-sm"
                     title="تحميل محتوى المزود الأصلي بالكامل بدون أي إضافات منا (Raw JSON)"
                   >
                     <span className="material-symbols-outlined text-sm">download_for_offline</span>
@@ -1445,7 +1445,7 @@ export default function ProvidersClient() {
                         type="button"
                         onClick={() => handleToggleAllServices(true)}
                         disabled={isPerformingBulkAction || loadingServices}
-                        className="px-3 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold transition-all flex items-center gap-1 shadow-sm disabled:opacity-50 text-[11px]"
+                        className="px-3 py-1.5 rounded-xl bg-violet-500 hover:bg-violet-600 text-white font-bold transition-all flex items-center gap-1 shadow-sm disabled:opacity-50 text-[11px]"
                         title="تفعيل وإظهار كافة خدمات وباقات هذا المزود للعملاء في المتجر"
                       >
                         <span className="material-symbols-outlined text-sm">visibility</span>
@@ -1592,7 +1592,7 @@ export default function ProvidersClient() {
                     onClick={() => setPackageFilter("active")}
                     className={`px-2.5 py-1 rounded-lg transition-all text-[11px] sm:text-xs ${
                       packageFilter === "active"
-                        ? "bg-emerald-500 text-white shadow"
+                        ? "bg-violet-500 text-white shadow"
                         : "bg-surface-container-high text-on-surface-variant hover:text-on-surface"
                     }`}
                   >
@@ -1695,7 +1695,7 @@ export default function ProvidersClient() {
                                 ))}
                                 {serviceLoadSource === "stored" ? (
                                   group.isAllActive ? (
-                                    <span className="text-[10px] px-2 py-0.5 rounded-md bg-emerald-500/15 text-emerald-400 font-bold border border-emerald-500/20">
+                                    <span className="text-[10px] px-2 py-0.5 rounded-md bg-violet-500/15 text-violet-400 font-bold border border-violet-500/20">
                                       مفعلة بالكامل ({group.activeCount}/{group.total})
                                     </span>
                                   ) : group.isAllHidden ? (
@@ -1742,7 +1742,7 @@ export default function ProvidersClient() {
                                 className={`px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-xl font-bold text-xs transition-all flex items-center gap-1 border ${
                                   group.isAllActive
                                     ? "bg-red-500/10 text-red-400 hover:bg-red-500/20 border-red-500/20"
-                                    : "bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 border-emerald-500/20"
+                                    : "bg-violet-500/10 text-violet-400 hover:bg-violet-500/20 border-violet-500/20"
                                 }`}
                                 title={group.isAllActive ? "إخفاء كل خدمات هذه الباقة عن المتجر" : "تفعيل وإظهار كل خدمات الباقة في المتجر"}
                               >
@@ -1832,8 +1832,8 @@ export default function ProvidersClient() {
                                         }}
                                         className={`w-8 h-8 rounded-xl flex items-center justify-center transition-all disabled:opacity-40 disabled:cursor-not-allowed ${
                                           srv.isActive
-                                            ? "bg-emerald-500/10 text-emerald-400 hover:bg-red-500/10 hover:text-red-400 border border-emerald-500/20"
-                                            : "bg-red-500/10 text-red-400 hover:bg-emerald-500/10 hover:text-emerald-400 border border-red-500/20"
+                                            ? "bg-violet-500/10 text-violet-400 hover:bg-red-500/10 hover:text-red-400 border border-violet-500/20"
+                                            : "bg-red-500/10 text-red-400 hover:bg-violet-500/10 hover:text-violet-400 border border-red-500/20"
                                         }`}
                                         title={srv.isActive ? "إخفاء عن المتجر" : "إظهار في المتجر"}
                                       >
@@ -1895,7 +1895,7 @@ export default function ProvidersClient() {
           <div className="bg-surface-container border border-outline-variant/30 rounded-3xl p-6 sm:p-8 max-w-lg w-full shadow-2xl space-y-6">
             <div className="flex items-center justify-between pb-4 border-b border-outline-variant/20">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 flex items-center justify-center">
+                <div className="w-10 h-10 rounded-xl bg-violet-500/10 border border-violet-500/30 text-violet-400 flex items-center justify-center">
                   <span className="material-symbols-outlined text-2xl">download</span>
                 </div>
                 <div>
@@ -1913,7 +1913,7 @@ export default function ProvidersClient() {
             </div>
 
             <div className="p-3.5 rounded-2xl bg-surface-container-lowest/80 border border-outline-variant/20 text-xs text-on-surface-variant space-y-1 leading-relaxed">
-              <p className="font-bold text-emerald-400 flex items-center gap-1.5">
+              <p className="font-bold text-violet-400 flex items-center gap-1.5">
                 <span className="material-symbols-outlined text-sm">verified</span>
                 <span>بيانات خام أصلية 100% بدون أي إضافات أو تعديلات من نظامنا:</span>
               </p>
@@ -1924,18 +1924,18 @@ export default function ProvidersClient() {
               <button
                 onClick={() => handleDownloadRawProviderData(rawExportModalProvider, "all")}
                 disabled={isDownloadingRaw}
-                className="w-full p-4 rounded-2xl bg-surface-container-high hover:bg-surface-container-highest border border-outline-variant/30 hover:border-emerald-500/40 text-right transition-all flex items-center justify-between group"
+                className="w-full p-4 rounded-2xl bg-surface-container-high hover:bg-surface-container-highest border border-outline-variant/30 hover:border-violet-500/40 text-right transition-all flex items-center justify-between group"
               >
                 <div className="space-y-1">
-                  <div className="text-sm font-bold text-on-surface group-hover:text-emerald-400 transition-colors flex items-center gap-2">
-                    <span className="material-symbols-outlined text-lg text-emerald-400">inventory_2</span>
+                  <div className="text-sm font-bold text-on-surface group-hover:text-violet-400 transition-colors flex items-center gap-2">
+                    <span className="material-symbols-outlined text-lg text-violet-400">inventory_2</span>
                     <span>1. تحميل جميع الاستجابات الخام (Full Raw API)</span>
                   </div>
                   <p className="text-[11px] text-on-surface-variant">
                     ملف JSON يضم الردود الكاملة الأصلية لجميع الأقسام: IMEI + Server + Remote
                   </p>
                 </div>
-                <span className="material-symbols-outlined text-xl text-on-surface-variant group-hover:text-emerald-400 group-hover:translate-x-[-4px] transition-all">
+                <span className="material-symbols-outlined text-xl text-on-surface-variant group-hover:text-violet-400 group-hover:translate-x-[-4px] transition-all">
                   download
                 </span>
               </button>
@@ -1943,18 +1943,18 @@ export default function ProvidersClient() {
               <button
                 onClick={() => handleDownloadRawProviderData(rawExportModalProvider, "pure_dhru")}
                 disabled={isDownloadingRaw}
-                className="w-full p-4 rounded-2xl bg-surface-container-high hover:bg-surface-container-highest border border-outline-variant/30 hover:border-emerald-500/40 text-right transition-all flex items-center justify-between group"
+                className="w-full p-4 rounded-2xl bg-surface-container-high hover:bg-surface-container-highest border border-outline-variant/30 hover:border-violet-500/40 text-right transition-all flex items-center justify-between group"
               >
                 <div className="space-y-1">
-                  <div className="text-sm font-bold text-on-surface group-hover:text-emerald-400 transition-colors flex items-center gap-2">
-                    <span className="material-symbols-outlined text-lg text-emerald-400">code</span>
+                  <div className="text-sm font-bold text-on-surface group-hover:text-violet-400 transition-colors flex items-center gap-2">
+                    <span className="material-symbols-outlined text-lg text-violet-400">code</span>
                     <span>2. تحميل بصيغة Dhru الأصلية المباشرة (SUCCESS: LIST)</span>
                   </div>
                   <p className="text-[11px] text-on-surface-variant">
                     مصفوفة SUCCESS موحدة للباقات والخدمات بنفس صياغة وسيرفرات Dhru القياسية
                   </p>
                 </div>
-                <span className="material-symbols-outlined text-xl text-on-surface-variant group-hover:text-emerald-400 group-hover:translate-x-[-4px] transition-all">
+                <span className="material-symbols-outlined text-xl text-on-surface-variant group-hover:text-violet-400 group-hover:translate-x-[-4px] transition-all">
                   download
                 </span>
               </button>
@@ -1993,7 +1993,7 @@ export default function ProvidersClient() {
             </div>
 
             {isDownloadingRaw && (
-              <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-bold flex items-center justify-center gap-2 animate-pulse">
+              <div className="p-3 rounded-xl bg-violet-500/10 border border-violet-500/30 text-violet-400 text-xs font-bold flex items-center justify-center gap-2 animate-pulse">
                 <span className="material-symbols-outlined animate-spin text-base">refresh</span>
                 <span>جاري سحب وتجهيز البيانات الأصلية من سيرفر المزود...</span>
               </div>

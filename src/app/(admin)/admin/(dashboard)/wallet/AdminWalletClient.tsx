@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect, useRef, useCallback, useDeferredValue } from "react";
 import { buildAdminTransactionsUrl, mergeTransactionPages } from "../../../../../lib/admin-wallet-pagination";
@@ -239,12 +239,12 @@ export default function AdminWalletClient() {
           <span className="material-symbols-outlined text-amber-400 text-3xl">pending_actions</span>
         </div>
 
-        <div className="p-5 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-between">
+        <div className="p-5 rounded-2xl bg-violet-500/10 border border-violet-500/30 flex items-center justify-between">
           <div>
-            <p className="text-xs font-bold text-emerald-300">معاملات معتمدة ومكتملة</p>
-            <p className="text-2xl font-bold text-emerald-400 font-mono mt-1">{completedCount}</p>
+            <p className="text-xs font-bold text-violet-300">معاملات معتمدة ومكتملة</p>
+            <p className="text-2xl font-bold text-violet-400 font-mono mt-1">{completedCount}</p>
           </div>
-          <span className="material-symbols-outlined text-emerald-400 text-3xl">check_circle</span>
+          <span className="material-symbols-outlined text-violet-400 text-3xl">check_circle</span>
         </div>
       </div>
 
@@ -258,7 +258,7 @@ export default function AdminWalletClient() {
             <div className="flex items-center gap-2">
               <h3 className="font-bold text-sm text-on-surface">ربط واستلام إشعارات وصور الإيصالات على تلجرام</h3>
               {telegramStatus.connected ? (
-                <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 font-bold text-[10px] border border-emerald-500/30">
+                <span className="px-2.5 py-0.5 rounded-full bg-violet-500/20 text-violet-400 font-bold text-[10px] border border-violet-500/30">
                   متصل وتعمل الإشعارات
                 </span>
               ) : (
@@ -291,7 +291,7 @@ export default function AdminWalletClient() {
         <div
           className={`p-4 rounded-xl text-xs font-bold flex items-center gap-2 ${
             alertMessage.type === "success"
-              ? "bg-emerald-500/15 border border-emerald-500/30 text-emerald-300"
+              ? "bg-violet-500/15 border border-violet-500/30 text-violet-300"
               : "bg-red-500/15 border border-red-500/30 text-red-300"
           }`}
         >
@@ -338,7 +338,7 @@ export default function AdminWalletClient() {
             <button
               onClick={() => setStatusFilter("completed")}
               className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                statusFilter === "completed" ? "bg-emerald-500 text-white" : "bg-surface-container-high text-on-surface-variant"
+                statusFilter === "completed" ? "bg-violet-500 text-white" : "bg-surface-container-high text-on-surface-variant"
               }`}
             >
               المكتملة ({completedCount})
@@ -393,12 +393,12 @@ export default function AdminWalletClient() {
                         </div>
                         {tx.user?.phone && (
                           <div className="flex items-center gap-1 mt-0.5">
-                            <span className="material-symbols-outlined text-[11px] text-emerald-400">call</span>
+                            <span className="material-symbols-outlined text-[11px] text-violet-400">call</span>
                             <a
                               href={`https://wa.me/${tx.user.phone.replace(/[^0-9]/g, "")}`}
                               target="_blank"
                               rel="noreferrer"
-                              className="text-[10px] text-emerald-400 hover:underline font-mono dir-ltr"
+                              className="text-[10px] text-violet-400 hover:underline font-mono dir-ltr"
                             >
                               {tx.user.phone}
                             </a>
@@ -447,7 +447,7 @@ export default function AdminWalletClient() {
                       </td>
 
                       {/* Amount */}
-                      <td className="p-4 font-mono font-bold text-base text-emerald-400 dir-ltr">
+                      <td className="p-4 font-mono font-bold text-base text-violet-400 dir-ltr">
                         +${tx.amount.toFixed(2)}
                       </td>
 
@@ -459,8 +459,8 @@ export default function AdminWalletClient() {
                       {/* Status Pill */}
                       <td className="p-4">
                         {tx.status === "completed" && (
-                          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 font-bold text-[11px]">
-                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-violet-500/15 border border-violet-500/30 text-violet-400 font-bold text-[11px]">
+                            <span className="w-1.5 h-1.5 rounded-full bg-violet-400"></span>
                             مكتمل
                           </span>
                         )}
@@ -485,7 +485,7 @@ export default function AdminWalletClient() {
                             <button
                               onClick={() => handleApprove(tx.id)}
                               disabled={isActioning}
-                              className="px-3 py-1.5 rounded-xl bg-emerald-500 text-white hover:bg-emerald-600 font-bold text-xs shadow-md transition-all flex items-center gap-1 active:scale-95 disabled:opacity-50"
+                              className="px-3 py-1.5 rounded-xl bg-violet-500 text-white hover:bg-violet-600 font-bold text-xs shadow-md transition-all flex items-center gap-1 active:scale-95 disabled:opacity-50"
                             >
                               {isActioning ? (
                                 <span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>

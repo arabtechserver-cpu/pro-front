@@ -1,4 +1,4 @@
-import { getDictionary } from "@/i18n/get-dictionary";
+﻿import { getDictionary } from "@/i18n/get-dictionary";
 import { Locale } from "@/i18n/config";
 import Link from "next/link";
 import NewsletterSection from "@/components/NewsletterSection";
@@ -36,7 +36,7 @@ export default async function BlogPage(props: { params: Promise<{ lang: Locale }
       <section className="relative w-full max-w-4xl mx-auto text-center pt-8">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-primary/20 rounded-full blur-[80px] -z-10"></div>
         <h1 className="font-display-lg text-4xl lg:text-5xl font-bold tracking-tight text-on-surface mb-4">
-          {dict.blog?.title || "Arab Tech Server Blog"}
+          {dict.blog?.title || "Arab Tech Pro Server Blog"}
         </h1>
         <p className="text-lg text-on-surface-variant">
           {dict.blog?.subtitle || "Latest news, updates, and tutorials from the GSM community."}

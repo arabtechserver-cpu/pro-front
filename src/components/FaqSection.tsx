@@ -50,12 +50,14 @@ export default function FaqSection({ lang }: FaqSectionProps) {
 
   return (
     <section className="relative py-14 sm:py-20 bg-transparent text-white overflow-hidden">
-      {/* Subtle Glow */}
-      <div className="absolute top-1/2 right-1/4 -translate-y-1/2 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
+      {/* Stronger Purple Glow */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_70%_50%_at_50%_50%,rgba(109,40,217,0.15),transparent)] pointer-events-none"></div>
+      <div className="absolute top-1/2 right-1/4 -translate-y-1/2 w-[500px] h-[500px] bg-violet-600/15 rounded-full blur-3xl pointer-events-none"></div>
+      <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-[400px] h-[400px] bg-purple-700/12 rounded-full blur-3xl pointer-events-none"></div>
 
       <div className="w-full cyber-container relative z-10">
         <h2 className="text-3xl sm:text-5xl font-black text-center mb-10 sm:mb-14" data-aos="fade-down" suppressHydrationWarning>
-          <span className="bg-gradient-to-r from-emerald-400 via-cyan-300 to-teal-200 bg-clip-text text-transparent">
+          <span className="bg-gradient-to-r from-violet-400 via-cyan-300 to-purple-200 bg-clip-text text-transparent">
             {isAr ? "الأسئلة الشائعة " : "Frequently Asked "}
           </span>
           <span>{isAr ? "والأكثر تداولاً" : "Questions"}</span>
@@ -84,7 +86,7 @@ export default function FaqSection({ lang }: FaqSectionProps) {
                     {isAr ? faq.qAr : faq.qEn}
                   </span>
                   <div
-                    className={`convex-pill w-10 h-10 flex items-center justify-center bg-[#070c1a] border border-cyan-400/50 text-cyan-300 transition-transform duration-300 shrink-0 ms-4 shadow-md ${
+                    className={`convex-pill w-10 h-10 flex items-center justify-center bg-[#050814] border border-cyan-400/50 text-cyan-300 transition-transform duration-300 shrink-0 ms-4 shadow-md ${
                       isOpen ? "rotate-45" : "rotate-0"
                     }`}
                   >
@@ -93,7 +95,7 @@ export default function FaqSection({ lang }: FaqSectionProps) {
                 </button>
 
                 {isOpen && (
-                  <div className="px-6 sm:px-8 pb-6 pt-2 text-slate-300 text-sm sm:text-base leading-relaxed border-t border-cyan-500/20 bg-[#070c1a]/40">
+                  <div className="px-6 sm:px-8 pb-6 pt-2 text-slate-300 text-sm sm:text-base leading-relaxed border-t border-cyan-500/20 bg-[#050814]/40">
                     {isAr ? faq.aAr : faq.aEn}
                   </div>
                 )}

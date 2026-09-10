@@ -9,92 +9,94 @@ export default function HexagonalFeatures({ lang }: HexagonalFeaturesProps) {
 
   const features = [
     {
-      id: "sec",
+      id: "unlock",
       delay: 100,
-      icon: "fas fa-shield-alt",
-      gradient: "from-emerald-500 to-emerald-700",
-      glowColor: "rgba(16, 185, 129, 0.35)",
-      title: isAr ? "أمان وحماية عسكرية" : "Military-Grade Security",
+      icon: "fas fa-unlock-alt",
+      gradient: "from-violet-500 to-purple-700",
+      glowColor: "rgba(139, 92, 246, 0.35)",
+      title: isAr ? "خدمات فك الشفرة" : "Carrier Unlock Services",
       desc: isAr
-        ? "بروتوكولات تشفير متقدمة وخوادم آمنة تضمن حماية بياناتك ومعاملاتك بالكامل طوال عملية فك وتفعيل الأجهزة."
-        : "Advanced encryption protocols and secure servers ensure your data remains completely protected throughout the unlocking process.",
+        ? "فك شفرات الهواتف والشبكات المغلقة رسمياً لجميع الموديلات والشركات العالمية بكفاءة وأمان تام."
+        : "Official carrier and network unlocking for all major global models and operators.",
     },
     {
-      id: "speed",
+      id: "fastboot",
       delay: 200,
       icon: "fas fa-bolt",
-      gradient: "from-cyan-500 to-cyan-700",
+      gradient: "from-cyan-500 to-blue-600",
       glowColor: "rgba(6, 182, 212, 0.35)",
-      title: isAr ? "سرعة تسليم فائقة" : "Lightning Fast Delivery",
+      title: isAr ? "سيرفرات الـ Fastboot" : "Fastboot Servers",
       desc: isAr
-        ? "إتمام معظم طلبات السيرفر وفك الشفرات في دقائق معدودة بفضل أنظمتنا المؤتمتة وبنيتنا التحتية الموزعة."
-        : "Most unlocks completed in under 5 minutes with our automated API systems and optimized server infrastructure.",
+        ? "تفليش مباشر وسريع لأجهزة شاومي وأندرويد وتخطي الحسابات عبر وضع الفاست بوت الفوري."
+        : "High-speed Xiaomi and Android fastboot flashing, bootloader, and account bypass.",
     },
     {
-      id: "global",
+      id: "tools",
       delay: 300,
-      icon: "fas fa-globe",
-      gradient: "from-purple-500 to-purple-700",
-      glowColor: "rgba(139, 92, 246, 0.35)",
-      title: isAr ? "تغطية عالمية واسعة" : "Worldwide Coverage",
+      icon: "fas fa-tools",
+      gradient: "from-purple-500 to-indigo-700",
+      glowColor: "rgba(168, 85, 247, 0.35)",
+      title: isAr ? "أدوات برمجية متكاملة" : "Integrated Software Tools",
       desc: isAr
-        ? "دعم كامل للأجهزة والشبكات من أكثر من 150 دولة مع توفير بوابات دفع محلية وعالمية متعددة."
-        : "Support for devices from all major carriers and regions across 150+ countries with localized payment options.",
+        ? "تفعيل وتجديد فوري لكافة بوكسات ودونجل السوفت وير (شيميرا، باندورا، دي إف تي، بورنيو)."
+        : "Instant license activations for top software tools: Chimera, DFT Pro, Pandora, and Borneo.",
     },
     {
       id: "support",
       delay: 400,
       icon: "fas fa-headset",
-      gradient: "from-amber-500 to-amber-700",
+      gradient: "from-amber-500 to-orange-600",
       glowColor: "rgba(245, 158, 11, 0.35)",
       title: isAr ? "دعم فني متخصص 24/7" : "24/7 Expert Support",
       desc: isAr
-        ? "فريق دعم مباشر يعمل على مدار الساعة لحل المشكلات وتقديم التوجيه الفني عبر التيليجرام والواتساب."
-        : "Round-the-clock assistance from our team of unlocking specialists via live chat, WhatsApp, and Telegram.",
+        ? "طاقم فني متخصص متواجد على مدار الساعة لمساعدتك في معالجة الأجهزة وتقديم التوجيه الفني."
+        : "Dedicated GSM engineers and technicians available around the clock via live chat and Telegram.",
     },
     {
-      id: "success",
+      id: "imei",
       delay: 500,
-      icon: "fas fa-trophy",
-      gradient: "from-rose-500 to-rose-700",
-      glowColor: "rgba(239, 68, 68, 0.35)",
-      title: isAr ? "نسبة نجاح 99.9%" : "99.9% Success Rate",
+      icon: "fas fa-fingerprint",
+      gradient: "from-rose-500 to-pink-700",
+      glowColor: "rgba(244, 63, 94, 0.35)",
+      title: isAr ? "خدمات الـ IMEI" : "IMEI Services",
       desc: isAr
-        ? "أعلى معدلات نجاح في الشرق الأوسط والعالم من خلال فحص دقيق وخوارزميات تحديث مستمرة."
-        : "Industry-leading success rate with advanced algorithms and continuous system optimization for maximum reliability.",
+        ? "فحص وتصليح السيريال نمبر، تخطي حماية جوجل FRP والآيكلود بأعلى معدلات نجاح معتمدة."
+        : "Official IMEI checks, serial repair, Google FRP bypass, and verified iCloud removal.",
     },
     {
-      id: "tech",
+      id: "credits",
       delay: 600,
-      icon: "fas fa-rocket",
-      gradient: "from-pink-500 to-pink-700",
-      glowColor: "rgba(236, 72, 153, 0.35)",
-      title: isAr ? "تكنولوجيا وتقنيات حديثة" : "Cutting-Edge Technology",
+      icon: "fas fa-coins",
+      gradient: "from-yellow-500 to-amber-600",
+      glowColor: "rgba(234, 179, 8, 0.35)",
+      title: isAr ? "السيرفرات والـ Credits" : "Servers & Credits",
       desc: isAr
-        ? "أحدث طرق فك الحماية وأقوى خوادم الـ API المؤتمتة التي تواكب تحديثات أنظمة الحماية لجميع الموديلات."
-        : "Latest unlocking techniques and proprietary algorithms that stay ahead of carrier security updates.",
+        ? "شحن وتغذية فورية لأرصدة الكريدت لكافة السيرفرات والأدوات مع ربط API مباشر للموزعين."
+        : "Instant credit top-ups for all major tool servers with reseller-ready automated API integration.",
     },
   ];
 
   return (
     <section className="relative py-14 sm:py-20 bg-transparent overflow-hidden">
-      {/* Dynamic Background Glows */}
-      <div className="absolute top-1/4 -left-32 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
-      <div className="absolute bottom-1/4 -right-32 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl pointer-events-none"></div>
+      {/* Dynamic Background Glows - stronger purple */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-10%,rgba(109,40,217,0.22),transparent)] pointer-events-none"></div>
+      <div className="absolute top-1/4 -left-32 w-[500px] h-[500px] bg-violet-600/15 rounded-full blur-3xl pointer-events-none"></div>
+      <div className="absolute bottom-1/4 -right-32 w-[500px] h-[500px] bg-purple-500/15 rounded-full blur-3xl pointer-events-none"></div>
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[300px] bg-violet-600/8 rounded-full blur-[80px] pointer-events-none"></div>
 
       <div className="relative z-10 w-full cyber-container">
         {/* Section Header */}
-        <div className="text-center mb-12 lg:mb-16" data-aos="fade-up">
-          <div className="inline-flex items-center gap-2.5 bg-gradient-to-r from-emerald-500/20 to-cyan-500/20 backdrop-blur-md px-5 py-2 rounded-full border border-emerald-400/30 mb-5 shadow-sm">
-            <i className="fas fa-sparkles text-emerald-400 text-sm"></i>
-            <span className="text-emerald-300 font-bold text-xs sm:text-sm uppercase tracking-wider">
+        <div className="text-center mb-12 lg:mb-16" data-aos="fade-up" suppressHydrationWarning>
+          <div className="inline-flex items-center gap-2.5 bg-gradient-to-r from-violet-500/20 to-cyan-500/20 backdrop-blur-md px-5 py-2 rounded-full border border-violet-400/30 mb-5 shadow-sm">
+            <i className="fas fa-sparkles text-violet-400 text-sm"></i>
+            <span className="text-violet-300 font-bold text-xs sm:text-sm uppercase tracking-wider">
               {isAr ? "لماذا تختارنا ؟" : "WHY CHOOSE US"}
             </span>
           </div>
 
           <h2 className="text-3xl sm:text-5xl lg:text-6xl font-black text-white mb-6 tracking-tight">
             <span>{isAr ? "تميز في عالم " : "Unlock "}</span>
-            <span className="bg-gradient-to-r from-cyan-400 via-emerald-400 to-purple-400 bg-clip-text text-transparent drop-shadow-[0_2px_15px_rgba(34,211,238,0.35)]">
+            <span className="bg-gradient-to-r from-cyan-400 via-violet-400 to-purple-400 bg-clip-text text-transparent drop-shadow-[0_2px_15px_rgba(34,211,238,0.35)]">
               {isAr ? "خدمات الـ GSM والسيرفر" : "Excellence & Performance"}
             </span>
           </h2>
@@ -114,12 +116,13 @@ export default function HexagonalFeatures({ lang }: HexagonalFeaturesProps) {
               className="curved-cockpit group relative rounded-3xl p-7 sm:p-8 transition-all duration-300 hover:-translate-y-2 active:scale-[0.97] border-2 border-cyan-500/30 hover:border-cyan-400/80 active:border-cyan-400 shadow-2xl active:shadow-[0_0_35px_rgba(34,211,238,0.45)] flex flex-col justify-between"
               data-aos="fade-up"
               data-aos-delay={f.delay}
+              suppressHydrationWarning
             >
               {/* Top Arched Accent */}
               <div className="absolute -top-[2px] left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-cyan-400/60 to-transparent pointer-events-none"></div>
 
               {/* Glowing Corner Chip Accent */}
-              <div className="absolute top-4 end-4 w-2 h-2 rounded-full bg-cyan-400/40 group-hover:bg-cyan-400 group-hover:shadow-[0_0_10px_#22d3ee] transition-all"></div>
+              <div className="absolute top-4 end-4 w-2 h-2 rounded-full bg-cyan-400/40 group-hover:bg-cyan-400 group-hover:shadow-[0_0_10px_#8b5cf6] transition-all"></div>
 
               <div>
                 {/* Icon Circle */}

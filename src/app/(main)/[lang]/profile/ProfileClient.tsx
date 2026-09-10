@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
@@ -408,7 +408,7 @@ export default function ProfileClient({ lang, dict }: { lang: string; dict: any 
     return (
       <div className="min-h-[75vh] flex items-center justify-center px-4 py-16">
         <div className="glass-card rounded-3xl p-8 sm:p-12 border border-outline-variant/30 shadow-2xl max-w-md w-full text-center space-y-6">
-          <div className="w-20 h-20 mx-auto rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center text-primary shadow-[0_0_25px_rgba(45,212,191,0.2)]">
+          <div className="w-20 h-20 mx-auto rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center text-primary shadow-[0_0_25px_rgba(124,58,237,0.2)]">
             <span className="material-symbols-outlined text-4xl">account_circle</span>
           </div>
           <div className="space-y-2">
@@ -452,12 +452,12 @@ export default function ProfileClient({ lang, dict }: { lang: string; dict: any 
           {/* User Info & Avatar */}
           <div className="flex items-center gap-5 sm:gap-6">
             <div className="relative shrink-0">
-              <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-gradient-to-tr from-primary via-teal-400 to-secondary p-1 shadow-[0_0_30px_rgba(45,212,191,0.3)]">
+              <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-gradient-to-tr from-primary via-purple-400 to-secondary p-1 shadow-[0_0_30px_rgba(124,58,237,0.3)]">
                 <div className="w-full h-full rounded-[14px] bg-surface-container-lowest flex items-center justify-center text-3xl sm:text-4xl font-black text-primary">
                   {(profile?.fullName || userSession?.fullName || "U").charAt(0).toUpperCase()}
                 </div>
               </div>
-              <span className="absolute -bottom-1 -end-1 w-6 h-6 rounded-full bg-emerald-500 border-2 border-surface flex items-center justify-center text-white text-xs shadow-md" title="Active">
+              <span className="absolute -bottom-1 -end-1 w-6 h-6 rounded-full bg-violet-500 border-2 border-surface flex items-center justify-center text-white text-xs shadow-md" title="Active">
                 <span className="material-symbols-outlined text-[14px]">check</span>
               </span>
             </div>
@@ -472,7 +472,7 @@ export default function ProfileClient({ lang, dict }: { lang: string; dict: any 
                 <span
                   className="text-xs font-black px-3 py-1 rounded-full text-white flex items-center gap-1.5 shadow-sm"
                   style={{
-                    backgroundColor: profile?.membershipTier?.badgeColor || userSession?.membershipTier?.badgeColor || "#2dd4bf"
+                    backgroundColor: profile?.membershipTier?.badgeColor || userSession?.membershipTier?.badgeColor || "#7c3aed"
                   }}
                 >
                   <span className="material-symbols-outlined text-sm">workspace_premium</span>
@@ -593,7 +593,7 @@ export default function ProfileClient({ lang, dict }: { lang: string; dict: any 
               {orders.length}
             </p>
             <div className="flex items-center gap-3 mt-2 pt-2 border-t border-outline-variant/15 text-[11px] font-bold">
-              <span className="text-emerald-400 font-mono flex items-center gap-1">
+              <span className="text-violet-400 font-mono flex items-center gap-1">
                 <span className="material-symbols-outlined text-xs">check_circle</span>
                 <span>{completedOrdersCount} {isAr ? "مكتمل" : "done"}</span>
               </span>
@@ -616,7 +616,7 @@ export default function ProfileClient({ lang, dict }: { lang: string; dict: any 
             </div>
           </div>
           <div className="mt-3">
-            <p className="text-3xl font-black text-emerald-400 font-mono tracking-tight">
+            <p className="text-3xl font-black text-violet-400 font-mono tracking-tight">
               ${completedDepositsTotal.toFixed(2)}
             </p>
             <div className="mt-2 pt-2 border-t border-outline-variant/15 text-[11px] text-on-surface-variant font-medium">
@@ -705,7 +705,7 @@ export default function ProfileClient({ lang, dict }: { lang: string; dict: any 
           <span className="material-symbols-outlined text-base">api</span>
           <span>{isAr ? "بيانات الـ API والمطورين" : "API & Developers"}</span>
           {profile?.apiEnabled && (
-            <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
+            <span className="w-2 h-2 rounded-full bg-violet-400"></span>
           )}
         </button>
       </div>
@@ -748,7 +748,7 @@ export default function ProfileClient({ lang, dict }: { lang: string; dict: any 
                 </button>
                 <button
                   onClick={() => setOrderFilter("completed")}
-                  className={`px-3 py-1.5 rounded-lg transition-all ${orderFilter === "completed" ? "bg-emerald-500 text-white shadow-sm" : "text-on-surface-variant hover:text-on-surface"}`}
+                  className={`px-3 py-1.5 rounded-lg transition-all ${orderFilter === "completed" ? "bg-violet-500 text-white shadow-sm" : "text-on-surface-variant hover:text-on-surface"}`}
                 >
                   {isAr ? "مكتمل" : "Completed"}
                 </button>
@@ -850,8 +850,8 @@ export default function ProfileClient({ lang, dict }: { lang: string; dict: any 
                         {/* Reply / Result */}
                         <td className="p-3.5 max-w-[220px]">
                           {order.reply ? (
-                            <div className="flex items-center gap-1.5 p-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 font-mono text-[11px]">
-                              <span className="material-symbols-outlined text-xs shrink-0 text-emerald-400">key</span>
+                            <div className="flex items-center gap-1.5 p-1.5 rounded-lg bg-violet-500/10 border border-violet-500/20 text-violet-300 font-mono text-[11px]">
+                              <span className="material-symbols-outlined text-xs shrink-0 text-violet-400">key</span>
                               <span className="truncate">{cleanHtmlToText(order.reply)}</span>
                               <button
                                 onClick={() => copyToClipboard(cleanHtmlToText(order.reply || ""), `reply-${order.id}`)}
@@ -872,7 +872,7 @@ export default function ProfileClient({ lang, dict }: { lang: string; dict: any 
                         <td className="p-3.5 font-mono font-bold text-on-surface">
                           <div>${Number(order.price).toFixed(2)}</div>
                           {order.couponCode && (
-                            <div className="text-[10px] text-emerald-400 font-bold flex items-center gap-0.5">
+                            <div className="text-[10px] text-violet-400 font-bold flex items-center gap-0.5">
                               <span>{order.couponCode}</span>
                             </div>
                           )}
@@ -881,8 +881,8 @@ export default function ProfileClient({ lang, dict }: { lang: string; dict: any 
                         {/* Status */}
                         <td className="p-3.5 text-center">
                           {isSuccess && (
-                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
-                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-violet-500/15 text-violet-400 border border-violet-500/30">
+                              <span className="w-1.5 h-1.5 rounded-full bg-violet-400"></span>
                               {isAr ? "مكتمل" : "Completed"}
                             </span>
                           )}
@@ -960,7 +960,7 @@ export default function ProfileClient({ lang, dict }: { lang: string; dict: any 
                 </button>
                 <button
                   onClick={() => setTxFilter("completed")}
-                  className={`px-3 py-1.5 rounded-lg transition-all ${txFilter === "completed" ? "bg-emerald-500 text-white shadow-sm" : "text-on-surface-variant hover:text-on-surface"}`}
+                  className={`px-3 py-1.5 rounded-lg transition-all ${txFilter === "completed" ? "bg-violet-500 text-white shadow-sm" : "text-on-surface-variant hover:text-on-surface"}`}
                 >
                   {isAr ? "معتمد" : "Completed"}
                 </button>
@@ -1041,7 +1041,7 @@ export default function ProfileClient({ lang, dict }: { lang: string; dict: any 
                         {/* Type */}
                         <td className="p-3.5">
                           <span className="font-bold text-on-surface flex items-center gap-1.5">
-                            <span className="material-symbols-outlined text-sm text-emerald-400">arrow_downward</span>
+                            <span className="material-symbols-outlined text-sm text-violet-400">arrow_downward</span>
                             <span>{isAr ? "إيداع رصيد" : "Deposit"}</span>
                           </span>
                         </td>
@@ -1054,7 +1054,7 @@ export default function ProfileClient({ lang, dict }: { lang: string; dict: any 
                         </td>
 
                         {/* Amount */}
-                        <td className="p-3.5 font-mono font-black text-emerald-400 text-sm">
+                        <td className="p-3.5 font-mono font-black text-violet-400 text-sm">
                           +${Number(tx.amount).toFixed(2)}
                         </td>
 
@@ -1075,8 +1075,8 @@ export default function ProfileClient({ lang, dict }: { lang: string; dict: any 
                         {/* Status */}
                         <td className="p-3.5 text-center">
                           {isSuccess && (
-                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
-                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-violet-500/15 text-violet-400 border border-violet-500/30">
+                              <span className="w-1.5 h-1.5 rounded-full bg-violet-400"></span>
                               {isAr ? "معتمد" : "Approved"}
                             </span>
                           )}
@@ -1145,7 +1145,7 @@ export default function ProfileClient({ lang, dict }: { lang: string; dict: any 
               <div className="p-3 rounded-xl bg-surface-container-high/60 border border-outline-variant/20 space-y-1">
                 <span className="text-on-surface-variant">{isAr ? "مستوى العضوية الحالية" : "Membership Tier"}</span>
                 <p className="font-bold text-on-surface text-sm flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full" style={{ backgroundColor: profile?.membershipTier?.badgeColor || "#2dd4bf" }}></span>
+                  <span className="w-2 h-2 rounded-full" style={{ backgroundColor: profile?.membershipTier?.badgeColor || "#7c3aed" }}></span>
                   <span>{isAr ? (profile?.membershipTier?.nameAr || profile?.membershipTier?.name || "عضوية أساسية") : (profile?.membershipTier?.name || "Standard")}</span>
                 </p>
               </div>
@@ -1161,8 +1161,8 @@ export default function ProfileClient({ lang, dict }: { lang: string; dict: any 
 
               <div className="p-3 rounded-xl bg-surface-container-high/60 border border-outline-variant/20 space-y-1">
                 <span className="text-on-surface-variant">{isAr ? "حالة الحساب" : "Account Status"}</span>
-                <p className="font-bold text-emerald-400 flex items-center gap-1">
-                  <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
+                <p className="font-bold text-violet-400 flex items-center gap-1">
+                  <span className="w-2 h-2 rounded-full bg-violet-400"></span>
                   <span>{isAr ? "نشط ومفعّل بالكامل" : "Active & Verified"}</span>
                 </p>
               </div>
@@ -1178,7 +1178,7 @@ export default function ProfileClient({ lang, dict }: { lang: string; dict: any 
 
             {/* Alerts */}
             {settingsSuccess && (
-              <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-bold flex items-center gap-2">
+              <div className="p-4 rounded-xl bg-violet-500/10 border border-violet-500/30 text-violet-400 text-xs font-bold flex items-center gap-2">
                 <span className="material-symbols-outlined text-base">check_circle</span>
                 <span>{settingsSuccess}</span>
               </div>
@@ -1343,8 +1343,8 @@ export default function ProfileClient({ lang, dict }: { lang: string; dict: any 
             </div>
 
             {profile?.apiEnabled ? (
-              <span className="px-3 py-1 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 text-xs font-bold flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
+              <span className="px-3 py-1 rounded-full bg-violet-500/15 text-violet-400 border border-violet-500/30 text-xs font-bold flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-violet-400"></span>
                 <span>{isAr ? "حساب الـ API مفعل" : "API Access Enabled"}</span>
               </span>
             ) : (

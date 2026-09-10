@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import Link from 'next/link';
 import { Locale } from '@/i18n/config';
 
@@ -152,13 +152,13 @@ export default async function TutorialsPage(props: { params: Promise<{ lang: Loc
 
                         {/* Price Badge */}
                         <div className="absolute top-3 right-3">
-                          <span className={`px-3 py-1 rounded-full text-xs font-extrabold shadow-md backdrop-blur-md border ${series.isSubscriptionRequired ? 'bg-amber-500 text-black border-amber-400' : 'bg-emerald-500 text-black border-emerald-400'}`}>
+                          <span className={`px-3 py-1 rounded-full text-xs font-extrabold shadow-md backdrop-blur-md border ${series.isSubscriptionRequired ? 'bg-amber-500 text-black border-amber-400' : 'bg-violet-500 text-black border-violet-400'}`}>
                             {series.isSubscriptionRequired ? `$${(series.price || 0).toFixed(2)}` : (isAr ? 'مجاني' : 'Free')}
                           </span>
                         </div>
 
                         {/* Total Lessons Badge */}
-                        <div className="absolute bottom-3 left-3 bg-black/70 backdrop-blur-md text-white px-2.5 py-1 rounded-lg text-xs font-bold flex items-center gap-1.5 border border-white/10">
+                        <div className="absolute bottom-3 left-3 bg-black/70 backdrop-blur-md text-white px-2.5 py-1 rounded-lg text-xs font-bold flex items-center gap-1.5 border border-violet-400/15">
                           <span className="material-symbols-outlined text-sm text-indigo-400">format_list_bulleted</span>
                           <span>{totalVideos} {isAr ? 'دروس' : 'lessons'}</span>
                         </div>
@@ -178,7 +178,7 @@ export default async function TutorialsPage(props: { params: Promise<{ lang: Loc
                         {/* Footer Meta & Action */}
                         <div className="pt-4 border-t border-gray-800/80 flex items-center justify-between">
                           <span className="text-xs text-gray-500 flex items-center gap-1">
-                            <span className="material-symbols-outlined text-sm text-emerald-400">check_circle</span>
+                            <span className="material-symbols-outlined text-sm text-violet-400">check_circle</span>
                             {freeCount > 0 ? (isAr ? `${freeCount} دروس مجانية` : `${freeCount} Free Previews`) : (isAr ? 'كورس شامل' : 'Full Course')}
                           </span>
 
@@ -262,7 +262,7 @@ export default async function TutorialsPage(props: { params: Promise<{ lang: Loc
 
                         {/* Badges */}
                         <div className="absolute top-3 right-3 flex items-center gap-2">
-                          <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold shadow ${video.isFreePreview ? 'bg-emerald-500 text-black' : 'bg-amber-500 text-black'}`}>
+                          <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold shadow ${video.isFreePreview ? 'bg-violet-500 text-black' : 'bg-amber-500 text-black'}`}>
                             {video.isFreePreview ? (isAr ? 'مجاني' : 'Free') : (isAr ? 'مقفل' : 'Locked')}
                           </span>
                         </div>

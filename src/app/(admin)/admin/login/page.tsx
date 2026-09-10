@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -77,7 +77,7 @@ export default function AdminLogin() {
         <div className="absolute top-0 right-0 w-32 h-32 bg-primary/20 rounded-bl-full blur-2xl"></div>
         
         <div className="text-center mb-8 relative z-10">
-          <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-primary/20 shadow-[0_0_15px_rgba(45,212,191,0.2)]">
+          <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-primary/20 shadow-[0_0_15px_rgba(124,58,237,0.2)]">
             <span className="material-symbols-outlined text-3xl text-primary glow-cyan">shield_person</span>
           </div>
           <h1 className="text-3xl font-display font-bold text-on-surface mb-2">لوحة الإدارة</h1>

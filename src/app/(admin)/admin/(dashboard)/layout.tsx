@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import Link from "next/link";
@@ -63,8 +63,8 @@ export default function AdminLayout({
             <span>لوحة الإدارة</span>
           </Link>
           <span className="flex h-2.5 w-2.5 relative">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-violet-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-violet-500"></span>
           </span>
         </div>
         
@@ -118,7 +118,7 @@ export default function AdminLayout({
         <header className="bg-surface-container/60 backdrop-blur-md border-b border-outline-variant/30 px-6 py-3.5 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-3">
             <span className="text-xs font-bold text-on-surface-variant bg-surface-container-high px-3 py-1.5 rounded-lg border border-outline-variant/20 flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+              <span className="w-2 h-2 rounded-full bg-violet-500 animate-pulse"></span>
               <span>عرب تك برو سيرفر</span>
             </span>
           </div>

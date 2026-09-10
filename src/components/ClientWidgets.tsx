@@ -38,12 +38,12 @@ export default function ClientWidgets({ lang }: { lang: string }) {
   }, []);
 
   return (
-    <>
+    <React.Suspense fallback={null}>
       <AosInit />
       <AnalyticsTracker />
       <CyberMouseBackground />
       <AiChatWidget />
       <FloatingSideDock lang={lang} />
-    </>
+    </React.Suspense>
   );
 }

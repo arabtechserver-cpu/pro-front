@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 
@@ -381,7 +381,7 @@ export default function AdminApiUsersPage() {
 
     if (score <= 1) return { percent: 25, text: "ضعيفة", color: "bg-red-500" };
     if (score === 2) return { percent: 50, text: "متوسطة", color: "bg-amber-500" };
-    if (score === 3) return { percent: 75, text: "قوية", color: "bg-emerald-500" };
+    if (score === 3) return { percent: 75, text: "قوية", color: "bg-violet-500" };
     return { percent: 100, text: "قوية جداً", color: "bg-primary" };
   }, [newPassword]);
 
@@ -430,12 +430,12 @@ export default function AdminApiUsersPage() {
           <span className="material-symbols-outlined text-primary text-3xl">groups</span>
         </div>
 
-        <div className="p-5 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-between">
+        <div className="p-5 rounded-2xl bg-violet-500/10 border border-violet-500/30 flex items-center justify-between">
           <div>
-            <p className="text-xs font-bold text-emerald-300">الحسابات النشطة</p>
-            <p className="text-2xl font-bold text-emerald-400 font-mono mt-1">{stats.active}</p>
+            <p className="text-xs font-bold text-violet-300">الحسابات النشطة</p>
+            <p className="text-2xl font-bold text-violet-400 font-mono mt-1">{stats.active}</p>
           </div>
-          <span className="material-symbols-outlined text-emerald-400 text-3xl">verified_user</span>
+          <span className="material-symbols-outlined text-violet-400 text-3xl">verified_user</span>
         </div>
 
         <div className="p-5 rounded-2xl bg-red-500/10 border border-red-500/30 flex items-center justify-between">
@@ -475,7 +475,7 @@ export default function AdminApiUsersPage() {
             <button
               onClick={() => setStatusFilter("active")}
               className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                statusFilter === "active" ? "bg-emerald-500 text-white" : "bg-surface-container-high text-on-surface-variant"
+                statusFilter === "active" ? "bg-violet-500 text-white" : "bg-surface-container-high text-on-surface-variant"
               }`}
             >
               النشطة ({stats.active})
@@ -543,16 +543,16 @@ export default function AdminApiUsersPage() {
                       <p className="text-on-surface font-mono text-xs">{user.email}</p>
                       {user.phone ? (
                         <div className="flex items-center gap-1.5 mt-1">
-                          <span className="material-symbols-outlined text-xs text-emerald-400">call</span>
+                          <span className="material-symbols-outlined text-xs text-violet-400">call</span>
                           <a 
                             href={`https://wa.me/${user.phone.replace(/[^0-9]/g, "")}`}
                             target="_blank"
                             rel="noreferrer"
-                            className="font-mono text-[11px] text-emerald-400 hover:text-emerald-300 hover:underline dir-ltr flex items-center gap-1 font-bold"
+                            className="font-mono text-[11px] text-violet-400 hover:text-violet-300 hover:underline dir-ltr flex items-center gap-1 font-bold"
                             title="مراسلة عبر واتساب"
                           >
                             <span>{user.phone}</span>
-                            <span className="text-[9px] bg-emerald-500/20 text-emerald-300 px-1 py-0.2 rounded">واتساب</span>
+                            <span className="text-[9px] bg-violet-500/20 text-violet-300 px-1 py-0.2 rounded">واتساب</span>
                           </a>
                         </div>
                       ) : (
@@ -575,8 +575,8 @@ export default function AdminApiUsersPage() {
                     {/* Status Badge */}
                     <td className="p-4">
                       {user.status === "active" ? (
-                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 font-bold text-[11px]">
-                          <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-violet-500/15 border border-violet-500/30 text-violet-400 font-bold text-[11px]">
+                          <span className="w-2 h-2 rounded-full bg-violet-400"></span>
                           نشط
                         </span>
                       ) : (
@@ -608,7 +608,7 @@ export default function AdminApiUsersPage() {
                             setBalanceInputValue(user.balance ? user.balance.toString() : "0");
                             setBalanceActionType("set");
                           }}
-                          className="px-2.5 py-1.5 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-400 border border-emerald-500/30 font-bold text-xs flex items-center gap-1 transition-all"
+                          className="px-2.5 py-1.5 rounded-lg bg-violet-500/15 hover:bg-violet-500/25 text-violet-400 border border-violet-500/30 font-bold text-xs flex items-center gap-1 transition-all"
                           title="تعديل الرصيد المالي"
                         >
                           <span className="material-symbols-outlined text-sm">account_balance_wallet</span>
@@ -622,7 +622,7 @@ export default function AdminApiUsersPage() {
                           className={`px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1 ${
                             user.status === "active"
                               ? "bg-red-500/15 text-red-400 hover:bg-red-500/30 border border-red-500/30"
-                              : "bg-emerald-500/15 text-emerald-400 hover:bg-emerald-500/30 border border-emerald-500/30"
+                              : "bg-violet-500/15 text-violet-400 hover:bg-violet-500/30 border border-violet-500/30"
                           }`}
                         >
                           <span className="material-symbols-outlined text-sm">
@@ -706,10 +706,10 @@ export default function AdminApiUsersPage() {
       {/* EDIT BALANCE MODAL DIALOG */}
       {editBalanceModalUser && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md animate-in fade-in duration-200">
-          <div className="glass-card w-full max-w-md rounded-2xl p-6 border border-emerald-500/30 shadow-2xl relative overflow-hidden space-y-5">
+          <div className="glass-card w-full max-w-md rounded-2xl p-6 border border-violet-500/30 shadow-2xl relative overflow-hidden space-y-5">
             <div className="flex items-center justify-between pb-4 border-b border-outline-variant/20">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
+                <div className="w-10 h-10 rounded-full bg-violet-500/20 text-violet-400 flex items-center justify-center">
                   <span className="material-symbols-outlined text-xl">account_balance_wallet</span>
                 </div>
                 <div>
@@ -729,7 +729,7 @@ export default function AdminApiUsersPage() {
             {/* Current Balance Display */}
             <div className="p-4 rounded-xl bg-surface-container-high border border-outline-variant/20 flex items-center justify-between">
               <span className="text-xs font-bold text-on-surface-variant">الرصيد الحالي بالمحفظة:</span>
-              <span className="text-lg font-bold font-mono text-emerald-400">${(editBalanceModalUser.balance || 0).toFixed(2)} USD</span>
+              <span className="text-lg font-bold font-mono text-violet-400">${(editBalanceModalUser.balance || 0).toFixed(2)} USD</span>
             </div>
 
             {/* Action Type Tabs */}
@@ -744,7 +744,7 @@ export default function AdminApiUsersPage() {
               <button
                 type="button"
                 onClick={() => setBalanceActionType("add")}
-                className={`py-2 rounded-lg transition-all ${balanceActionType === "add" ? "bg-emerald-500 text-white shadow" : "text-on-surface-variant hover:text-on-surface"}`}
+                className={`py-2 rounded-lg transition-all ${balanceActionType === "add" ? "bg-violet-500 text-white shadow" : "text-on-surface-variant hover:text-on-surface"}`}
               >
                 إضافة رصيد +
               </button>
@@ -781,7 +781,7 @@ export default function AdminApiUsersPage() {
               <button
                 onClick={handleSaveBalance}
                 disabled={isSavingBalance}
-                className="flex-1 bg-emerald-500 text-white py-3 rounded-xl font-bold text-xs hover:bg-emerald-600 transition-all flex items-center justify-center gap-2 shadow-md active:scale-95 disabled:opacity-50"
+                className="flex-1 bg-violet-500 text-white py-3 rounded-xl font-bold text-xs hover:bg-violet-600 transition-all flex items-center justify-center gap-2 shadow-md active:scale-95 disabled:opacity-50"
               >
                 {isSavingBalance ? (
                   <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
@@ -1038,12 +1038,12 @@ export default function AdminApiUsersPage() {
                 <p className="text-[10px] text-on-surface-variant font-bold">رقم الهاتف / الواتساب</p>
                 {selectedUserModal.phone ? (
                   <div className="flex items-center justify-between gap-1 mt-1">
-                    <span className="font-mono font-bold text-emerald-400 dir-ltr select-all truncate">{selectedUserModal.phone}</span>
+                    <span className="font-mono font-bold text-violet-400 dir-ltr select-all truncate">{selectedUserModal.phone}</span>
                     <a
                       href={`https://wa.me/${selectedUserModal.phone.replace(/[^0-9]/g, "")}`}
                       target="_blank"
                       rel="noreferrer"
-                      className="px-2 py-0.5 rounded bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 font-bold text-[10px] flex items-center gap-1 transition-all"
+                      className="px-2 py-0.5 rounded bg-violet-500/20 hover:bg-violet-500/30 text-violet-300 font-bold text-[10px] flex items-center gap-1 transition-all"
                     >
                       <span className="material-symbols-outlined text-xs">chat</span>
                       <span>واتساب</span>
@@ -1069,7 +1069,7 @@ export default function AdminApiUsersPage() {
                   <p className="text-[10px] text-on-surface-variant font-bold">تاريخ إنشاء الحساب</p>
                   <p className="font-mono text-on-surface-variant mt-0.5">{new Date(selectedUserModal.createdAt).toLocaleDateString("ar-EG", { year: "numeric", month: "long", day: "numeric", hour: "2-digit", minute: "2-digit" })}</p>
                 </div>
-                <span className={`px-3 py-1 rounded-full text-xs font-bold ${selectedUserModal.status === "active" ? "bg-emerald-500/15 text-emerald-400 border border-emerald-500/30" : "bg-red-500/15 text-red-400 border border-red-500/30"}`}>
+                <span className={`px-3 py-1 rounded-full text-xs font-bold ${selectedUserModal.status === "active" ? "bg-violet-500/15 text-violet-400 border border-violet-500/30" : "bg-red-500/15 text-red-400 border border-red-500/30"}`}>
                   {selectedUserModal.status === "active" ? "حساب نشط" : "حساب موقوف"}
                 </span>
               </div>

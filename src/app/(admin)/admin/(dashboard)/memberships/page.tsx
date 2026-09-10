@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
 
@@ -118,7 +118,7 @@ export default function AdminMembershipsPage() {
       nameAr: tier.nameAr || tier.name,
       minDeposit: tier.minDeposit.toString(),
       discountPercentage: tier.discountPercentage.toString(),
-      badgeColor: tier.badgeColor || "#2dd4bf",
+      badgeColor: tier.badgeColor || "#7c3aed",
       description: tier.description || "",
       isDefault: tier.isDefault
     });
@@ -266,7 +266,7 @@ export default function AdminMembershipsPage() {
       {toast && (
         <div className={`fixed bottom-6 left-6 z-50 px-5 py-3 rounded-2xl shadow-2xl backdrop-blur-xl border flex items-center gap-3 animate-in fade-in slide-in-from-bottom-4 duration-300 ${
           toast.type === "success"
-            ? "bg-emerald-500/20 border-emerald-500/40 text-emerald-300"
+            ? "bg-violet-500/20 border-violet-500/40 text-violet-300"
             : "bg-red-500/20 border-red-500/40 text-red-300"
         }`}>
           <span className="material-symbols-outlined">
@@ -291,7 +291,7 @@ export default function AdminMembershipsPage() {
         <div className="flex items-center gap-3">
           <button
             onClick={openCreateTierModal}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-gradient-to-r from-primary to-secondary text-on-primary font-bold text-xs hover:shadow-[0_0_20px_rgba(45,212,191,0.3)] hover:scale-[1.02] transition-all"
+            className="flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-gradient-to-r from-primary to-secondary text-on-primary font-bold text-xs hover:shadow-[0_0_20px_rgba(124,58,237,0.3)] hover:scale-[1.02] transition-all"
           >
             <span className="material-symbols-outlined text-base">add_circle</span>
             <span>إضافة مستوى عضوية جديد</span>
@@ -349,7 +349,7 @@ export default function AdminMembershipsPage() {
                     <div className="flex items-start justify-between mb-4">
                       <div
                         className="w-12 h-12 rounded-2xl flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform"
-                        style={{ backgroundColor: tier.badgeColor || "#2dd4bf" }}
+                        style={{ backgroundColor: tier.badgeColor || "#7c3aed" }}
                       >
                         <span className="material-symbols-outlined text-2xl">workspace_premium</span>
                       </div>
@@ -372,7 +372,7 @@ export default function AdminMembershipsPage() {
                     <div className="space-y-2 mb-4">
                       <div className="flex items-center justify-between p-2.5 rounded-xl bg-surface-container-high/60 border border-outline-variant/10">
                         <span className="text-xs text-on-surface-variant font-medium">نسبة الخصم</span>
-                        <span className="text-base font-extrabold text-emerald-400 font-mono">
+                        <span className="text-base font-extrabold text-violet-400 font-mono">
                           {tier.discountPercentage}% خصم
                         </span>
                       </div>
@@ -534,7 +534,7 @@ export default function AdminMembershipsPage() {
                           <td className="p-4">
                             <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full font-mono font-extrabold text-xs ${
                               effectiveDiscount > 0
-                                ? "bg-emerald-500/15 text-emerald-400 border border-emerald-500/30"
+                                ? "bg-violet-500/15 text-violet-400 border border-violet-500/30"
                                 : "bg-surface-container-high text-on-surface-variant"
                             }`}>
                               {effectiveDiscount > 0 ? `🔥 ${effectiveDiscount}% خصم` : "سعر أساسي (0%)"}

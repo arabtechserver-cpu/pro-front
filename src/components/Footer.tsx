@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 
 interface FooterProps {
   dict: any;
@@ -23,7 +23,7 @@ export default function Footer({ dict, lang = "ar" }: FooterProps) {
       badge: "VF",
       tagAr: "محفظة كاش",
       tagEn: "E-Wallet",
-      color: "from-red-600/20 to-rose-600/20 border-red-500/40 text-red-400"
+      color: "from-violet-600/20 to-purple-600/20 border-violet-500/40 text-violet-400"
     },
     {
       id: "bankak",
@@ -32,7 +32,7 @@ export default function Footer({ dict, lang = "ar" }: FooterProps) {
       badge: "BOK",
       tagAr: "تحويل مباشر",
       tagEn: "Direct Transfer",
-      color: "from-emerald-600/20 to-teal-600/20 border-emerald-500/40 text-emerald-400"
+      color: "from-violet-600/20 to-purple-600/20 border-violet-500/40 text-violet-400"
     },
     {
       id: "bep20",
@@ -55,9 +55,9 @@ export default function Footer({ dict, lang = "ar" }: FooterProps) {
   ];
 
   return (
-    <footer className="mt-auto border-t-2 border-cyan-500/25 bg-[#070c1a]/95 backdrop-blur-2xl relative overflow-hidden shadow-[0_-8px_30px_rgba(0,0,0,0.5)]">
+    <footer className="mt-auto border-t-2 border-violet-500/25 bg-[#050814]/95 backdrop-blur-2xl relative overflow-hidden shadow-[0_-8px_30px_rgba(0,0,0,0.5)]">
       {/* Background Decorative Glow */}
-      <div className="absolute top-0 left-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
+      <div className="absolute top-0 left-1/4 w-96 h-96 bg-violet-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
       <div className="w-full cyber-container py-12 relative z-10 space-y-10">
         {/* Main Footer Links */}
@@ -75,7 +75,7 @@ export default function Footer({ dict, lang = "ar" }: FooterProps) {
                 <source srcSet={lang === "ar" ? "/images/logo_ar.webp" : "/images/logo_en.webp"} type="image/webp" />
                 <img 
                   src={lang === "ar" ? "/images/logo_ar.png" : "/images/logo_en.png"} 
-                  alt={lang === "ar" ? "عرب تك برو سيرفر | Arab Tech Pro Server (عرب تيك سيرفر)" : "Arab Tech Pro Server Logo"} 
+                  alt={lang === "ar" ? "عرب تك برو سيرفر | Arab Tech Pro Server" : "Arab Tech Pro Server Logo"} 
                   width={220}
                   height={55}
                   className="relative z-10 h-11 sm:h-14 w-auto max-w-[220px] sm:max-w-[300px] object-contain drop-shadow-[0_0_10px_rgba(255,255,255,0.25)]" 
@@ -93,7 +93,7 @@ export default function Footer({ dict, lang = "ar" }: FooterProps) {
                 href="https://wa.me/16728972935" 
                 target="_blank" 
                 rel="noopener noreferrer" 
-                className="w-8 h-8 rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 hover:bg-emerald-500 hover:text-white transition-all duration-300 shadow-sm"
+                className="w-8 h-8 rounded-full bg-violet-500/10 border border-violet-500/30 flex items-center justify-center text-violet-400 hover:bg-violet-500 hover:text-white transition-all duration-300 shadow-sm"
                 title={lang === "ar" ? "واتساب الإدارة 1 (+16728972935)" : "WhatsApp Admin 1"}
                 aria-label="WhatsApp Admin 1"
               >
@@ -104,7 +104,7 @@ export default function Footer({ dict, lang = "ar" }: FooterProps) {
                 href="https://wa.me/249123667227" 
                 target="_blank" 
                 rel="noopener noreferrer" 
-                className="w-8 h-8 rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 hover:bg-emerald-500 hover:text-white transition-all duration-300 shadow-sm"
+                className="w-8 h-8 rounded-full bg-violet-500/10 border border-violet-500/30 flex items-center justify-center text-violet-400 hover:bg-violet-500 hover:text-white transition-all duration-300 shadow-sm"
                 title={lang === "ar" ? "واتساب الإدارة 2 (+249123667227)" : "WhatsApp Admin 2"}
                 aria-label="WhatsApp Admin 2"
               >
@@ -115,7 +115,7 @@ export default function Footer({ dict, lang = "ar" }: FooterProps) {
                 href="https://chat.whatsapp.com/DINRDwU2lVjFcGRowxT3m5" 
                 target="_blank" 
                 rel="noopener noreferrer" 
-                className="w-8 h-8 rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 hover:bg-emerald-500 hover:text-white transition-all duration-300 shadow-sm"
+                className="w-8 h-8 rounded-full bg-violet-500/10 border border-violet-500/30 flex items-center justify-center text-violet-400 hover:bg-violet-500 hover:text-white transition-all duration-300 shadow-sm"
                 title={lang === "ar" ? "مجتمع وقناة الواتساب" : "WhatsApp Community"}
                 aria-label="WhatsApp Community"
               >
@@ -259,16 +259,16 @@ export default function Footer({ dict, lang = "ar" }: FooterProps) {
             href="https://wa.me/16728972935"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-3 p-3 rounded-2xl bg-surface-container-high/40 hover:bg-emerald-500/10 border border-outline-variant/20 hover:border-emerald-500/40 transition-all duration-200 group"
+            className="flex items-center gap-3 p-3 rounded-2xl bg-surface-container-high/40 hover:bg-violet-500/10 border border-outline-variant/20 hover:border-violet-500/40 transition-all duration-200 group"
           >
-            <div className="w-9 h-9 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shrink-0 group-hover:scale-105 transition-transform">
+            <div className="w-9 h-9 rounded-xl bg-violet-500/10 border border-violet-500/30 flex items-center justify-center text-violet-400 shrink-0 group-hover:scale-105 transition-transform">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12.012 2c-5.506 0-9.989 4.478-9.99 9.984 0 1.762.459 3.48 1.332 5.001L2 22l5.148-1.348c1.472.802 3.13 1.224 4.863 1.225h.005c5.505 0 9.989-4.478 9.99-9.985 0-2.668-1.039-5.176-2.927-7.062A9.923 9.923 0 0 0 12.012 2zm.005 16.521h-.004c-1.493 0-2.957-.401-4.232-1.157l-.304-.18-3.146.825.839-3.067-.198-.315c-.832-1.323-1.272-2.859-1.272-4.436 0-4.492 3.656-8.147 8.152-8.147 2.176 0 4.221.848 5.76 2.387a8.096 8.096 0 0 1 2.384 5.763c0 4.493-3.656 8.147-8.152 8.147zm4.469-6.108c-.245-.123-1.452-.716-1.677-.798-.225-.082-.389-.123-.553.123-.164.246-.635.798-.778.962-.143.164-.286.184-.531.062-.245-.123-1.037-.382-1.976-1.219-.73-.651-1.223-1.455-1.366-1.7-.143-.246-.015-.379.108-.501.111-.11.245-.286.368-.429.123-.143.164-.246.245-.409.082-.164.041-.307-.02-.429-.062-.123-.553-1.332-.757-1.822-.204-.49-.409-.419-.553-.429h-.471c-.164 0-.429.062-.654.307-.225.246-.86.84-.86 2.05 0 1.209.88 2.373 1.002 2.537.123.164 1.733 2.646 4.198 3.712.586.254 1.044.406 1.401.52.59.187 1.127.16 1.551.097.473-.07 1.452-.593 1.656-1.166.204-.573.204-1.064.143-1.166-.061-.102-.225-.164-.47-.287z"/></svg>
             </div>
             <div>
               <p className="text-[10px] text-on-surface-variant font-medium">
                 {lang === "ar" ? "واتساب الدعم والإدارة" : "WhatsApp Admin"}
               </p>
-              <p className="font-bold text-emerald-400 font-mono text-xs mt-0.5" dir="ltr">
+              <p className="font-bold text-violet-400 font-mono text-xs mt-0.5" dir="ltr">
                 +1 (672) 897-2935
               </p>
             </div>
@@ -279,16 +279,16 @@ export default function Footer({ dict, lang = "ar" }: FooterProps) {
             href="https://wa.me/249123667227"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-3 p-3 rounded-2xl bg-surface-container-high/40 hover:bg-emerald-500/10 border border-outline-variant/20 hover:border-emerald-500/40 transition-all duration-200 group"
+            className="flex items-center gap-3 p-3 rounded-2xl bg-surface-container-high/40 hover:bg-violet-500/10 border border-outline-variant/20 hover:border-violet-500/40 transition-all duration-200 group"
           >
-            <div className="w-9 h-9 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shrink-0 group-hover:scale-105 transition-transform">
+            <div className="w-9 h-9 rounded-xl bg-violet-500/10 border border-violet-500/30 flex items-center justify-center text-violet-400 shrink-0 group-hover:scale-105 transition-transform">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12.012 2c-5.506 0-9.989 4.478-9.99 9.984 0 1.762.459 3.48 1.332 5.001L2 22l5.148-1.348c1.472.802 3.13 1.224 4.863 1.225h.005c5.505 0 9.989-4.478 9.99-9.985 0-2.668-1.039-5.176-2.927-7.062A9.923 9.923 0 0 0 12.012 2zm.005 16.521h-.004c-1.493 0-2.957-.401-4.232-1.157l-.304-.18-3.146.825.839-3.067-.198-.315c-.832-1.323-1.272-2.859-1.272-4.436 0-4.492 3.656-8.147 8.152-8.147 2.176 0 4.221.848 5.76 2.387a8.096 8.096 0 0 1 2.384 5.763c0 4.493-3.656 8.147-8.152 8.147zm4.469-6.108c-.245-.123-1.452-.716-1.677-.798-.225-.082-.389-.123-.553.123-.164.246-.635.798-.778.962-.143.164-.286.184-.531.062-.245-.123-1.037-.382-1.976-1.219-.73-.651-1.223-1.455-1.366-1.7-.143-.246-.015-.379.108-.501.111-.11.245-.286.368-.429.123-.143.164-.246.245-.409.082-.164.041-.307-.02-.429-.062-.123-.553-1.332-.757-1.822-.204-.49-.409-.419-.553-.429h-.471c-.164 0-.429.062-.654.307-.225.246-.86.84-.86 2.05 0 1.209.88 2.373 1.002 2.537.123.164 1.733 2.646 4.198 3.712.586.254 1.044.406 1.401.52.59.187 1.127.16 1.551.097.473-.07 1.452-.593 1.656-1.166.204-.573.204-1.064.143-1.166-.061-.102-.225-.164-.47-.287z"/></svg>
             </div>
             <div>
               <p className="text-[10px] text-on-surface-variant font-medium">
                 {lang === "ar" ? "واتساب خدمة العملاء" : "Customer Support"}
               </p>
-              <p className="font-bold text-emerald-400 font-mono text-xs mt-0.5" dir="ltr">
+              <p className="font-bold text-violet-400 font-mono text-xs mt-0.5" dir="ltr">
                 +249 12 366 7227
               </p>
             </div>

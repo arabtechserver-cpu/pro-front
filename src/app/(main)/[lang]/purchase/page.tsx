@@ -1,4 +1,4 @@
-import { getDictionary } from "@/i18n/get-dictionary";
+﻿import { getDictionary } from "@/i18n/get-dictionary";
 import { Locale } from "@/i18n/config";
 import PurchaseClient from "./PurchaseClient";
 import { Metadata, ResolvingMetadata } from "next";
@@ -79,7 +79,7 @@ export async function generateMetadata(props: Props, parent: ResolvingMetadata):
   // Default Purchase Page Metadata
   const defaultTitle = isAr ? "طلب خدمة وتفعيل فوري" : "Order New Service";
   const defaultDesc = isAr
-    ? "اختر واطلب خدمات فك الشبكات، تخطي الآيكلود وFRP، وشراء رصيد البوكسات والدونجلات عبر سيرفر عرب تك برو (عرب تيك سيرفر) بأفضل الأسعار وأسرع وقت."
+    ? "اختر واطلب خدمات فك الشبكات، تخطي الآيكلود وFRP، وشراء رصيد البوكسات والدونجلات عبر سيرفر عرب تك برو (عرب تك برو سيرفر) بأفضل الأسعار وأسرع وقت."
     : "Choose and order network unlock services, iCloud & FRP bypass, and server credits at the best rates.";
 
   return {

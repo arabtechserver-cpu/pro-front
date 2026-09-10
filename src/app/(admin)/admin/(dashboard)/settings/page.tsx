@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -120,7 +120,7 @@ export default function AdminSettingsPage() {
         )}
         
         {success && (
-          <div className="bg-green-500/10 text-green-600 p-4 rounded-2xl mb-6 flex items-center gap-3">
+          <div className="bg-violet-500/10 text-violet-600 p-4 rounded-2xl mb-6 flex items-center gap-3">
             <span className="material-symbols-outlined">check_circle</span>
             {success}
           </div>

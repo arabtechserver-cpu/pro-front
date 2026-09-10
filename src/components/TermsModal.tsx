@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import Link from "next/link";
@@ -36,7 +36,7 @@ export default function TermsModal({
                 {lang === "ar" ? "الشروط والأحكام وسياسة الاسترجاع والضمان" : "Terms of Service & Refund Policy"}
               </h2>
               <p className="text-xs text-on-surface-variant">
-                {lang === "ar" ? "وثيقة رسمية ومعتمدة لدى منصة عرب تك سيرفر" : "Official Certified Document"}
+                {lang === "ar" ? "وثيقة رسمية ومعتمدة لدى منصة عرب تك برو سيرفر" : "Official Certified Document"}
               </p>
             </div>
           </div>
@@ -88,7 +88,7 @@ export default function TermsModal({
                 <div>
                   <p className="font-semibold text-on-surface mb-1">
                     {lang === "ar" 
-                      ? "نحرص في منصة عرب تك سيرفر على الشفافية التامة ووضوح العلاقة مع عملائنا. يرجى قراءة شروط الاستخدام وسياسة الاسترجاع والضمان بعناية قبل إتمام أي طلب."
+                      ? "نحرص في منصة عرب تك برو سيرفر على الشفافية التامة ووضوح العلاقة مع عملائنا. يرجى قراءة شروط الاستخدام وسياسة الاسترجاع والضمان بعناية قبل إتمام أي طلب."
                       : "We are committed to full transparency. Please read our terms and refund policies carefully before completing any order."}
                   </p>
                   <button 
@@ -181,15 +181,15 @@ export default function TermsModal({
                     : "We strive for complete satisfaction. In case of any technical issue, the following terms apply:"}
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2 text-xs">
-                  <div className="p-2 rounded-xl bg-surface-container-high/60 flex items-center gap-2 text-emerald-400 font-semibold">
+                  <div className="p-2 rounded-xl bg-surface-container-high/60 flex items-center gap-2 text-violet-400 font-semibold">
                     <span className="material-symbols-outlined text-sm">check_circle</span>
                     <span>رد تلقائي كامل للرصيد إلى المحفظة في حال رفض السيرفر للطلب.</span>
                   </div>
-                  <div className="p-2 rounded-xl bg-surface-container-high/60 flex items-center gap-2 text-emerald-400 font-semibold">
+                  <div className="p-2 rounded-xl bg-surface-container-high/60 flex items-center gap-2 text-violet-400 font-semibold">
                     <span className="material-symbols-outlined text-sm">check_circle</span>
                     <span>إمكانية طلب إلغاء واسترجاع في حال تأخر السيرفر عن الوقت الأقصى.</span>
                   </div>
-                  <div className="p-2 rounded-xl bg-surface-container-high/60 flex items-center gap-2 text-emerald-400 font-semibold">
+                  <div className="p-2 rounded-xl bg-surface-container-high/60 flex items-center gap-2 text-violet-400 font-semibold">
                     <span className="material-symbols-outlined text-sm">check_circle</span>
                     <span>معالجة سريعة لطلبات الاسترجاع والتذاكر عبر الدعم الفني.</span>
                   </div>
@@ -214,8 +214,8 @@ export default function TermsModal({
               </div>
 
               {/* Point 2 */}
-              <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 space-y-2">
-                <div className="flex items-center gap-2 text-emerald-400 font-bold text-sm">
+              <div className="p-4 rounded-2xl bg-violet-500/10 border border-violet-500/20 space-y-2">
+                <div className="flex items-center gap-2 text-violet-400 font-bold text-sm">
                   <span>2️⃣</span>
                   <h4>{lang === "ar" ? "حالات استرجاع الرصيد المؤكدة (100%)" : "2. Guaranteed 100% Refund Cases"}</h4>
                 </div>
@@ -265,7 +265,7 @@ export default function TermsModal({
         <div className="p-4 border-t border-outline-variant/20 flex items-center justify-between bg-surface-container-high/40">
           <div className="flex items-center gap-2 text-xs text-on-surface-variant">
             <span className="material-symbols-outlined text-primary text-base">verified_user</span>
-            <span>{lang === "ar" ? "منصة عرب تك سيرفر — جميع الحقوق محفوظة" : "Arab Tech Pro Server"}</span>
+            <span>{lang === "ar" ? "منصة عرب تك برو سيرفر — جميع الحقوق محفوظة" : "Arab Tech Pro Server"}</span>
           </div>
 
           <button

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
@@ -287,7 +287,7 @@ export default function LoginClient({ lang, dict }: { lang: Locale; dict: any })
         )}
 
         {successMessage && (
-          <div className="relative z-10 mb-5 p-3.5 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs font-semibold flex items-center gap-2.5 animate-in fade-in slide-in-from-top-2 duration-200">
+          <div className="relative z-10 mb-5 p-3.5 rounded-xl bg-violet-500/15 border border-violet-500/30 text-violet-300 text-xs font-semibold flex items-center gap-2.5 animate-in fade-in slide-in-from-top-2 duration-200">
             <span className="material-symbols-outlined text-base shrink-0">check_circle</span>
             <span>{successMessage}</span>
           </div>
@@ -394,7 +394,7 @@ export default function LoginClient({ lang, dict }: { lang: Locale; dict: any })
           <button 
             type="submit" 
             disabled={isLoading}
-            className="w-full mt-4 bg-primary-container text-on-primary-container py-3.5 rounded-lg font-bold uppercase tracking-wider hover:bg-primary transition-all glow-primary shadow-[0_0_15px_rgba(45,212,191,0.2)] active:scale-[0.98] flex items-center justify-center gap-2 disabled:opacity-50"
+            className="w-full mt-4 bg-primary-container text-on-primary-container py-3.5 rounded-lg font-bold uppercase tracking-wider hover:bg-primary transition-all glow-primary shadow-[0_0_15px_rgba(124,58,237,0.2)] active:scale-[0.98] flex items-center justify-center gap-2 disabled:opacity-50"
           >
             {isLoading ? (
               <>
@@ -443,7 +443,7 @@ export default function LoginClient({ lang, dict }: { lang: Locale; dict: any })
             )}
 
             {forgotSuccess && (
-              <div className="mt-4 p-3 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs font-semibold flex items-center gap-2">
+              <div className="mt-4 p-3 rounded-xl bg-violet-500/15 border border-violet-500/30 text-violet-300 text-xs font-semibold flex items-center gap-2">
                 <span className="material-symbols-outlined text-base">check_circle</span>
                 <span>{forgotSuccess}</span>
               </div>
@@ -542,7 +542,7 @@ export default function LoginClient({ lang, dict }: { lang: Locale; dict: any })
                   <button
                     type="submit"
                     disabled={forgotLoading || !forgotOtp.trim() || !forgotNewPassword.trim()}
-                    className="flex-1 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-black font-bold text-xs transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                    className="flex-1 py-3 rounded-xl bg-violet-500 hover:bg-violet-600 text-black font-bold text-xs transition-all flex items-center justify-center gap-2 disabled:opacity-50"
                   >
                     {forgotLoading ? (
                       <>

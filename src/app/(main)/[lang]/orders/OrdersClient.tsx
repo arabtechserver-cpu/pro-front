@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
@@ -128,7 +128,7 @@ export default function OrdersClient({ lang, dict }: { lang: string, dict: any }
         <div className="flex flex-wrap items-center gap-3 shrink-0">
           <Link
             href={`/${lang}/purchase`}
-            className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-primary to-secondary text-on-primary font-bold text-xs hover:shadow-[0_0_20px_rgba(45,212,191,0.4)] transition-all flex items-center gap-2 shadow-md active:scale-95"
+            className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-primary to-secondary text-on-primary font-bold text-xs hover:shadow-[0_0_20px_rgba(124,58,237,0.4)] transition-all flex items-center gap-2 shadow-md active:scale-95"
           >
             <span className="material-symbols-outlined text-base">add_circle</span>
             <span>{lang === 'ar' ? 'طلب خدمة جديدة +' : 'Order New Service +'}</span>
@@ -208,7 +208,7 @@ export default function OrdersClient({ lang, dict }: { lang: string, dict: any }
               </button>
               <button 
                 onClick={() => setFilterStatus("completed")}
-                className={`px-3 py-1.5 rounded-lg transition-all ${filterStatus === "completed" ? "bg-emerald-500 text-white shadow-sm" : "text-on-surface-variant hover:text-on-surface"}`}
+                className={`px-3 py-1.5 rounded-lg transition-all ${filterStatus === "completed" ? "bg-violet-500 text-white shadow-sm" : "text-on-surface-variant hover:text-on-surface"}`}
               >
                 {lang === 'ar' ? 'مكتمل' : 'Completed'}
               </button>
@@ -304,7 +304,7 @@ export default function OrdersClient({ lang, dict }: { lang: string, dict: any }
                       <td className="p-4 text-start font-mono text-xs">
                         {ord.reply ? (
                           <div className="flex items-center gap-2">
-                            <span className="bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-bold px-3 py-1 rounded-xl text-xs select-all dir-ltr glow-cyan whitespace-pre-wrap block">
+                            <span className="bg-violet-500/10 border border-violet-500/30 text-violet-400 font-bold px-3 py-1 rounded-xl text-xs select-all dir-ltr glow-cyan whitespace-pre-wrap block">
                               {cleanHtmlToText(ord.reply)}
                             </span>
                             <button
@@ -320,7 +320,7 @@ export default function OrdersClient({ lang, dict }: { lang: string, dict: any }
                             </button>
                           </div>
                         ) : isCompleted ? (
-                          <span className="text-emerald-400 font-bold text-[11px]">{lang === 'ar' ? 'تم التفعيل بنجاح' : 'Done / Unlocked'}</span>
+                          <span className="text-violet-400 font-bold text-[11px]">{lang === 'ar' ? 'تم التفعيل بنجاح' : 'Done / Unlocked'}</span>
                         ) : isFailed ? (
                           <span className="text-red-400 font-bold text-[11px]">{lang === 'ar' ? 'تعذر التنفيذ / مرفوض' : 'Rejected'}</span>
                         ) : (
@@ -337,8 +337,8 @@ export default function OrdersClient({ lang, dict }: { lang: string, dict: any }
 
                       <td className="p-4 text-center">
                         {isCompleted && (
-                          <span className="px-3.5 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 font-bold text-[11px] inline-flex items-center gap-1.5">
-                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                          <span className="px-3.5 py-1 rounded-full bg-violet-500/15 border border-violet-500/30 text-violet-400 font-bold text-[11px] inline-flex items-center gap-1.5">
+                            <span className="w-1.5 h-1.5 rounded-full bg-violet-400"></span>
                             <span>{lang === 'ar' ? 'مكتمل' : 'Completed'}</span>
                           </span>
                         )}

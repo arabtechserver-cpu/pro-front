@@ -81,8 +81,8 @@ export default function CampaignSlider({ campaigns, lang }: { campaigns: Campaig
       onTouchEnd={handleTouchEnd}
     >
       {/* Curved Arched Cyber Lines */}
-      <div className="absolute -top-[2px] left-0 right-0 h-[2.5px] bg-gradient-to-r from-transparent via-cyan-400 to-transparent shadow-[0_0_15px_#22d3ee] pointer-events-none z-20"></div>
-      <div className="absolute -bottom-[2px] left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-emerald-400 to-transparent shadow-[0_0_15px_#34d399] pointer-events-none z-20"></div>
+      <div className="absolute -top-[2px] left-0 right-0 h-[2.5px] bg-gradient-to-r from-transparent via-cyan-400 to-transparent shadow-[0_0_15px_#8b5cf6] pointer-events-none z-20"></div>
+      <div className="absolute -bottom-[2px] left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-violet-400 to-transparent shadow-[0_0_15px_#a78bfa] pointer-events-none z-20"></div>
 
       <AnimatePresence mode="wait">
         <motion.div
@@ -97,11 +97,11 @@ export default function CampaignSlider({ campaigns, lang }: { campaigns: Campaig
             className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
             style={{ backgroundImage: `url('${current?.image || "/images/promo_samsung.webp"}')` }}
           ></div>
-          <div className="absolute inset-0 bg-gradient-to-t from-[#070c1a]/98 via-[#070c1a]/60 to-transparent opacity-90"></div>
+          <div className="absolute inset-0 bg-gradient-to-t from-[#050814]/98 via-[#050814]/60 to-transparent opacity-90"></div>
           
           <div className="absolute bottom-10 sm:bottom-12 left-5 sm:left-12 right-5 sm:right-12 z-10">
             {tag && (
-              <span className="convex-pill bg-gradient-to-r from-emerald-500/25 to-cyan-500/25 text-emerald-300 px-4 py-1.5 text-xs sm:text-sm uppercase font-black tracking-wider mb-3 inline-block backdrop-blur-md border border-emerald-400/40 shadow-sm animate-mobile-badge">
+              <span className="convex-pill bg-gradient-to-r from-violet-500/25 to-cyan-500/25 text-violet-300 px-4 py-1.5 text-xs sm:text-sm uppercase font-black tracking-wider mb-3 inline-block backdrop-blur-md border border-violet-400/40 shadow-sm animate-mobile-badge">
                 {tag}
               </span>
             )}
@@ -113,10 +113,10 @@ export default function CampaignSlider({ campaigns, lang }: { campaigns: Campaig
             </p>
             <Link
               href={url}
-              className="convex-pill w-max bg-gradient-to-r from-emerald-500 via-teal-400 to-cyan-500 text-slate-950 px-6 sm:px-8 py-2.5 sm:py-3.5 text-xs sm:text-base font-black shadow-lg hover:shadow-cyan-400/40 flex items-center gap-2 active:scale-95 active:shadow-[0_0_25px_rgba(45,212,191,0.8)]"
+              className="btn-purple-glow w-max px-7 sm:px-9 py-2.5 sm:py-3.5 text-xs sm:text-base font-black flex items-center gap-2 group"
             >
               <span>{isAr ? "عرض تفاصيل الباقة" : "View Details"}</span>
-              <i className={`fas fa-arrow-${isAr ? "left" : "right"} text-xs`}></i>
+              <i className={`fas fa-arrow-${isAr ? "left" : "right"} text-xs transition-transform group-hover:-translate-x-1`}></i>
             </Link>
           </div>
         </motion.div>
@@ -131,8 +131,8 @@ export default function CampaignSlider({ campaigns, lang }: { campaigns: Campaig
               onClick={() => setCurrentIndex(idx)}
               className={`h-2 rounded-full transition-all duration-300 active:scale-90 ${
                 idx === currentIndex
-                  ? "w-8 bg-gradient-to-r from-emerald-400 to-cyan-400 shadow-[0_0_12px_#22d3ee] animate-pulse"
-                  : "w-2 bg-white/40 hover:bg-white/70"
+                  ? "w-8 bg-gradient-to-r from-violet-400 to-cyan-400 shadow-[0_0_12px_#8b5cf6] animate-pulse"
+                  : "w-2 bg-violet-400/50 hover:bg-violet-300/80"
               }`}
               aria-label={`Go to slide ${idx + 1}`}
             />

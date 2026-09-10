@@ -1,4 +1,4 @@
-import { Locale } from "@/i18n/config";
+﻿import { Locale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/get-dictionary";
 import Link from "next/link";
 
@@ -35,21 +35,21 @@ export default async function RefundPolicyPage(props: PageProps) {
       </div>
 
       {/* Quick Summary Alert */}
-      <div className="glass-card rounded-3xl p-6 border border-emerald-500/30 bg-emerald-500/10 space-y-3">
-        <h2 className="text-base font-bold text-emerald-400 flex items-center gap-2">
+      <div className="glass-card rounded-3xl p-6 border border-violet-500/30 bg-violet-500/10 space-y-3">
+        <h2 className="text-base font-bold text-violet-400 flex items-center gap-2">
           <span className="material-symbols-outlined">verified</span>
           <span>{lang === "ar" ? "ملخص سياسة الاسترجاع السريعة" : "Quick Refund Summary"}</span>
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs sm:text-sm">
-          <div className="p-3 rounded-2xl bg-surface-container-high/80 flex items-center gap-2 text-emerald-300 font-semibold">
+          <div className="p-3 rounded-2xl bg-surface-container-high/80 flex items-center gap-2 text-violet-300 font-semibold">
             <span className="material-symbols-outlined text-sm">check_circle</span>
             <span>رد تلقائي كامل للرصيد إلى المحفظة في حال رفض السيرفر المصدر للطلب.</span>
           </div>
-          <div className="p-3 rounded-2xl bg-surface-container-high/80 flex items-center gap-2 text-emerald-300 font-semibold">
+          <div className="p-3 rounded-2xl bg-surface-container-high/80 flex items-center gap-2 text-violet-300 font-semibold">
             <span className="material-symbols-outlined text-sm">check_circle</span>
             <span>إمكانية طلب إلغاء واسترجاع في حال تأخر السيرفر عن الوقت الأقصى.</span>
           </div>
-          <div className="p-3 rounded-2xl bg-surface-container-high/80 flex items-center gap-2 text-emerald-300 font-semibold">
+          <div className="p-3 rounded-2xl bg-surface-container-high/80 flex items-center gap-2 text-violet-300 font-semibold">
             <span className="material-symbols-outlined text-sm">check_circle</span>
             <span>معالجة سريعة لطلبات الاسترجاع والتذاكر عبر الدعم الفني.</span>
           </div>
@@ -74,8 +74,8 @@ export default async function RefundPolicyPage(props: PageProps) {
           </p>
         </div>
 
-        <div className="glass-card rounded-3xl p-6 sm:p-8 border border-emerald-500/20 bg-emerald-500/5 space-y-3">
-          <div className="flex items-center gap-3 text-emerald-400 font-bold text-base">
+        <div className="glass-card rounded-3xl p-6 sm:p-8 border border-violet-500/20 bg-violet-500/5 space-y-3">
+          <div className="flex items-center gap-3 text-violet-400 font-bold text-base">
             <span className="text-xl">2️⃣</span>
             <h2>{lang === "ar" ? "حالات استرجاع الرصيد المؤكدة (100%)" : "2. Guaranteed 100% Refund Cases"}</h2>
           </div>

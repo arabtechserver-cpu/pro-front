@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
 import ImageUploader from '@/components/ImageUploader';
@@ -451,7 +451,7 @@ export default function VideosAdminPage() {
 
             <div className="flex items-center justify-between text-xs text-on-surface-variant">
               <span className="truncate max-w-md">رابط الفيديو: {previewVideo.videoUrl}</span>
-              <span className={`px-2.5 py-1 rounded-full font-bold ${previewVideo.isFreePreview ? 'bg-emerald-500/20 text-emerald-400' : 'bg-amber-500/20 text-amber-400'}`}>
+              <span className={`px-2.5 py-1 rounded-full font-bold ${previewVideo.isFreePreview ? 'bg-violet-500/20 text-violet-400' : 'bg-amber-500/20 text-amber-400'}`}>
                 {previewVideo.isFreePreview ? 'معاينة مجانية' : 'كورس مقفل للمشتركين'}
               </span>
             </div>
@@ -478,7 +478,7 @@ export default function VideosAdminPage() {
                     <h2 className="text-xl font-bold text-on-surface">
                       {curriculumSeries.titleAr || curriculumSeries.titleEn}
                     </h2>
-                    <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold ${curriculumSeries.isSubscriptionRequired ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30' : 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'}`}>
+                    <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold ${curriculumSeries.isSubscriptionRequired ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30' : 'bg-violet-500/15 text-violet-400 border border-violet-500/30'}`}>
                       {curriculumSeries.isSubscriptionRequired ? `مدفوع ($${(curriculumSeries.price || 0).toFixed(2)})` : 'مجاني 🟢'}
                     </span>
                   </div>
@@ -568,7 +568,7 @@ export default function VideosAdminPage() {
                           <h4 className="font-bold text-sm text-on-surface">
                             {lesson.titleAr || lesson.titleEn}
                           </h4>
-                          <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold ${lesson.isFreePreview ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/20' : 'bg-amber-500/15 text-amber-400 border border-amber-500/20'}`}>
+                          <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold ${lesson.isFreePreview ? 'bg-violet-500/15 text-violet-400 border border-violet-500/20' : 'bg-amber-500/15 text-amber-400 border border-amber-500/20'}`}>
                             {lesson.isFreePreview ? '🟢 معاينة مجانية' : '🔒 مقفل للمشتركين'}
                           </span>
                         </div>
@@ -1054,13 +1054,13 @@ export default function VideosAdminPage() {
 
                       {/* Price Badge */}
                       <div className="absolute top-3 right-3">
-                        <span className={`px-3 py-1 rounded-full text-xs font-bold shadow-md backdrop-blur-md ${series.isSubscriptionRequired ? 'bg-amber-500/90 text-black border border-amber-400' : 'bg-emerald-600/90 text-white border border-emerald-400'}`}>
+                        <span className={`px-3 py-1 rounded-full text-xs font-bold shadow-md backdrop-blur-md ${series.isSubscriptionRequired ? 'bg-amber-500/90 text-black border border-amber-400' : 'bg-violet-600/90 text-white border border-violet-400'}`}>
                           {series.isSubscriptionRequired ? `مدفوع: $${(series.price || 0).toFixed(2)}` : 'مجاني 🟢'}
                         </span>
                       </div>
 
                       {/* Total Videos Badge */}
-                      <div className="absolute bottom-3 left-3 bg-black/70 backdrop-blur-md text-white px-2.5 py-1 rounded-lg text-xs font-bold flex items-center gap-1.5 border border-white/10">
+                      <div className="absolute bottom-3 left-3 bg-black/70 backdrop-blur-md text-white px-2.5 py-1 rounded-lg text-xs font-bold flex items-center gap-1.5 border border-violet-400/15">
                         <span className="material-symbols-outlined text-sm text-primary">play_lesson</span>
                         <span>{totalLessons} دروس</span>
                       </div>
@@ -1225,7 +1225,7 @@ export default function VideosAdminPage() {
 
                       {/* Status Badges on Thumbnail */}
                       <div className="absolute top-2.5 right-2.5 flex items-center gap-1.5">
-                        <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold shadow ${video.isFreePreview ? 'bg-emerald-500 text-black' : 'bg-amber-500 text-black'}`}>
+                        <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold shadow ${video.isFreePreview ? 'bg-violet-500 text-black' : 'bg-amber-500 text-black'}`}>
                           {video.isFreePreview ? 'مجاني 🟢' : 'مقفل 🔒'}
                         </span>
                       </div>

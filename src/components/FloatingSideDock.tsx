@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
@@ -94,9 +94,9 @@ export default function FloatingSideDock({ lang = "ar" }: FloatingSideDockProps)
           type="button"
           onClick={scrollToTop}
           aria-label={isAr ? "الرجوع لأعلى الصفحة" : "Scroll to top"}
-          className="fixed bottom-5 left-4 sm:bottom-8 sm:left-8 z-40 w-12 h-12 rounded-full bg-emerald-500 hover:bg-emerald-400 text-white flex items-center justify-center shadow-[0_4px_20px_rgba(16,185,129,0.6)] transition-all duration-300 hover:scale-110 active:scale-90 animate-in fade-in zoom-in-75 relative group"
+          className="fixed bottom-5 left-4 sm:bottom-8 sm:left-8 z-40 w-12 h-12 rounded-full bg-violet-500 hover:bg-violet-400 text-white flex items-center justify-center shadow-[0_4px_20px_rgba(124,58,237,0.6)] transition-all duration-300 hover:scale-110 active:scale-90 animate-in fade-in zoom-in-75 relative group"
         >
-          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-40 pointer-events-none"></span>
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-violet-400 opacity-40 pointer-events-none"></span>
           <span className="material-symbols-outlined text-2xl font-bold group-hover:-translate-y-0.5 transition-transform">keyboard_arrow_up</span>
         </button>
       )}

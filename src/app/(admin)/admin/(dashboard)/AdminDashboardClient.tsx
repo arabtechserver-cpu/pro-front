@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
@@ -112,7 +112,7 @@ export default function AdminDashboardClient() {
               <div className="space-y-1">
                 <p className="text-xs font-bold text-on-surface-variant">المستخدمين المسجلين</p>
                 <h3 className="text-3xl font-bold text-on-surface font-mono">{data.users.total}</h3>
-                <p className="text-[11px] text-emerald-400 font-semibold">
+                <p className="text-[11px] text-violet-400 font-semibold">
                   {data.users.active} حساب نشط
                 </p>
               </div>
@@ -124,18 +124,18 @@ export default function AdminDashboardClient() {
             {/* Total Wallet Balances */}
             <Link
               href="/admin/wallet"
-              className="glass-card p-6 rounded-3xl border border-outline-variant/30 hover:border-emerald-500/50 transition-all shadow-lg flex items-center justify-between group"
+              className="glass-card p-6 rounded-3xl border border-outline-variant/30 hover:border-violet-500/50 transition-all shadow-lg flex items-center justify-between group"
             >
               <div className="space-y-1">
                 <p className="text-xs font-bold text-on-surface-variant">إجمالي أرصدة محافظ العملاء</p>
-                <h3 className="text-3xl font-bold text-emerald-400 font-mono">
+                <h3 className="text-3xl font-bold text-violet-400 font-mono">
                   ${data.users.totalBalances.toFixed(2)}
                 </h3>
                 <p className="text-[11px] text-on-surface-variant font-semibold">
                   موزعة على {data.users.total} محفظة
                 </p>
               </div>
-              <div className="w-14 h-14 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+              <div className="w-14 h-14 rounded-2xl bg-violet-500/10 border border-violet-500/20 text-violet-400 flex items-center justify-center group-hover:scale-110 transition-transform">
                 <span className="material-symbols-outlined text-3xl">account_balance_wallet</span>
               </div>
             </Link>
@@ -229,7 +229,7 @@ export default function AdminDashboardClient() {
                 href="/admin/wallet"
                 className="p-4 rounded-2xl bg-surface-container-high border border-outline-variant/20 hover:border-primary/40 hover:bg-surface-container-highest transition-all flex items-center gap-2.5"
               >
-                <span className="material-symbols-outlined text-emerald-400 text-xl">add_card</span>
+                <span className="material-symbols-outlined text-violet-400 text-xl">add_card</span>
                 <span>مراجعة طلبات الشحن</span>
               </Link>
 
@@ -315,7 +315,7 @@ export default function AdminDashboardClient() {
                         <td className="p-4 font-mono font-bold text-primary">${(o.price || 0).toFixed(2)}</td>
                         <td className="p-4">
                           <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
-                            o.status === "completed" ? "bg-emerald-500/15 text-emerald-400 border border-emerald-500/30" :
+                            o.status === "completed" ? "bg-violet-500/15 text-violet-400 border border-violet-500/30" :
                             o.status === "pending" ? "bg-amber-500/15 text-amber-400 border border-amber-500/30" :
                             "bg-red-500/15 text-red-400 border border-red-500/30"
                           }`}>
@@ -354,11 +354,11 @@ export default function AdminDashboardClient() {
                       <tr key={tx.id} className="hover:bg-surface-container-high/30 transition-colors">
                         <td className="p-4 font-mono font-bold text-primary dir-ltr">{tx.refNo}</td>
                         <td className="p-4 font-bold text-on-surface">{tx.user?.fullName || tx.user?.email || "عميل"}</td>
-                        <td className="p-4 font-mono font-bold text-emerald-400 dir-ltr">+${(tx.amount || 0).toFixed(2)}</td>
+                        <td className="p-4 font-mono font-bold text-violet-400 dir-ltr">+${(tx.amount || 0).toFixed(2)}</td>
                         <td className="p-4 text-on-surface-variant">{tx.method}</td>
                         <td className="p-4">
                           <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
-                            tx.status === "completed" ? "bg-emerald-500/15 text-emerald-400 border border-emerald-500/30" :
+                            tx.status === "completed" ? "bg-violet-500/15 text-violet-400 border border-violet-500/30" :
                             tx.status === "pending" ? "bg-amber-500/15 text-amber-400 border border-amber-500/30" :
                             "bg-red-500/15 text-red-400 border border-red-500/30"
                           }`}>
@@ -398,13 +398,13 @@ export default function AdminDashboardClient() {
                         <td className="p-4 font-bold text-on-surface">{u.fullName} (@{u.username})</td>
                         <td className="p-4 font-mono text-on-surface-variant">
                           <div>{u.email}</div>
-                          {u.phone && <div className="text-[10px] text-emerald-400 font-mono mt-0.5 dir-ltr">{u.phone}</div>}
+                          {u.phone && <div className="text-[10px] text-violet-400 font-mono mt-0.5 dir-ltr">{u.phone}</div>}
                         </td>
                         <td className="p-4 text-on-surface">{u.country || "—"}</td>
                         <td className="p-4 font-mono font-bold text-primary">${(u.balance || 0).toFixed(2)}</td>
                         <td className="p-4">
                           <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
-                            u.status === "active" ? "bg-emerald-500/15 text-emerald-400 border border-emerald-500/30" : "bg-red-500/15 text-red-400 border border-red-500/30"
+                            u.status === "active" ? "bg-violet-500/15 text-violet-400 border border-violet-500/30" : "bg-red-500/15 text-red-400 border border-red-500/30"
                           }`}>
                             {u.status === "active" ? "نشط" : "موقوف"}
                           </span>

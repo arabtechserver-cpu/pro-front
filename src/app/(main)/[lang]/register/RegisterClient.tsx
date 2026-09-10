@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useMemo, useEffect, useCallback } from "react";
 import Link from "next/link";
@@ -379,7 +379,7 @@ export default function RegisterClient({ lang, dict }: { lang: Locale; dict: any
 
     if (score <= 1) return { percent: 25, textAr: "ضعيفة", textEn: "Weak", color: "bg-red-500" };
     if (score === 2) return { percent: 50, textAr: "متوسطة", textEn: "Medium", color: "bg-yellow-500" };
-    if (score === 3) return { percent: 75, textAr: "قوية", textEn: "Strong", color: "bg-emerald-500" };
+    if (score === 3) return { percent: 75, textAr: "قوية", textEn: "Strong", color: "bg-violet-500" };
     return { percent: 100, textAr: "قوية جداً", textEn: "Very Strong", color: "bg-primary glow-cyan" };
   }, [password]);
 
@@ -520,7 +520,7 @@ export default function RegisterClient({ lang, dict }: { lang: Locale; dict: any
         )}
 
         {successMessage && (
-          <div className="relative z-10 mb-6 p-4 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs font-semibold flex items-center gap-2.5 animate-in fade-in slide-in-from-top-2 duration-200">
+          <div className="relative z-10 mb-6 p-4 rounded-xl bg-violet-500/15 border border-violet-500/30 text-violet-300 text-xs font-semibold flex items-center gap-2.5 animate-in fade-in slide-in-from-top-2 duration-200">
             <span className="material-symbols-outlined text-base shrink-0">check_circle</span>
             <span>{successMessage}</span>
           </div>
@@ -794,7 +794,7 @@ export default function RegisterClient({ lang, dict }: { lang: Locale; dict: any
               {passwordsMatch !== null && (
                 <div className="text-[11px] font-bold mt-0.5">
                   {passwordsMatch ? (
-                    <span className="text-emerald-400 flex items-center gap-1">
+                    <span className="text-violet-400 flex items-center gap-1">
                       <span className="material-symbols-outlined text-sm">check_circle</span>
                       {lang === "ar" ? "كلمات المرور متطابقة" : "Passwords match"}
                     </span>
@@ -862,7 +862,7 @@ export default function RegisterClient({ lang, dict }: { lang: Locale; dict: any
             <button 
               type="submit" 
               disabled={isLoading}
-              className="w-full bg-primary-container text-on-primary-container py-4 rounded-lg font-bold text-lg hover:bg-primary transition-all glow-primary shadow-[0_0_15px_rgba(45,212,191,0.2)] active:scale-[0.99] flex items-center justify-center gap-2 disabled:opacity-50"
+              className="w-full bg-primary-container text-on-primary-container py-4 rounded-lg font-bold text-lg hover:bg-primary transition-all glow-primary shadow-[0_0_15px_rgba(124,58,237,0.2)] active:scale-[0.99] flex items-center justify-center gap-2 disabled:opacity-50"
             >
               {isLoading ? (
                 <>

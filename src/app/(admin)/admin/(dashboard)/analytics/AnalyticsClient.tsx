@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
 
@@ -202,7 +202,7 @@ export default function AnalyticsClient() {
             <div>
               <h2 className="text-xl font-bold text-on-surface flex items-center gap-2">
                 <span>سجل طلبات المزودين المنفذة خلال المدة المحددة</span>
-                <span className="text-xs px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+                <span className="text-xs px-2.5 py-0.5 rounded-full bg-violet-500/15 text-violet-400 border border-violet-500/30">
                   Live Sync
                 </span>
               </h2>
@@ -334,8 +334,8 @@ export default function AnalyticsClient() {
                 <span>العدد الإجمالي:</span>
                 <span className="font-mono text-primary font-extrabold">{orderSummary.total}</span>
               </span>
-              <span className="flex items-center gap-1.5 font-bold text-emerald-400">
-                <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+              <span className="flex items-center gap-1.5 font-bold text-violet-400">
+                <span className="w-2 h-2 rounded-full bg-violet-500"></span>
                 <span>المكتمل بنجاح:</span>
                 <span className="font-mono font-extrabold">{orderSummary.completedCount}</span>
               </span>
@@ -353,7 +353,7 @@ export default function AnalyticsClient() {
 
             <div className="text-on-surface-variant font-bold">
               <span>إجمالي القيمة: </span>
-              <span className="font-mono text-emerald-400 font-extrabold">
+              <span className="font-mono text-violet-400 font-extrabold">
                 ${orderSummary.totalVolume.toFixed(2)} USD
               </span>
             </div>
@@ -441,7 +441,7 @@ export default function AnalyticsClient() {
                       <td className="p-3.5 font-bold text-on-surface max-w-md">
                         <div className="flex items-center gap-1.5 flex-wrap">
                           <span>{order.serviceName}</span>
-                          <span className="text-emerald-400 text-xs" title="خدمة مزود معتمدة">
+                          <span className="text-violet-400 text-xs" title="خدمة مزود معتمدة">
                             ✅
                           </span>
                         </div>
@@ -611,9 +611,9 @@ export default function AnalyticsClient() {
               </div>
 
               {selectedOrderDetails.reply && (
-                <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 space-y-1.5">
-                  <p className="text-emerald-400 font-bold">الكود / الرد المسلّم من المزود:</p>
-                  <p className="font-mono text-emerald-300 font-bold break-all">{selectedOrderDetails.reply}</p>
+                <div className="p-3 rounded-xl bg-violet-500/10 border border-violet-500/30 space-y-1.5">
+                  <p className="text-violet-400 font-bold">الكود / الرد المسلّم من المزود:</p>
+                  <p className="font-mono text-violet-300 font-bold break-all">{selectedOrderDetails.reply}</p>
                 </div>
               )}
 
@@ -658,7 +658,7 @@ function StatCard({
 }) {
   const colorMap = {
     sky: { bg: "bg-sky-500/10", border: "border-sky-500/30", text1: "text-sky-300", text2: "text-sky-400" },
-    emerald: { bg: "bg-emerald-500/10", border: "border-emerald-500/30", text1: "text-emerald-300", text2: "text-emerald-400" },
+    emerald: { bg: "bg-violet-500/10", border: "border-violet-500/30", text1: "text-violet-300", text2: "text-violet-400" },
     amber: { bg: "bg-amber-500/10", border: "border-amber-500/30", text1: "text-amber-300", text2: "text-amber-400" },
     fuchsia: { bg: "bg-fuchsia-500/10", border: "border-fuchsia-500/30", text1: "text-fuchsia-300", text2: "text-fuchsia-400" }
   };

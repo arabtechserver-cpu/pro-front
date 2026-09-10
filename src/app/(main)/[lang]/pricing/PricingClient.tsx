@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect, useMemo, useRef, useDeferredValue } from "react";
 import { categoryMatchesFilter, createInitialCollapsedGroups, sortDisplayGroups } from "../../../../lib/pricing-groups";
@@ -31,11 +31,11 @@ function RenderPriceBadge({ service, lang, discountPercent = 0 }: { service: any
             <span className="text-xs text-on-surface-variant line-through font-mono opacity-50">
               ${priceNum.toFixed(2)}
             </span>
-            <span className="font-price-display text-emerald-400 glow-cyan font-bold text-base">
+            <span className="font-price-display text-violet-400 glow-cyan font-bold text-base">
               ${discountedPrice.toFixed(2)}
             </span>
           </div>
-          <span className="text-[10px] text-emerald-400 font-bold font-mono">
+          <span className="text-[10px] text-violet-400 font-bold font-mono">
             {lang === 'ar' ? `-${discountPercent}% خصم VIP` : `-${discountPercent}% VIP`}
           </span>
         </div>
@@ -51,7 +51,7 @@ function RenderPriceBadge({ service, lang, discountPercent = 0 }: { service: any
 
   if (isFree) {
     return (
-      <span className="px-2.5 py-1 rounded-lg bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 font-bold text-xs inline-flex items-center gap-1">
+      <span className="px-2.5 py-1 rounded-lg bg-violet-500/15 border border-violet-500/30 text-violet-400 font-bold text-xs inline-flex items-center gap-1">
         <span>{lang === 'ar' ? 'مجاناً' : 'Free'}</span>
       </span>
     );
@@ -573,15 +573,15 @@ export default function PricingClient({
         <>
           {/* VIP Membership Active Banner */}
           {discountPercent > 0 && (
-            <div className="p-4 sm:p-5 rounded-3xl bg-gradient-to-r from-emerald-500/15 via-primary/20 to-emerald-500/15 border border-emerald-500/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xl backdrop-blur-md animate-in fade-in duration-300">
+            <div className="p-4 sm:p-5 rounded-3xl bg-gradient-to-r from-violet-500/15 via-primary/20 to-violet-500/15 border border-violet-500/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xl backdrop-blur-md animate-in fade-in duration-300">
               <div className="flex items-center gap-3.5">
-                <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center border border-emerald-500/30 shrink-0 shadow-md">
+                <div className="w-12 h-12 rounded-2xl bg-violet-500/20 text-violet-400 flex items-center justify-center border border-violet-500/30 shrink-0 shadow-md">
                   <span className="material-symbols-outlined text-2xl">workspace_premium</span>
                 </div>
                 <div>
                   <h3 className="font-bold text-sm sm:text-base text-on-surface flex items-center gap-2">
                     <span>{lang === 'ar' ? `مرحباً بك! لديك "${userSession?.membershipTier?.nameAr || userSession?.membershipTier?.name || 'عضوية VIP'}"` : `Welcome! You have "${userSession?.membershipTier?.name || 'VIP Membership'}"`}</span>
-                    <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40">
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-violet-500/20 text-violet-400 border border-violet-500/40">
                       VIP
                     </span>
                   </h3>
@@ -593,9 +593,9 @@ export default function PricingClient({
                 </div>
               </div>
 
-              <div className="px-4 py-2 rounded-2xl bg-surface-container-high/80 border border-emerald-500/30 flex items-center gap-2">
+              <div className="px-4 py-2 rounded-2xl bg-surface-container-high/80 border border-violet-500/30 flex items-center gap-2">
                 <span className="text-xs text-on-surface-variant font-medium">{lang === 'ar' ? 'نسبة الخصم:' : 'Active Discount:'}</span>
-                <span className="text-base font-extrabold text-emerald-400 font-mono">
+                <span className="text-base font-extrabold text-violet-400 font-mono">
                   -{discountPercent}%
                 </span>
               </div>

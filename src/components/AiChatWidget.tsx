@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useRef, useEffect } from 'react';
 import { getUserAuthToken } from "../lib/client-auth-token";
@@ -239,8 +239,8 @@ export default function AiChatWidget() {
           <div className="flex flex-col items-center sm:items-end bg-[#0b0f19]/95 backdrop-blur-xl border border-cyan-400/50 rounded-2xl px-2.5 py-1 sm:px-3.5 sm:py-2 shadow-[0_8px_25px_rgba(0,0,0,0.6)] group-hover:border-cyan-400 transition-all pointer-events-none mb-1 sm:mb-0">
             <div className="flex items-center gap-1.5">
               <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-violet-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-violet-500"></span>
               </span>
               <span className="text-[10px] sm:text-xs font-black text-white tracking-wide flex items-center gap-1 whitespace-nowrap">
                 <span>المساعد الذكي AI</span>
@@ -384,7 +384,7 @@ export default function AiChatWidget() {
                 <div className="w-full h-full bg-[#0f172a] rounded-full flex items-center justify-center">
                   <span className="material-symbols-outlined text-primary text-lg sm:text-xl">smart_toy</span>
                 </div>
-                <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 border-2 border-[#0b0f19] rounded-full"></span>
+                <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-violet-500 border-2 border-[#0b0f19] rounded-full"></span>
               </div>
               <div>
                 <h3 className="font-bold text-xs sm:text-sm text-on-surface flex items-center gap-1.5">
@@ -402,7 +402,7 @@ export default function AiChatWidget() {
                 onClick={startNewChat}
                 title="محادثة جديدة"
                 aria-label="بدء محادثة جديدة"
-                className="p-1.5 text-on-surface-variant hover:text-primary hover:bg-white/5 rounded-full transition-colors"
+                className="p-1.5 text-on-surface-variant hover:text-primary hover:bg-violet-400/8 rounded-full transition-colors"
               >
                 <span className="material-symbols-outlined text-base sm:text-lg">refresh</span>
               </button>
@@ -410,7 +410,7 @@ export default function AiChatWidget() {
                 onClick={() => setIsOpen(false)}
                 title="إغلاق"
                 aria-label="إغلاق نافذة المحادثة"
-                className="p-1.5 text-on-surface-variant hover:text-red-400 hover:bg-white/5 rounded-full transition-colors"
+                className="p-1.5 text-on-surface-variant hover:text-red-400 hover:bg-violet-400/8 rounded-full transition-colors"
               >
                 <span className="material-symbols-outlined text-base sm:text-lg">close</span>
               </button>
