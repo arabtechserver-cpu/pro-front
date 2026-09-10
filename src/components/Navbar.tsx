@@ -218,13 +218,13 @@ export default function Navbar({ lang, dict }: NavbarProps) {
             </Link>
 
             {/* Desktop Navigation Links */}
-            <nav className="hidden lg:flex items-center gap-1.5 bg-surface-container-low/40 p-1.5 rounded-full border border-outline-variant/20 backdrop-blur-md shadow-inner">
+            <nav className="hidden lg:flex items-center gap-1.5 bg-surface-container-low/85 p-1.5 rounded-full border border-violet-500/30 backdrop-blur-xl shadow-lg">
               <Link 
                 href={`/${lang}`} 
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
+                className={`px-4 py-2 rounded-full text-sm font-semibold transition-all duration-200 ${
                   isActive("/") 
-                    ? "bg-primary text-on-primary font-bold shadow-[0_0_12px_rgba(139,92,246,0.3)]" 
-                    : "text-on-surface-variant hover:text-primary hover:bg-surface-container-high/50"
+                    ? "bg-primary text-white font-bold shadow-[0_0_15px_rgba(139,92,246,0.4)]" 
+                    : "text-slate-200 hover:text-white hover:bg-white/10"
                 }`}
               >
                 {dict.home}
@@ -234,26 +234,26 @@ export default function Navbar({ lang, dict }: NavbarProps) {
               <div className="relative group">
                 <button 
                   aria-label={dict.resellerPricing || (lang === "ar" ? "قائمة الأسعار والخدمات" : "Reseller Pricing")}
-                  className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
+                  className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-semibold transition-all duration-200 ${
                     isActive("/pricing") 
-                      ? "bg-primary text-on-primary font-bold shadow-[0_0_12px_rgba(139,92,246,0.3)]" 
-                      : "text-on-surface-variant hover:text-primary hover:bg-surface-container-high/50"
+                      ? "bg-primary text-white font-bold shadow-[0_0_15px_rgba(139,92,246,0.4)]" 
+                      : "text-slate-200 hover:text-white hover:bg-white/10"
                   }`}
                 >
                   <span>{dict.resellerPricing}</span>
                   <span className="material-symbols-outlined text-base transition-transform duration-300 group-hover:rotate-180">expand_more</span>
                 </button>
 
-                <div className="absolute top-full start-0 mt-2 w-56 glass-card rounded-2xl border border-outline-variant/30 shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top scale-95 group-hover:scale-100 overflow-hidden backdrop-blur-xl bg-surface-container-lowest/90 p-1.5 z-50">
-                  <Link href={`/${lang}/pricing`} className="flex items-center gap-2.5 px-4 py-3 rounded-xl text-xs font-semibold text-on-surface-variant hover:bg-primary/10 hover:text-primary transition-all">
+                <div className="absolute top-full start-0 mt-2 w-56 glass-card rounded-2xl border border-violet-500/30 shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top scale-95 group-hover:scale-100 overflow-hidden backdrop-blur-xl bg-surface-container-lowest/95 p-1.5 z-50">
+                  <Link href={`/${lang}/pricing`} className="flex items-center gap-2.5 px-4 py-3 rounded-xl text-xs font-bold text-slate-200 hover:bg-primary/20 hover:text-white transition-all">
                     <span className="material-symbols-outlined text-primary text-base">phonelink_setup</span>
                     {dict.imeiService}
                   </Link>
-                  <Link href={`/${lang}/pricing`} className="flex items-center gap-2.5 px-4 py-3 rounded-xl text-xs font-semibold text-on-surface-variant hover:bg-primary/10 hover:text-primary transition-all">
+                  <Link href={`/${lang}/pricing`} className="flex items-center gap-2.5 px-4 py-3 rounded-xl text-xs font-bold text-slate-200 hover:bg-primary/20 hover:text-white transition-all">
                     <span className="material-symbols-outlined text-secondary text-base">dns</span>
                     {dict.serverService}
                   </Link>
-                  <Link href={`/${lang}/pricing`} className="flex items-center gap-2.5 px-4 py-3 rounded-xl text-xs font-semibold text-on-surface-variant hover:bg-primary/10 hover:text-primary transition-all">
+                  <Link href={`/${lang}/pricing`} className="flex items-center gap-2.5 px-4 py-3 rounded-xl text-xs font-bold text-slate-200 hover:bg-primary/20 hover:text-white transition-all">
                     <span className="material-symbols-outlined text-tertiary text-base">cast</span>
                     {dict.remoteService}
                   </Link>
@@ -263,10 +263,10 @@ export default function Navbar({ lang, dict }: NavbarProps) {
               {/* My Orders History Page */}
               <Link 
                 href={`/${lang}/orders`} 
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 flex items-center gap-1.5 ${
+                className={`px-4 py-2 rounded-full text-sm font-semibold transition-all duration-200 flex items-center gap-1.5 ${
                   isActive("/orders") 
-                    ? "bg-primary text-on-primary font-bold shadow-[0_0_12px_rgba(139,92,246,0.3)]" 
-                    : "text-on-surface-variant hover:text-primary hover:bg-surface-container-high/50"
+                    ? "bg-primary text-white font-bold shadow-[0_0_15px_rgba(139,92,246,0.4)]" 
+                    : "text-slate-200 hover:text-white hover:bg-white/10"
                 }`}
               >
                 <span className="material-symbols-outlined text-base">receipt_long</span>
@@ -276,10 +276,10 @@ export default function Navbar({ lang, dict }: NavbarProps) {
               {/* Wallet Page */}
               <Link 
                 href={`/${lang}/wallet`} 
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 flex items-center gap-1.5 ${
+                className={`px-4 py-2 rounded-full text-sm font-semibold transition-all duration-200 flex items-center gap-1.5 ${
                   isActive("/wallet") 
-                    ? "bg-primary text-on-primary font-bold shadow-[0_0_12px_rgba(139,92,246,0.3)]" 
-                    : "text-on-surface-variant hover:text-primary hover:bg-surface-container-high/50"
+                    ? "bg-primary text-white font-bold shadow-[0_0_15px_rgba(139,92,246,0.4)]" 
+                    : "text-slate-200 hover:text-white hover:bg-white/10"
                 }`}
               >
                 <span className="material-symbols-outlined text-base">account_balance_wallet</span>
@@ -288,10 +288,10 @@ export default function Navbar({ lang, dict }: NavbarProps) {
 
               <Link 
                 href={`/${lang}/blog`} 
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
+                className={`px-4 py-2 rounded-full text-sm font-semibold transition-all duration-200 ${
                   isActive("/blog") 
-                    ? "bg-primary text-on-primary font-bold shadow-[0_0_12px_rgba(139,92,246,0.3)]" 
-                    : "text-on-surface-variant hover:text-primary hover:bg-surface-container-high/50"
+                    ? "bg-primary text-white font-bold shadow-[0_0_15px_rgba(139,92,246,0.4)]" 
+                    : "text-slate-200 hover:text-white hover:bg-white/10"
                 }`}
               >
                 {dict.blog}
@@ -299,10 +299,10 @@ export default function Navbar({ lang, dict }: NavbarProps) {
 
               <Link 
                 href={`/${lang}/tutorials`} 
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
+                className={`px-4 py-2 rounded-full text-sm font-semibold transition-all duration-200 ${
                   isActive("/tutorials") 
-                    ? "bg-primary text-on-primary font-bold shadow-[0_0_12px_rgba(139,92,246,0.3)]" 
-                    : "text-on-surface-variant hover:text-primary hover:bg-surface-container-high/50"
+                    ? "bg-primary text-white font-bold shadow-[0_0_15px_rgba(139,92,246,0.4)]" 
+                    : "text-slate-200 hover:text-white hover:bg-white/10"
                 }`}
               >
                 {dict.tutorials}
@@ -310,10 +310,10 @@ export default function Navbar({ lang, dict }: NavbarProps) {
 
               <Link 
                 href={`/${lang}/contact`} 
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
+                className={`px-4 py-2 rounded-full text-sm font-semibold transition-all duration-200 ${
                   isActive("/contact") 
-                    ? "bg-primary text-on-primary font-bold shadow-[0_0_12px_rgba(139,92,246,0.3)]" 
-                    : "text-on-surface-variant hover:text-primary hover:bg-surface-container-high/50"
+                    ? "bg-primary text-white font-bold shadow-[0_0_15px_rgba(139,92,246,0.4)]" 
+                    : "text-slate-200 hover:text-white hover:bg-white/10"
                 }`}
               >
                 {dict.contactUs}
@@ -327,7 +327,7 @@ export default function Navbar({ lang, dict }: NavbarProps) {
             <Link 
               href={switchLanguage()} 
               aria-label={lang === "ar" ? "Switch language to English" : "التبديل إلى اللغة العربية"}
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-full border border-outline-variant/30 bg-surface-container-low/60 text-on-surface-variant hover:text-primary hover:border-primary/50 hover:bg-primary/10 transition-all duration-200 group text-xs font-bold"
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-full border border-violet-500/30 bg-surface-container-low/80 text-slate-200 hover:text-white hover:border-primary/50 hover:bg-primary/20 transition-all duration-200 group text-xs font-bold"
               title={lang === "ar" ? "Switch to English" : "التبديل للعربية"}
             >
               <span className="material-symbols-outlined text-sm text-primary group-hover:rotate-45 transition-transform duration-300">language</span>
@@ -412,7 +412,7 @@ export default function Navbar({ lang, dict }: NavbarProps) {
                       </Link>
                     </div>
 
-                    {/* Menu Options */}
+            {/* Menu Options */}
                     <div className="space-y-1 text-xs font-semibold">
                       <Link 
                         href={`/${lang}/profile`}
@@ -424,36 +424,36 @@ export default function Navbar({ lang, dict }: NavbarProps) {
                       </Link>
 
                       <Link 
-                        href={`/${lang}/wallet`}
-                        onClick={() => setUserDropdownOpen(false)}
-                        className="flex items-center gap-2.5 p-2.5 rounded-xl text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-all"
+                        href={`/${lang}/wallet`} 
+                        onClick={() => setUserDropdownOpen(false)} 
+                        className="flex items-center gap-2.5 p-2.5 rounded-xl text-slate-200 hover:text-white hover:bg-surface-container-high transition-all"
                       >
                         <span className="material-symbols-outlined text-primary text-base">account_balance_wallet</span>
                         <span>{lang === "ar" ? "صفحة المحفظة والشحن" : "My Wallet & Top-up"}</span>
                       </Link>
 
                       <Link 
-                        href={`/${lang}/pricing`}
-                        onClick={() => setUserDropdownOpen(false)}
-                        className="flex items-center gap-2.5 p-2.5 rounded-xl text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-all"
+                        href={`/${lang}/pricing`} 
+                        onClick={() => setUserDropdownOpen(false)} 
+                        className="flex items-center gap-2.5 p-2.5 rounded-xl text-slate-200 hover:text-white hover:bg-surface-container-high transition-all"
                       >
                         <span className="material-symbols-outlined text-secondary text-base">receipt_long</span>
                         <span>{lang === "ar" ? "طلباتي وسجل الخدمات" : "My Orders & Services"}</span>
                       </Link>
 
                       <Link 
-                        href={`/${lang}/orders`}
-                        onClick={() => setUserDropdownOpen(false)}
-                        className="flex items-center gap-2.5 p-2.5 rounded-xl text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-all"
+                        href={`/${lang}/orders`} 
+                        onClick={() => setUserDropdownOpen(false)} 
+                        className="flex items-center gap-2.5 p-2.5 rounded-xl text-slate-200 hover:text-white hover:bg-surface-container-high transition-all"
                       >
                         <span className="material-symbols-outlined text-tertiary text-base">history</span>
                         <span>{lang === "ar" ? "متابعة الطلبات المباشرة" : "Track Live Orders"}</span>
                       </Link>
 
                       <Link 
-                        href={`/${lang}/api-developer`}
-                        onClick={() => setUserDropdownOpen(false)}
-                        className="flex items-center gap-2.5 p-2.5 rounded-xl text-on-surface-variant hover:text-purple-400 hover:bg-surface-container-high transition-all"
+                        href={`/${lang}/api-developer`} 
+                        onClick={() => setUserDropdownOpen(false)} 
+                        className="flex items-center gap-2.5 p-2.5 rounded-xl text-slate-200 hover:text-purple-300 hover:bg-surface-container-high transition-all"
                       >
                         <span className="material-symbols-outlined text-purple-400 text-base">api</span>
                         <span>{lang === "ar" ? "ربط الـ API" : "API Developer"}</span>
@@ -461,9 +461,9 @@ export default function Navbar({ lang, dict }: NavbarProps) {
 
                       {userSession.role === "admin" && (
                         <Link 
-                          href="/admin"
-                          onClick={() => setUserDropdownOpen(false)}
-                          className="flex items-center gap-2.5 p-2.5 rounded-xl text-amber-400 font-bold bg-amber-500/10 border border-amber-500/20 hover:bg-amber-500/20 transition-all"
+                          href="/admin" 
+                          onClick={() => setUserDropdownOpen(false)} 
+                          className="flex items-center gap-2.5 p-2.5 rounded-xl text-amber-300 font-bold bg-amber-500/10 border border-amber-500/20 hover:bg-amber-500/20 transition-all"
                         >
                           <span className="material-symbols-outlined text-amber-400 text-base">dashboard</span>
                           <span>لوحة الإدارة (Admin Panel)</span>
@@ -472,7 +472,7 @@ export default function Navbar({ lang, dict }: NavbarProps) {
 
                       <button
                         onClick={handleLogout}
-                        className="w-full flex items-center gap-2.5 p-2.5 rounded-xl text-red-400 hover:bg-red-500/15 transition-all text-start"
+                        className="w-full flex items-center gap-2.5 p-2.5 rounded-xl text-red-300 hover:bg-red-500/15 transition-all text-start font-semibold"
                       >
                         <span className="material-symbols-outlined text-red-400 text-base">logout</span>
                         <span>{lang === "ar" ? "تسجيل الخروج" : "Sign Out"}</span>
@@ -484,7 +484,7 @@ export default function Navbar({ lang, dict }: NavbarProps) {
             ) : (
               <Link 
                 href={`/${lang}/login`} 
-                className="btn-purple-glow flex items-center gap-2 px-6 py-2 rounded-full text-white font-bold text-sm hover:scale-[1.03] active:scale-95 transition-all duration-300"
+                className="btn-purple-glow flex items-center gap-2 px-6 py-2 rounded-full text-white font-bold text-sm hover:scale-[1.03] active:scale-95 transition-all duration-300 shadow-[0_0_20px_rgba(139,92,246,0.4)]"
               >
                 <span className="material-symbols-outlined text-lg">lock</span>
                 <span>{dict.login}</span>
@@ -497,7 +497,7 @@ export default function Navbar({ lang, dict }: NavbarProps) {
             <Link 
               href={switchLanguage()} 
               aria-label={lang === "ar" ? "Switch language to English" : "التبديل إلى اللغة العربية"}
-              className="flex items-center gap-1 px-3 py-1.5 rounded-full border border-outline-variant/30 bg-surface-container-low text-on-surface-variant hover:text-primary transition-colors text-xs font-bold"
+              className="flex items-center gap-1 px-3 py-1.5 rounded-full border border-violet-500/30 bg-surface-container-low text-slate-200 hover:text-white transition-colors text-xs font-bold"
             >
               <span className="material-symbols-outlined text-xs text-primary">language</span>
               <span>{lang === "ar" ? "EN" : "AR"}</span>
@@ -505,7 +505,7 @@ export default function Navbar({ lang, dict }: NavbarProps) {
 
             <button 
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2.5 rounded-xl bg-surface-container-high/80 border border-outline-variant/30 text-on-surface-variant hover:text-primary hover:bg-primary/10 transition-all active:scale-95"
+              className="p-2.5 rounded-xl bg-surface-container-high/90 border border-violet-500/30 text-white hover:text-primary hover:bg-primary/20 transition-all active:scale-95"
               aria-label="Toggle menu"
             >
               <span className="material-symbols-outlined text-2xl block transition-transform duration-300">
@@ -558,8 +558,8 @@ export default function Navbar({ lang, dict }: NavbarProps) {
             <Link 
               href={`/${lang}`} 
               onClick={() => setMobileMenuOpen(false)} 
-              className={`flex items-center gap-3 p-3.5 rounded-xl font-medium text-sm transition-all ${
-                isActive("/") ? "bg-primary/15 text-primary font-bold" : "text-on-surface hover:bg-surface-container-high"
+              className={`flex items-center gap-3 p-3.5 rounded-xl font-semibold text-sm transition-all ${
+                isActive("/") ? "bg-primary text-white font-bold shadow-md" : "text-slate-100 hover:text-white hover:bg-surface-container-high"
               }`}
             >
               <span className="material-symbols-outlined text-lg">home</span>
@@ -569,8 +569,8 @@ export default function Navbar({ lang, dict }: NavbarProps) {
             <Link 
               href={`/${lang}/pricing`} 
               onClick={() => setMobileMenuOpen(false)} 
-              className={`flex items-center gap-3 p-3.5 rounded-xl font-medium text-sm transition-all ${
-                isActive("/pricing") ? "bg-primary/15 text-primary font-bold" : "text-on-surface hover:bg-surface-container-high"
+              className={`flex items-center gap-3 p-3.5 rounded-xl font-semibold text-sm transition-all ${
+                isActive("/pricing") ? "bg-primary text-white font-bold shadow-md" : "text-slate-100 hover:text-white hover:bg-surface-container-high"
               }`}
             >
               <span className="material-symbols-outlined text-lg">sell</span>
@@ -580,8 +580,8 @@ export default function Navbar({ lang, dict }: NavbarProps) {
             <Link 
               href={`/${lang}/orders`} 
               onClick={() => setMobileMenuOpen(false)} 
-              className={`flex items-center gap-3 p-3.5 rounded-xl font-medium text-sm transition-all ${
-                isActive("/orders") ? "bg-primary/15 text-primary font-bold" : "text-on-surface hover:bg-surface-container-high"
+              className={`flex items-center gap-3 p-3.5 rounded-xl font-semibold text-sm transition-all ${
+                isActive("/orders") ? "bg-primary text-white font-bold shadow-md" : "text-slate-100 hover:text-white hover:bg-surface-container-high"
               }`}
             >
               <span className="material-symbols-outlined text-lg">receipt_long</span>
@@ -591,8 +591,8 @@ export default function Navbar({ lang, dict }: NavbarProps) {
             <Link 
               href={`/${lang}/api-developer`} 
               onClick={() => setMobileMenuOpen(false)} 
-              className={`flex items-center gap-3 p-3.5 rounded-xl font-medium text-sm transition-all ${
-                isActive("/api-developer") ? "bg-purple-500/15 text-purple-400 font-bold" : "text-on-surface hover:bg-surface-container-high"
+              className={`flex items-center gap-3 p-3.5 rounded-xl font-semibold text-sm transition-all ${
+                isActive("/api-developer") ? "bg-purple-600 text-white font-bold shadow-md" : "text-slate-100 hover:text-purple-300 hover:bg-surface-container-high"
               }`}
             >
               <span className="material-symbols-outlined text-lg text-purple-400">api</span>
@@ -602,8 +602,8 @@ export default function Navbar({ lang, dict }: NavbarProps) {
             <Link 
               href={`/${lang}/wallet`} 
               onClick={() => setMobileMenuOpen(false)} 
-              className={`flex items-center gap-3 p-3.5 rounded-xl font-medium text-sm transition-all ${
-                isActive("/wallet") ? "bg-primary/15 text-primary font-bold" : "text-on-surface hover:bg-surface-container-high"
+              className={`flex items-center gap-3 p-3.5 rounded-xl font-semibold text-sm transition-all ${
+                isActive("/wallet") ? "bg-primary text-white font-bold shadow-md" : "text-slate-100 hover:text-white hover:bg-surface-container-high"
               }`}
             >
               <span className="material-symbols-outlined text-lg">account_balance_wallet</span>
@@ -613,8 +613,8 @@ export default function Navbar({ lang, dict }: NavbarProps) {
             <Link 
               href={`/${lang}/blog`} 
               onClick={() => setMobileMenuOpen(false)} 
-              className={`flex items-center gap-3 p-3.5 rounded-xl font-medium text-sm transition-all ${
-                isActive("/blog") ? "bg-primary/15 text-primary font-bold" : "text-on-surface hover:bg-surface-container-high"
+              className={`flex items-center gap-3 p-3.5 rounded-xl font-semibold text-sm transition-all ${
+                isActive("/blog") ? "bg-primary text-white font-bold shadow-md" : "text-slate-100 hover:text-white hover:bg-surface-container-high"
               }`}
             >
               <span className="material-symbols-outlined text-lg">article</span>
@@ -624,8 +624,8 @@ export default function Navbar({ lang, dict }: NavbarProps) {
             <Link 
               href={`/${lang}/tutorials`} 
               onClick={() => setMobileMenuOpen(false)} 
-              className={`flex items-center gap-3 p-3.5 rounded-xl font-medium text-sm transition-all ${
-                isActive("/tutorials") ? "bg-primary/15 text-primary font-bold" : "text-on-surface hover:bg-surface-container-high"
+              className={`flex items-center gap-3 p-3.5 rounded-xl font-semibold text-sm transition-all ${
+                isActive("/tutorials") ? "bg-primary text-white font-bold shadow-md" : "text-slate-100 hover:text-white hover:bg-surface-container-high"
               }`}
             >
               <span className="material-symbols-outlined text-lg">play_circle</span>
@@ -635,8 +635,8 @@ export default function Navbar({ lang, dict }: NavbarProps) {
             <Link 
               href={`/${lang}/contact`} 
               onClick={() => setMobileMenuOpen(false)} 
-              className={`flex items-center gap-3 p-3.5 rounded-xl font-medium text-sm transition-all ${
-                isActive("/contact") ? "bg-primary/15 text-primary font-bold" : "text-on-surface hover:bg-surface-container-high"
+              className={`flex items-center gap-3 p-3.5 rounded-xl font-semibold text-sm transition-all ${
+                isActive("/contact") ? "bg-primary text-white font-bold shadow-md" : "text-slate-100 hover:text-white hover:bg-surface-container-high"
               }`}
             >
               <span className="material-symbols-outlined text-lg">mail</span>

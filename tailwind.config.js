@@ -23,7 +23,7 @@ module.exports = {
         "background":               "#050814",
         "on-background":            "#e8e6ff",
         "on-surface":               "#e8e6ff",
-        "on-surface-variant":       "#a8a4c8",
+        "on-surface-variant":       "#cbd5e1",
         "inverse-surface":          "#e8e6ff",
         "inverse-on-surface":       "#0d0f22",
 

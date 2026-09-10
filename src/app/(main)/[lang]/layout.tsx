@@ -304,7 +304,7 @@ export default async function RootLayout(
         />
       </head>
       <body
-        className={`${cairo.variable} ${inter.variable} ${jakarta.variable} ${jetbrains.variable} bg-[#060814] text-on-surface antialiased min-h-screen flex flex-col relative`}
+        className={`${cairo.variable} ${inter.variable} ${jakarta.variable} ${jetbrains.variable} bg-[#060814] text-slate-100 subpixel-antialiased min-h-screen flex flex-col relative`}
         style={{ backgroundColor: "#060814", colorScheme: "dark" }}
       >
         {/* Client Enhancement Widgets (Lazy loaded, non-blocking) */}
