@@ -217,7 +217,7 @@ export default function CloudflareTurnstile({
       {!isLoaded && !hasError && !hasFallback && (
         <div className="flex items-center gap-2 text-xs text-on-surface-variant/70 animate-pulse py-1">
           <span className="w-3.5 h-3.5 border-2 border-primary border-t-transparent rounded-full animate-spin"></span>
-          <span>حماية متقدمة عبر Cloudflare 🛡️</span>
+          <span>حماية متقدمة عبر Cloudflare</span>
         </div>
       )}
       {(hasError || hasFallback) && (

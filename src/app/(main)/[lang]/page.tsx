@@ -32,7 +32,8 @@ async function getHomepageConfig() {
     try {
       const cleanBase = baseUrl.replace(/\/$/, "");
       const res = await fetch(`${cleanBase}/api/homepage`, {
-        next: { revalidate: 20 }
+        next: { revalidate: 60 },
+        signal: AbortSignal.timeout(1200)
       });
       if (res.ok) {
         return await res.json();
@@ -48,11 +49,11 @@ export async function generateMetadata(props: { params: Promise<{ lang: Locale }
   const params = await props.params;
   const isAr = params.lang === "ar";
   const title = isAr
-    ? "عرب تك برو سيرفر | Arab Tech Pro Server - سيرفر عرب تيك لخدمات فك الهواتف وIMEI"
-    : "Arab Tech Pro Server - The Best Platform for Remote Phone Unlocking & IMEI Services";
+    ? "عرب تك برو سيرفر | منصة فك شفرات وتفعيل الهواتف"
+    : "Arab Tech Pro Server | GSM & Remote Unlock Services";
   const description = isAr 
-    ? "الموقع الرسمي لمنصة عرب تك برو سيرفر | Arab Tech Pro Server (عرب تيك سيرفر). خدمات فك شبكات الهواتف الرسمية، تخطي iCloud و FRP، وتفعيل بوكسات ودونجل وسيرفرات IMEI بأفضل الأسعار وأعلى سرعة."
-    : "Official Arab Tech Pro Server (Arab Tech Server) for phone network unlocking, iCloud & FRP bypass, box and dongle activations, and IMEI services worldwide.";
+    ? "منصة عرب تك برو سيرفر لفك شفرات الهواتف، تخطي حسابات آيكلود وFRP، وتفعيل البوكسات والدونجل وسيرفرات IMEI بأسعار الجملة المعتمدة."
+    : "Arab Tech Pro Server: Professional phone unlocking, iCloud and FRP bypass, box activations, and high-speed IMEI server services.";
 
   const shareImg = isAr 
     ? "https://arabtechproserver.tech/images/og_share_ar.png"
@@ -526,7 +527,7 @@ export default async function Home(props: { params: Promise<{ lang: Locale }> })
                 </svg>
                 {/* Instant flash badge */}
                 <span className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-secondary flex items-center justify-center text-surface text-[10px] font-bold border border-surface shadow">
-                  ⚡
+                  <span className="material-symbols-outlined text-[10px]">bolt</span>
                 </span>
               </div>
             </div>

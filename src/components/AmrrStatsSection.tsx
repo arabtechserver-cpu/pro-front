@@ -40,7 +40,7 @@ export default function AmrrStatsSection({ lang }: AmrrStatsSectionProps) {
             <div className="text-center sm:text-start mb-5 sm:mb-6">
               <div className="inline-flex items-center gap-2 bg-emerald-500/15 border border-emerald-500/30 px-3.5 py-1.5 rounded-full text-xs font-bold text-emerald-300 mb-3 shadow-sm">
                 <span className="w-2 h-2 rounded-full bg-emerald-400 online-blink"></span>
-                <span>{isAr ? "جاهز للتنفيذ الفوري ⚡" : "Instant Processing Ready ⚡"}</span>
+                <span>{isAr ? "جاهز للتنفيذ الفوري" : "Instant Processing Ready"}</span>
               </div>
               <h2 className="text-2xl sm:text-3xl font-black text-white mb-2 leading-tight">
                 {isAr ? "جاهز لفك وتفعيل جهازك؟" : "Ready to Unlock Your Device?"}
@@ -60,8 +60,8 @@ export default function AmrrStatsSection({ lang }: AmrrStatsSectionProps) {
                 <i className="fas fa-rocket text-lg text-yellow-300 animate-thruster"></i>
                 <span className="tracking-wide">
                   {isAr
-                    ? (isLoggedIn ? "طلب فك وتفعيل فوري ⚡" : "ابدأ الفك والتفعيل الآن")
-                    : (isLoggedIn ? "Order Unlock & Activation ⚡" : "Start Unlocking Now")}
+                    ? (isLoggedIn ? "طلب فك وتفعيل فوري" : "ابدأ الفك والتفعيل الآن")
+                    : (isLoggedIn ? "Order Unlock & Activation" : "Start Unlocking Now")}
                 </span>
                 <i className={`fas ${isAr ? "fa-arrow-left" : "fa-arrow-right"} text-xs transition-transform group-hover:translate-x-1`}></i>
               </Link>

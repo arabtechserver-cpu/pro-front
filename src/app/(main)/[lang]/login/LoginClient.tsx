@@ -422,12 +422,13 @@ export default function LoginClient({ lang, dict }: { lang: Locale; dict: any })
                   <span className="material-symbols-outlined text-xl">lock_reset</span>
                 </div>
                 <div>
-                  <h3 className="font-bold text-on-surface text-base">استعادة كلمة المرور</h3>
+                  <h2 className="font-bold text-on-surface text-base">استعادة كلمة المرور</h2>
                   <p className="text-xs text-on-surface-variant">إرسال كود التحقق OTP إلى بريدك الإلكتروني</p>
                 </div>
               </div>
               <button 
                 onClick={() => setForgotModalOpen(false)}
+                aria-label="إغلاق نافذة استعادة كلمة المرور"
                 className="p-1.5 rounded-lg hover:bg-surface-container-high text-on-surface-variant transition-colors"
               >
                 <span className="material-symbols-outlined text-lg">close</span>

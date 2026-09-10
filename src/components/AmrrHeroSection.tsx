@@ -114,8 +114,8 @@ export default function AmrrHeroSection({ lang }: AmrrHeroSectionProps) {
               <i className="fas fa-rocket text-base sm:text-lg group-hover:rotate-12 transition-transform animate-thruster"></i>
               <span>
                 {isAr
-                  ? (isLoggedIn ? "طلب فك وتفعيل فوري ⚡" : "ابدأ الفك والاشتراك الآن")
-                  : (isLoggedIn ? "Order Unlock & Activation ⚡" : "Start Unlocking Now")}
+                  ? (isLoggedIn ? "طلب فك وتفعيل فوري" : "ابدأ الفك والاشتراك الآن")
+                  : (isLoggedIn ? "Order Unlock & Activation" : "Start Unlocking Now")}
               </span>
             </Link>
 
@@ -207,7 +207,7 @@ export default function AmrrHeroSection({ lang }: AmrrHeroSectionProps) {
               </div>
               <div>
                 <span className="block text-[10px] sm:text-[11px] font-bold text-white whitespace-nowrap">
-                  {isAr ? "تسليم تلقائي ⚡" : "Instant Delivery"}
+                  {isAr ? "تسليم تلقائي" : "Instant Delivery"}
                 </span>
                 <span className="block text-[8px] sm:text-[9px] text-emerald-300 font-semibold whitespace-nowrap">
                   {isAr ? "خلال 1-5 دقائق" : "1 - 5 mins"}
@@ -222,7 +222,7 @@ export default function AmrrHeroSection({ lang }: AmrrHeroSectionProps) {
               </div>
               <div>
                 <span className="block text-[10px] sm:text-[11px] font-bold text-white whitespace-nowrap">
-                  {isAr ? "حماية مشفرة 🛡️" : "100% Secure"}
+                  {isAr ? "حماية مشفرة" : "100% Secure"}
                 </span>
                 <span className="block text-[8px] sm:text-[9px] text-cyan-300 font-semibold whitespace-nowrap">
                   {isAr ? "خوادم معتمدة" : "Verified servers"}
@@ -237,7 +237,7 @@ export default function AmrrHeroSection({ lang }: AmrrHeroSectionProps) {
               </div>
               <div>
                 <span className="block text-[10px] sm:text-[11px] font-bold text-white whitespace-nowrap">
-                  {isAr ? "150+ دولة 🌐" : "Global Reach"}
+                  {isAr ? "150+ دولة" : "Global Reach"}
                 </span>
                 <span className="block text-[8px] sm:text-[9px] text-purple-300 font-semibold whitespace-nowrap">
                   {isAr ? "كل الشبكات" : "All carriers"}

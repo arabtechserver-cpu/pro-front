@@ -95,7 +95,7 @@ export default function TermsModal({
                     onClick={() => setActiveTab("refund")}
                     className="text-primary font-bold text-xs hover:underline flex items-center gap-1 mt-2"
                   >
-                    <span>{lang === "ar" ? "🔄 الانتقال لسياسة الاسترجاع مباشرة" : "Go to Refund Policy directly"}</span>
+                    <span>{lang === "ar" ? "الانتقال لسياسة الاسترجاع مباشرة" : "Go to Refund Policy directly"}</span>
                   </button>
                 </div>
               </div>
@@ -103,7 +103,7 @@ export default function TermsModal({
               {/* Point 1 */}
               <div className="p-4 rounded-2xl bg-surface-container-high/40 border border-outline-variant/20 space-y-2">
                 <div className="flex items-center gap-2 text-primary font-bold text-sm">
-                  <span>📝</span>
+                  <span className="material-symbols-outlined text-base">description</span>
                   <h3>{lang === "ar" ? "1. قبول الشروط" : "1. Acceptance of Terms"}</h3>
                 </div>
                 <p className="text-on-surface-variant text-xs sm:text-sm">
@@ -116,7 +116,7 @@ export default function TermsModal({
               {/* Point 2 */}
               <div className="p-4 rounded-2xl bg-surface-container-high/40 border border-outline-variant/20 space-y-2">
                 <div className="flex items-center gap-2 text-primary font-bold text-sm">
-                  <span>🖥️</span>
+                  <span className="material-symbols-outlined text-base">devices</span>
                   <h3>{lang === "ar" ? "2. طبيعة الخدمات الرقمية" : "2. Nature of Digital Services"}</h3>
                 </div>
                 <p className="text-on-surface-variant text-xs sm:text-sm">
@@ -129,7 +129,7 @@ export default function TermsModal({
               {/* Point 3 */}
               <div className="p-4 rounded-2xl bg-surface-container-high/40 border border-outline-variant/20 space-y-2">
                 <div className="flex items-center gap-2 text-primary font-bold text-sm">
-                  <span>👤</span>
+                  <span className="material-symbols-outlined text-base">person</span>
                   <h3>{lang === "ar" ? "3. صحة البيانات والمسؤولية" : "3. Data Accuracy & Responsibility"}</h3>
                 </div>
                 <p className="text-on-surface-variant text-xs sm:text-sm">
@@ -142,7 +142,7 @@ export default function TermsModal({
               {/* Point 4 */}
               <div className="p-4 rounded-2xl bg-surface-container-high/40 border border-outline-variant/20 space-y-2">
                 <div className="flex items-center gap-2 text-primary font-bold text-sm">
-                  <span>🔒</span>
+                  <span className="material-symbols-outlined text-base">security</span>
                   <h3>{lang === "ar" ? "4. حماية الحساب والمحفظة" : "4. Account & Wallet Protection"}</h3>
                 </div>
                 <p className="text-on-surface-variant text-xs sm:text-sm">
@@ -155,7 +155,7 @@ export default function TermsModal({
               {/* Point 5 */}
               <div className="p-4 rounded-2xl bg-surface-container-high/40 border border-outline-variant/20 space-y-2">
                 <div className="flex items-center gap-2 text-primary font-bold text-sm">
-                  <span>✍️</span>
+                  <span className="material-symbols-outlined text-base">history_edu</span>
                   <h3>{lang === "ar" ? "5. التحديثات والتعديلات" : "5. Updates and Amendments"}</h3>
                 </div>
                 <p className="text-on-surface-variant text-xs sm:text-sm">
@@ -182,19 +182,19 @@ export default function TermsModal({
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2 text-xs">
                   <div className="p-2 rounded-xl bg-surface-container-high/60 flex items-center gap-2 text-emerald-400 font-semibold">
-                    <span>✅</span>
+                    <span className="material-symbols-outlined text-sm">check_circle</span>
                     <span>رد تلقائي كامل للرصيد إلى المحفظة في حال رفض السيرفر للطلب.</span>
                   </div>
                   <div className="p-2 rounded-xl bg-surface-container-high/60 flex items-center gap-2 text-emerald-400 font-semibold">
-                    <span>✅</span>
+                    <span className="material-symbols-outlined text-sm">check_circle</span>
                     <span>إمكانية طلب إلغاء واسترجاع في حال تأخر السيرفر عن الوقت الأقصى.</span>
                   </div>
                   <div className="p-2 rounded-xl bg-surface-container-high/60 flex items-center gap-2 text-emerald-400 font-semibold">
-                    <span>✅</span>
+                    <span className="material-symbols-outlined text-sm">check_circle</span>
                     <span>معالجة سريعة لطلبات الاسترجاع والتذاكر عبر الدعم الفني.</span>
                   </div>
                   <div className="p-2 rounded-xl bg-surface-container-high/60 flex items-center gap-2 text-red-400 font-semibold">
-                    <span>❌</span>
+                    <span className="material-symbols-outlined text-sm">cancel</span>
                     <span>لا يشمل الاسترجاع الأكواد المستهلكة بنجاح أو بيانات IMEI الخاطئة.</span>
                   </div>
                 </div>

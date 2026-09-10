@@ -42,19 +42,19 @@ export default async function RefundPolicyPage(props: PageProps) {
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs sm:text-sm">
           <div className="p-3 rounded-2xl bg-surface-container-high/80 flex items-center gap-2 text-emerald-300 font-semibold">
-            <span>✅</span>
+            <span className="material-symbols-outlined text-sm">check_circle</span>
             <span>رد تلقائي كامل للرصيد إلى المحفظة في حال رفض السيرفر المصدر للطلب.</span>
           </div>
           <div className="p-3 rounded-2xl bg-surface-container-high/80 flex items-center gap-2 text-emerald-300 font-semibold">
-            <span>✅</span>
+            <span className="material-symbols-outlined text-sm">check_circle</span>
             <span>إمكانية طلب إلغاء واسترجاع في حال تأخر السيرفر عن الوقت الأقصى.</span>
           </div>
           <div className="p-3 rounded-2xl bg-surface-container-high/80 flex items-center gap-2 text-emerald-300 font-semibold">
-            <span>✅</span>
+            <span className="material-symbols-outlined text-sm">check_circle</span>
             <span>معالجة سريعة لطلبات الاسترجاع والتذاكر عبر الدعم الفني.</span>
           </div>
           <div className="p-3 rounded-2xl bg-surface-container-high/80 flex items-center gap-2 text-red-300 font-semibold">
-            <span>❌</span>
+            <span className="material-symbols-outlined text-sm">cancel</span>
             <span>لا يشمل الاسترجاع الأكواد المستهلكة بنجاح أو بيانات IMEI الخاطئة من العميل.</span>
           </div>
         </div>

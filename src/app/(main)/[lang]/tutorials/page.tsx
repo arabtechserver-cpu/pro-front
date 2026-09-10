@@ -32,28 +32,34 @@ interface VideoSeries {
 
 async function getSeries(): Promise<VideoSeries[]> {
   try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 2000);
     const res = await fetch('https://api.arabtechproserver.tech/api/videos/series', {
-      cache: 'no-store'
+      next: { revalidate: 60 },
+      signal: controller.signal
     });
+    clearTimeout(timeout);
     if (!res.ok) return [];
     const data = await res.json();
     return Array.isArray(data) ? data : [];
-  } catch (error) {
-    console.error('Failed to fetch series:', error);
+  } catch {
     return [];
   }
 }
 
 async function getAllVideos(): Promise<VideoLesson[]> {
   try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 2000);
     const res = await fetch('https://api.arabtechproserver.tech/api/videos/tutorials', {
-      cache: 'no-store'
+      next: { revalidate: 60 },
+      signal: controller.signal
     });
+    clearTimeout(timeout);
     if (!res.ok) return [];
     const data = await res.json();
     return Array.isArray(data) ? data : [];
-  } catch (error) {
-    console.error('Failed to fetch tutorials:', error);
+  } catch {
     return [];
   }
 }
@@ -132,6 +138,10 @@ export default async function TutorialsPage(props: { params: Promise<{ lang: Loc
                           <img
                             src={series.thumbnail}
                             alt={title}
+                            width={640}
+                            height={360}
+                            loading="lazy"
+                            decoding="async"
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                           />
                         ) : (
@@ -143,7 +153,7 @@ export default async function TutorialsPage(props: { params: Promise<{ lang: Loc
                         {/* Price Badge */}
                         <div className="absolute top-3 right-3">
                           <span className={`px-3 py-1 rounded-full text-xs font-extrabold shadow-md backdrop-blur-md border ${series.isSubscriptionRequired ? 'bg-amber-500 text-black border-amber-400' : 'bg-emerald-500 text-black border-emerald-400'}`}>
-                            {series.isSubscriptionRequired ? `$${(series.price || 0).toFixed(2)}` : (isAr ? 'مجاني 🟢' : 'Free 🟢')}
+                            {series.isSubscriptionRequired ? `$${(series.price || 0).toFixed(2)}` : (isAr ? 'مجاني' : 'Free')}
                           </span>
                         </div>
 
@@ -231,6 +241,10 @@ export default async function TutorialsPage(props: { params: Promise<{ lang: Loc
                           <img
                             src={video.thumbnail}
                             alt={videoTitle}
+                            width={640}
+                            height={360}
+                            loading="lazy"
+                            decoding="async"
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                           />
                         ) : (
@@ -249,7 +263,7 @@ export default async function TutorialsPage(props: { params: Promise<{ lang: Loc
                         {/* Badges */}
                         <div className="absolute top-3 right-3 flex items-center gap-2">
                           <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold shadow ${video.isFreePreview ? 'bg-emerald-500 text-black' : 'bg-amber-500 text-black'}`}>
-                            {video.isFreePreview ? (isAr ? 'مجاني 🟢' : 'Free 🟢') : (isAr ? 'مقفل 🔒' : 'Locked 🔒')}
+                            {video.isFreePreview ? (isAr ? 'مجاني' : 'Free') : (isAr ? 'مقفل' : 'Locked')}
                           </span>
                         </div>
 

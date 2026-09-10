@@ -342,7 +342,9 @@ export default function Navbar({ lang, dict }: NavbarProps) {
                 >
                   <div className="flex flex-col text-end">
                     <span className="text-xs font-bold text-on-surface flex items-center gap-1.5 justify-end">
-                      <span>{COUNTRY_FLAGS[userSession.country || "EG"] || "🌐"}</span>
+                      {COUNTRY_FLAGS[userSession.country || "EG"] && (
+                        <span>{COUNTRY_FLAGS[userSession.country || "EG"]}</span>
+                      )}
                       <span>{userSession.fullName || userSession.username}</span>
                     </span>
                     <span className="text-[11px] font-bold text-primary font-mono dir-ltr">

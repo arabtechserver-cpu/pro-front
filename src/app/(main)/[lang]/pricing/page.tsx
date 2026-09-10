@@ -17,8 +17,8 @@ async function fetchPricingServices(): Promise<any[]> {
   for (const base of backendCandidates) {
     try {
       const res = await fetch(`${base}/api/dhru/services?view=pricing`, {
-        cache: "no-store",
-        signal: AbortSignal.timeout(2500)
+        next: { revalidate: 60 },
+        signal: AbortSignal.timeout(1500)
       });
       if (res.ok) {
         const data = await res.json();
@@ -52,10 +52,10 @@ export async function generateMetadata(
     section = section.replace(/^%20/, '').trim();
   }
 
-  let title = isAr ? "قائمة الأسعار والخدمات | عرب تك برو سيرفر (عرب تيك)" : "Services & Price List | Arab Tech Pro Server";
+  let title = isAr ? "قائمة الأسعار والخدمات | عرب تك برو سيرفر" : "Services & Price List | Arab Tech Pro Server";
   let description = isAr
-    ? "تصفح قائمة أسعار وخدمات منصة عرب تك برو سيرفر (عرب تيك سيرفر): فك الشفرات، تخطي حسابات جوجل FRP وiCloud، وتنشيط الدونجلات والبوكسات بأفضل الأسعار وأعلى سرعة تسليم."
-    : "Browse our complete catalog and price list for phone unlocking, FRP & iCloud bypass, and tool activations.";
+    ? "تصفح قائمة أسعار وخدمات عرب تك برو سيرفر لفك الشفرات وتخطي حسابات FRP وتنشيط البوكسات بأفضل الأسعار وأسرع تسليم."
+    : "Browse Arab Tech Pro Server complete catalog and live price list for phone unlocking, FRP bypass, and software tool activations.";
 
   if (section) {
     const categories = await fetchPricingServices();
@@ -76,25 +76,16 @@ export async function generateMetadata(
     if (matchingServices.length > 0) {
       const count = matchingServices.length;
       title = isAr
-        ? `${section} (${count} خدمات وأسعار) | عرب تك برو سيرفر`
-        : `${section} (${count} Services & Prices) | Arab Tech Pro Server`;
-
-      const serviceListFormatted = matchingServices
-        .slice(0, 8)
-        .map((s) => {
-          const rawPrice = s.credit !== undefined ? Number((s.credit + (s.margin || 0)).toFixed(2)) : 0;
-          const priceStr = rawPrice > 0 ? `$${rawPrice.toFixed(2)}` : (isAr ? 'سعر خاص' : 'Special');
-          return `${s.name} [${priceStr}]`;
-        })
-        .join(" • ");
+        ? `${section} (${count} خدمة) | عرب تك برو سيرفر`
+        : `${section} (${count} Services) | Arab Tech Pro Server`;
 
       description = isAr
-        ? `أسعار باقة ${section} (${count} خدمات): ${serviceListFormatted}${matchingServices.length > 8 ? ' • والمزيد...' : ''} | تسليم فوري وتفعيل تلقائي 24/7 على منصة عرب تك برو سيرفر.`
-        : `Live prices for ${section} (${count} services): ${serviceListFormatted}${matchingServices.length > 8 ? ' • and more...' : ''} | Instant delivery 24/7 on Arab Tech Pro Server.`;
+        ? `أسعار باقة ${section} (${count} خدمة): تسليم فوري وتفعيل تلقائي 24/7 عبر سيرفر عرب تك برو بأفضل الأسعار المعتمدة.`
+        : `Live prices for ${section} (${count} services): instant 24/7 delivery and activation on Arab Tech Pro Server.`;
     } else {
-      title = isAr ? `${section} - أسعار وخدمات | عرب تك برو سيرفر` : `${section} - Services & Price List | Arab Tech Pro Server`;
+      title = isAr ? `${section} | أسعار وخدمات عرب تك برو سيرفر` : `${section} | Services & Prices`;
       description = isAr
-        ? `تصفح أسعار وخدمات قسم "${section}" المتاحة على منصة عرب تك برو سيرفر مع التسليم الفوري وأقوى الخصومات.`
+        ? `تصفح أسعار وخدمات باقة ${section} على منصة عرب تك برو سيرفر مع التسليم الفوري وأقوى عروض الموزعين.`
         : `Explore ${section} services and real-time live prices on Arab Tech Pro Server with instant 24/7 delivery.`;
     }
   }

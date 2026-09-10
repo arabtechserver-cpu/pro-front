@@ -45,7 +45,7 @@ export default function LiveMetricsSection({ lang }: LiveMetricsSectionProps) {
               href={`${langPrefix}/pricing`}
               className="w-full sm:w-auto px-7 py-3.5 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-white font-bold text-sm sm:text-base shadow-[0_4px_25px_rgba(16,185,129,0.4)] flex items-center justify-center gap-2.5 transition-all duration-300 hover:scale-[1.02] active:scale-95"
             >
-              <span className="text-lg">🚀</span>
+              <span className="material-symbols-outlined text-lg">rocket_launch</span>
               <span>{isAr ? "ابدأ بفك القفل الآن" : "Start Unlocking Now"}</span>
             </Link>
 

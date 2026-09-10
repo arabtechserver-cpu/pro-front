@@ -393,6 +393,7 @@ export default function AiChatWidget() {
               <button
                 onClick={startNewChat}
                 title="محادثة جديدة"
+                aria-label="بدء محادثة جديدة"
                 className="p-1.5 text-on-surface-variant hover:text-primary hover:bg-white/5 rounded-full transition-colors"
               >
                 <span className="material-symbols-outlined text-base sm:text-lg">refresh</span>
@@ -400,6 +401,7 @@ export default function AiChatWidget() {
               <button
                 onClick={() => setIsOpen(false)}
                 title="إغلاق"
+                aria-label="إغلاق نافذة المحادثة"
                 className="p-1.5 text-on-surface-variant hover:text-red-400 hover:bg-white/5 rounded-full transition-colors"
               >
                 <span className="material-symbols-outlined text-base sm:text-lg">close</span>
@@ -414,7 +416,7 @@ export default function AiChatWidget() {
                 <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary mb-3 shadow-inner">
                   <span className="material-symbols-outlined text-2xl sm:text-3xl">auto_awesome</span>
                 </div>
-                <h4 className="font-bold text-sm sm:text-base text-on-surface mb-1">مرحباً بك في المساعد الذكي 👋</h4>
+                <h4 className="font-bold text-sm sm:text-base text-on-surface mb-1">مرحباً بك في المساعد الذكي</h4>
                 <p className="text-[11px] sm:text-xs max-w-[280px] mb-3 text-on-surface-variant/80">
                   اسألني عن أسعار الخدمات، فحص وتتبع الطلبات، باقات الجملة، أو رفع شكوى مباشرة للإدارة.
                 </p>
@@ -422,7 +424,7 @@ export default function AiChatWidget() {
                 {/* Suggestions Pills */}
                 <div className="w-full space-y-1.5 text-right">
                   <p className="text-[10px] sm:text-[11px] font-bold text-on-surface-variant/90 px-1 mb-1">
-                    💡 أسئلة مقترحة شائعة:
+                    أسئلة مقترحة شائعة:
                   </p>
                   {suggestions.map((sug, i) => (
                     <button
@@ -475,9 +477,12 @@ export default function AiChatWidget() {
             className="p-2.5 sm:p-3 bg-surface-container-lowest border-t border-outline-variant/30 flex items-center gap-2"
           >
             <input
+              id="ai-chat-input"
+              name="aiQuery"
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
+              aria-label="اكتب استفسارك أو طلبك هنا"
               placeholder="اكتب استفسارك أو طلبك هنا..."
               disabled={isLoading}
               className="flex-1 bg-surface-container-low border border-outline-variant/30 rounded-2xl px-3.5 py-2.5 sm:px-4 sm:py-3 text-xs sm:text-sm text-on-surface placeholder:text-on-surface-variant/40 focus:outline-none focus:border-primary transition-colors"

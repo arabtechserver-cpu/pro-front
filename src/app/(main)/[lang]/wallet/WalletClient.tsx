@@ -185,7 +185,7 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
       id: "vodafone",
       nameAr: "فودافون كاش (Vodafone Cash)",
       nameEn: "Vodafone Cash",
-      badge: "📱",
+      badge: "VF",
       icon: "phone_iphone",
       color: "from-red-600 to-rose-700",
       copyValue: currencyConfig?.vodafone?.walletNumber || "",
@@ -202,7 +202,7 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
       id: "binance",
       nameAr: "Binance Pay (باينانس)",
       nameEn: "Binance Pay",
-      badge: "🔶",
+      badge: "PAY",
       icon: "currency_exchange",
       color: "from-amber-500 to-yellow-600",
       copyValue: currencyConfig?.binance?.payId || "",
@@ -219,7 +219,7 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
       id: "bnb",
       nameAr: "BNB Smart Chain (BEP20)",
       nameEn: "BNB Smart Chain (BEP20)",
-      badge: "🟡",
+      badge: "BSC",
       icon: "currency_bitcoin",
       color: "from-yellow-500 to-amber-600",
       copyValue: currencyConfig?.cryptoBnb?.address || "0xaCc3ab6f0165B39Cf2F1286ED8A778735Ae8314f",
@@ -270,8 +270,8 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
       if (res.ok && data.success) {
         setSuccessMessage(
           lang === "ar"
-            ? `🎉 تم الدفع واعتتماد الشحن التلقائي بمبلغ $${data.amount} USD بنجاح! رصيدك الجديد: $${data.balance}`
-            : `🎉 Payment successful! $${data.amount} USD added. New balance: $${data.balance}`
+            ? `تم الدفع واعتتماد الشحن التلقائي بمبلغ $${data.amount} USD بنجاح! رصيدك الجديد: $${data.balance}`
+            : `Payment successful! $${data.amount} USD added. New balance: $${data.balance}`
         );
 
         if (userObj || userSession) {
@@ -409,8 +409,8 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
       if (res.ok && data.success) {
         setSuccessMessage(
           lang === "ar"
-            ? `🎉 تم إرسال طلب الشحن بقيمة $${parseFloat(depositAmount).toFixed(2)} وإرفاق إشعار التحويل بنجاح! جاري المراجعة والتفعيل فوراً.`
-            : `🎉 Deposit request of $${parseFloat(depositAmount).toFixed(2)} submitted & receipt attached successfully!`
+            ? `تم إرسال طلب الشحن بقيمة $${parseFloat(depositAmount).toFixed(2)} وإرفاق إشعار التحويل بنجاح! جاري المراجعة والتفعيل فوراً.`
+            : `Deposit request of $${parseFloat(depositAmount).toFixed(2)} submitted & receipt attached successfully!`
         );
 
         setTransactionRef("");
@@ -503,7 +503,7 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
                 ) : (
                   <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-xs font-bold">
                     <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                    {lang === "ar" ? "حساب فعال 🟢" : "Active 🟢"}
+                    {lang === "ar" ? "حساب فعال" : "Active"}
                   </span>
                 )}
                 <span className="text-[11px] text-on-surface-variant font-mono">
@@ -575,9 +575,9 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
                             {m.isBankak
                               ? `سعر الصرف: 1$ = ${sdgRate} SDG`
                               : m.isAutomaticPayPal
-                              ? (lang === "ar" ? "⚡ شحن تلقائي داخل الموقع" : "⚡ In-Page Direct Top-up")
+                              ? (lang === "ar" ? "شحن تلقائي داخل الموقع" : "In-Page Direct Top-up")
                               : isSelected
-                              ? (lang === "ar" ? "محدد الآن 🟢" : "Selected 🟢")
+                              ? (lang === "ar" ? "محدد الآن" : "Selected")
                               : (lang === "ar" ? "انقر لعرض البيانات والنسخ" : "Click to view details")}
                           </p>
                         </div>
@@ -653,12 +653,12 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
                       <span className="material-symbols-outlined text-sm">
                         {copiedId === activeMethod.id ? "check" : "content_copy"}
                       </span>
-                      <span>{copiedId === activeMethod.id ? "تم النسخ! ✓" : "نسخ رقم الحساب"}</span>
+                      <span>{copiedId === activeMethod.id ? "تم النسخ" : "نسخ رقم الحساب"}</span>
                     </button>
                   </div>
 
                   <p className="text-xs text-slate-200 leading-relaxed font-medium whitespace-pre-wrap block">
-                    ℹ️ {cleanHtmlToText(activeMethod.instructionsAr)}
+                    {cleanHtmlToText(activeMethod.instructionsAr)}
                   </p>
                 </div>
               )}
@@ -682,7 +682,7 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
                       <span className="material-symbols-outlined text-sm">
                         {copiedId === activeMethod.id ? "check" : "content_copy"}
                       </span>
-                      <span>{copiedId === activeMethod.id ? "تم النسخ! 📋✓" : "نسخ رقم/عنوان التحويل"}</span>
+                      <span>{copiedId === activeMethod.id ? "تم النسخ" : "نسخ رقم/عنوان التحويل"}</span>
                     </button>
                   </div>
 
@@ -693,7 +693,7 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
                   </div>
 
                   <p className="text-xs text-slate-200 leading-relaxed font-medium whitespace-pre-wrap block">
-                    ℹ️ {cleanHtmlToText(lang === "ar" ? activeMethod.instructionsAr : activeMethod.instructionsEn)}
+                    {cleanHtmlToText(lang === "ar" ? activeMethod.instructionsAr : activeMethod.instructionsEn)}
                   </p>
                 </div>
               )}
@@ -757,7 +757,7 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
               {!activeMethod.isAutomaticPayPal && (
                 <div className="space-y-2 pt-2 border-t border-outline-variant/20">
                   <label className="text-xs font-extrabold text-slate-100 uppercase tracking-wider block">
-                    {lang === "ar" ? "إرفاق صورة إشعار أو إيصال التحويل (اختياري) 📸" : "Attach Receipt Screenshot 📸"}
+                    {lang === "ar" ? "إرفاق صورة إشعار أو إيصال التحويل (اختياري)" : "Attach Receipt Screenshot"}
                   </label>
 
                   <div className="relative flex flex-col items-center justify-center p-6 border-2 border-dashed border-primary/50 rounded-2xl bg-[#0f172a]/80 hover:border-primary transition-all text-center group cursor-pointer">
@@ -814,7 +814,7 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
                   <div className="p-4 rounded-2xl bg-amber-500/15 border-2 border-amber-400/50 shadow-lg text-amber-200 space-y-1">
                     <div className="flex items-center gap-2 text-amber-300 font-extrabold text-sm">
                       <span className="material-symbols-outlined text-xl text-amber-400 shrink-0">bolt</span>
-                      <span>{lang === "ar" ? "الدفع المباشر داخل الموقع عبر PayPal ⚡" : "In-Page Direct PayPal Checkout ⚡"}</span>
+                      <span>{lang === "ar" ? "الدفع المباشر داخل الموقع عبر PayPal" : "In-Page Direct PayPal Checkout"}</span>
                     </div>
                     <p className="text-xs text-slate-200 font-medium leading-relaxed">
                       {lang === "ar"
@@ -1015,15 +1015,15 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
                       <td className="p-3.5">
                         {tx.status === "completed" ? (
                           <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-[10px] font-bold">
-                            مكتمل ✅
+                            مكتمل
                           </span>
                         ) : tx.status === "pending" ? (
                           <span className="px-2.5 py-0.5 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-400 text-[10px] font-bold">
-                            قيد المراجعة ⏳
+                            قيد المراجعة
                           </span>
                         ) : (
                           <span className="px-2.5 py-0.5 rounded-full bg-red-500/15 border border-red-500/30 text-red-400 text-[10px] font-bold">
-                            مرفوض ❌
+                            مرفوض
                           </span>
                         )}
                       </td>

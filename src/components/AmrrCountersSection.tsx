@@ -244,7 +244,7 @@ export default function AmrrCountersSection({ lang }: AmrrCountersSectionProps) 
                 {/* Light shimmer sweep */}
                 <div className="absolute inset-0 w-1/2 h-full bg-gradient-to-r from-transparent via-white/40 to-transparent -skew-x-12 animate-shimmer pointer-events-none"></div>
                 <i className="fas fa-rocket text-base sm:text-lg text-slate-950 group-hover:rotate-12 group-hover:-translate-y-1 transition-transform animate-thruster"></i>
-                <span>{isAr ? (isLoggedIn ? "طلب فك وتفعيل فوري ⚡" : "ابدأ الفك والتفعيل الآن") : (isLoggedIn ? "Order Unlock & Activation ⚡" : "Start Unlocking Now")}</span>
+                <span>{isAr ? (isLoggedIn ? "طلب فك وتفعيل فوري" : "ابدأ الفك والتفعيل الآن") : (isLoggedIn ? "Order Unlock & Activation" : "Start Unlocking Now")}</span>
                 <i className={`fas ${isAr ? "fa-arrow-left" : "fa-arrow-right"} text-xs transition-transform group-hover:translate-x-1`}></i>
               </Link>
 

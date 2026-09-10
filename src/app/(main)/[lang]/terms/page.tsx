@@ -37,7 +37,7 @@ export default async function TermsPage(props: PageProps) {
             href={`/${lang}/refund`}
             className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-primary/10 text-primary hover:bg-primary/20 font-bold text-xs transition-all"
           >
-            <span>{lang === "ar" ? "🔄 الانتقال لسياسة الاسترجاع والضمان التفصيلية" : "Go to Refund Policy"}</span>
+            <span>{lang === "ar" ? "الانتقال لسياسة الاسترجاع والضمان التفصيلية" : "Go to Refund Policy"}</span>
             <span className="material-symbols-outlined text-sm">arrow_forward</span>
           </Link>
         </div>
@@ -47,7 +47,7 @@ export default async function TermsPage(props: PageProps) {
       <div className="space-y-6">
         <div className="glass-card rounded-3xl p-6 sm:p-8 border border-outline-variant/20 space-y-3">
           <div className="flex items-center gap-3 text-primary font-bold text-base">
-            <span className="text-xl">📝</span>
+            <span className="material-symbols-outlined text-xl">description</span>
             <h2>{lang === "ar" ? "1. قبول الشروط" : "1. Acceptance of Terms"}</h2>
           </div>
           <p className="text-on-surface-variant text-sm leading-relaxed">
@@ -59,7 +59,7 @@ export default async function TermsPage(props: PageProps) {
 
         <div className="glass-card rounded-3xl p-6 sm:p-8 border border-outline-variant/20 space-y-3">
           <div className="flex items-center gap-3 text-primary font-bold text-base">
-            <span className="text-xl">🖥️</span>
+            <span className="material-symbols-outlined text-xl">devices</span>
             <h2>{lang === "ar" ? "2. طبيعة الخدمات الرقمية" : "2. Nature of Digital Services"}</h2>
           </div>
           <p className="text-on-surface-variant text-sm leading-relaxed">
@@ -71,7 +71,7 @@ export default async function TermsPage(props: PageProps) {
 
         <div className="glass-card rounded-3xl p-6 sm:p-8 border border-outline-variant/20 space-y-3">
           <div className="flex items-center gap-3 text-primary font-bold text-base">
-            <span className="text-xl">👤</span>
+            <span className="material-symbols-outlined text-xl">person</span>
             <h2>{lang === "ar" ? "3. صحة البيانات والمسؤولية" : "3. Data Accuracy & Responsibility"}</h2>
           </div>
           <p className="text-on-surface-variant text-sm leading-relaxed">
@@ -83,7 +83,7 @@ export default async function TermsPage(props: PageProps) {
 
         <div className="glass-card rounded-3xl p-6 sm:p-8 border border-outline-variant/20 space-y-3">
           <div className="flex items-center gap-3 text-primary font-bold text-base">
-            <span className="text-xl">🔒</span>
+            <span className="material-symbols-outlined text-xl">security</span>
             <h2>{lang === "ar" ? "4. حماية الحساب والمحفظة" : "4. Account & Wallet Protection"}</h2>
           </div>
           <p className="text-on-surface-variant text-sm leading-relaxed">
@@ -95,7 +95,7 @@ export default async function TermsPage(props: PageProps) {
 
         <div className="glass-card rounded-3xl p-6 sm:p-8 border border-outline-variant/20 space-y-3">
           <div className="flex items-center gap-3 text-primary font-bold text-base">
-            <span className="text-xl">✍️</span>
+            <span className="material-symbols-outlined text-xl">history_edu</span>
             <h2>{lang === "ar" ? "5. التحديثات والتعديلات" : "5. Updates and Amendments"}</h2>
           </div>
           <p className="text-on-surface-variant text-sm leading-relaxed">

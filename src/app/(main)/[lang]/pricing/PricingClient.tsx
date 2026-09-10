@@ -51,14 +51,14 @@ function RenderPriceBadge({ service, lang, discountPercent = 0 }: { service: any
   if (isFree) {
     return (
       <span className="px-2.5 py-1 rounded-lg bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 font-bold text-xs inline-flex items-center gap-1">
-        <span>{lang === 'ar' ? 'مجاناً 🎁' : 'Free 🎁'}</span>
+        <span>{lang === 'ar' ? 'مجاناً' : 'Free'}</span>
       </span>
     );
   }
 
   return (
     <span className="px-2.5 py-1 rounded-lg bg-amber-500/15 border border-amber-500/30 text-amber-400 font-bold text-xs inline-flex items-center gap-1">
-      <span>{lang === 'ar' ? 'سعر خاص 💬' : 'On Request 💬'}</span>
+      <span>{lang === 'ar' ? 'سعر خاص' : 'On Request'}</span>
     </span>
   );
 }
@@ -506,10 +506,10 @@ export default function PricingClient({
                 <span>/</span>
                 <span className="text-on-surface-variant">{singleSectionData.categoryName}</span>
               </div>
-              <h1 className="text-xl sm:text-4xl font-bold text-on-surface flex items-center gap-3">
+              <h2 className="text-xl sm:text-4xl font-bold text-on-surface flex items-center gap-3">
                 <span className="material-symbols-outlined text-primary text-2xl sm:text-4xl">folder</span>
                 {singleSectionData.groupName}
-              </h1>
+              </h2>
               <p className="text-xs sm:text-sm text-on-surface-variant mt-1">
                 {lang === 'ar' 
                   ? `عرض مستقل لخدمات قسم ${singleSectionData.groupName} (${singleSectionData.servicesList.length} خدمات مجهزة)`
@@ -595,7 +595,7 @@ export default function PricingClient({
               <div className="px-4 py-2 rounded-2xl bg-surface-container-high/80 border border-emerald-500/30 flex items-center gap-2">
                 <span className="text-xs text-on-surface-variant font-medium">{lang === 'ar' ? 'نسبة الخصم:' : 'Active Discount:'}</span>
                 <span className="text-base font-extrabold text-emerald-400 font-mono">
-                  🔥 -{discountPercent}%
+                  -{discountPercent}%
                 </span>
               </div>
             </div>

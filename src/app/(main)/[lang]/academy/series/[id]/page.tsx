@@ -85,7 +85,7 @@ export default async function SeriesDetailPage(
                 </span>
 
                 <span className={`px-3.5 py-1 rounded-full text-xs font-bold border ${series.isSubscriptionRequired ? 'bg-amber-500/20 text-amber-400 border-amber-500/30' : 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30'}`}>
-                  {series.isSubscriptionRequired ? (isAr ? `مدفوع ($${(series.price || 0).toFixed(2)})` : `Paid ($${(series.price || 0).toFixed(2)})`) : (isAr ? 'مجاني بالكامل 🟢' : 'Free Course 🟢')}
+                  {series.isSubscriptionRequired ? (isAr ? `مدفوع ($${(series.price || 0).toFixed(2)})` : `Paid ($${(series.price || 0).toFixed(2)})`) : (isAr ? 'مجاني بالكامل' : 'Free Course')}
                 </span>
               </div>
 
@@ -237,7 +237,7 @@ export default async function SeriesDetailPage(
                             {videoTitle}
                           </h3>
                           <span className={`px-2.5 py-0.5 rounded-md text-[10px] font-bold ${isFree ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30' : 'bg-amber-500/15 text-amber-400 border border-amber-500/30'}`}>
-                            {isFree ? (isAr ? '🟢 متاح مجاناً' : '🟢 Free Preview') : (isAr ? '🔒 للمشتركين فقط' : '🔒 Members Only')}
+                            {isFree ? (isAr ? 'متاح مجاناً' : 'Free Preview') : (isAr ? 'للمشتركين فقط' : 'Members Only')}
                           </span>
                         </div>
 

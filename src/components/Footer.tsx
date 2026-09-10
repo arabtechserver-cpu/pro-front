@@ -11,7 +11,7 @@ export default function Footer({ dict, lang = "ar" }: FooterProps) {
       id: "paypal",
       nameAr: "باي بال PayPal",
       nameEn: "PayPal Checkout",
-      badge: "🅿️",
+      badge: "PP",
       tagAr: "دفع آمن تلقائي",
       tagEn: "Live Instant",
       color: "from-blue-600/20 to-indigo-600/20 border-blue-500/40 text-blue-400"
@@ -20,7 +20,7 @@ export default function Footer({ dict, lang = "ar" }: FooterProps) {
       id: "vodafone",
       nameAr: "فودافون كاش",
       nameEn: "Vodafone Cash",
-      badge: "📱",
+      badge: "VF",
       tagAr: "محفظة كاش",
       tagEn: "E-Wallet",
       color: "from-red-600/20 to-rose-600/20 border-red-500/40 text-red-400"
@@ -29,7 +29,7 @@ export default function Footer({ dict, lang = "ar" }: FooterProps) {
       id: "bankak",
       nameAr: "بنك الخرطوم (بنكك)",
       nameEn: "Bank of Khartoum",
-      badge: "🏦",
+      badge: "BOK",
       tagAr: "تحويل مباشر",
       tagEn: "Direct Transfer",
       color: "from-emerald-600/20 to-teal-600/20 border-emerald-500/40 text-emerald-400"
@@ -38,7 +38,7 @@ export default function Footer({ dict, lang = "ar" }: FooterProps) {
       id: "bep20",
       nameAr: "BNB Smart Chain (BEP20)",
       nameEn: "BNB Smart Chain",
-      badge: "🟡",
+      badge: "BSC",
       tagAr: "USDT / BNB",
       tagEn: "BEP20 Crypto",
       color: "from-amber-500/20 to-yellow-600/20 border-amber-500/40 text-amber-400"
@@ -47,7 +47,7 @@ export default function Footer({ dict, lang = "ar" }: FooterProps) {
       id: "binance",
       nameAr: "باينانس Binance Pay",
       nameEn: "Binance Pay",
-      badge: "🔶",
+      badge: "PAY",
       tagAr: "ID: 894642115",
       tagEn: "ID: 894642115",
       color: "from-amber-600/20 to-orange-600/20 border-amber-400/40 text-amber-300"
@@ -167,7 +167,7 @@ export default function Footer({ dict, lang = "ar" }: FooterProps) {
           </div>
 
           <div>
-            <h3 className="font-bold text-sm text-on-surface mb-4">{dict.services}</h3>
+            <h2 className="font-bold text-sm text-on-surface mb-4">{dict.services}</h2>
             <ul className="flex flex-col gap-2 text-xs">
               <li><Link href={`/${lang}/pricing`} className="text-on-surface-variant hover:text-primary transition-colors">{dict.imei}</Link></li>
               <li><Link href={`/${lang}/pricing`} className="text-on-surface-variant hover:text-primary transition-colors">{dict.server}</Link></li>
@@ -176,7 +176,7 @@ export default function Footer({ dict, lang = "ar" }: FooterProps) {
           </div>
 
           <div>
-            <h3 className="font-bold text-sm text-on-surface mb-4">{dict.support}</h3>
+            <h2 className="font-bold text-sm text-on-surface mb-4">{dict.support}</h2>
             <ul className="flex flex-col gap-2 text-xs">
               <li><Link href={`/${lang}/contact`} className="text-on-surface-variant hover:text-primary transition-colors">{dict.contact}</Link></li>
               <li><Link href={`/${lang}/tutorials`} className="text-on-surface-variant hover:text-primary transition-colors">{dict.tutorials}</Link></li>
@@ -185,7 +185,7 @@ export default function Footer({ dict, lang = "ar" }: FooterProps) {
           </div>
 
           <div>
-            <h3 className="font-bold text-sm text-on-surface mb-4">{dict.legal}</h3>
+            <h2 className="font-bold text-sm text-on-surface mb-4">{dict.legal}</h2>
             <ul className="flex flex-col gap-2 text-xs">
               <li><Link href={`/${lang}/terms`} className="text-on-surface-variant hover:text-primary transition-colors">{dict.terms}</Link></li>
               <li><Link href={`/${lang}/terms`} className="text-on-surface-variant hover:text-primary transition-colors">{dict.privacy}</Link></li>
@@ -200,16 +200,16 @@ export default function Footer({ dict, lang = "ar" }: FooterProps) {
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
             <div className="flex items-center gap-2">
               <span className="material-symbols-outlined text-primary text-lg">payments</span>
-              <h4 className="text-xs font-bold text-on-surface">
+              <h3 className="text-xs font-bold text-on-surface">
                 {lang === "ar" ? "وسائل وبوابات الدفع المتاحة لجميع الدول:" : "Supported Payment Gateways & Deposit Methods:"}
-              </h4>
+              </h3>
             </div>
 
             <Link 
               href={`/${lang}/wallet`} 
               className="text-[11px] font-bold text-primary hover:underline flex items-center gap-1"
             >
-              <span>{lang === "ar" ? "صفحة شحن المحفظة 💳" : "Go to Wallet Top-up 💳"}</span>
+              <span>{lang === "ar" ? "صفحة شحن المحفظة" : "Go to Wallet Top-up"}</span>
             </Link>
           </div>
 

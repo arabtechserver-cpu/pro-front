@@ -141,7 +141,7 @@ export default async function AcademyPage(props: { params: Promise<{ lang: Local
                         {/* Price Badge */}
                         <div className="absolute top-3 right-3">
                           <span className={`px-3 py-1 rounded-full text-xs font-extrabold shadow-md backdrop-blur-md border ${series.isSubscriptionRequired ? 'bg-amber-500 text-black border-amber-400' : 'bg-emerald-500 text-black border-emerald-400'}`}>
-                            {series.isSubscriptionRequired ? `$${(series.price || 0).toFixed(2)}` : (isAr ? 'مجاني 🟢' : 'Free 🟢')}
+                            {series.isSubscriptionRequired ? `$${(series.price || 0).toFixed(2)}` : (isAr ? 'مجاني' : 'Free')}
                           </span>
                         </div>
 
@@ -246,7 +246,7 @@ export default async function AcademyPage(props: { params: Promise<{ lang: Local
                         {/* Badges */}
                         <div className="absolute top-3 right-3 flex items-center gap-2">
                           <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold shadow ${video.isFreePreview ? 'bg-emerald-500 text-black' : 'bg-amber-500 text-black'}`}>
-                            {video.isFreePreview ? (isAr ? 'مجاني 🟢' : 'Free 🟢') : (isAr ? 'مقفل 🔒' : 'Locked 🔒')}
+                            {video.isFreePreview ? (isAr ? 'مجاني' : 'Free') : (isAr ? 'مقفل' : 'Locked')}
                           </span>
                         </div>
 

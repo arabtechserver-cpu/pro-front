@@ -180,9 +180,12 @@ export default function OrdersClient({ lang, dict }: { lang: string, dict: any }
               search
             </span>
             <input
+              id="orders-search-input"
+              name="ordersSearch"
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
+              aria-label={lang === 'ar' ? 'البحث برقم الطلب، اسم الخدمة، أو رقم IMEI' : 'Search by order ID, service, or IMEI'}
               placeholder={lang === 'ar' ? 'ابحث برقم الطلب، اسم الخدمة، أو رقم IMEI...' : 'Search by order ID, service, or IMEI...'}
               className="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-xl py-2.5 ps-10 pe-4 text-xs text-on-surface focus:outline-none focus:border-primary transition-all placeholder:text-on-surface-variant/50"
             />
@@ -201,19 +204,19 @@ export default function OrdersClient({ lang, dict }: { lang: string, dict: any }
                 onClick={() => setFilterStatus("processing")}
                 className={`px-3 py-1.5 rounded-lg transition-all ${filterStatus === "processing" ? "bg-amber-500 text-white shadow-sm" : "text-on-surface-variant hover:text-on-surface"}`}
               >
-                {lang === 'ar' ? 'جاري التنفيذ ⏳' : 'Processing'}
+                {lang === 'ar' ? 'جاري التنفيذ' : 'Processing'}
               </button>
               <button 
                 onClick={() => setFilterStatus("completed")}
                 className={`px-3 py-1.5 rounded-lg transition-all ${filterStatus === "completed" ? "bg-emerald-500 text-white shadow-sm" : "text-on-surface-variant hover:text-on-surface"}`}
               >
-                {lang === 'ar' ? 'مكتمل 🟢' : 'Completed'}
+                {lang === 'ar' ? 'مكتمل' : 'Completed'}
               </button>
               <button 
                 onClick={() => setFilterStatus("failed")}
                 className={`px-3 py-1.5 rounded-lg transition-all ${filterStatus === "failed" ? "bg-red-500 text-white shadow-sm" : "text-on-surface-variant hover:text-on-surface"}`}
               >
-                {lang === 'ar' ? 'مرفوض 🔴' : 'Failed'}
+                {lang === 'ar' ? 'مرفوض' : 'Failed'}
               </button>
             </div>
 
@@ -223,6 +226,7 @@ export default function OrdersClient({ lang, dict }: { lang: string, dict: any }
               disabled={loadingOrders}
               className="px-3.5 py-2 rounded-xl bg-surface-container-high border border-outline-variant/30 hover:border-primary/50 text-xs font-bold text-on-surface flex items-center gap-1.5 transition-all active:scale-95"
               title="تحديث البيانات"
+              aria-label={lang === 'ar' ? 'تحديث قائمة الطلبات' : 'Refresh orders list'}
             >
               <span className={`material-symbols-outlined text-sm text-primary ${loadingOrders ? 'animate-spin' : ''}`}>refresh</span>
               <span>{lang === 'ar' ? 'تحديث' : 'Refresh'}</span>
@@ -238,7 +242,7 @@ export default function OrdersClient({ lang, dict }: { lang: string, dict: any }
                 <th className="p-4 text-start">{lang === 'ar' ? 'رقم الطلب' : 'Order ID'}</th>
                 <th className="p-4 text-start">{lang === 'ar' ? 'اسم الخدمة' : 'Service Name'}</th>
                 <th className="p-4 text-start">{lang === 'ar' ? 'رقم الجهاز / البيانات' : 'Target Input / IMEI'}</th>
-                <th className="p-4 text-start">{lang === 'ar' ? 'النتيجة وكود الفك 🔑' : 'Result / Unlock Code 🔑'}</th>
+                <th className="p-4 text-start">{lang === 'ar' ? 'النتيجة وكود الفك' : 'Result / Unlock Code'}</th>
                 <th className="p-4 text-start">{lang === 'ar' ? 'الكمية والسعر' : 'Qty & Cost'}</th>
                 <th className="p-4 text-center">{lang === 'ar' ? 'حالة الطلب' : 'Status'}</th>
                 <th className="p-4 text-end">{lang === 'ar' ? 'تاريخ وساعة الطلب' : 'Date & Time'}</th>
@@ -306,20 +310,21 @@ export default function OrdersClient({ lang, dict }: { lang: string, dict: any }
                             <button
                               onClick={() => {
                                 navigator.clipboard.writeText(cleanHtmlToText(ord.reply));
-                                alert(lang === 'ar' ? 'تم نسخ الكود/النتيجة بنجاح 📋' : 'Code copied to clipboard!');
+                                alert(lang === 'ar' ? 'تم نسخ الكود/النتيجة بنجاح' : 'Code copied to clipboard!');
                               }}
                               className="p-1 text-on-surface-variant hover:text-primary transition-colors"
                               title="نسخ النتيجة"
+                              aria-label="نسخ النتيجة"
                             >
                               <span className="material-symbols-outlined text-sm">content_copy</span>
                             </button>
                           </div>
                         ) : isCompleted ? (
-                          <span className="text-emerald-400 font-bold text-[11px]">{lang === 'ar' ? 'تم التفعيل بنجاح 🟢' : 'Done / Unlocked'}</span>
+                          <span className="text-emerald-400 font-bold text-[11px]">{lang === 'ar' ? 'تم التفعيل بنجاح' : 'Done / Unlocked'}</span>
                         ) : isFailed ? (
                           <span className="text-red-400 font-bold text-[11px]">{lang === 'ar' ? 'تعذر التنفيذ / مرفوض' : 'Rejected'}</span>
                         ) : (
-                          <span className="text-amber-400/80 font-bold text-[11px] animate-pulse">{lang === 'ar' ? 'جاري انتظار الكود... ⏳' : 'Waiting provider...'}</span>
+                          <span className="text-amber-400/80 font-bold text-[11px] animate-pulse">{lang === 'ar' ? 'جاري انتظار الكود...' : 'Waiting provider...'}</span>
                         )}
                       </td>
 
@@ -334,19 +339,19 @@ export default function OrdersClient({ lang, dict }: { lang: string, dict: any }
                         {isCompleted && (
                           <span className="px-3.5 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 font-bold text-[11px] inline-flex items-center gap-1.5">
                             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-                            <span>{lang === 'ar' ? 'مكتمل 🟢' : 'Completed'}</span>
+                            <span>{lang === 'ar' ? 'مكتمل' : 'Completed'}</span>
                           </span>
                         )}
                         {isProcessing && (
                           <span className="px-3.5 py-1 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-400 font-bold text-[11px] inline-flex items-center gap-1.5 animate-pulse">
                             <span className="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
-                            <span>{lang === 'ar' ? 'قيد التنفيذ ⏳' : 'Processing'}</span>
+                            <span>{lang === 'ar' ? 'قيد التنفيذ' : 'Processing'}</span>
                           </span>
                         )}
                         {isFailed && (
                           <span className="px-3.5 py-1 rounded-full bg-red-500/15 border border-red-500/30 text-red-400 font-bold text-[11px] inline-flex items-center gap-1.5">
                             <span className="w-1.5 h-1.5 rounded-full bg-red-400"></span>
-                            <span>{lang === 'ar' ? 'مرفوض 🔴' : 'Failed'}</span>
+                            <span>{lang === 'ar' ? 'مرفوض' : 'Failed'}</span>
                           </span>
                         )}
                       </td>

@@ -51,6 +51,7 @@ export default function FloatingSideDock({ lang = "ar" }: FloatingSideDockProps)
           target="_blank"
           rel="noopener noreferrer"
           title="WhatsApp Support"
+          aria-label={isAr ? "دعم واتساب الفوري" : "WhatsApp Support"}
           className="group flex items-center bg-[#25D366] hover:bg-[#20bd5a] text-white p-2.5 sm:p-3 rounded-r-2xl shadow-[0_4px_15px_rgba(37,211,102,0.4)] transition-all duration-300 hover:translate-x-1.5 hover:shadow-[0_6px_22px_rgba(37,211,102,0.6)]"
         >
           <svg className="w-5 h-5 sm:w-6 sm:h-6 fill-current" viewBox="0 0 24 24">
@@ -64,6 +65,7 @@ export default function FloatingSideDock({ lang = "ar" }: FloatingSideDockProps)
           target="_blank"
           rel="noopener noreferrer"
           title="Telegram Channel"
+          aria-label={isAr ? "قناة تيليجرام الرسمية" : "Telegram Channel"}
           className="group flex items-center bg-[#0088cc] hover:bg-[#007ab8] text-white p-2.5 sm:p-3 rounded-r-2xl shadow-[0_4px_15px_rgba(0,136,204,0.4)] transition-all duration-300 hover:translate-x-1.5 hover:shadow-[0_6px_22px_rgba(0,136,204,0.6)]"
         >
           <svg className="w-5 h-5 sm:w-6 sm:h-6 fill-current" viewBox="0 0 24 24">
@@ -77,6 +79,7 @@ export default function FloatingSideDock({ lang = "ar" }: FloatingSideDockProps)
           target="_blank"
           rel="noopener noreferrer"
           title="Facebook Page"
+          aria-label={isAr ? "صفحة الفيسبوك" : "Facebook Page"}
           className="group flex items-center bg-[#1877F2] hover:bg-[#166fe5] text-white p-2.5 sm:p-3 rounded-r-2xl shadow-[0_4px_15px_rgba(24,119,242,0.4)] transition-all duration-300 hover:translate-x-1.5 hover:shadow-[0_6px_22px_rgba(24,119,242,0.6)]"
         >
           <svg className="w-5 h-5 sm:w-6 sm:h-6 fill-current" viewBox="0 0 24 24">

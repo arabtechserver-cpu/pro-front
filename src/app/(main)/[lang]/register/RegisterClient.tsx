@@ -240,7 +240,7 @@ const ALL_COUNTRIES: Country[] = [
     code: "OTHER",
     nameAr: "باقي دول العالم",
     nameEn: "Other International Countries",
-    flag: "🌐",
+    flag: "",
     dialCode: "+0",
     walletsAr: ["USDT TRC20 / BEP20 (Cryptocurrency)", "Binance Pay", "Perfect Money", "Payeer", "Credit / Debit Card"],
     walletsEn: ["USDT TRC20 / BEP20 (Cryptocurrency)", "Binance Pay", "Perfect Money", "Payeer", "Credit / Debit Card"]
@@ -377,10 +377,10 @@ export default function RegisterClient({ lang, dict }: { lang: Locale; dict: any
     if (/[0-9]/.test(password)) score += 1;
     if (/[^A-Za-z0-9]/.test(password)) score += 1;
 
-    if (score <= 1) return { percent: 25, textAr: "ضعيفة ⚠️", textEn: "Weak ⚠️", color: "bg-red-500" };
-    if (score === 2) return { percent: 50, textAr: "متوسطة 🟡", textEn: "Medium 🟡", color: "bg-yellow-500" };
-    if (score === 3) return { percent: 75, textAr: "قوية 🟢", textEn: "Strong 🟢", color: "bg-emerald-500" };
-    return { percent: 100, textAr: "قوية جداً 🔥", textEn: "Very Strong 🔥", color: "bg-primary glow-cyan" };
+    if (score <= 1) return { percent: 25, textAr: "ضعيفة", textEn: "Weak", color: "bg-red-500" };
+    if (score === 2) return { percent: 50, textAr: "متوسطة", textEn: "Medium", color: "bg-yellow-500" };
+    if (score === 3) return { percent: 75, textAr: "قوية", textEn: "Strong", color: "bg-emerald-500" };
+    return { percent: 100, textAr: "قوية جداً", textEn: "Very Strong", color: "bg-primary glow-cyan" };
   }, [password]);
 
   const passwordsMatch = useMemo(() => {

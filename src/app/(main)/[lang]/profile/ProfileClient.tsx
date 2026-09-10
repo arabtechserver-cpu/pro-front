@@ -485,7 +485,7 @@ export default function ProfileClient({ lang, dict }: { lang: string; dict: any 
 
                 {/* Role Badge */}
                 <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-surface-container-highest/80 text-on-surface-variant border border-outline-variant/30">
-                  {userSession?.role === "admin" ? (isAr ? "مدير النظام 🛡️" : "Admin") : (isAr ? "عميل معتمد 👤" : "Client")}
+                  {userSession?.role === "admin" ? (isAr ? "مدير النظام" : "Admin") : (isAr ? "عميل معتمد" : "Client")}
                 </span>
               </div>
 
@@ -507,10 +507,14 @@ export default function ProfileClient({ lang, dict }: { lang: string; dict: any 
                     </span>
                   </>
                 )}
-                <span className="text-outline-variant">•</span>
-                <span className="flex items-center gap-1">
-                  {COUNTRY_FLAGS[profile?.country || userSession?.country || "EG"] || "🌐"}
-                </span>
+                {COUNTRY_FLAGS[profile?.country || userSession?.country || "EG"] && (
+                  <>
+                    <span className="text-outline-variant">•</span>
+                    <span className="flex items-center gap-1">
+                      {COUNTRY_FLAGS[profile?.country || userSession?.country || "EG"]}
+                    </span>
+                  </>
+                )}
               </div>
             </div>
           </div>
@@ -740,13 +744,13 @@ export default function ProfileClient({ lang, dict }: { lang: string; dict: any 
                   onClick={() => setOrderFilter("completed")}
                   className={`px-3 py-1.5 rounded-lg transition-all ${orderFilter === "completed" ? "bg-emerald-500 text-white shadow-sm" : "text-on-surface-variant hover:text-on-surface"}`}
                 >
-                  {isAr ? "مكتمل 🟢" : "Completed"}
+                  {isAr ? "مكتمل" : "Completed"}
                 </button>
                 <button
                   onClick={() => setOrderFilter("failed")}
                   className={`px-3 py-1.5 rounded-lg transition-all ${orderFilter === "failed" ? "bg-red-500 text-white shadow-sm" : "text-on-surface-variant hover:text-on-surface"}`}
                 >
-                  {isAr ? "مرفوض 🔴" : "Failed"}
+                  {isAr ? "مرفوض" : "Failed"}
                 </button>
               </div>
 
@@ -772,7 +776,7 @@ export default function ProfileClient({ lang, dict }: { lang: string; dict: any 
                   <th className="p-3.5 text-start">{isAr ? "رقم الطلب" : "Order ID"}</th>
                   <th className="p-3.5 text-start">{isAr ? "الخدمة" : "Service"}</th>
                   <th className="p-3.5 text-start">{isAr ? "البيانات / IMEI" : "Input / IMEI"}</th>
-                  <th className="p-3.5 text-start">{isAr ? "النتيجة وكود الفك 🔑" : "Result / Unlock Code"}</th>
+                  <th className="p-3.5 text-start">{isAr ? "النتيجة وكود الفك" : "Result / Unlock Code"}</th>
                   <th className="p-3.5 text-start">{isAr ? "التكلفة" : "Cost"}</th>
                   <th className="p-3.5 text-center">{isAr ? "الحالة" : "Status"}</th>
                   <th className="p-3.5 text-end">{isAr ? "التاريخ" : "Date"}</th>
@@ -863,7 +867,7 @@ export default function ProfileClient({ lang, dict }: { lang: string; dict: any 
                           <div>${Number(order.price).toFixed(2)}</div>
                           {order.couponCode && (
                             <div className="text-[10px] text-emerald-400 font-bold flex items-center gap-0.5">
-                              <span>🎟️ {order.couponCode}</span>
+                              <span>{order.couponCode}</span>
                             </div>
                           )}
                         </td>
@@ -952,19 +956,19 @@ export default function ProfileClient({ lang, dict }: { lang: string; dict: any 
                   onClick={() => setTxFilter("completed")}
                   className={`px-3 py-1.5 rounded-lg transition-all ${txFilter === "completed" ? "bg-emerald-500 text-white shadow-sm" : "text-on-surface-variant hover:text-on-surface"}`}
                 >
-                  {isAr ? "معتمد 🟢" : "Completed"}
+                  {isAr ? "معتمد" : "Completed"}
                 </button>
                 <button
                   onClick={() => setTxFilter("pending")}
                   className={`px-3 py-1.5 rounded-lg transition-all ${txFilter === "pending" ? "bg-amber-500 text-white shadow-sm" : "text-on-surface-variant hover:text-on-surface"}`}
                 >
-                  {isAr ? "قيد المراجعة ⏳" : "Pending"}
+                  {isAr ? "قيد المراجعة" : "Pending"}
                 </button>
                 <button
                   onClick={() => setTxFilter("failed")}
                   className={`px-3 py-1.5 rounded-lg transition-all ${txFilter === "failed" ? "bg-red-500 text-white shadow-sm" : "text-on-surface-variant hover:text-on-surface"}`}
                 >
-                  {isAr ? "مرفوض 🔴" : "Failed"}
+                  {isAr ? "مرفوض" : "Failed"}
                 </button>
               </div>
 
@@ -1335,7 +1339,7 @@ export default function ProfileClient({ lang, dict }: { lang: string; dict: any 
             {profile?.apiEnabled ? (
               <span className="px-3 py-1 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 text-xs font-bold flex items-center gap-1.5">
                 <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
-                <span>{isAr ? "حساب الـ API مفعل ✅" : "API Access Enabled"}</span>
+                <span>{isAr ? "حساب الـ API مفعل" : "API Access Enabled"}</span>
               </span>
             ) : (
               <span className="px-3 py-1 rounded-full bg-amber-500/15 text-amber-400 border border-amber-500/30 text-xs font-bold flex items-center gap-1.5">

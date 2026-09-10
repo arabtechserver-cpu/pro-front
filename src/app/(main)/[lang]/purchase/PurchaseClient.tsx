@@ -492,13 +492,13 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
 
     const cleanInput = couponInput.trim().toUpperCase();
 
-    // التحقق من أكواد العرض الوهمي الترويجي المطبقة مسبقاً
+    // التحقق من أكواد العرض الترويجي المطبقة مسبقاً
     if (["PRO10", "SAVE10", "ARAB10", "DISCOUNT10", "OFFER10", "SPECIAL10"].includes(cleanInput)) {
       setCouponFeedback({
         type: "success",
         text: lang === "ar"
-          ? "🎉 كود الخصم (10%) مفعّل ومطبّق بالفعل وتلقائياً على السعر المعروض للخدمة!"
-          : "🎉 Promo code (10% OFF) is already automatically included in the displayed rate!"
+          ? "كود الخصم (10%) مفعّل ومطبّق بالفعل وتلقائياً على السعر المعروض للخدمة!"
+          : "Promo code (10% OFF) is already automatically included in the displayed rate!"
       });
       return;
     }
@@ -784,7 +784,7 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
 
             <div className="space-y-1.5">
               <h3 className="text-2xl font-bold text-white font-display">
-                {lang === 'ar' ? '🎉 تم استلام وتأكيد طلبك بنجاح!' : '🎉 Order Placed Successfully!'}
+                {lang === 'ar' ? 'تم استلام وتأكيد طلبك بنجاح' : 'Order Placed Successfully'}
               </h3>
               <p className="text-xs text-on-surface-variant leading-relaxed">
                 {lang === 'ar'
@@ -824,14 +824,14 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
                 className="flex-1 bg-gradient-to-r from-emerald-500 to-teal-600 text-black py-3.5 rounded-2xl font-bold text-xs shadow-lg hover:shadow-emerald-500/30 transition-all flex items-center justify-center gap-2 active:scale-95"
               >
                 <span className="material-symbols-outlined text-base">receipt_long</span>
-                <span>{lang === 'ar' ? 'الانتقال لسجل طلباتي 📜' : 'View in My Orders 📜'}</span>
+                <span>{lang === 'ar' ? 'الانتقال لسجل طلباتي' : 'View in My Orders'}</span>
               </Link>
               <button
                 type="button"
                 onClick={() => setSuccessOrderModalData(null)}
                 className="px-6 bg-surface-container-high hover:bg-surface-container-highest text-on-surface py-3.5 rounded-2xl font-bold text-xs border border-outline-variant/30 transition-all active:scale-95"
               >
-                {lang === 'ar' ? '➕ طلب خدمة أخرى' : '➕ Order Another Service'}
+                {lang === 'ar' ? 'طلب خدمة أخرى' : 'Order Another Service'}
               </button>
             </div>
           </div>
@@ -864,7 +864,7 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
                   <span>{lang === 'ar' ? 'مباشر الآن' : 'LIVE NOW'}</span>
                 </span>
                 <span className="text-[11px] text-on-surface-variant font-medium flex items-center gap-1">
-                  <span>🔥</span>
+                  <span className="material-symbols-outlined text-xs text-amber-400">trending_up</span>
                   <span>{lang === 'ar' ? 'إقبال شراء مرتفع' : 'High Buying Demand'}</span>
                 </span>
               </div>
@@ -960,7 +960,7 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
             className="px-4 py-2.5 rounded-xl bg-surface-container-high border border-outline-variant/30 hover:border-primary/50 text-xs font-bold text-on-surface flex items-center gap-2 transition-all shadow-sm active:scale-95"
           >
             <span className="material-symbols-outlined text-base text-primary">receipt_long</span>
-            <span>{lang === 'ar' ? 'سجل طلباتي 📜' : 'My Orders 📜'}</span>
+            <span>{lang === 'ar' ? 'سجل طلباتي' : 'My Orders'}</span>
           </Link>
 
           {userSession && (
@@ -1014,7 +1014,7 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
                 href={`/${lang}/orders`}
                 className="px-4 py-2 rounded-xl bg-emerald-500 text-black font-bold text-xs hover:bg-emerald-400 transition-all shrink-0 text-center"
               >
-                {lang === 'ar' ? 'عرض ومتابعة طلباتي 📜' : 'Track My Orders 📜'}
+                {lang === 'ar' ? 'عرض ومتابعة طلباتي' : 'Track My Orders'}
               </Link>
             )}
           </div>
@@ -1072,10 +1072,10 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
                     const pNum = typeof p === 'number' ? p : parseFloat(p) || 0;
                     const isFree = pNum === 0 && (srv.name?.toLowerCase().includes("free") || srv.name?.includes("مجاني") || srv.name?.includes("مجانا"));
                     const priceLabel = isFree 
-                      ? (lang === 'ar' ? 'مجاناً 🎁' : 'Free 🎁') 
+                      ? (lang === 'ar' ? 'مجاناً' : 'Free') 
                       : pNum > 0 
                       ? `$${pNum.toFixed(2)} USD` 
-                      : (lang === 'ar' ? 'سعر خاص 💬' : 'Special Price 💬');
+                      : (lang === 'ar' ? 'سعر خاص' : 'Special Price');
                     const groupPrefix = srv.groupName ? `[${srv.groupName}] ` : '';
                     return (
                       <option key={srv.id} value={srv.id}>
@@ -1089,87 +1089,96 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
           </div>
 
           {/* Selected Service Details Card */}
-          {selectedService && (
-            <div className="p-5 rounded-2xl bg-surface-container-high/60 border border-outline-variant/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-              <div className="space-y-2">
-                {/* Category & Group/Package Badges */}
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="px-2.5 py-0.5 rounded-lg bg-primary/10 border border-primary/20 text-primary text-[11px] font-bold flex items-center gap-1.5">
-                    <span className="material-symbols-outlined text-xs">folder_open</span>
-                    <span>القسم: {selectedCategory?.name || (lang === 'ar' ? 'القسم الرئيسي' : 'Main Category')}</span>
-                  </span>
-
-                  {selectedService.groupName && (
-                    <span className="px-2.5 py-0.5 rounded-lg bg-secondary/10 border border-secondary/20 text-secondary text-[11px] font-bold flex items-center gap-1.5">
-                      <span className="material-symbols-outlined text-xs">package_2</span>
-                      <span>الباقة: {selectedService.groupName}</span>
+          <div className="min-h-[110px]">
+            {selectedService ? (
+              <div className="p-5 rounded-2xl bg-surface-container-high/60 border border-outline-variant/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div className="space-y-2">
+                  {/* Category & Group/Package Badges */}
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="px-2.5 py-0.5 rounded-lg bg-primary/10 border border-primary/20 text-primary text-[11px] font-bold flex items-center gap-1.5">
+                      <span className="material-symbols-outlined text-xs">folder_open</span>
+                      <span>القسم: {selectedCategory?.name || (lang === 'ar' ? 'القسم الرئيسي' : 'Main Category')}</span>
                     </span>
+
+                    {selectedService.groupName && (
+                      <span className="px-2.5 py-0.5 rounded-lg bg-secondary/10 border border-secondary/20 text-secondary text-[11px] font-bold flex items-center gap-1.5">
+                        <span className="material-symbols-outlined text-xs">package_2</span>
+                        <span>الباقة: {selectedService.groupName}</span>
+                      </span>
+                    )}
+                  </div>
+
+                  <h3 className="font-bold text-sm text-on-surface">{selectedService.name}</h3>
+                  <div className="flex items-center gap-4 text-xs text-on-surface-variant">
+                    <span className="flex items-center gap-1">
+                      <span className="material-symbols-outlined text-sm text-secondary">schedule</span>
+                      <span>وقت التسليم: {selectedService.time || "فوري - 30 دقيقة"}</span>
+                    </span>
+                  </div>
+
+                  {/* Collapsible Provider Instructions & Info */}
+                  {selectedService.info && (
+                    <div className="mt-3 pt-2.5 border-t border-outline-variant/15">
+                      <button
+                        type="button"
+                        onClick={() => setShowServiceInfo(!showServiceInfo)}
+                        className="text-xs font-bold text-primary flex items-center gap-1.5 hover:underline"
+                      >
+                        <span className="material-symbols-outlined text-sm">info</span>
+                        <span>
+                          {showServiceInfo
+                            ? (lang === 'ar' ? 'إخفاء شروط وتعليمات المزود' : 'Hide provider rules & instructions')
+                            : (lang === 'ar' ? 'عرض شروط وتعليمات المزود للخدمة' : 'View provider rules & instructions')}
+                        </span>
+                        <span className="material-symbols-outlined text-xs">
+                          {showServiceInfo ? 'expand_less' : 'expand_more'}
+                        </span>
+                      </button>
+                      {showServiceInfo && (
+                        <div className="mt-2.5 p-3 rounded-xl bg-surface-container-lowest border border-outline-variant/30 text-xs text-on-surface-variant leading-relaxed max-h-56 overflow-y-auto whitespace-pre-wrap block">
+                          {cleanHtmlToText(selectedService.info)}
+                        </div>
+                      )}
+                    </div>
                   )}
                 </div>
 
-                <h4 className="font-bold text-sm text-on-surface">{selectedService.name}</h4>
-                <div className="flex items-center gap-4 text-xs text-on-surface-variant">
-                  <span className="flex items-center gap-1">
-                    <span className="material-symbols-outlined text-sm text-secondary">schedule</span>
-                    <span>وقت التسليم: {selectedService.time || "فوري - 30 دقيقة"}</span>
+                <div className="text-start sm:text-end shrink-0">
+                  <span className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider block">
+                    {lang === 'ar' ? 'سعر الخدمة' : 'Service Price'}
                   </span>
-                </div>
-
-                {/* Collapsible Provider Instructions & Info */}
-                {selectedService.info && (
-                  <div className="mt-3 pt-2.5 border-t border-outline-variant/15">
-                    <button
-                      type="button"
-                      onClick={() => setShowServiceInfo(!showServiceInfo)}
-                      className="text-xs font-bold text-primary flex items-center gap-1.5 hover:underline"
-                    >
-                      <span className="material-symbols-outlined text-sm">info</span>
-                      <span>
-                        {showServiceInfo
-                          ? (lang === 'ar' ? 'إخفاء شروط وتعليمات المزود ▲' : 'Hide provider rules & instructions ▲')
-                          : (lang === 'ar' ? 'عرض شروط وتعليمات المزود للخدمة ▼' : 'View provider rules & instructions ▼')}
-                      </span>
-                    </button>
-                    {showServiceInfo && (
-                      <div className="mt-2.5 p-3 rounded-xl bg-surface-container-lowest border border-outline-variant/30 text-xs text-on-surface-variant leading-relaxed max-h-56 overflow-y-auto whitespace-pre-wrap block">
-                        {cleanHtmlToText(selectedService.info)}
+                  {unitPrice > 0 ? (
+                    <div className="flex flex-col items-start sm:items-end gap-1 mt-0.5">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-on-surface-variant/70 line-through font-mono">
+                          ${(unitPrice / 0.9).toFixed(2)} USD
+                        </span>
+                        <span className="text-2xl font-bold font-mono text-primary glow-cyan">
+                          ${unitPrice.toFixed(2)} USD
+                        </span>
                       </div>
-                    )}
-                  </div>
-                )}
-              </div>
-
-              <div className="text-start sm:text-end shrink-0">
-                <span className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider block">
-                  {lang === 'ar' ? 'سعر الخدمة' : 'Service Price'}
-                </span>
-                {unitPrice > 0 ? (
-                  <div className="flex flex-col items-start sm:items-end gap-1 mt-0.5">
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs text-on-surface-variant/70 line-through font-mono">
-                        ${(unitPrice / 0.9).toFixed(2)} USD
-                      </span>
-                      <span className="text-2xl font-bold font-mono text-primary glow-cyan">
-                        ${unitPrice.toFixed(2)} USD
+                      <span className="text-[10px] font-bold text-emerald-400 bg-emerald-500/15 border border-emerald-500/30 px-2 py-0.5 rounded-full flex items-center gap-1">
+                        <span className="material-symbols-outlined text-[12px]">local_offer</span>
+                        <span>{lang === 'ar' ? 'خصم 10% مطبق' : '10% OFF Applied'}</span>
                       </span>
                     </div>
-                    <span className="text-[10px] font-bold text-emerald-400 bg-emerald-500/15 border border-emerald-500/30 px-2 py-0.5 rounded-full flex items-center gap-1">
-                      <span className="material-symbols-outlined text-[12px]">local_offer</span>
-                      <span>{lang === 'ar' ? 'خصم 10% مطبق ⚡' : '10% OFF Applied ⚡'}</span>
+                  ) : isFreeService ? (
+                    <span className="text-sm font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-3 py-1 rounded-xl inline-block mt-1">
+                      {lang === 'ar' ? 'خدمة مجانية' : 'Free Service'}
                     </span>
-                  </div>
-                ) : isFreeService ? (
-                  <span className="text-sm font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-3 py-1 rounded-xl inline-block mt-1">
-                    {lang === 'ar' ? 'خدمة مجانية 🎁' : 'Free Service 🎁'}
-                  </span>
-                ) : (
-                  <span className="text-xs font-bold text-amber-400 bg-amber-500/10 border border-amber-500/30 px-3 py-1 rounded-xl inline-block mt-1">
-                    {lang === 'ar' ? 'سعر خاص عند الطلب 💬' : 'Price on Request 💬'}
-                  </span>
-                )}
+                  ) : (
+                    <span className="text-xs font-bold text-amber-400 bg-amber-500/10 border border-amber-500/30 px-3 py-1 rounded-xl inline-block mt-1">
+                      {lang === 'ar' ? 'سعر خاص عند الطلب' : 'Price on Request'}
+                    </span>
+                  )}
+                </div>
               </div>
-            </div>
-          )}
+            ) : (
+              <div className="p-5 rounded-2xl border border-outline-variant/20 bg-surface-container-high/30 h-[110px] flex items-center justify-center text-xs text-on-surface-variant/60">
+                {lang === 'ar' ? 'اختر الخدمة لعرض تفاصيلها والشروط الفنية' : 'Select a service to view technical specifications'}
+              </div>
+            )}
+          </div>
 
           {/* PROVIDER REQUIRED CUSTOM FIELDS VS STANDARD INPUT */}
           {(() => {
@@ -1600,7 +1609,7 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
                   <p className="text-xl font-bold font-mono text-primary glow-cyan dir-ltr">${totalPrice.toFixed(2)} USD</p>
                   {rawTotalPrice > 0 && (
                     <span className="text-[11px] font-bold text-emerald-400 bg-emerald-500/15 border border-emerald-500/30 px-2 py-0.5 rounded-md flex items-center gap-1 dir-ltr">
-                      <span>⚡ -10% (${((rawTotalPrice / 0.9) - rawTotalPrice).toFixed(2)})</span>
+                      <span>-10% (${((rawTotalPrice / 0.9) - rawTotalPrice).toFixed(2)})</span>
                     </span>
                   )}
                   {appliedCoupon && (
@@ -1634,7 +1643,7 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
                     href={`/${lang}/wallet`}
                     className="px-3 py-1.5 rounded-lg bg-primary text-on-primary font-bold text-xs hover:bg-primary-container transition-all"
                   >
-                    {lang === 'ar' ? 'شحن المحفظة 💳' : 'Top Up 💳'}
+                    {lang === 'ar' ? 'شحن المحفظة' : 'Top Up'}
                   </Link>
                 </div>
               )}
@@ -1661,10 +1670,10 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
                 <span className="material-symbols-outlined text-lg">rocket_launch</span>
                 <span>
                   {isFreeService
-                    ? (lang === 'ar' ? 'تأكيد وإرسال الطلب (مجاناً 🎁)' : 'Confirm & Send Order (Free 🎁)')
+                    ? (lang === 'ar' ? 'تأكيد وإرسال الطلب (مجاناً)' : 'Confirm & Send Order (Free)')
                     : (lang === 'ar' 
-                        ? `تأكيد وإرسال الطلب ($${totalPrice.toFixed(2)} USD) - شامل خصم 10% ⚡` 
-                        : `Confirm & Send Order ($${totalPrice.toFixed(2)} USD) - 10% OFF Included ⚡`)}
+                        ? `تأكيد وإرسال الطلب ($${totalPrice.toFixed(2)} USD) - شامل خصم 10%` 
+                        : `Confirm & Send Order ($${totalPrice.toFixed(2)} USD) - 10% OFF Included`)}
                 </span>
               </>
             )}

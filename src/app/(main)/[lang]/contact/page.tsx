@@ -83,18 +83,18 @@ export default async function Contact(props: { params: Promise<{ lang: Locale }>
           <form className="flex flex-col gap-5">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <div className="flex flex-col gap-2">
-                <label className="text-xs font-label-sm text-on-surface-variant uppercase tracking-wider">{dict.contact.name}</label>
-                <input type="text" className="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-lg py-3 px-4 text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all" />
+                <label htmlFor="contact-name" className="text-xs font-label-sm text-on-surface-variant uppercase tracking-wider">{dict.contact.name}</label>
+                <input id="contact-name" name="name" type="text" className="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-lg py-3 px-4 text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all" />
               </div>
               <div className="flex flex-col gap-2">
-                <label className="text-xs font-label-sm text-on-surface-variant uppercase tracking-wider">{dict.contact.email}</label>
-                <input type="email" className="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-lg py-3 px-4 text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all" />
+                <label htmlFor="contact-email" className="text-xs font-label-sm text-on-surface-variant uppercase tracking-wider">{dict.contact.email}</label>
+                <input id="contact-email" name="email" type="email" className="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-lg py-3 px-4 text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all" />
               </div>
             </div>
             
             <div className="flex flex-col gap-2">
-              <label className="text-xs font-label-sm text-on-surface-variant uppercase tracking-wider">{dict.contact.department}</label>
-              <select className="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-lg py-3 px-4 text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all appearance-none">
+              <label htmlFor="contact-department" className="text-xs font-label-sm text-on-surface-variant uppercase tracking-wider">{dict.contact.department}</label>
+              <select id="contact-department" name="department" aria-label={dict.contact.department} className="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-lg py-3 px-4 text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all appearance-none">
                 <option value="general">General Inquiry</option>
                 <option value="sales">Sales & Bulk Pricing</option>
                 <option value="api">API Technical Support</option>
@@ -103,8 +103,8 @@ export default async function Contact(props: { params: Promise<{ lang: Locale }>
             </div>
             
             <div className="flex flex-col gap-2">
-              <label className="text-xs font-label-sm text-on-surface-variant uppercase tracking-wider">{dict.contact.message}</label>
-              <textarea rows={5} className="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-lg py-3 px-4 text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all resize-none"></textarea>
+              <label htmlFor="contact-message" className="text-xs font-label-sm text-on-surface-variant uppercase tracking-wider">{dict.contact.message}</label>
+              <textarea id="contact-message" name="message" rows={5} className="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-lg py-3 px-4 text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all resize-none"></textarea>
             </div>
             
             <button type="button" className="w-full mt-2 bg-primary-container text-on-primary-container py-3.5 rounded-lg font-bold uppercase tracking-wider hover:bg-primary transition-all glow-primary shadow-[0_0_15px_rgba(45,212,191,0.2)] active:scale-[0.98]">
@@ -120,14 +120,14 @@ export default async function Contact(props: { params: Promise<{ lang: Locale }>
           <div className="flex flex-col gap-4">
             <div className="glass-card p-5 rounded-lg border border-outline-variant/30 cursor-pointer group hover:border-primary/50 transition-colors">
               <div className="flex justify-between items-center">
-                 <h4 className="font-bold text-on-surface group-hover:text-primary transition-colors">How long do IMEI unlocks take?</h4>
+                 <h3 className="font-bold text-on-surface group-hover:text-primary transition-colors">How long do IMEI unlocks take?</h3>
                  <span className="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors">expand_more</span>
               </div>
             </div>
             
             <div className="glass-card p-5 rounded-lg border border-primary/50 cursor-pointer">
               <div className="flex justify-between items-center mb-3">
-                 <h4 className="font-bold text-primary">Can I get a refund for a wrong IMEI?</h4>
+                 <h3 className="font-bold text-primary">Can I get a refund for a wrong IMEI?</h3>
                  <span className="material-symbols-outlined text-primary">expand_less</span>
               </div>
               <p className="text-sm text-on-surface-variant leading-relaxed">
@@ -137,14 +137,14 @@ export default async function Contact(props: { params: Promise<{ lang: Locale }>
             
             <div className="glass-card p-5 rounded-lg border border-outline-variant/30 cursor-pointer group hover:border-primary/50 transition-colors">
               <div className="flex justify-between items-center">
-                 <h4 className="font-bold text-on-surface group-hover:text-primary transition-colors">How do I access the Reseller API?</h4>
+                 <h3 className="font-bold text-on-surface group-hover:text-primary transition-colors">How do I access the Reseller API?</h3>
                  <span className="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors">expand_more</span>
               </div>
             </div>
             
             <div className="glass-card p-5 rounded-lg border border-outline-variant/30 cursor-pointer group hover:border-primary/50 transition-colors">
               <div className="flex justify-between items-center">
-                 <h4 className="font-bold text-on-surface group-hover:text-primary transition-colors">What payment methods do you accept?</h4>
+                 <h3 className="font-bold text-on-surface group-hover:text-primary transition-colors">What payment methods do you accept?</h3>
                  <span className="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors">expand_more</span>
               </div>
             </div>
