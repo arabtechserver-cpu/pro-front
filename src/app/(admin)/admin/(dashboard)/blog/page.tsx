@@ -394,7 +394,7 @@ export default function AdminBlog() {
                   <div className="flex gap-4 items-start">
                     <div
                       className="w-24 h-24 rounded-xl bg-cover bg-center border border-outline-variant/30 flex-shrink-0"
-                      style={{ backgroundImage: `url('${post.imageUrl || "/images/promo_hero.png"}')` }}
+                      style={{ backgroundImage: `url('${post.imageUrl || "/images/promo_hero.webp"}')` }}
                     />
                     <div className="space-y-1.5 flex-1 min-w-0">
                       <div className="flex items-center gap-2">
@@ -492,7 +492,7 @@ export default function AdminBlog() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-medium mb-2">صورة المقال <span className="text-error">*</span></label>
-                <ImageUploader name="imageUrl" defaultValue="/images/promo_samsung.png" className="w-full bg-surface-container border border-outline-variant/50 rounded-xl p-3" />
+                <ImageUploader name="imageUrl" defaultValue="/images/promo_samsung.webp" className="w-full bg-surface-container border border-outline-variant/50 rounded-xl p-3" />
               </div>
               <div>
                 <label className="block text-sm font-medium mb-2">التصنيف <span className="text-error">*</span></label>

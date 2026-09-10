@@ -89,7 +89,7 @@ export default async function BlogPostPage(props: Props) {
         {post.imageUrl && (
           <div
             className="absolute inset-0 bg-cover bg-center z-0"
-            style={{ backgroundImage: `url('${post.imageUrl}')` }}
+            style={{ backgroundImage: `url('${(post.imageUrl || "/images/promo_hero.webp").replace(/\.png$/, ".webp")}')` }}
           />
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-surface to-surface/40 z-10" />

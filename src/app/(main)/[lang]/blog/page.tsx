@@ -57,7 +57,7 @@ export default async function BlogPage(props: { params: Promise<{ lang: Locale }
               <div className="relative h-48 overflow-hidden z-10">
                 <div 
                   className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
-                  style={{ backgroundImage: `url('${post.imageUrl}')` }}
+                  style={{ backgroundImage: `url('${(post.imageUrl || "/images/promo_hero.webp").replace(/\.png$/, ".webp")}')` }}
                 ></div>
                 <div className="absolute inset-0 bg-gradient-to-t from-surface-container via-surface-container/20 to-transparent opacity-100"></div>
                 

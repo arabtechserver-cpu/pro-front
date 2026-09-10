@@ -72,9 +72,9 @@ export default function NewsletterSection({ lang = "ar", className = "" }: Newsl
             <span>{isAr ? "النشرة الإخبارية والعروض الحصرية" : "Exclusive Newsletter & Offers"}</span>
           </div>
 
-          <h3 className="text-xl sm:text-2xl lg:text-3xl font-bold text-on-surface tracking-tight">
+          <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-on-surface tracking-tight">
             {isAr ? "اشترك في النشرة الإخبارية لـ عرب تك برو" : "Subscribe to our newsletter"}
-          </h3>
+          </h2>
 
           <p className="text-on-surface-variant text-xs sm:text-sm max-w-xl leading-relaxed">
             {isAr
@@ -128,6 +128,9 @@ export default function NewsletterSection({ lang = "ar", className = "" }: Newsl
                     mail
                   </span>
                   <input
+                    id="newsletter-email"
+                    name="newsletter-email"
+                    aria-label={isAr ? "البريد الإلكتروني للاشتراك في النشرة الإخبارية" : "Email address for newsletter subscription"}
                     placeholder={isAr ? "أدخل بريدك الإلكتروني..." : "Email address..."}
                     value={email}
                     onChange={(e) => {

@@ -42,9 +42,9 @@ export default function AmrrStatsSection({ lang }: AmrrStatsSectionProps) {
                 <span className="w-2 h-2 rounded-full bg-emerald-400 online-blink"></span>
                 <span>{isAr ? "جاهز للتنفيذ الفوري ⚡" : "Instant Processing Ready ⚡"}</span>
               </div>
-              <h3 className="text-2xl sm:text-3xl font-black text-white mb-2 leading-tight">
+              <h2 className="text-2xl sm:text-3xl font-black text-white mb-2 leading-tight">
                 {isAr ? "جاهز لفك وتفعيل جهازك؟" : "Ready to Unlock Your Device?"}
-              </h3>
+              </h2>
               <p className="text-slate-300 text-xs sm:text-base leading-relaxed">
                 {isAr ? "اختر الخطوة المناسبة وابدأ في ثوانٍ معدودة" : "Choose your preferred action below"}
               </p>
@@ -121,9 +121,9 @@ export default function AmrrStatsSection({ lang }: AmrrStatsSectionProps) {
                   {isAr ? "مؤشرات الأداء اللحظية" : "LIVE PERFORMANCE METRICS"}
                 </span>
               </div>
-              <h3 className="text-xl sm:text-2xl font-black text-white">
+              <h2 className="text-xl sm:text-2xl font-black text-white">
                 {isAr ? "التميز في الأداء والسرعة" : "Unlocking Excellence"}
-              </h3>
+              </h2>
             </div>
             <span className="text-xs text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/20 font-semibold flex items-center gap-1.5 w-max">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>

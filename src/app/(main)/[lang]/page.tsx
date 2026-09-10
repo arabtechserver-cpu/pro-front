@@ -197,7 +197,7 @@ export default async function Home(props: { params: Promise<{ lang: Locale }> })
         titleAr: c.promo1TitleAr || "حذف حساب جوجل لسامسونج",
         descEn: c.promo1DescEn || "",
         descAr: c.promo1DescAr || "",
-        image: c.promo1Image || "/images/promo_samsung.png",
+        image: c.promo1Image || "/images/promo_samsung.webp",
         url: c.promo1Url || "/pricing"
       });
     }
@@ -209,7 +209,7 @@ export default async function Home(props: { params: Promise<{ lang: Locale }> })
         titleAr: c.promo2TitleAr || "أداة شيميراChimera",
         descEn: c.promo2DescEn || "",
         descAr: c.promo2DescAr || "",
-        image: c.promo2Image || "/images/promo_chimera.png",
+        image: c.promo2Image || "/images/promo_chimera.webp",
         url: c.promo2Url || "/pricing"
       });
     }
@@ -224,7 +224,7 @@ export default async function Home(props: { params: Promise<{ lang: Locale }> })
         titleAr: "حذف حساب جوجل لسامسونج",
         descEn: "Instant via IMEI. Support all models.",
         descAr: "فك فوري لجميع موديلات سامسونج.",
-        image: "/images/promo_samsung.png",
+        image: "/images/promo_samsung.webp",
         url: "/pricing"
       },
       {
@@ -234,7 +234,7 @@ export default async function Home(props: { params: Promise<{ lang: Locale }> })
         titleAr: "أداة شيميراChimera",
         descEn: "Activations and credits available instantly.",
         descAr: "تراخيص وأرصدة سريعة ومتاحة فوراً.",
-        image: "/images/promo_chimera.png",
+        image: "/images/promo_chimera.webp",
         url: "/pricing"
       }
     ];
@@ -380,6 +380,7 @@ export default async function Home(props: { params: Promise<{ lang: Locale }> })
 
       {/* --- Service Lanes --- */}
       <section className="w-full cyber-container">
+        <h2 className="sr-only">{isAr ? "مسارات الخدمات الرئيسية" : "Main Service Lanes"}</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           <Link href={imeiUrl} data-aos="fade-up" data-aos-delay="100" className="glass-card p-5 sm:p-6 rounded-2xl border border-cyan-500/30 hover:border-emerald-400/80 active:border-emerald-400 active:scale-[0.97] active:shadow-[0_0_30px_rgba(52,211,153,0.5)] group transition-all relative overflow-hidden flex flex-col gap-3 sm:gap-4 shadow-xl">
             <div 
@@ -486,6 +487,7 @@ export default async function Home(props: { params: Promise<{ lang: Locale }> })
 
       {/* --- Feature Ribbon --- */}
       <section data-aos="fade-up" className="w-full cyber-container">
+        <h2 className="sr-only">{isAr ? "مميزات وموثوقية المنصة" : "Platform Trust & Features"}</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 divide-y md:divide-y-0 md:divide-x md:rtl:divide-x-reverse divide-cyan-500/20 curved-cockpit rounded-2xl sm:rounded-3xl p-5 sm:p-8 border-2 border-cyan-500/30 relative overflow-hidden backdrop-blur-xl shadow-2xl">
           {/* Card 1: Official Distributor */}
           <div className="group flex flex-col items-center text-center p-4 sm:p-5 rounded-2xl transition-all duration-300 hover:bg-surface-container-high/40 hover:-translate-y-1 active:scale-[0.97] relative">

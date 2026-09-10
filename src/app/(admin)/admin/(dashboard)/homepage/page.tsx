@@ -115,7 +115,7 @@ export default function AdminHomepageManager() {
                 titleAr: c.promo1TitleAr || "حذف حساب جوجل لسامسونج",
                 descEn: c.promo1DescEn || "",
                 descAr: c.promo1DescAr || "",
-                image: c.promo1Image || "/images/promo_samsung.png",
+                image: c.promo1Image || "/images/promo_samsung.webp",
                 url: c.promo1Url || "/pricing"
               });
             }
@@ -127,7 +127,7 @@ export default function AdminHomepageManager() {
                 titleAr: c.promo2TitleAr || "أداة شيميراChimera",
                 descEn: c.promo2DescEn || "",
                 descAr: c.promo2DescAr || "",
-                image: c.promo2Image || "/images/promo_chimera.png",
+                image: c.promo2Image || "/images/promo_chimera.webp",
                 url: c.promo2Url || "/pricing"
               });
             }

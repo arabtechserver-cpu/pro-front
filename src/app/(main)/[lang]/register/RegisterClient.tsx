@@ -531,8 +531,10 @@ export default function RegisterClient({ lang, dict }: { lang: Locale; dict: any
           {/* Column 1 */}
           <div className="flex flex-col gap-5">
             <div className="flex flex-col gap-2">
-              <label className="text-xs font-label-sm text-on-surface-variant uppercase tracking-wider">{dict.register.fullName}</label>
+              <label htmlFor="reg-fullname" className="text-xs font-label-sm text-on-surface-variant uppercase tracking-wider">{dict.register.fullName}</label>
               <input 
+                id="reg-fullname"
+                name="fullName"
                 type="text" 
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
@@ -541,13 +543,16 @@ export default function RegisterClient({ lang, dict }: { lang: Locale; dict: any
                 autoCorrect="off"
                 autoCapitalize="off"
                 spellCheck={false}
+                aria-label={dict.register.fullName}
                 className="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-lg py-3 px-4 text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all placeholder:text-on-surface-variant/50"
               />
             </div>
 
             <div className="flex flex-col gap-2">
-              <label className="text-xs font-label-sm text-on-surface-variant uppercase tracking-wider">{dict.register.email}</label>
+              <label htmlFor="reg-email" className="text-xs font-label-sm text-on-surface-variant uppercase tracking-wider">{dict.register.email}</label>
               <input 
+                id="reg-email"
+                name="email"
                 type="email" 
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -556,6 +561,7 @@ export default function RegisterClient({ lang, dict }: { lang: Locale; dict: any
                 autoCorrect="off"
                 autoCapitalize="off"
                 spellCheck={false}
+                aria-label={dict.register.email}
                 className="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-lg py-3 px-4 text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all placeholder:text-on-surface-variant/50 font-mono"
               />
             </div>
@@ -563,7 +569,7 @@ export default function RegisterClient({ lang, dict }: { lang: Locale; dict: any
             {/* PHONE NUMBER FIELD WITH COUNTRY CODE PREVIEW */}
             <div className="flex flex-col gap-2">
               <div className="flex items-center justify-between">
-                <label className="text-xs font-label-sm text-on-surface-variant uppercase tracking-wider">
+                <label htmlFor="reg-phone" className="text-xs font-label-sm text-on-surface-variant uppercase tracking-wider">
                   {dict.register.phone || (lang === "ar" ? "رقم الهاتف / الواتساب" : "Phone / WhatsApp Number")}
                 </label>
                 <span className="text-[11px] text-primary font-mono font-bold flex items-center gap-1 dir-ltr bg-primary/10 px-2 py-0.5 rounded border border-primary/20">
@@ -576,6 +582,8 @@ export default function RegisterClient({ lang, dict }: { lang: Locale; dict: any
                   call
                 </span>
                 <input 
+                  id="reg-phone"
+                  name="phone"
                   type="tel" 
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
@@ -584,6 +592,7 @@ export default function RegisterClient({ lang, dict }: { lang: Locale; dict: any
                   autoCorrect="off"
                   autoCapitalize="off"
                   spellCheck={false}
+                  aria-label={dict.register.phone || (lang === "ar" ? "رقم الهاتف أو الواتساب" : "Phone or WhatsApp Number")}
                   className={`w-full bg-surface-container-lowest border border-outline-variant/30 rounded-lg py-3 ${lang === 'ar' ? 'pr-9 pl-4' : 'pl-9 pr-4'} text-on-surface font-mono focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all placeholder:text-on-surface-variant/50 placeholder:font-sans`}
                 />
               </div>
@@ -592,7 +601,7 @@ export default function RegisterClient({ lang, dict }: { lang: Locale; dict: any
             {/* PASSWORD FIELD WITH EYE TOGGLE & GENERATOR */}
             <div className="flex flex-col gap-2">
               <div className="flex justify-between items-center">
-                <label className="text-xs font-label-sm text-on-surface-variant uppercase tracking-wider">{dict.register.password}</label>
+                <label htmlFor="reg-password" className="text-xs font-label-sm text-on-surface-variant uppercase tracking-wider">{dict.register.password}</label>
                 <button
                   type="button"
                   onClick={generateStrongPassword}
@@ -605,6 +614,8 @@ export default function RegisterClient({ lang, dict }: { lang: Locale; dict: any
 
               <div className="relative">
                 <input 
+                  id="reg-password"
+                  name="password"
                   type={showPassword ? "text" : "password"} 
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -613,11 +624,13 @@ export default function RegisterClient({ lang, dict }: { lang: Locale; dict: any
                   autoCorrect="off"
                   autoCapitalize="off"
                   spellCheck={false}
+                  aria-label={dict.register.password}
                   className={`w-full bg-surface-container-lowest border border-outline-variant/30 rounded-lg py-3 ${lang === 'ar' ? 'pr-4 pl-11' : 'pl-4 pr-11'} text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all placeholder:text-on-surface-variant/50`}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
+                  aria-label={showPassword ? (lang === 'ar' ? "إخفاء كلمة المرور" : "Hide password") : (lang === 'ar' ? "إظهار كلمة المرور" : "Show password")}
                   className={`absolute ${lang === 'ar' ? 'left-3' : 'right-3'} top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-primary transition-colors`}
                   title={showPassword ? "إخفاء" : "إظهار"}
                 >
@@ -650,8 +663,10 @@ export default function RegisterClient({ lang, dict }: { lang: Locale; dict: any
           {/* Column 2 */}
           <div className="flex flex-col gap-5">
             <div className="flex flex-col gap-2">
-              <label className="text-xs font-label-sm text-on-surface-variant uppercase tracking-wider">{dict.register.username}</label>
+              <label htmlFor="reg-username" className="text-xs font-label-sm text-on-surface-variant uppercase tracking-wider">{dict.register.username}</label>
               <input 
+                id="reg-username"
+                name="username"
                 type="text" 
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
@@ -660,18 +675,21 @@ export default function RegisterClient({ lang, dict }: { lang: Locale; dict: any
                 autoCorrect="off"
                 autoCapitalize="off"
                 spellCheck={false}
+                aria-label={dict.register.username}
                 className="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-lg py-3 px-4 text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all placeholder:text-on-surface-variant/50"
               />
             </div>
 
             {/* Searchable Country Selector */}
             <div className="flex flex-col gap-2 relative">
-              <label className="text-xs font-label-sm text-on-surface-variant uppercase tracking-wider">
+              <label htmlFor="reg-country-btn" className="text-xs font-label-sm text-on-surface-variant uppercase tracking-wider">
                 {lang === "ar" ? "الدولة (جميع دول العالم)" : "Country"}
               </label>
 
               <button
+                id="reg-country-btn"
                 type="button"
+                aria-label={lang === "ar" ? "اختر الدولة" : "Select country"}
                 onClick={() => setDropdownOpen(!dropdownOpen)}
                 className="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-lg py-3 px-4 text-on-surface flex items-center justify-between hover:border-primary/50 focus:outline-none transition-all"
               >
@@ -689,6 +707,8 @@ export default function RegisterClient({ lang, dict }: { lang: Locale; dict: any
                   <div className="relative mb-3">
                     <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-sm text-on-surface-variant">search</span>
                     <input
+                      id="reg-country-search"
+                      name="country-search"
                       type="text"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
@@ -697,6 +717,7 @@ export default function RegisterClient({ lang, dict }: { lang: Locale; dict: any
                       autoCorrect="off"
                       autoCapitalize="off"
                       spellCheck={false}
+                      aria-label={lang === "ar" ? "ابحث باسم الدولة" : "Search country"}
                       className="w-full bg-surface-container border border-outline-variant/30 rounded-lg py-2 pl-9 pr-3 text-xs text-on-surface focus:outline-none focus:border-primary"
                       autoFocus
                     />
@@ -738,12 +759,14 @@ export default function RegisterClient({ lang, dict }: { lang: Locale; dict: any
 
             {/* CONFIRM PASSWORD FIELD WITH EYE TOGGLE */}
             <div className="flex flex-col gap-2">
-              <label className="text-xs font-label-sm text-on-surface-variant uppercase tracking-wider">
+              <label htmlFor="reg-confirm-password" className="text-xs font-label-sm text-on-surface-variant uppercase tracking-wider">
                 {lang === "ar" ? "تأكيد كلمة المرور" : "Confirm Password"}
               </label>
 
               <div className="relative">
                 <input 
+                  id="reg-confirm-password"
+                  name="confirmPassword"
                   type={showConfirmPassword ? "text" : "password"} 
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
@@ -752,11 +775,13 @@ export default function RegisterClient({ lang, dict }: { lang: Locale; dict: any
                   autoCorrect="off"
                   autoCapitalize="off"
                   spellCheck={false}
+                  aria-label={lang === "ar" ? "تأكيد كلمة المرور" : "Confirm Password"}
                   className={`w-full bg-surface-container-lowest border border-outline-variant/30 rounded-lg py-3 ${lang === 'ar' ? 'pr-4 pl-11' : 'pl-4 pr-11'} text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all placeholder:text-on-surface-variant/50`}
                 />
                 <button
                   type="button"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  aria-label={showConfirmPassword ? (lang === 'ar' ? "إخفاء تأكيد كلمة المرور" : "Hide confirm password") : (lang === 'ar' ? "إظهار تأكيد كلمة المرور" : "Show confirm password")}
                   className={`absolute ${lang === 'ar' ? 'left-3' : 'right-3'} top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-primary transition-colors`}
                   title={showConfirmPassword ? "إخفاء" : "إظهار"}
                 >

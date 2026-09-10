@@ -1024,10 +1024,13 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Category Selector */}
             <div className="flex flex-col gap-2">
-              <label className="text-xs font-bold text-on-surface-variant uppercase tracking-wider">
+              <label htmlFor="purchase-category-select" className="text-xs font-bold text-on-surface-variant uppercase tracking-wider">
                 {lang === 'ar' ? '1. فئة الخدمة الرئيسية' : '1. Service Category'}
               </label>
               <select
+                id="purchase-category-select"
+                name="purchaseCategory"
+                aria-label={lang === 'ar' ? 'فئة الخدمة الرئيسية' : 'Service Category'}
                 value={selectedCategoryId}
                 onChange={(e) => handleCategoryChange(e.target.value)}
                 disabled={loadingServices}
@@ -1047,10 +1050,13 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
 
             {/* Service Selector */}
             <div className="flex flex-col gap-2">
-              <label className="text-xs font-bold text-on-surface-variant uppercase tracking-wider">
+              <label htmlFor="purchase-service-select" className="text-xs font-bold text-on-surface-variant uppercase tracking-wider">
                 {lang === 'ar' ? '2. اختيار الخدمة المطلوبة' : '2. Select Service'}
               </label>
               <select
+                id="purchase-service-select"
+                name="purchaseService"
+                aria-label={lang === 'ar' ? 'اختيار الخدمة المطلوبة' : 'Select Service'}
                 value={selectedServiceId}
                 onChange={(e) => handleServiceChange(e.target.value)}
                 disabled={loadingServices || availableServices.length === 0}
@@ -1207,12 +1213,13 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
                         const optionsList = extractFieldOptions(key, fieldObj);
                         const isLong = isLongTextField(key, fieldObj);
                         const isRequired = fieldObj?.required === true || fieldObj?.required === 1 || fieldObj?.required === '1' || fieldObj?.required === 'on';
+                        const fieldId = `custom-field-${key}`;
 
                         // حقل select / dropdown — لو فيه options حقيقية
                         if (fieldType === 'select' && optionsList.length > 0) {
                           return (
                             <div key={key} className="flex flex-col gap-2">
-                              <label className="text-xs font-bold text-on-surface-variant uppercase tracking-wider flex items-center justify-between">
+                              <label htmlFor={fieldId} className="text-xs font-bold text-on-surface-variant uppercase tracking-wider flex items-center justify-between">
                                 <span>{cleanLabel}:</span>
                                 {isRequired ? (
                                   <span className="text-rose-400 font-bold text-[11px] flex items-center gap-0.5">
@@ -1224,6 +1231,9 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
                                 )}
                               </label>
                               <select
+                                id={fieldId}
+                                name={key}
+                                aria-label={cleanLabel}
                                 value={customFieldValues[key] || ""}
                                 onChange={(e) => setCustomFieldValues({ ...customFieldValues, [key]: e.target.value })}
                                 className="w-full bg-surface-container-lowest border border-outline-variant/40 rounded-xl py-3.5 px-4 text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all font-semibold text-xs cursor-pointer"
@@ -1247,7 +1257,7 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
                         if (isLong) {
                           return (
                             <div key={key} className="flex flex-col gap-2 md:col-span-2">
-                              <label className="text-xs font-bold text-on-surface-variant uppercase tracking-wider flex items-center justify-between">
+                              <label htmlFor={fieldId} className="text-xs font-bold text-on-surface-variant uppercase tracking-wider flex items-center justify-between">
                                 <span>{cleanLabel}:</span>
                                 {isRequired ? (
                                   <span className="text-rose-400 font-bold text-[11px] flex items-center gap-0.5">
@@ -1259,6 +1269,9 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
                                 )}
                               </label>
                               <textarea
+                                id={fieldId}
+                                name={key}
+                                aria-label={cleanLabel}
                                 rows={2}
                                 value={customFieldValues[key] || ""}
                                 onChange={(e) => setCustomFieldValues({ ...customFieldValues, [key]: e.target.value })}
@@ -1278,7 +1291,7 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
                         // حقل نصي عادي / كلمة مرور / إيميل / سيريال
                         return (
                           <div key={key} className="flex flex-col gap-2">
-                            <label className="text-xs font-bold text-on-surface-variant uppercase tracking-wider flex items-center justify-between">
+                            <label htmlFor={fieldId} className="text-xs font-bold text-on-surface-variant uppercase tracking-wider flex items-center justify-between">
                               <span>{cleanLabel}:</span>
                               {isRequired ? (
                                 <span className="text-rose-400 font-bold text-[11px] flex items-center gap-0.5">
@@ -1290,6 +1303,9 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
                               )}
                             </label>
                             <input
+                              id={fieldId}
+                              name={key}
+                              aria-label={cleanLabel}
                               type={fieldType === "password" ? "password" : "text"}
                               value={customFieldValues[key] || ""}
                               onChange={(e) => setCustomFieldValues({ ...customFieldValues, [key]: e.target.value })}
@@ -1312,7 +1328,7 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
                   {/* ── حالة 2: خدمة IMEI ولا يوجد حقل IMEI في الحقول المخصصة للمزود ── */}
                   {isImeiService && !hasImeiInCustom && (
                     <div className="space-y-2 p-5 rounded-2xl bg-surface-container-high/40 border border-primary/20">
-                      <label className="text-xs font-bold text-on-surface-variant uppercase tracking-wider flex items-center justify-between">
+                      <label htmlFor="purchase-imei-input" className="text-xs font-bold text-on-surface-variant uppercase tracking-wider flex items-center justify-between">
                         <span>
                           {isBatteryExtractService
                             ? (lang === 'ar' ? 'الرقم التسلسلي للبطارية أو IMEI (Battery Serial / IMEI):' : 'Battery Serial Number or IMEI:')
@@ -1324,6 +1340,13 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
                         </span>
                       </label>
                       <input
+                        id="purchase-imei-input"
+                        name="purchaseImei"
+                        aria-label={
+                          isBatteryExtractService
+                            ? (lang === 'ar' ? 'الرقم التسلسلي للبطارية أو IMEI' : 'Battery Serial Number or IMEI')
+                            : (lang === 'ar' ? 'رقم IMEI أو السيريال للجهاز' : 'Device IMEI or Serial Number')
+                        }
                         type="text"
                         value={targetInput}
                         onChange={(e) => setTargetInput(e.target.value)}
@@ -1340,7 +1363,7 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
                   {/* ── حالة 3: خدمة Server أو Remote بدون حقول مخصصة ── */}
                   {!isImeiService && !hasCustomFields && (
                     <div className="space-y-2 p-5 rounded-2xl bg-surface-container-high/40 border border-primary/20">
-                      <label className="text-xs font-bold text-on-surface-variant uppercase tracking-wider flex items-center justify-between">
+                      <label htmlFor="purchase-target-input" className="text-xs font-bold text-on-surface-variant uppercase tracking-wider flex items-center justify-between">
                         <span>
                           {lang === 'ar' ? 'بيانات الطلب / المعرف المطلوب (Target / Account / Link):' : 'Order Target / Account ID / Link:'}
                         </span>
@@ -1349,6 +1372,9 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
                         </span>
                       </label>
                       <input
+                        id="purchase-target-input"
+                        name="purchaseTarget"
+                        aria-label={lang === 'ar' ? 'بيانات الطلب أو المعرف المطلوب' : 'Order Target or Account ID'}
                         type="text"
                         value={targetInput}
                         onChange={(e) => setTargetInput(e.target.value)}
@@ -1407,6 +1433,9 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
                       <span className="material-symbols-outlined text-lg">remove</span>
                     </button>
                     <input
+                      id="purchase-quantity-input"
+                      name="purchaseQuantity"
+                      aria-label={lang === 'ar' ? 'الكمية المطلوبة' : 'Required Quantity'}
                       type="number"
                       min={minQty}
                       max={maxQty > 0 ? maxQty : undefined}
@@ -1469,10 +1498,13 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
             )}
 
             <div className="flex flex-col gap-2">
-              <label className="text-xs font-bold text-on-surface-variant uppercase tracking-wider">
+              <label htmlFor="purchase-notes-input" className="text-xs font-bold text-on-surface-variant uppercase tracking-wider">
                 {lang === 'ar' ? 'ملاحظات إضافية (اختياري)' : 'Additional Notes (Optional)'}
               </label>
               <input
+                id="purchase-notes-input"
+                name="purchaseNotes"
+                aria-label={lang === 'ar' ? 'ملاحظات إضافية' : 'Additional Notes'}
                 type="text"
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
@@ -1484,7 +1516,7 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
             {/* Coupon Code Section */}
             <div className="p-4 sm:p-5 rounded-2xl bg-surface-container-high/40 border border-primary/20 space-y-3">
               <div className="flex items-center justify-between">
-                <label className="text-xs font-bold text-on-surface-variant uppercase tracking-wider flex items-center gap-1.5">
+                <label htmlFor="purchase-coupon-input" className="text-xs font-bold text-on-surface-variant uppercase tracking-wider flex items-center gap-1.5">
                   <span className="material-symbols-outlined text-primary text-base">confirmation_number</span>
                   <span>{lang === 'ar' ? 'كود الخصم (Coupon Code)' : 'Coupon Code'}</span>
                 </label>
@@ -1502,6 +1534,9 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
 
               <div className="flex gap-2">
                 <input
+                  id="purchase-coupon-input"
+                  name="purchaseCoupon"
+                  aria-label={lang === 'ar' ? 'كود الخصم' : 'Coupon Code'}
                   type="text"
                   value={couponInput}
                   onChange={(e) => setCouponInput(e.target.value.toUpperCase())}

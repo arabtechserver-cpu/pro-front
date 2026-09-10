@@ -296,10 +296,12 @@ export default function LoginClient({ lang, dict }: { lang: Locale; dict: any })
         {/* Login Form */}
         <form onSubmit={handleLoginSubmit} className="relative z-10 flex flex-col gap-5" autoComplete="off">
           <div className="flex flex-col gap-2">
-            <label className="text-sm font-label-sm text-on-surface-variant uppercase tracking-wider">{dict.login.emailLabel}</label>
+            <label htmlFor="login-email" className="text-sm font-label-sm text-on-surface-variant uppercase tracking-wider">{dict.login.emailLabel}</label>
             <div className="relative">
               <span className={`absolute ${lang === 'ar' ? 'right-3' : 'left-3'} top-1/2 -translate-y-1/2 material-symbols-outlined text-on-surface-variant text-sm`}>person</span>
               <input 
+                id="login-email"
+                name="email"
                 type="text" 
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -308,6 +310,7 @@ export default function LoginClient({ lang, dict }: { lang: Locale; dict: any })
                 autoCorrect="off"
                 autoCapitalize="off"
                 spellCheck={false}
+                aria-label={dict.login.emailLabel}
                 className={`w-full bg-surface-container-lowest border border-outline-variant/30 rounded-lg py-3 ${lang === 'ar' ? 'pr-10 pl-4' : 'pl-10 pr-4'} text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all placeholder:text-on-surface-variant/50`}
               />
             </div>
@@ -315,7 +318,7 @@ export default function LoginClient({ lang, dict }: { lang: Locale; dict: any })
 
           <div className="flex flex-col gap-2">
             <div className="flex justify-between items-center">
-               <label className="text-sm font-label-sm text-on-surface-variant uppercase tracking-wider">{dict.login.passwordLabel}</label>
+               <label htmlFor="login-password" className="text-sm font-label-sm text-on-surface-variant uppercase tracking-wider">{dict.login.passwordLabel}</label>
                <button 
                 type="button" 
                 onClick={() => {
@@ -333,6 +336,8 @@ export default function LoginClient({ lang, dict }: { lang: Locale; dict: any })
             <div className="relative">
               <span className={`absolute ${lang === 'ar' ? 'right-3' : 'left-3'} top-1/2 -translate-y-1/2 material-symbols-outlined text-on-surface-variant text-sm`}>lock</span>
               <input 
+                id="login-password"
+                name="password"
                 type={showPassword ? "text" : "password"} 
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -341,11 +346,13 @@ export default function LoginClient({ lang, dict }: { lang: Locale; dict: any })
                 autoCorrect="off"
                 autoCapitalize="off"
                 spellCheck={false}
+                aria-label={dict.login.passwordLabel}
                 className={`w-full bg-surface-container-lowest border border-outline-variant/30 rounded-lg py-3 ${lang === 'ar' ? 'pr-10 pl-10' : 'pl-10 pr-10'} text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all placeholder:text-on-surface-variant/50`}
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
+                aria-label={showPassword ? (lang === 'ar' ? "إخفاء كلمة المرور" : "Hide password") : (lang === 'ar' ? "إظهار كلمة المرور" : "Show password")}
                 className={`absolute ${lang === 'ar' ? 'left-3' : 'right-3'} top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-primary transition-colors`}
                 title={showPassword ? "إخفاء" : "إظهار"}
               >
@@ -444,13 +451,16 @@ export default function LoginClient({ lang, dict }: { lang: Locale; dict: any })
             {forgotStep === "email" ? (
               <form onSubmit={handleForgotSendOtp} className="py-5 space-y-4">
                 <div className="flex flex-col gap-2">
-                  <label className="text-xs font-bold text-on-surface-variant uppercase tracking-wider">البريد الإلكتروني المسجل (Gmail)</label>
+                  <label htmlFor="forgot-email" className="text-xs font-bold text-on-surface-variant uppercase tracking-wider">البريد الإلكتروني المسجل (Gmail)</label>
                   <input
+                    id="forgot-email"
+                    name="forgot-email"
                     type="email"
                     value={forgotEmail}
                     onChange={(e) => setForgotEmail(e.target.value)}
                     placeholder="customer@gmail.com"
                     autoComplete="off"
+                    aria-label="البريد الإلكتروني المسجل"
                     className="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-xl py-3 px-4 text-xs text-on-surface focus:outline-none focus:border-primary font-mono"
                     autoFocus
                   />
@@ -486,31 +496,38 @@ export default function LoginClient({ lang, dict }: { lang: Locale; dict: any })
             ) : (
               <form onSubmit={handleForgotResetPassword} className="py-5 space-y-4">
                 <div className="flex flex-col gap-2">
-                  <label className="text-xs font-bold text-on-surface-variant uppercase tracking-wider text-center">أدخل كود OTP (6 أرقام) من الإيميل</label>
+                  <label htmlFor="forgot-otp" className="text-xs font-bold text-on-surface-variant uppercase tracking-wider text-center">أدخل كود OTP (6 أرقام) من الإيميل</label>
                   <input
+                    id="forgot-otp"
+                    name="forgot-otp"
                     type="text"
                     value={forgotOtp}
                     onChange={(e) => setForgotOtp(e.target.value)}
                     maxLength={6}
                     placeholder="1 2 3 4 5 6"
+                    aria-label="كود التحقق OTP"
                     className="w-full bg-surface-container-lowest border-2 border-primary/50 rounded-xl py-3 px-4 text-center text-xl font-bold tracking-[0.4em] text-primary focus:outline-none focus:border-primary font-mono"
                     autoFocus
                   />
                 </div>
 
                 <div className="flex flex-col gap-2">
-                  <label className="text-xs font-bold text-on-surface-variant uppercase tracking-wider">كلمة المرور الجديدة</label>
+                  <label htmlFor="forgot-new-password" className="text-xs font-bold text-on-surface-variant uppercase tracking-wider">كلمة المرور الجديدة</label>
                   <div className="relative">
                     <input
+                      id="forgot-new-password"
+                      name="forgot-new-password"
                       type={forgotShowPassword ? "text" : "password"}
                       value={forgotNewPassword}
                       onChange={(e) => setForgotNewPassword(e.target.value)}
                       placeholder="********"
+                      aria-label="كلمة المرور الجديدة"
                       className="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-xl py-3 pr-4 pl-10 text-xs text-on-surface focus:outline-none focus:border-primary font-mono"
                     />
                     <button
                       type="button"
                       onClick={() => setForgotShowPassword(!forgotShowPassword)}
+                      aria-label={forgotShowPassword ? "إخفاء كلمة المرور الجديدة" : "إظهار كلمة المرور الجديدة"}
                       className="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-primary transition-colors"
                     >
                       <span className="material-symbols-outlined text-lg">

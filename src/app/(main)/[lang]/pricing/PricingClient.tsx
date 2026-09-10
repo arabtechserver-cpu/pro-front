@@ -607,7 +607,10 @@ export default function PricingClient({
               <div className="relative flex-grow">
                 <span className={`absolute ${lang === 'ar' ? 'right-3' : 'left-3'} top-1/2 -translate-y-1/2 material-symbols-outlined text-on-surface-variant`}>search</span>
                 <input 
+                  id="pricing-search-input"
+                  name="pricingSearch"
                   type="text" 
+                  aria-label={lang === 'ar' ? 'البحث في قائمة الأسعار والخدمات' : 'Search services and pricing'}
                   placeholder={dict.pricing?.search || "ابحث عن خدمة أو موديل أو قسم..."}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
@@ -615,6 +618,8 @@ export default function PricingClient({
                 />
                 {searchQuery && (
                   <button
+                    type="button"
+                    aria-label={lang === 'ar' ? 'مسح البحث' : 'Clear search'}
                     onClick={() => setSearchQuery("")}
                     className={`absolute ${lang === 'ar' ? 'left-3' : 'right-3'} top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-on-surface`}
                   >
@@ -624,6 +629,9 @@ export default function PricingClient({
               </div>
 
               <select 
+                id="pricing-category-select"
+                name="pricingCategory"
+                aria-label={lang === 'ar' ? 'تصفية حسب نوع الخدمة' : 'Filter by category'}
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
                 className="bg-surface-container border border-outline-variant/30 rounded-xl py-3 px-4 text-on-surface focus:outline-none focus:border-primary min-w-[200px] appearance-none"

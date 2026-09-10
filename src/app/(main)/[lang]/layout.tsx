@@ -15,11 +15,11 @@ export async function generateMetadata(props: { params: Promise<{ lang: string }
   const params = await props.params;
   const isAr = params.lang === "ar";
   const siteTitle = isAr
-    ? "عرب تك برو سيرفر | Arab Tech Pro Server - سيرفر عرب تيك لفك وتفعيل الأجهزة"
+    ? "عرب تك برو سيرفر | منصة فك شفرات وتفعيل الهواتف"
     : "Arab Tech Pro Server | GSM & Remote Unlock Services";
   const siteDesc = isAr
-    ? "الموقع الرسمي لمنصة عرب تك برو سيرفر | Arab Tech Pro Server (عرب تيك سيرفر) - أفضل وأسرع سيرفر لفك شفرات الهواتف، تخطي آيكلود وFRP، وشراء رصيد البوكسات والدونجل وسيرفرات IMEI عن بعد بأفضل أسعار الجملة."
-    : "Official Arab Tech Pro Server (Arab Tech Server) - The leading platform for remote phone unlocking, iCloud & FRP bypass, box and dongle activations, and instant IMEI services.";
+    ? "منصة عرب تك برو سيرفر لفك شفرات الهواتف، تخطي حسابات آيكلود وFRP، وتفعيل البوكسات والدونجل وسيرفرات IMEI بأسعار الجملة المعتمدة."
+    : "Arab Tech Pro Server: Professional phone unlocking, iCloud and FRP bypass, box and dongle activations, and high-speed IMEI server services.";
 
   return {
     title: {
@@ -274,7 +274,7 @@ export default async function RootLayout(
         <meta property="og:image:height" content="630" />
         <meta property="og:image:alt" content="Arab Tech Pro Server Logo" />
         <meta name="twitter:image" content={isAr ? "https://arabtechproserver.tech/images/og_share_ar.png" : "https://arabtechproserver.tech/images/og_share_en.png"} />
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" />
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap" />
         <link
           rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
