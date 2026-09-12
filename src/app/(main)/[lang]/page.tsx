@@ -208,7 +208,7 @@ export default async function Home(props: { params: Promise<{ lang: Locale }> })
         tagEn: c.promo2TagEn || "Official Reseller",
         tagAr: c.promo2TagAr || "ترخيص رسمي",
         titleEn: c.promo2TitleEn || "Chimera Tool",
-        titleAr: c.promo2TitleAr || "أداة شيميراChimera",
+        titleAr: c.promo2TitleAr || "أداة شيميرا (Chimera)",
         descEn: c.promo2DescEn || "",
         descAr: c.promo2DescAr || "",
         image: c.promo2Image || "/images/promo_chimera.webp",
@@ -233,7 +233,7 @@ export default async function Home(props: { params: Promise<{ lang: Locale }> })
         tagEn: "Official Reseller",
         tagAr: "ترخيص رسمي",
         titleEn: "Chimera Tool",
-        titleAr: "أداة شيميراChimera",
+        titleAr: "أداة شيميرا (Chimera)",
         descEn: "Activations and credits available instantly.",
         descAr: "تراخيص وأرصدة سريعة ومتاحة فوراً.",
         image: "/images/promo_chimera.webp",
@@ -243,7 +243,7 @@ export default async function Home(props: { params: Promise<{ lang: Locale }> })
   }
 
   return (
-    <div className="flex flex-col gap-10 sm:gap-16 lg:gap-20 pb-12 sm:pb-20 overflow-x-clip">
+    <div className="flex flex-col gap-6 sm:gap-10 lg:gap-12 pb-12 sm:pb-20 overflow-x-clip">
       <link
         rel="preload"
         as="image"
@@ -283,7 +283,7 @@ export default async function Home(props: { params: Promise<{ lang: Locale }> })
       />
 
       {/* --- Continuous Seamless Notice Bar --- */}
-      <div className="w-full bg-surface-container/90 backdrop-blur-md border-b border-outline-variant/20 mb-2 sm:mb-4 relative z-20 overflow-hidden">
+      <div className="w-full bg-[#0a0f18]/80 backdrop-blur-md border-b border-[#141d2e] mb-2 sm:mb-4 relative z-20 overflow-hidden">
         <div className="w-full flex whitespace-nowrap overflow-hidden py-2 sm:py-2.5" dir="ltr">
           <div className="flex w-max animate-marquee hover:[animation-play-state:paused] cursor-pointer select-none text-xs sm:text-sm font-medium text-on-surface-variant">
             
@@ -374,7 +374,7 @@ export default async function Home(props: { params: Promise<{ lang: Locale }> })
       </div>
 
       {/* --- Amrr Split-Screen Asymmetric Hero --- */}
-      <div className="w-full cyber-container">
+      <div className="w-full cyber-container section-spotlight">
         <AmrrHeroSection lang={params.lang} />
       </div>
 
@@ -389,105 +389,101 @@ export default async function Home(props: { params: Promise<{ lang: Locale }> })
       </div>
 
       {/* --- Service Lanes --- */}
-      <section className="w-full cyber-container">
+      <section className="w-full cyber-container section-spotlight">
         <h2 className="sr-only">{isAr ? "مسارات الخدمات الرئيسية" : "Main Service Lanes"}</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-          <Link href={imeiUrl} data-aos="fade-up" data-aos-delay="100" suppressHydrationWarning className="glass-card p-5 sm:p-6 rounded-2xl border border-cyan-500/30 hover:border-violet-400/80 active:border-violet-400 active:scale-[0.97] active:shadow-[0_0_30px_rgba(139,92,246,0.5)] group transition-all relative overflow-hidden flex flex-col gap-3 sm:gap-4 shadow-xl">
+          <Link href={imeiUrl} data-aos="fade-up" data-aos-delay="100" suppressHydrationWarning className="lamp-card p-5 sm:p-6 rounded-2xl group transition-all relative overflow-hidden flex flex-col gap-3 sm:gap-4 shadow-lg">
             <div 
-              className="absolute inset-0 bg-cover bg-center opacity-40 group-hover:opacity-75 transition-opacity duration-500 z-0 pointer-events-none" 
+              className="absolute inset-0 bg-cover bg-center opacity-30 group-hover:opacity-50 transition-opacity duration-300 z-0 pointer-events-none" 
               style={{ backgroundImage: "url('/images/promo_imei.webp')" }}
             ></div>
-            <div className="absolute inset-0 bg-gradient-to-t from-[#050814]/95 via-[#050814]/50 to-transparent z-0 pointer-events-none"></div>
-            <div className="absolute top-3 end-3 w-2 h-2 rounded-full bg-violet-400/40 group-hover:bg-violet-400 group-hover:shadow-[0_0_8px_#a78bfa] transition-all"></div>
-            <div className="relative z-10 w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-violet-500/15 border border-violet-500/30 flex items-center justify-center text-violet-400 text-lg sm:text-xl group-hover:bg-violet-500 group-hover:text-slate-950 group-hover:scale-110 group-active:scale-95 transition-all shadow-md">
+            <div className="absolute inset-0 bg-gradient-to-t from-[#0B0F17]/95 via-[#0B0F17]/70 to-transparent z-0 pointer-events-none"></div>
+            <div className="relative z-10 w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 text-lg sm:text-xl group-hover:scale-105 transition-transform shadow-sm">
               <i className="fas fa-fingerprint"></i>
             </div>
             <div className="relative z-10">
-              <h3 className="font-bold text-base sm:text-lg text-white mb-1 group-hover:text-violet-400 transition-colors">{imeiTitle || "IMEI Services"}</h3>
+              <h3 className="font-bold text-base sm:text-lg text-white mb-1 group-hover:text-blue-400 transition-colors">{imeiTitle || "IMEI Services"}</h3>
               <p className="text-xs sm:text-sm text-slate-300">{imeiDesc || "Unlocks, checks, and device services"}</p>
             </div>
-            <i className="fas fa-arrow-right text-violet-400 absolute bottom-5 sm:bottom-6 right-5 sm:right-6 opacity-0 group-hover:opacity-100 transform translate-x-[-10px] group-hover:translate-x-0 transition-all"></i>
+            <i className={`fas ${isAr ? "fa-arrow-left" : "fa-arrow-right"} text-blue-400 absolute bottom-5 sm:bottom-6 end-5 sm:end-6 opacity-0 group-hover:opacity-100 transition-all`}></i>
           </Link>
 
-          <Link href={serverUrl} data-aos="fade-up" data-aos-delay="200" suppressHydrationWarning className="glass-card p-5 sm:p-6 rounded-2xl border border-cyan-500/30 hover:border-cyan-400/80 active:border-cyan-400 active:scale-[0.97] active:shadow-[0_0_30px_rgba(34,211,238,0.5)] group transition-all relative overflow-hidden flex flex-col gap-3 sm:gap-4 shadow-xl">
+          <Link href={serverUrl} data-aos="fade-up" data-aos-delay="200" suppressHydrationWarning className="lamp-card p-5 sm:p-6 rounded-2xl group transition-all relative overflow-hidden flex flex-col gap-3 sm:gap-4 shadow-lg">
             <div 
-              className="absolute inset-0 bg-cover bg-center opacity-40 group-hover:opacity-75 transition-opacity duration-500 z-0 pointer-events-none" 
+              className="absolute inset-0 bg-cover bg-center opacity-30 group-hover:opacity-50 transition-opacity duration-300 z-0 pointer-events-none" 
               style={{ backgroundImage: "url('/images/promo_server.webp')" }}
             ></div>
-            <div className="absolute inset-0 bg-gradient-to-t from-[#050814]/95 via-[#050814]/50 to-transparent z-0 pointer-events-none"></div>
-            <div className="absolute top-3 end-3 w-2 h-2 rounded-full bg-cyan-400/40 group-hover:bg-cyan-400 group-hover:shadow-[0_0_8px_#22d3ee] transition-all"></div>
-            <div className="relative z-10 w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-cyan-500/15 border border-cyan-500/30 flex items-center justify-center text-cyan-400 text-lg sm:text-xl group-hover:bg-cyan-500 group-hover:text-slate-950 group-hover:scale-110 group-active:scale-95 transition-all shadow-md">
+            <div className="absolute inset-0 bg-gradient-to-t from-[#0B0F17]/95 via-[#0B0F17]/70 to-transparent z-0 pointer-events-none"></div>
+            <div className="relative z-10 w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 text-lg sm:text-xl group-hover:scale-105 transition-transform shadow-sm">
               <i className="fas fa-server"></i>
             </div>
             <div className="relative z-10">
-              <h3 className="font-bold text-base sm:text-lg text-white mb-1 group-hover:text-cyan-400 transition-colors">{serverTitle || "Server Services"}</h3>
+              <h3 className="font-bold text-base sm:text-lg text-white mb-1 group-hover:text-emerald-400 transition-colors">{serverTitle || "Server Services"}</h3>
               <p className="text-xs sm:text-sm text-slate-300">{serverDesc || "Credits, activations, and tools"}</p>
             </div>
-            <i className="fas fa-arrow-right text-cyan-400 absolute bottom-5 sm:bottom-6 right-5 sm:right-6 opacity-0 group-hover:opacity-100 transform translate-x-[-10px] group-hover:translate-x-0 transition-all"></i>
+            <i className={`fas ${isAr ? "fa-arrow-left" : "fa-arrow-right"} text-emerald-400 absolute bottom-5 sm:bottom-6 end-5 sm:end-6 opacity-0 group-hover:opacity-100 transition-all`}></i>
           </Link>
 
-          <Link href={remoteUrl} data-aos="fade-up" data-aos-delay="300" suppressHydrationWarning className="glass-card p-5 sm:p-6 rounded-2xl border border-cyan-500/30 hover:border-purple-400/80 active:border-purple-400 active:scale-[0.97] active:shadow-[0_0_30px_rgba(168,85,247,0.5)] group transition-all relative overflow-hidden flex flex-col gap-3 sm:gap-4 shadow-xl">
+          <Link href={remoteUrl} data-aos="fade-up" data-aos-delay="300" suppressHydrationWarning className="lamp-card p-5 sm:p-6 rounded-2xl group transition-all relative overflow-hidden flex flex-col gap-3 sm:gap-4 shadow-lg">
             <div 
-              className="absolute inset-0 bg-cover bg-center opacity-40 group-hover:opacity-75 transition-opacity duration-500 z-0 pointer-events-none" 
+              className="absolute inset-0 bg-cover bg-center opacity-30 group-hover:opacity-50 transition-opacity duration-300 z-0 pointer-events-none" 
               style={{ backgroundImage: "url('/images/promo_remote.webp')" }}
             ></div>
-            <div className="absolute inset-0 bg-gradient-to-t from-[#050814]/95 via-[#050814]/50 to-transparent z-0 pointer-events-none"></div>
-            <div className="absolute top-3 end-3 w-2 h-2 rounded-full bg-purple-400/40 group-hover:bg-purple-400 group-hover:shadow-[0_0_8px_#c084fc] transition-all"></div>
-            <div className="relative z-10 w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-purple-500/15 border border-purple-500/30 flex items-center justify-center text-purple-400 text-lg sm:text-xl group-hover:bg-purple-500 group-hover:text-slate-950 group-hover:scale-110 group-active:scale-95 transition-all shadow-md">
+            <div className="absolute inset-0 bg-gradient-to-t from-[#0B0F17]/95 via-[#0B0F17]/70 to-transparent z-0 pointer-events-none"></div>
+            <div className="relative z-10 w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-sky-400 text-lg sm:text-xl group-hover:scale-105 transition-transform shadow-sm">
               <i className="fas fa-broadcast-tower"></i>
             </div>
             <div className="relative z-10">
-              <h3 className="font-bold text-base sm:text-lg text-white mb-1 group-hover:text-purple-400 transition-colors">{remoteTitle || "Remote Services"}</h3>
+              <h3 className="font-bold text-base sm:text-lg text-white mb-1 group-hover:text-sky-400 transition-colors">{remoteTitle || "Remote Services"}</h3>
               <p className="text-xs sm:text-sm text-slate-300">{remoteDesc || "Assisted sessions and support"}</p>
             </div>
-            <i className="fas fa-arrow-right text-purple-400 absolute bottom-5 sm:bottom-6 right-5 sm:right-6 opacity-0 group-hover:opacity-100 transform translate-x-[-10px] group-hover:translate-x-0 transition-all"></i>
+            <i className={`fas ${isAr ? "fa-arrow-left" : "fa-arrow-right"} text-sky-400 absolute bottom-5 sm:bottom-6 end-5 sm:end-6 opacity-0 group-hover:opacity-100 transition-all`}></i>
           </Link>
 
-          <Link href={storeUrl} data-aos="fade-up" data-aos-delay="400" suppressHydrationWarning className="glass-card p-5 sm:p-6 rounded-2xl border border-cyan-500/30 hover:border-amber-400/80 active:border-amber-400 active:scale-[0.97] active:shadow-[0_0_30px_rgba(251,191,36,0.5)] group transition-all relative overflow-hidden flex flex-col gap-3 sm:gap-4 shadow-xl">
+          <Link href={storeUrl} data-aos="fade-up" data-aos-delay="400" suppressHydrationWarning className="lamp-card p-5 sm:p-6 rounded-2xl group transition-all relative overflow-hidden flex flex-col gap-3 sm:gap-4 shadow-lg">
             <div 
-              className="absolute inset-0 bg-cover bg-center opacity-40 group-hover:opacity-75 transition-opacity duration-500 z-0 pointer-events-none" 
+              className="absolute inset-0 bg-cover bg-center opacity-30 group-hover:opacity-50 transition-opacity duration-300 z-0 pointer-events-none" 
               style={{ backgroundImage: "url('/images/promo_store.webp')" }}
             ></div>
-            <div className="absolute inset-0 bg-gradient-to-t from-[#050814]/95 via-[#050814]/50 to-transparent z-0 pointer-events-none"></div>
-            <div className="absolute top-3 end-3 w-2 h-2 rounded-full bg-amber-400/40 group-hover:bg-amber-400 group-hover:shadow-[0_0_8px_#fbbf24] transition-all"></div>
-            <div className="relative z-10 w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-400 text-lg sm:text-xl group-hover:bg-amber-500 group-hover:text-slate-950 group-hover:scale-110 group-active:scale-95 transition-all shadow-md">
+            <div className="absolute inset-0 bg-gradient-to-t from-[#0B0F17]/95 via-[#0B0F17]/70 to-transparent z-0 pointer-events-none"></div>
+            <div className="relative z-10 w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 text-lg sm:text-xl group-hover:scale-105 transition-transform shadow-sm">
               <i className="fas fa-shopping-bag"></i>
             </div>
             <div className="relative z-10">
               <h3 className="font-bold text-base sm:text-lg text-white mb-1 group-hover:text-amber-400 transition-colors">{storeTitle || "Tools & Store"}</h3>
               <p className="text-xs sm:text-sm text-slate-300">{storeDesc || "Licenses, products, and bundles"}</p>
             </div>
-            <i className="fas fa-arrow-right text-amber-400 absolute bottom-5 sm:bottom-6 right-5 sm:right-6 opacity-0 group-hover:opacity-100 transform translate-x-[-10px] group-hover:translate-x-0 transition-all"></i>
+            <i className={`fas ${isAr ? "fa-arrow-left" : "fa-arrow-right"} text-amber-400 absolute bottom-5 sm:bottom-6 end-5 sm:end-6 opacity-0 group-hover:opacity-100 transition-all`}></i>
           </Link>
         </div>
       </section>
 
-      {/* --- Tool Marquee --- */}
-      <section data-aos="fade-up" suppressHydrationWarning className="border-y border-cyan-500/20 bg-transparent py-6 sm:py-8 overflow-hidden relative">
+      {/* --- Tool Marquee with plain dark border --- */}
+      <section data-aos="fade-up" suppressHydrationWarning className="border-y border-[#141d2e] bg-[#0c121d]/50 py-5 sm:py-6 overflow-hidden relative">
         <div className="absolute top-0 left-0 w-16 sm:w-32 h-full bg-gradient-to-r from-background to-transparent z-10 pointer-events-none"></div>
         <div className="absolute top-0 right-0 w-16 sm:w-32 h-full bg-gradient-to-l from-background to-transparent z-10 pointer-events-none"></div>
         
         <div className="cyber-container mb-3 sm:mb-4 flex justify-center">
-          <span className="bg-[#050814]/90 border border-cyan-500/30 px-3.5 sm:px-5 py-1.5 rounded-full text-[10px] sm:text-xs font-bold uppercase tracking-widest text-cyan-300 flex items-center gap-2 shadow-sm">
-            <i className="fas fa-certificate text-violet-400"></i> Tool Network
+          <span className="bg-[#141d30] border border-white/15 px-3.5 sm:px-5 py-1 rounded-full text-[11px] sm:text-xs font-semibold uppercase tracking-widest text-slate-300 flex items-center gap-2 shadow-sm">
+            <i className="fas fa-certificate text-blue-400"></i> Tool Network
           </span>
         </div>
 
         <div className="w-full flex whitespace-nowrap overflow-hidden" dir="ltr">
           <div className="flex w-max animate-marquee hover:[animation-play-state:paused] cursor-pointer select-none">
-            <div className="flex shrink-0 items-center gap-8 sm:gap-12 px-6 text-base sm:text-xl font-bold text-white/90">
+            <div className="flex shrink-0 items-center gap-8 sm:gap-12 px-6 text-base sm:text-lg font-semibold text-slate-300">
               {(hp?.toolMarquee || ["Chimera", "UnlockTool", "Borneo", "iRemoval Pro", "DFT Pro", "MobileSea Tool", "AMT", "Phoenix", "Cheetah", "FKey"]).map((tool: string, idx: number) => (
-                <span key={idx} className="flex items-center gap-3 text-cyan-300 hover:text-violet-400 transition-colors shrink-0">
-                  <i className="fas fa-tools text-violet-400"></i> {tool}
+                <span key={idx} className="flex items-center gap-2.5 text-slate-300 hover:text-white transition-colors shrink-0">
+                  <i className="fas fa-tools text-blue-400 text-sm"></i> {tool}
                 </span>
               ))}
             </div>
 
             {/* Repeat exact clone for continuous seamless loop */}
-            <div className="flex shrink-0 items-center gap-8 sm:gap-12 px-6 text-base sm:text-xl font-bold text-white/90" aria-hidden="true">
+            <div className="flex shrink-0 items-center gap-8 sm:gap-12 px-6 text-base sm:text-lg font-semibold text-slate-300" aria-hidden="true">
               {(hp?.toolMarquee || ["Chimera", "UnlockTool", "Borneo", "iRemoval Pro", "DFT Pro", "MobileSea Tool", "AMT", "Phoenix", "Cheetah", "FKey"]).map((tool: string, idx: number) => (
-                <span key={`repeat-${idx}`} className="flex items-center gap-3 text-cyan-300 hover:text-violet-400 transition-colors shrink-0">
-                  <i className="fas fa-tools text-violet-400"></i> {tool}
+                <span key={`repeat-${idx}`} className="flex items-center gap-2.5 text-slate-300 hover:text-white transition-colors shrink-0">
+                  <i className="fas fa-tools text-blue-400 text-sm"></i> {tool}
                 </span>
               ))}
             </div>
@@ -496,22 +492,19 @@ export default async function Home(props: { params: Promise<{ lang: Locale }> })
       </section>
 
       {/* --- Feature Ribbon --- */}
-      <section data-aos="fade-up" suppressHydrationWarning className="w-full cyber-container">
+      <section data-aos="fade-up" suppressHydrationWarning className="w-full cyber-container section-spotlight">
         <h2 className="sr-only">{isAr ? "مميزات وموثوقية المنصة" : "Platform Trust & Features"}</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 divide-y md:divide-y-0 md:divide-x md:rtl:divide-x-reverse divide-cyan-500/20 curved-cockpit rounded-2xl sm:rounded-3xl p-5 sm:p-8 border-2 border-cyan-500/30 relative overflow-hidden backdrop-blur-xl shadow-2xl">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 bg-[#141d30]/95 rounded-2xl sm:rounded-3xl p-5 sm:p-8 border border-white/15 relative overflow-hidden backdrop-blur-md shadow-xl lamp-card">
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 max-w-lg h-[2px] bg-gradient-to-r from-transparent via-blue-400 to-transparent shadow-[0_0_14px_2px_rgba(96,165,250,0.85)] z-20 pointer-events-none"></div>
+
           {/* Card 1: Specialized Support Team */}
-          <div className="group flex flex-col items-center text-center p-4 sm:p-5 rounded-2xl transition-all duration-300 hover:bg-white/[0.03] hover:-translate-y-1 active:scale-[0.97] relative">
+          <div className="group flex flex-col items-center text-center p-5 sm:p-6 rounded-2xl transition-all duration-200 relative lamp-card">
             <div className="relative mb-4">
-              <div className="absolute -inset-2 bg-gradient-to-r from-purple-500/30 to-violet-500/30 rounded-full blur-md opacity-60 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500 animate-pulse"></div>
-              <div className="relative w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-purple-500/20 via-[#0a0f24] to-purple-500/10 flex items-center justify-center text-purple-400 border border-purple-500/40 shadow-[0_0_20px_rgba(168,85,247,0.3)] group-hover:rotate-6 group-hover:scale-105 group-active:scale-95 transition-transform duration-300">
+              <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 shadow-sm transition-colors">
                 <i className="fas fa-headset text-2xl"></i>
-                <span className="absolute -top-1 -right-1 flex h-3.5 w-3.5">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-purple-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-purple-500 border border-[#060814]"></span>
-                </span>
               </div>
             </div>
-            <h3 className="font-bold text-lg sm:text-xl text-white mb-1.5 group-hover:text-purple-400 transition-colors">
+            <h3 className="font-bold text-lg sm:text-xl text-white mb-1.5 group-hover:text-blue-400 transition-colors">
               {feat1Title || (isAr ? "فريق دعم متخصص" : "Specialized Support Team")}
             </h3>
             <p className="text-slate-300 text-xs sm:text-sm max-w-xs leading-relaxed">
@@ -520,17 +513,13 @@ export default async function Home(props: { params: Promise<{ lang: Locale }> })
           </div>
 
           {/* Card 2: 100% Safe Commission & Security */}
-          <div className="group flex flex-col items-center text-center p-4 sm:p-5 pt-6 md:pt-4 rounded-2xl transition-all duration-300 hover:bg-white/[0.03] hover:-translate-y-1 active:scale-[0.97] relative">
+          <div className="group flex flex-col items-center text-center p-5 sm:p-6 rounded-2xl transition-all duration-200 relative lamp-card">
             <div className="relative mb-4">
-              <div className="absolute -inset-2 bg-gradient-to-r from-cyan-500/30 to-purple-500/30 rounded-full blur-md opacity-60 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500 animate-pulse"></div>
-              <div className="relative w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-cyan-500/20 via-[#0a0f24] to-purple-500/10 flex items-center justify-center text-cyan-400 border border-cyan-500/40 shadow-[0_0_20px_rgba(34,211,238,0.25)] group-hover:-rotate-6 group-hover:scale-105 group-active:scale-95 transition-transform duration-300">
+              <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 shadow-sm transition-colors">
                 <i className="fas fa-shield-alt text-2xl"></i>
-                <span className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-cyan-400 flex items-center justify-center text-[#060814] text-[10px] font-bold border border-[#060814] shadow">
-                  <i className="fas fa-check text-[9px]"></i>
-                </span>
               </div>
             </div>
-            <h3 className="font-bold text-lg sm:text-xl text-white mb-1.5 group-hover:text-cyan-400 transition-colors">
+            <h3 className="font-bold text-lg sm:text-xl text-white mb-1.5 group-hover:text-emerald-400 transition-colors">
               {feat2Title || (isAr ? "عمولة أمنة 100%" : "100% Safe Commission")}
             </h3>
             <p className="text-slate-300 text-xs sm:text-sm max-w-xs leading-relaxed">
@@ -539,18 +528,13 @@ export default async function Home(props: { params: Promise<{ lang: Locale }> })
           </div>
 
           {/* Card 3: Continuous Support & Development */}
-          <div className="group flex flex-col items-center text-center p-4 sm:p-5 pt-6 md:pt-4 rounded-2xl transition-all duration-300 hover:bg-white/[0.03] hover:-translate-y-1 active:scale-[0.97] relative">
+          <div className="group flex flex-col items-center text-center p-5 sm:p-6 rounded-2xl transition-all duration-200 relative lamp-card">
             <div className="relative mb-4">
-              <div className="absolute -inset-2 bg-gradient-to-r from-violet-500/30 to-purple-500/30 rounded-full blur-md opacity-60 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500 animate-pulse"></div>
-              <div className="relative w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-violet-500/20 via-[#0a0f24] to-violet-500/10 flex items-center justify-center text-violet-400 border border-violet-500/40 shadow-[0_0_20px_rgba(139,92,246,0.3)] group-hover:rotate-6 group-hover:scale-105 transition-transform duration-300">
+              <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 shadow-sm transition-colors">
                 <i className="fas fa-sync-alt text-2xl"></i>
-                <span className="absolute -top-1 -right-1 flex h-3.5 w-3.5">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-violet-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-violet-500 border border-[#060814]"></span>
-                </span>
               </div>
             </div>
-            <h3 className="font-bold text-lg sm:text-xl text-white mb-1.5 group-hover:text-violet-400 transition-colors">
+            <h3 className="font-bold text-lg sm:text-xl text-white mb-1.5 group-hover:text-amber-400 transition-colors">
               {feat3Title || (isAr ? "دعم مستمر وتطوير" : "Continuous Updates & Development")}
             </h3>
             <p className="text-slate-300 text-xs sm:text-sm max-w-xs leading-relaxed">
@@ -559,7 +543,7 @@ export default async function Home(props: { params: Promise<{ lang: Locale }> })
           </div>
         </div>
       </section>
-
+ 
       {/* --- Hexagonal Features Grid (amrr-unlocker match) --- */}
       <HexagonalFeatures lang={params.lang} />
 
@@ -567,13 +551,16 @@ export default async function Home(props: { params: Promise<{ lang: Locale }> })
       <PackagesSlider lang={params.lang} />
 
       {/* --- Campaign Stage (Promotions) --- */}
-      <section data-aos="fade-up" suppressHydrationWarning className="w-full cyber-container relative">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-6 sm:mb-8 gap-4">
+      <section data-aos="fade-up" suppressHydrationWarning className="w-full cyber-container relative section-spotlight">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-6 sm:mb-8 gap-4 lamp-header">
           <div>
-            <span className="text-violet-400 text-xs sm:text-sm font-bold uppercase tracking-wider flex items-center gap-2 mb-2">
-              <i className="fas fa-certificate text-cyan-400"></i> Official reseller campaigns
-            </span>
-            <h2 className="text-xl sm:text-3xl font-black text-white">Fresh activations, unlocks, and tool offers</h2>
+            <div className="inline-flex items-center gap-2 bg-blue-500/10 border border-blue-500/20 px-3.5 py-1.5 rounded-full text-xs font-semibold text-blue-400 mb-2.5 shadow-sm">
+              <i className="fas fa-certificate text-blue-400"></i>
+              <span>{isAr ? "عروض وحملات الموزعين الرسمية" : "Official Reseller Campaigns"}</span>
+            </div>
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-white tracking-tight">
+              {isAr ? "أحدث تفعيلات الأدوات، فك الشفرات، والخصومات" : "Fresh Activations, Unlocks, and Tool Offers"}
+            </h2>
           </div>
         </div>
 
@@ -581,7 +568,7 @@ export default async function Home(props: { params: Promise<{ lang: Locale }> })
           {campaigns.length > 0 ? (
             <CampaignSlider campaigns={campaigns} lang={params.lang} />
           ) : (
-            <div className="curved-cockpit rounded-2xl sm:rounded-3xl p-8 border-2 border-cyan-500/30 text-center text-slate-300 shadow-xl">
+            <div className="bg-[#141d30] rounded-2xl sm:rounded-3xl p-8 border border-white/15 text-center text-slate-300 shadow-xl">
               {isAr ? "لا توجد عروض حالية." : "No active campaigns at the moment."}
             </div>
           )}

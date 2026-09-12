@@ -197,34 +197,62 @@ export default function Navbar({ lang, dict }: NavbarProps) {
         <div className="w-full px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-18 sm:h-20">
             
-            {/* Logo with Glowing White Bubble Aura */}
+            {/* Logo */}
             <Link 
               href={`/${lang}`} 
-              className="relative flex items-center group py-1 shrink-0" 
+              className="relative inline-flex items-center group py-1 shrink-0" 
               aria-label={lang === "ar" ? "عرب تك برو سيرفر | Arab Tech Pro Server" : "Arab Tech Pro Server"}
               title={lang === "ar" ? "عرب تك برو سيرفر | Arab Tech Pro Server" : "Arab Tech Pro Server"}
             >
-              <div className="absolute -inset-2 bg-gradient-to-r from-white/25 via-primary/30 to-white/25 rounded-full blur-lg opacity-75 group-hover:opacity-100 transition-all duration-500 pointer-events-none"></div>
-              <picture>
-                <source srcSet={lang === "ar" ? "/images/logo_ar.webp" : "/images/logo_en.webp"} type="image/webp" />
-                <img 
-                  src={lang === "ar" ? "/images/logo_ar.png" : "/images/logo_en.png"} 
-                  alt={lang === "ar" ? "عرب تك برو سيرفر | Arab Tech Pro Server" : "Arab Tech Pro Server Logo"} 
-                  width={240}
-                  height={60}
-                  className="relative z-10 h-10 sm:h-13 md:h-16 lg:h-18 w-auto max-w-[200px] sm:max-w-[290px] md:max-w-[380px] lg:max-w-[440px] object-contain transition-transform duration-300 group-hover:scale-105 drop-shadow-[0_0_15px_rgba(255,255,255,0.35)]" 
+              <div className="relative inline-flex items-center">
+                {/* Hazy Ambient Glow exactly mapped to 'عرب تيك' in Arabic and 'ARAB TECH' in English */}
+                <div 
+                  className="absolute pointer-events-none rounded-full transition-all duration-300"
+                  style={{
+                    left: lang === "ar" ? "-3%" : "47%",
+                    width: "58%",
+                    top: "6%",
+                    height: "68%",
+                    background: "radial-gradient(ellipse at center, rgba(56, 189, 248, 0.65) 0%, rgba(37, 99, 235, 0.30) 50%, transparent 80%)",
+                    filter: "blur(14px)",
+                    transform: "scale(1.4)",
+                  }}
+                  aria-hidden="true"
                 />
-              </picture>
+                <div 
+                  className="absolute pointer-events-none rounded-full transition-all duration-300"
+                  style={{
+                    left: lang === "ar" ? "1%" : "51%",
+                    width: "50%",
+                    top: "10%",
+                    height: "56%",
+                    background: "radial-gradient(ellipse at center, rgba(255, 255, 255, 0.70) 0%, rgba(186, 230, 253, 0.45) 45%, transparent 75%)",
+                    filter: "blur(8px)",
+                  }}
+                  aria-hidden="true"
+                />
+
+                <picture>
+                  <source srcSet={lang === "ar" ? "/images/logo_ar.webp" : "/images/logo_en.webp"} type="image/webp" />
+                  <img 
+                    src={lang === "ar" ? "/images/logo_ar.png" : "/images/logo_en.png"} 
+                    alt={lang === "ar" ? "عرب تك برو سيرفر | Arab Tech Pro Server" : "Arab Tech Pro Server Logo"} 
+                    width={240}
+                    height={60}
+                    className="relative z-10 h-10 sm:h-13 md:h-16 lg:h-18 w-auto max-w-[200px] sm:max-w-[290px] md:max-w-[380px] lg:max-w-[440px] object-contain transition-transform duration-200 group-hover:scale-105" 
+                  />
+                </picture>
+              </div>
             </Link>
 
             {/* Desktop Navigation Links */}
-            <nav className="hidden lg:flex items-center gap-1.5 bg-surface-container-low/85 p-1.5 rounded-full border border-violet-500/30 backdrop-blur-xl shadow-lg">
+            <nav className="hidden lg:flex items-center gap-1.5 bg-surface-container-low/90 p-1.5 rounded-full border border-white/10 backdrop-blur-xl shadow-lg">
               <Link 
                 href={`/${lang}`} 
                 className={`px-4 py-2 rounded-full text-sm font-semibold transition-all duration-200 ${
                   isActive("/") 
-                    ? "bg-primary text-white font-bold shadow-[0_0_15px_rgba(139,92,246,0.4)]" 
-                    : "text-slate-200 hover:text-white hover:bg-white/10"
+                    ? "bg-primary text-white font-bold shadow-md shadow-blue-950/40" 
+                    : "text-slate-300 hover:text-white hover:bg-white/5"
                 }`}
               >
                 {dict.home}
@@ -236,15 +264,15 @@ export default function Navbar({ lang, dict }: NavbarProps) {
                   aria-label={dict.resellerPricing || (lang === "ar" ? "قائمة الأسعار والخدمات" : "Reseller Pricing")}
                   className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-semibold transition-all duration-200 ${
                     isActive("/pricing") 
-                      ? "bg-primary text-white font-bold shadow-[0_0_15px_rgba(139,92,246,0.4)]" 
-                      : "text-slate-200 hover:text-white hover:bg-white/10"
+                      ? "bg-primary text-white font-bold shadow-md shadow-blue-950/40" 
+                      : "text-slate-300 hover:text-white hover:bg-white/5"
                   }`}
                 >
                   <span>{dict.resellerPricing}</span>
                   <span className="material-symbols-outlined text-base transition-transform duration-300 group-hover:rotate-180">expand_more</span>
                 </button>
 
-                <div className="absolute top-full start-0 mt-2 w-56 glass-card rounded-2xl border border-violet-500/30 shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top scale-95 group-hover:scale-100 overflow-hidden backdrop-blur-xl bg-surface-container-lowest/95 p-1.5 z-50">
+                <div className="absolute top-full start-0 mt-2 w-56 glass-card rounded-2xl border border-white/10 shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top scale-95 group-hover:scale-100 overflow-hidden backdrop-blur-xl bg-surface-container-lowest/95 p-1.5 z-50">
                   <Link href={`/${lang}/pricing`} className="flex items-center gap-2.5 px-4 py-3 rounded-xl text-xs font-bold text-slate-200 hover:bg-primary/20 hover:text-white transition-all">
                     <span className="material-symbols-outlined text-primary text-base">phonelink_setup</span>
                     {dict.imeiService}
@@ -265,8 +293,8 @@ export default function Navbar({ lang, dict }: NavbarProps) {
                 href={`/${lang}/orders`} 
                 className={`px-4 py-2 rounded-full text-sm font-semibold transition-all duration-200 flex items-center gap-1.5 ${
                   isActive("/orders") 
-                    ? "bg-primary text-white font-bold shadow-[0_0_15px_rgba(139,92,246,0.4)]" 
-                    : "text-slate-200 hover:text-white hover:bg-white/10"
+                    ? "bg-primary text-white font-bold shadow-md shadow-blue-950/40" 
+                    : "text-slate-300 hover:text-white hover:bg-white/5"
                 }`}
               >
                 <span className="material-symbols-outlined text-base">receipt_long</span>
@@ -278,8 +306,8 @@ export default function Navbar({ lang, dict }: NavbarProps) {
                 href={`/${lang}/wallet`} 
                 className={`px-4 py-2 rounded-full text-sm font-semibold transition-all duration-200 flex items-center gap-1.5 ${
                   isActive("/wallet") 
-                    ? "bg-primary text-white font-bold shadow-[0_0_15px_rgba(139,92,246,0.4)]" 
-                    : "text-slate-200 hover:text-white hover:bg-white/10"
+                    ? "bg-primary text-white font-bold shadow-md shadow-blue-950/40" 
+                    : "text-slate-300 hover:text-white hover:bg-white/5"
                 }`}
               >
                 <span className="material-symbols-outlined text-base">account_balance_wallet</span>
@@ -290,8 +318,8 @@ export default function Navbar({ lang, dict }: NavbarProps) {
                 href={`/${lang}/blog`} 
                 className={`px-4 py-2 rounded-full text-sm font-semibold transition-all duration-200 ${
                   isActive("/blog") 
-                    ? "bg-primary text-white font-bold shadow-[0_0_15px_rgba(139,92,246,0.4)]" 
-                    : "text-slate-200 hover:text-white hover:bg-white/10"
+                    ? "bg-primary text-white font-bold shadow-md shadow-blue-950/40" 
+                    : "text-slate-300 hover:text-white hover:bg-white/5"
                 }`}
               >
                 {dict.blog}
@@ -301,8 +329,8 @@ export default function Navbar({ lang, dict }: NavbarProps) {
                 href={`/${lang}/tutorials`} 
                 className={`px-4 py-2 rounded-full text-sm font-semibold transition-all duration-200 ${
                   isActive("/tutorials") 
-                    ? "bg-primary text-white font-bold shadow-[0_0_15px_rgba(139,92,246,0.4)]" 
-                    : "text-slate-200 hover:text-white hover:bg-white/10"
+                    ? "bg-primary text-white font-bold shadow-md shadow-blue-950/40" 
+                    : "text-slate-300 hover:text-white hover:bg-white/5"
                 }`}
               >
                 {dict.tutorials}
@@ -312,8 +340,8 @@ export default function Navbar({ lang, dict }: NavbarProps) {
                 href={`/${lang}/contact`} 
                 className={`px-4 py-2 rounded-full text-sm font-semibold transition-all duration-200 ${
                   isActive("/contact") 
-                    ? "bg-primary text-white font-bold shadow-[0_0_15px_rgba(139,92,246,0.4)]" 
-                    : "text-slate-200 hover:text-white hover:bg-white/10"
+                    ? "bg-primary text-white font-bold shadow-md shadow-blue-950/40" 
+                    : "text-slate-300 hover:text-white hover:bg-white/5"
                 }`}
               >
                 {dict.contactUs}
@@ -327,7 +355,7 @@ export default function Navbar({ lang, dict }: NavbarProps) {
             <Link 
               href={switchLanguage()} 
               aria-label={lang === "ar" ? "Switch language to English" : "التبديل إلى اللغة العربية"}
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-full border border-violet-500/30 bg-surface-container-low/80 text-slate-200 hover:text-white hover:border-primary/50 hover:bg-primary/20 transition-all duration-200 group text-xs font-bold"
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-full border border-white/10 bg-surface-container-low/80 text-slate-200 hover:text-white hover:border-primary/50 hover:bg-primary/20 transition-all duration-200 group text-xs font-bold"
               title={lang === "ar" ? "Switch to English" : "التبديل للعربية"}
             >
               <span className="material-symbols-outlined text-sm text-primary group-hover:rotate-45 transition-transform duration-300">language</span>
@@ -484,7 +512,7 @@ export default function Navbar({ lang, dict }: NavbarProps) {
             ) : (
               <Link 
                 href={`/${lang}/login`} 
-                className="btn-purple-glow flex items-center gap-2 px-6 py-2 rounded-full text-white font-bold text-sm hover:scale-[1.03] active:scale-95 transition-all duration-300 shadow-[0_0_20px_rgba(139,92,246,0.4)]"
+                className="btn-purple-glow flex items-center gap-2 px-6 py-2 rounded-full text-white font-bold text-sm transition-all duration-200 shadow-md shadow-blue-950/40"
               >
                 <span className="material-symbols-outlined text-lg">lock</span>
                 <span>{dict.login}</span>
@@ -497,7 +525,7 @@ export default function Navbar({ lang, dict }: NavbarProps) {
             <Link 
               href={switchLanguage()} 
               aria-label={lang === "ar" ? "Switch language to English" : "التبديل إلى اللغة العربية"}
-              className="flex items-center gap-1 px-3 py-1.5 rounded-full border border-violet-500/30 bg-surface-container-low text-slate-200 hover:text-white transition-colors text-xs font-bold"
+              className="flex items-center gap-1 px-3 py-1.5 rounded-full border border-white/10 bg-surface-container-low text-slate-200 hover:text-white transition-colors text-xs font-bold"
             >
               <span className="material-symbols-outlined text-xs text-primary">language</span>
               <span>{lang === "ar" ? "EN" : "AR"}</span>
@@ -505,7 +533,7 @@ export default function Navbar({ lang, dict }: NavbarProps) {
 
             <button 
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2.5 rounded-xl bg-surface-container-high/90 border border-violet-500/30 text-white hover:text-primary hover:bg-primary/20 transition-all active:scale-95"
+              className="p-2.5 rounded-xl bg-surface-container-high/90 border border-white/10 text-white hover:text-primary hover:bg-primary/20 transition-all active:scale-95"
               aria-label="Toggle menu"
             >
               <span className="material-symbols-outlined text-2xl block transition-transform duration-300">

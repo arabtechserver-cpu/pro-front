@@ -73,17 +73,14 @@ export default function CampaignSlider({ campaigns, lang }: { campaigns: Campaig
 
   return (
     <div
-      className="relative w-full curved-cockpit rounded-2xl sm:rounded-[2.5rem] overflow-hidden group h-[340px] sm:h-[420px] border-y-2 sm:border-2 border-cyan-500/30 shadow-2xl animate-neon-border touch-pan-y"
+      className="relative w-full rounded-2xl sm:rounded-3xl overflow-hidden group h-[340px] sm:h-[420px] bg-[#111622] border border-white/15 shadow-xl touch-pan-y lamp-card"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
     >
-      {/* Curved Arched Cyber Lines */}
-      <div className="absolute -top-[2px] left-0 right-0 h-[2.5px] bg-gradient-to-r from-transparent via-cyan-400 to-transparent shadow-[0_0_15px_#8b5cf6] pointer-events-none z-20"></div>
-      <div className="absolute -bottom-[2px] left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-violet-400 to-transparent shadow-[0_0_15px_#a78bfa] pointer-events-none z-20"></div>
-
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-72 sm:w-96 h-20 bg-blue-500/15 rounded-full blur-2xl pointer-events-none z-30"></div>
       <AnimatePresence mode="wait">
         <motion.div
           key={currentIndex}
@@ -97,23 +94,23 @@ export default function CampaignSlider({ campaigns, lang }: { campaigns: Campaig
             className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
             style={{ backgroundImage: `url('${current?.image || "/images/promo_samsung.webp"}')` }}
           ></div>
-          <div className="absolute inset-0 bg-gradient-to-t from-[#050814]/98 via-[#050814]/60 to-transparent opacity-90"></div>
+          <div className="absolute inset-0 bg-gradient-to-t from-[#0B0F17]/98 via-[#0B0F17]/60 to-transparent opacity-90"></div>
           
           <div className="absolute bottom-10 sm:bottom-12 left-5 sm:left-12 right-5 sm:right-12 z-10">
             {tag && (
-              <span className="convex-pill bg-gradient-to-r from-violet-500/25 to-cyan-500/25 text-violet-300 px-4 py-1.5 text-xs sm:text-sm uppercase font-black tracking-wider mb-3 inline-block backdrop-blur-md border border-violet-400/40 shadow-sm animate-mobile-badge">
+              <span className="bg-blue-500/10 text-blue-400 border border-blue-500/20 px-3.5 py-1 text-xs sm:text-sm uppercase font-semibold tracking-wider mb-3 inline-block rounded-full backdrop-blur-md shadow-sm">
                 {tag}
               </span>
             )}
-            <h3 className="font-black text-xl sm:text-4xl text-white mb-2 tracking-tight drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)] line-clamp-2">
+            <h3 className="font-black text-xl sm:text-3xl text-white mb-2 tracking-tight drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)] line-clamp-2">
               {title}
             </h3>
-            <p className="text-slate-200 text-xs sm:text-base mb-5 max-w-xl leading-relaxed line-clamp-2 sm:line-clamp-3">
+            <p className="text-slate-300 text-xs sm:text-base mb-5 max-w-xl leading-relaxed line-clamp-2 sm:line-clamp-3">
               {desc}
             </p>
             <Link
               href={url}
-              className="btn-purple-glow w-max px-7 sm:px-9 py-2.5 sm:py-3.5 text-xs sm:text-base font-black flex items-center gap-2 group"
+              className="btn-royal w-max px-7 sm:px-9 py-2.5 sm:py-3.5 text-xs sm:text-base font-bold flex items-center gap-2 group shadow-lg shadow-blue-900/30"
             >
               <span>{isAr ? "عرض تفاصيل الباقة" : "View Details"}</span>
               <i className={`fas fa-arrow-${isAr ? "left" : "right"} text-xs transition-transform group-hover:-translate-x-1`}></i>
@@ -122,7 +119,7 @@ export default function CampaignSlider({ campaigns, lang }: { campaigns: Campaig
         </motion.div>
       </AnimatePresence>
 
-      {/* Swipeable Indicator Dots (Pill Format) */}
+      {/* Swipeable Indicator Dots */}
       {campaigns.length > 1 && (
         <div className="absolute bottom-3 left-0 right-0 flex justify-center items-center gap-2 z-20">
           {campaigns.map((_, idx) => (
@@ -131,8 +128,8 @@ export default function CampaignSlider({ campaigns, lang }: { campaigns: Campaig
               onClick={() => setCurrentIndex(idx)}
               className={`h-2 rounded-full transition-all duration-300 active:scale-90 ${
                 idx === currentIndex
-                  ? "w-8 bg-gradient-to-r from-violet-400 to-cyan-400 shadow-[0_0_12px_#8b5cf6] animate-pulse"
-                  : "w-2 bg-violet-400/50 hover:bg-violet-300/80"
+                  ? "w-8 bg-blue-500"
+                  : "w-2 bg-slate-600 hover:bg-slate-500"
               }`}
               aria-label={`Go to slide ${idx + 1}`}
             />

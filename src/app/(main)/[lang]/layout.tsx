@@ -265,7 +265,7 @@ export default async function RootLayout(
   };
 
   return (
-    <html lang={lang} dir={dir} className="dark" style={{ backgroundColor: "#050814", colorScheme: "dark" }}>
+    <html lang={lang} dir={dir} className="dark" style={{ backgroundColor: "#0b0f17", colorScheme: "dark" }}>
       <head>
         <meta name="google-site-verification" content="N34n3oI-P5elZmLFHgFqp_BK93EijixhnIHEj_2oGnI" />
         <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
@@ -304,15 +304,15 @@ export default async function RootLayout(
         />
       </head>
       <body
-        className={`${cairo.variable} ${inter.variable} ${jakarta.variable} ${jetbrains.variable} bg-[#060814] text-slate-100 subpixel-antialiased min-h-screen flex flex-col relative`}
-        style={{ backgroundColor: "#060814", colorScheme: "dark" }}
+        className={`${cairo.variable} ${inter.variable} ${jakarta.variable} ${jetbrains.variable} bg-[#0b0f17] text-slate-100 subpixel-antialiased min-h-screen flex flex-col relative`}
+        style={{ backgroundColor: "#0b0f17", colorScheme: "dark" }}
       >
         {/* Client Enhancement Widgets (Lazy loaded, non-blocking) */}
         <ClientWidgets lang={lang} />
 
         <Navbar lang={lang} dict={dict.nav} />
         
-        <main className="flex-grow w-full pt-16 sm:pt-20 pb-12 overflow-x-clip bg-[#050814]">
+        <main className="flex-grow w-full pt-16 sm:pt-20 pb-12 overflow-x-clip bg-[#0b0f17]">
           {children}
         </main>
 

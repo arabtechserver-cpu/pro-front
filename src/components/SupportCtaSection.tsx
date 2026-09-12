@@ -17,20 +17,13 @@ export default function SupportCtaSection({
   const cleanWa = whatsappNum.replace(/[^0-9]/g, "");
 
   return (
-    <section className="relative py-12 sm:py-16 bg-transparent text-white text-center overflow-hidden">
+    <section className="relative py-12 sm:py-16 bg-transparent text-white text-center overflow-hidden section-spotlight">
       <div className="w-full cyber-container relative z-10">
         
-        {/* Curved Cockpit Card */}
-        <div className="curved-cockpit rounded-3xl p-8 sm:p-12 lg:p-16 border-2 border-cyan-500/30 shadow-2xl relative overflow-hidden animate-neon-border">
-          {/* Top Arched Cyber Line */}
-          <div className="absolute -top-[2px] left-0 right-0 h-[2.5px] bg-gradient-to-r from-transparent via-cyan-400 to-transparent shadow-[0_0_15px_#8b5cf6] pointer-events-none"></div>
-
-          {/* Bottom Arched Cyber Line */}
-          <div className="absolute -bottom-[2px] left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-cyan-400/60 to-transparent pointer-events-none"></div>
-
-          {/* Ambient Glow - stronger purple */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[400px] bg-violet-600/20 rounded-full blur-[100px] pointer-events-none"></div>
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-[200px] bg-purple-600/15 rounded-full blur-[80px] pointer-events-none"></div>
+        {/* Support Card */}
+        <div className="lamp-card rounded-2xl sm:rounded-3xl p-8 sm:p-12 lg:p-16 shadow-xl relative overflow-hidden">
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-72 sm:w-96 h-20 bg-blue-500/15 rounded-full blur-2xl pointer-events-none"></div>
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-blue-600/5 rounded-full blur-[100px] pointer-events-none"></div>
 
           <div className="relative z-10 max-w-2xl mx-auto">
             <h2
@@ -38,7 +31,7 @@ export default function SupportCtaSection({
               data-aos="fade-up"
               suppressHydrationWarning
             >
-              <span className="bg-gradient-to-r from-violet-400 via-cyan-300 to-purple-200 bg-clip-text text-transparent">
+              <span className="text-white">
                 {isAr ? "هل تحتاج لمساعدة أو لديك استفسار؟" : "Need Help or Have a Question?"}
               </span>
             </h2>
@@ -60,12 +53,12 @@ export default function SupportCtaSection({
                 href={telegramUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="btn-purple-glow inline-flex items-center gap-2.5 px-8 sm:px-10 py-3.5 sm:py-4 text-sm sm:text-base group"
+                className="btn-royal inline-flex items-center gap-2.5 px-8 sm:px-10 py-3.5 sm:py-4 text-sm sm:text-base font-bold group shadow-lg shadow-blue-900/30"
                 data-aos="fade-up"
                 data-aos-delay="100"
                 suppressHydrationWarning
               >
-                <i className="fas fa-headset text-yellow-300 text-base group-hover:scale-110 transition-transform"></i>
+                <i className="fas fa-headset text-amber-300 text-base group-hover:scale-105 transition-transform"></i>
                 <span>{isAr ? "محادثة الدعم الفني" : "Live Technical Support"}</span>
                 <i className={`fas ${isAr ? "fa-arrow-left" : "fa-arrow-right"} text-xs transition-transform group-hover:-translate-x-1`}></i>
               </a>
@@ -75,12 +68,12 @@ export default function SupportCtaSection({
                 href={`https://wa.me/${cleanWa}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="btn-cyan-glow inline-flex items-center gap-2.5 px-8 sm:px-10 py-3.5 sm:py-4 text-sm sm:text-base group"
+                className="bg-[#25D366]/15 hover:bg-[#25D366]/25 text-[#25D366] border border-[#25D366]/40 inline-flex items-center gap-2.5 px-8 sm:px-10 py-3.5 sm:py-4 rounded-full text-sm sm:text-base font-bold transition-all group shadow-md"
                 data-aos="fade-up"
                 data-aos-delay="200"
                 suppressHydrationWarning
               >
-                <i className="fab fa-whatsapp text-lg group-hover:scale-110 transition-transform"></i>
+                <i className="fab fa-whatsapp text-lg group-hover:scale-105 transition-transform"></i>
                 <span>{isAr ? "تواصل عبر واتساب" : "Contact via WhatsApp"}</span>
               </a>
             </div>

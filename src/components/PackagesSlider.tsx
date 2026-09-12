@@ -232,7 +232,6 @@ export default function PackagesSlider({ lang }: PackagesSliderProps) {
     }
   };
 
-  // Display 3 packages visible on desktop, 2 on tablet, 1 on mobile
   const visibleItems = [
     packages[currentIndex % total],
     packages[(currentIndex + 1) % total],
@@ -241,7 +240,7 @@ export default function PackagesSlider({ lang }: PackagesSliderProps) {
 
   return (
     <section
-      className="relative py-14 sm:py-20 bg-transparent overflow-hidden touch-pan-y"
+      className="relative py-14 sm:py-20 bg-transparent overflow-hidden touch-pan-y section-spotlight"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
       onTouchStart={handleTouchStart}
@@ -251,19 +250,19 @@ export default function PackagesSlider({ lang }: PackagesSliderProps) {
       suppressHydrationWarning
     >
       {/* Background Ambient Glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-cyan-500/10 rounded-full blur-[150px] pointer-events-none"></div>
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-blue-600/5 rounded-full blur-[140px] pointer-events-none"></div>
 
       <div className="w-full cyber-container relative z-10">
         {/* Section Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 lg:mb-14 gap-6">
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 lg:mb-14 gap-6 lamp-header">
           <div>
-            <div className="inline-flex items-center gap-2 bg-violet-500/15 text-violet-300 border border-violet-500/30 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider mb-4 shadow-sm">
-              <i className="fas fa-layer-group text-violet-400"></i>
+            <div className="inline-flex items-center gap-2 bg-blue-500/10 text-blue-400 border border-blue-500/20 px-3.5 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wider mb-4 shadow-sm">
+              <i className="fas fa-layer-group text-blue-400"></i>
               <span>{isAr ? "باقات وخدمات السيرفر المباشرة" : "Live Catalog & Service Packages"}</span>
             </div>
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight">
               {isAr ? "تصفح باقات الخدمات " : "Explore Featured "}
-              <span className="bg-gradient-to-r from-violet-400 via-cyan-300 to-purple-200 bg-clip-text text-transparent">
+              <span className="text-blue-400">
                 {isAr ? "والتفعيلات الحصرية" : "Service Packages"}
               </span>
             </h2>
@@ -275,30 +274,30 @@ export default function PackagesSlider({ lang }: PackagesSliderProps) {
           </div>
 
           {/* Controls: Slider Arrows */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2.5">
             <button
               onClick={handlePrev}
               aria-label={isAr ? "الباقة السابقة" : "Previous Package"}
-              className="convex-pill w-12 h-12 bg-[#050814]/95 border border-cyan-400/50 text-white flex items-center justify-center hover:bg-cyan-500 hover:text-slate-950 transition-all shadow-lg active:scale-95"
+              className="w-10 h-10 rounded-xl bg-[#111622] border border-white/10 text-slate-300 flex items-center justify-center hover:bg-[#1a2233] hover:text-white hover:border-blue-500/40 transition-all shadow-sm active:scale-95"
             >
-              <i className={`fas ${isAr ? "fa-arrow-right" : "fa-arrow-left"}`}></i>
+              <i className={`fas ${isAr ? "fa-arrow-right" : "fa-arrow-left"} text-sm`}></i>
             </button>
             <button
               onClick={handleNext}
               aria-label={isAr ? "الباقة التالية" : "Next Package"}
-              className="convex-pill w-12 h-12 bg-[#050814]/95 border border-cyan-400/50 text-white flex items-center justify-center hover:bg-cyan-500 hover:text-slate-950 transition-all shadow-lg active:scale-95"
+              className="w-10 h-10 rounded-xl bg-[#111622] border border-white/10 text-slate-300 flex items-center justify-center hover:bg-[#1a2233] hover:text-white hover:border-blue-500/40 transition-all shadow-sm active:scale-95"
             >
-              <i className={`fas ${isAr ? "fa-arrow-left" : "fa-arrow-right"}`}></i>
+              <i className={`fas ${isAr ? "fa-arrow-left" : "fa-arrow-right"} text-sm`}></i>
             </button>
           </div>
         </div>
 
         {/* The Responsive Slider Container */}
-        <div className="relative pt-4 sm:pt-6 pb-2">
+        <div className="relative pt-8 sm:pt-10 pb-4">
           {/* Mobile Swipe Cue */}
-          <div className="md:hidden flex items-center justify-center gap-2 mb-3 text-xs text-cyan-400/80 font-medium select-none pointer-events-none animate-pulse">
+          <div className="md:hidden flex items-center justify-center gap-2 mb-3 text-xs text-slate-400 font-medium select-none pointer-events-none">
             <span className="text-sm">‹‹</span>
-            <span>{isAr ? "اسحب يعرب تكً أو يساراً للتنقل بين الباقات" : "Swipe left or right to explore packages"}</span>
+            <span>{isAr ? "اسحب للتنقل بين الباقات" : "Swipe left or right to explore packages"}</span>
             <span className="text-sm">››</span>
           </div>
 
@@ -306,14 +305,14 @@ export default function PackagesSlider({ lang }: PackagesSliderProps) {
             {visibleItems.map((pkg, idx) => (
               <div
                 key={`${pkg.id}-${currentIndex}-${idx}`}
-                className={`relative rounded-3xl p-6 sm:p-8 curved-cockpit border-2 border-cyan-500/30 hover:border-cyan-400/80 shadow-2xl transition-all duration-300 backdrop-blur-xl group hover:-translate-y-2 active:scale-[0.98] active:border-cyan-400 flex flex-col justify-between ${
+                className={`relative rounded-2xl p-6 sm:p-7 lamp-card !overflow-visible shadow-xl transition-all duration-200 group hover:-translate-y-1 flex flex-col justify-between ${
                   idx === 1 ? "hidden md:flex" : idx === 2 ? "hidden lg:flex" : "flex"
                 }`}
               >
                 {/* Popular / Promo Badge */}
                 {(pkg.badgeAr || pkg.badgeEn) && (
-                  <div className="absolute -top-3.5 right-6 sm:right-8 rtl:right-auto rtl:left-6 sm:rtl:left-8 z-30 bg-gradient-to-r from-primary via-cyan-300 to-violet-400 text-slate-950 text-xs font-black px-4 py-1.5 rounded-full shadow-xl flex items-center gap-1.5 uppercase tracking-wide border border-violet-400/25 whitespace-nowrap pointer-events-none animate-mobile-badge">
-                    <i className="fas fa-crown text-amber-950"></i>
+                  <div className="absolute -top-3.5 right-6 sm:right-7 rtl:right-auto rtl:left-6 sm:rtl:left-7 z-30 bg-gradient-to-r from-amber-500/25 to-amber-600/25 text-amber-300 border border-amber-400/40 text-xs font-bold px-3.5 py-1 rounded-full shadow-lg shadow-amber-950/40 flex items-center gap-1.5 whitespace-nowrap pointer-events-none">
+                    <i className="fas fa-crown text-[10px] text-amber-400"></i>
                     <span>{isAr ? pkg.badgeAr : pkg.badgeEn}</span>
                   </div>
                 )}
@@ -321,21 +320,21 @@ export default function PackagesSlider({ lang }: PackagesSliderProps) {
                 <div>
                   {/* Category & Icon */}
                   <div className="flex items-center justify-between gap-3 mb-4">
-                    <span className="text-xs font-bold text-primary flex items-center gap-2 bg-primary/10 px-3 py-1 rounded-full border border-primary/20">
+                    <span className="text-xs font-semibold text-blue-400 flex items-center gap-1.5 bg-blue-500/10 px-3 py-1 rounded-full border border-blue-500/20">
                       <i className={pkg.icon}></i>
                       <span>{isAr ? pkg.categoryAr : pkg.categoryEn}</span>
                     </span>
 
                     <span className="text-xs text-slate-400 flex items-center gap-1.5 font-medium">
-                      <i className="fas fa-clock text-cyan-400 animate-pulse"></i>
+                      <i className="fas fa-clock text-slate-400"></i>
                       <span>{pkg.deliveryTime}</span>
                     </span>
                   </div>
 
                   {/* Title & Starting Price */}
-                  <div className="flex justify-between items-start mb-4">
+                  <div className="flex justify-between items-start mb-4 gap-2">
                     <div>
-                      <h3 className="text-2xl font-bold text-white group-hover:text-primary transition-colors leading-tight">
+                      <h3 className="text-xl font-bold text-white group-hover:text-blue-400 transition-colors leading-tight">
                         {isAr ? pkg.nameAr : pkg.nameEn}
                       </h3>
                       <span className="block text-xs text-slate-400 mt-1 line-clamp-1">
@@ -344,22 +343,22 @@ export default function PackagesSlider({ lang }: PackagesSliderProps) {
                     </div>
 
                     <div className="text-right shrink-0 rtl:text-left">
-                      <span className="text-xs text-slate-400 block font-medium">
+                      <span className="text-[11px] text-slate-400 block font-medium">
                         {isAr ? "يبدأ من" : "Starts at"}
                       </span>
-                      <span className="text-3xl lg:text-4xl font-black text-violet-400 tracking-tight">
+                      <span className="text-2xl lg:text-3xl font-black text-emerald-400 tracking-tight">
                         {pkg.startingPrice}
                       </span>
                     </div>
                   </div>
 
-                  <div className="w-full h-[1px] bg-gradient-to-r from-transparent via-outline-variant/30 to-transparent my-6"></div>
+                  <div className="w-full h-[1px] bg-white/10 my-5"></div>
 
                   {/* Feature / Included Services Checklist */}
-                  <ul className="space-y-3 mb-8">
+                  <ul className="space-y-2.5 mb-7">
                     {(isAr ? pkg.servicesAr : pkg.servicesEn).map((srv, sIdx) => (
-                      <li key={sIdx} className="flex items-start gap-3 text-sm text-slate-200">
-                        <span className="w-5 h-5 rounded-full bg-violet-500/20 text-violet-400 flex items-center justify-center text-xs shrink-0 mt-0.5 border border-violet-500/30">
+                      <li key={sIdx} className="flex items-start gap-2.5 text-sm text-slate-300">
+                        <span className="w-4 h-4 rounded-full bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-[10px] shrink-0 mt-0.5 border border-emerald-500/20">
                           <i className="fas fa-check"></i>
                         </span>
                         <span className="line-clamp-1">{srv}</span>
@@ -368,18 +367,18 @@ export default function PackagesSlider({ lang }: PackagesSliderProps) {
                   </ul>
                 </div>
 
-                {/* Call to Action Buttons Linking to /pricing */}
-                <div className="space-y-3">
+                {/* Call to Action Button */}
+                <div className="space-y-2.5">
                   <Link
                     href={`/${lang}/pricing?section=${encodeURIComponent(pkg.groupName)}`}
-                    className="btn-purple-glow w-full py-3.5 px-6 font-black text-center flex items-center justify-center gap-2 group"
+                    className="btn-royal w-full py-3 px-5 font-bold text-sm text-center flex items-center justify-center gap-2 group shadow-md shadow-blue-900/30"
                   >
                     <span>{isAr ? "اطلب الآن وابدأ التفعيل" : "Order & Activate Now"}</span>
                     <i className={`fas ${isAr ? "fa-arrow-left" : "fa-arrow-right"} text-xs transition-transform group-hover:-translate-x-1`}></i>
                   </Link>
 
-                  <p className="text-center text-xs text-slate-400 flex items-center justify-center gap-1.5">
-                    <i className="fas fa-shield-alt text-[10px] text-violet-400"></i>
+                  <p className="text-center text-[11px] text-slate-400 flex items-center justify-center gap-1.5">
+                    <i className="fas fa-shield-alt text-[10px] text-slate-400"></i>
                     <span>{isAr ? "تنفيذ مؤتمت عبر الـ API مع استرجاع الرصيد في حال الفشل" : "Automated API delivery with refund guarantee"}</span>
                   </p>
                 </div>
@@ -395,10 +394,10 @@ export default function PackagesSlider({ lang }: PackagesSliderProps) {
               key={idx}
               onClick={() => setCurrentIndex(idx)}
               aria-label={`Go to slide ${idx + 1}`}
-              className={`h-2.5 rounded-full transition-all duration-300 active:scale-90 ${
+              className={`h-2 rounded-full transition-all duration-300 active:scale-90 ${
                 idx === currentIndex % total
-                  ? "w-10 bg-gradient-to-r from-violet-400 via-cyan-400 to-purple-200 shadow-[0_0_15px_#8b5cf6] animate-pulse"
-                  : "w-2.5 bg-slate-700/80 hover:bg-slate-500"
+                  ? "w-8 bg-blue-500"
+                  : "w-2 bg-slate-700 hover:bg-slate-600"
               }`}
             />
           ))}
@@ -408,7 +407,7 @@ export default function PackagesSlider({ lang }: PackagesSliderProps) {
         <div className="text-center mt-10">
           <Link
             href={`/${lang}/pricing`}
-            className="btn-dark-pill inline-flex items-center gap-2.5 px-8 py-3.5 border border-cyan-400/50 text-cyan-300 hover:border-cyan-400 text-sm sm:text-base group"
+            className="btn-dark-pill px-8 sm:px-10 py-3.5 sm:py-4 font-bold text-sm sm:text-base gap-2.5 group shadow-md"
           >
             <span>{isAr ? "استعراض كافة الباقات والخدمات المتوفرة (أكثر من 500+ خدمة)" : "Explore All Packages & Services (500+)"}</span>
             <i className={`fas ${isAr ? "fa-arrow-left" : "fa-arrow-right"} text-sm transition-transform group-hover:-translate-x-1`}></i>

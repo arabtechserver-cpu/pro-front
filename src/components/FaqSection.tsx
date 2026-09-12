@@ -49,19 +49,18 @@ export default function FaqSection({ lang }: FaqSectionProps) {
   };
 
   return (
-    <section className="relative py-14 sm:py-20 bg-transparent text-white overflow-hidden">
-      {/* Stronger Purple Glow */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_70%_50%_at_50%_50%,rgba(109,40,217,0.15),transparent)] pointer-events-none"></div>
-      <div className="absolute top-1/2 right-1/4 -translate-y-1/2 w-[500px] h-[500px] bg-violet-600/15 rounded-full blur-3xl pointer-events-none"></div>
-      <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-[400px] h-[400px] bg-purple-700/12 rounded-full blur-3xl pointer-events-none"></div>
+    <section className="relative py-14 sm:py-20 bg-transparent text-white overflow-hidden section-spotlight">
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_40%_at_50%_50%,rgba(37,99,235,0.05),transparent)] pointer-events-none"></div>
 
       <div className="w-full cyber-container relative z-10">
-        <h2 className="text-3xl sm:text-5xl font-black text-center mb-10 sm:mb-14" data-aos="fade-down" suppressHydrationWarning>
-          <span className="bg-gradient-to-r from-violet-400 via-cyan-300 to-purple-200 bg-clip-text text-transparent">
-            {isAr ? "الأسئلة الشائعة " : "Frequently Asked "}
-          </span>
-          <span>{isAr ? "والأكثر تداولاً" : "Questions"}</span>
-        </h2>
+        <div className="lamp-header max-w-2xl mx-auto mb-10 sm:mb-14">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-center" data-aos="fade-down" suppressHydrationWarning>
+            <span className="text-blue-400">
+              {isAr ? "الأسئلة الشائعة " : "Frequently Asked "}
+            </span>
+            <span>{isAr ? "والأكثر تداولاً" : "Questions"}</span>
+          </h2>
+        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 items-start">
           {faqs.map((faq, idx) => {
@@ -69,25 +68,22 @@ export default function FaqSection({ lang }: FaqSectionProps) {
             return (
               <div
                 key={idx}
-                className="curved-cockpit rounded-2xl sm:rounded-3xl border-2 border-cyan-500/30 hover:border-cyan-400/70 overflow-hidden shadow-xl transition-all duration-300 backdrop-blur-xl"
+                className="lamp-card rounded-2xl overflow-hidden shadow-md transition-all duration-200"
                 data-aos="fade-up"
                 data-aos-delay={idx * 100}
                 suppressHydrationWarning
               >
-                {/* Top Arched Line Accent */}
-                <div className="absolute -top-[2px] left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-cyan-400/50 to-transparent pointer-events-none"></div>
-
                 <button
                   type="button"
                   onClick={() => toggleFaq(idx)}
-                  className="w-full flex justify-between items-center px-6 sm:px-8 py-5 text-left rtl:text-right focus:outline-none hover:bg-[#0c1328]/50 transition-colors"
+                  className="w-full flex justify-between items-center px-6 sm:px-8 py-5 text-left rtl:text-right focus:outline-none hover:bg-[#1b263e]/70 transition-colors"
                 >
                   <span className="text-base sm:text-lg font-bold text-white">
                     {isAr ? faq.qAr : faq.qEn}
                   </span>
                   <div
-                    className={`convex-pill w-10 h-10 flex items-center justify-center bg-[#050814] border border-cyan-400/50 text-cyan-300 transition-transform duration-300 shrink-0 ms-4 shadow-md ${
-                      isOpen ? "rotate-45" : "rotate-0"
+                    className={`w-8 h-8 rounded-lg flex items-center justify-center bg-[#1d273b] border border-white/15 text-blue-400 transition-transform duration-200 shrink-0 ms-4 ${
+                      isOpen ? "rotate-45 text-amber-400" : "rotate-0"
                     }`}
                   >
                     <i className="fas fa-plus text-xs"></i>
@@ -95,7 +91,7 @@ export default function FaqSection({ lang }: FaqSectionProps) {
                 </button>
 
                 {isOpen && (
-                  <div className="px-6 sm:px-8 pb-6 pt-2 text-slate-300 text-sm sm:text-base leading-relaxed border-t border-cyan-500/20 bg-[#050814]/40">
+                  <div className="px-6 sm:px-8 pb-6 pt-2 text-slate-300 text-sm sm:text-base leading-relaxed border-t border-white/10 bg-[#0B0F17]/50">
                     {isAr ? faq.aAr : faq.aEn}
                   </div>
                 )}
