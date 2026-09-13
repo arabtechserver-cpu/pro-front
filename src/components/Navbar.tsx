@@ -147,6 +147,28 @@ export default function Navbar({ lang, dict }: NavbarProps) {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // Auto-close mobile drawer on route change
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [pathname]);
+
+  // Lock body scroll and listen for Escape key when mobile drawer is open
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setMobileMenuOpen(false);
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.body.style.overflow = "";
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [mobileMenuOpen]);
+
   const switchLanguage = () => {
     const newLang = lang === "ar" ? "en" : "ar";
     const segments = pathname.split("/");
@@ -533,10 +555,10 @@ export default function Navbar({ lang, dict }: NavbarProps) {
 
             <button 
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2.5 rounded-xl bg-surface-container-high/90 border border-white/10 text-white hover:text-primary hover:bg-primary/20 transition-all active:scale-95"
-              aria-label="Toggle menu"
+              className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-surface-container-high/90 border border-white/10 text-white hover:text-primary hover:bg-primary/20 transition-all active:scale-95 flex items-center justify-center shrink-0 shadow-sm"
+              aria-label={mobileMenuOpen ? (lang === "ar" ? "إغلاق القائمة" : "Close menu") : (lang === "ar" ? "فتح القائمة" : "Open menu")}
             >
-              <span className="material-symbols-outlined text-2xl block transition-transform duration-300">
+              <span className="material-symbols-outlined text-xl sm:text-2xl block transition-transform duration-300">
                 {mobileMenuOpen ? "close" : "menu"}
               </span>
             </button>
@@ -544,149 +566,321 @@ export default function Navbar({ lang, dict }: NavbarProps) {
         </div>
       </div>
 
-      {/* Mobile Menu Dropdown with Smooth Animation */}
-      {mobileMenuOpen && (
-        <div className="lg:hidden absolute top-full left-0 right-0 glass-panel border-b border-outline-variant/30 shadow-2xl animate-in fade-in slide-in-from-top-3 duration-200 overflow-hidden bg-surface/95 backdrop-blur-2xl">
-          <div className="flex flex-col p-5 gap-2 max-h-[80vh] overflow-y-auto">
-            {/* Logged in User Pill on Mobile */}
-            {userSession && (
-              <div className="p-3 rounded-xl bg-primary/10 border border-primary/30 flex items-center justify-between mb-2">
-                <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-full bg-primary text-on-primary font-bold flex items-center justify-center text-xs">
-                    {userSession.fullName ? userSession.fullName.charAt(0) : "U"}
-                  </div>
-                  <div>
-                    <p className="font-bold text-xs text-on-surface">{userSession.fullName}</p>
-                    <p className="text-[10px] text-primary font-mono dir-ltr">{formatBalance(userSession.balance)}</p>
-                  </div>
-                </div>
+    </header>
 
-                <button
-                  onClick={handleLogout}
-                  className="px-3 py-1 rounded-lg bg-red-500/20 text-red-400 font-bold text-xs"
-                >
-                  خروج
-                </button>
+    {/* Mobile Side Drawer Backdrop */}
+    <div 
+      className={`fixed inset-0 bg-black/75 backdrop-blur-sm z-50 transition-opacity duration-300 lg:hidden ${
+        mobileMenuOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+      }`}
+      onClick={() => setMobileMenuOpen(false)}
+      aria-hidden="true"
+    />
+
+    {/* Mobile Side Drawer */}
+    <aside
+      id="mobile-side-drawer"
+      role="dialog"
+      aria-modal="true"
+      aria-label={lang === "ar" ? "القائمة الجانبية" : "Side Navigation Menu"}
+      className={`fixed top-0 bottom-0 z-50 w-[85%] max-w-[340px] sm:max-w-[380px] bg-[#0c121e] border-e sm:border-s border-white/10 shadow-2xl flex flex-col transition-transform duration-300 ease-out lg:hidden ${
+        lang === "ar" ? "right-0" : "left-0"
+      } ${
+        mobileMenuOpen 
+          ? "translate-x-0" 
+          : (lang === "ar" ? "translate-x-full" : "-translate-x-full")
+      }`}
+    >
+      {/* 1. Header Bar */}
+      <div className="bg-[#101827] px-4 py-3.5 border-b border-white/10 flex items-center justify-between text-white shrink-0">
+        <div className="flex items-center gap-2.5 min-w-0">
+          <button
+            onClick={() => setMobileMenuOpen(false)}
+            className="w-8 h-8 rounded-lg text-slate-300 hover:text-white hover:bg-white/10 transition-colors flex items-center justify-center shrink-0 border border-white/5"
+            aria-label={lang === "ar" ? "إغلاق القائمة" : "Close menu"}
+          >
+            <i className={`fas ${lang === "ar" ? "fa-arrow-right" : "fa-arrow-left"} text-sm`}></i>
+          </button>
+          <span className="font-black text-xs sm:text-sm tracking-wide text-white truncate font-mono">
+            {lang === "ar" ? "عرب تك برو سيرفر" : "ARAB TECH PRO SERVER"}
+          </span>
+        </div>
+        <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-bold">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span>ONLINE</span>
+        </div>
+      </div>
+
+      {/* 2. Top Action Buttons (تسجيل / تسجيل الدخول) */}
+      {userSession ? (
+        <div className="p-3.5 bg-[#0f1624] border-b border-white/10 shrink-0">
+          <div className="flex items-center justify-between gap-3 mb-2.5">
+            <div className="flex items-center gap-2.5 min-w-0">
+              <div className="w-9 h-9 rounded-full bg-blue-600 text-white font-black flex items-center justify-center text-sm shrink-0 shadow-md">
+                {userSession.fullName ? userSession.fullName.charAt(0) : "U"}
               </div>
-            )}
-
-            {userSession && (
-              <Link 
-                href={`/${lang}/profile`} 
-                onClick={() => setMobileMenuOpen(false)} 
-                className={`flex items-center gap-3 p-3.5 rounded-xl font-bold text-sm transition-all ${
-                  isActive("/profile") ? "bg-primary/20 text-primary border border-primary/30" : "text-primary bg-primary/10 hover:bg-primary/20 border border-primary/20"
-                }`}
-              >
-                <span className="material-symbols-outlined text-lg">account_circle</span>
-                <span>{lang === "ar" ? "الملف الشخصي والحساب" : "My Profile & Account"}</span>
-              </Link>
-            )}
-
-            <Link 
-              href={`/${lang}`} 
-              onClick={() => setMobileMenuOpen(false)} 
-              className={`flex items-center gap-3 p-3.5 rounded-xl font-semibold text-sm transition-all ${
-                isActive("/") ? "bg-primary text-white font-bold shadow-md" : "text-slate-100 hover:text-white hover:bg-surface-container-high"
-              }`}
+              <div className="min-w-0">
+                <p className="font-bold text-xs text-white truncate">{userSession.fullName}</p>
+                <p className="text-[11px] text-blue-400 font-mono dir-ltr font-semibold">{formatBalance(userSession.balance)}</p>
+              </div>
+            </div>
+            <button
+              onClick={handleLogout}
+              className="px-2.5 py-1 rounded-lg bg-red-500/15 text-red-400 hover:bg-red-500/25 font-bold text-xs transition-colors shrink-0"
             >
-              <span className="material-symbols-outlined text-lg">home</span>
-              {dict.home}
-            </Link>
-
-            <Link 
-              href={`/${lang}/pricing`} 
-              onClick={() => setMobileMenuOpen(false)} 
-              className={`flex items-center gap-3 p-3.5 rounded-xl font-semibold text-sm transition-all ${
-                isActive("/pricing") ? "bg-primary text-white font-bold shadow-md" : "text-slate-100 hover:text-white hover:bg-surface-container-high"
-              }`}
+              {lang === "ar" ? "خروج" : "Logout"}
+            </button>
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            <Link
+              href={`/${lang}/profile`}
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex items-center justify-center gap-1.5 py-2 px-2 rounded-lg bg-white/5 hover:bg-white/10 text-xs font-semibold text-slate-200 transition-colors"
             >
-              <span className="material-symbols-outlined text-lg">sell</span>
-              {dict.resellerPricing}
+              <span className="material-symbols-outlined text-sm text-blue-400">account_circle</span>
+              <span>{lang === "ar" ? "حسابي" : "Profile"}</span>
             </Link>
-
-            <Link 
-              href={`/${lang}/orders`} 
-              onClick={() => setMobileMenuOpen(false)} 
-              className={`flex items-center gap-3 p-3.5 rounded-xl font-semibold text-sm transition-all ${
-                isActive("/orders") ? "bg-primary text-white font-bold shadow-md" : "text-slate-100 hover:text-white hover:bg-surface-container-high"
-              }`}
+            <Link
+              href={`/${lang}/wallet`}
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex items-center justify-center gap-1.5 py-2 px-2 rounded-lg bg-blue-500/15 hover:bg-blue-500/25 border border-blue-500/20 text-xs font-bold text-blue-300 transition-colors"
             >
-              <span className="material-symbols-outlined text-lg">receipt_long</span>
-              <span>{lang === "ar" ? "الطلبات" : "My Orders"}</span>
+              <span className="material-symbols-outlined text-sm text-blue-400">account_balance_wallet</span>
+              <span>{lang === "ar" ? "شحن الرصيد" : "Top Up"}</span>
             </Link>
-
-            <Link 
-              href={`/${lang}/api-developer`} 
-              onClick={() => setMobileMenuOpen(false)} 
-              className={`flex items-center gap-3 p-3.5 rounded-xl font-semibold text-sm transition-all ${
-                isActive("/api-developer") ? "bg-purple-600 text-white font-bold shadow-md" : "text-slate-100 hover:text-purple-300 hover:bg-surface-container-high"
-              }`}
+          </div>
+        </div>
+      ) : (
+        <div className="p-3.5 bg-[#0f1624] border-b border-white/10 shrink-0">
+          <div className="grid grid-cols-2 gap-2.5">
+            <Link
+              href={`/${lang}/login`}
+              onClick={() => setMobileMenuOpen(false)}
+              className="py-2.5 px-3 rounded-xl bg-[#182235] hover:bg-[#202d45] border border-white/10 text-white font-bold text-xs sm:text-sm text-center transition-all shadow-sm"
             >
-              <span className="material-symbols-outlined text-lg text-purple-400">api</span>
-              <span>{lang === "ar" ? "ربط الـ API" : "API Developer"}</span>
+              {lang === "ar" ? "تسجيل الدخول" : "Sign In"}
             </Link>
-
-            <Link 
-              href={`/${lang}/wallet`} 
-              onClick={() => setMobileMenuOpen(false)} 
-              className={`flex items-center gap-3 p-3.5 rounded-xl font-semibold text-sm transition-all ${
-                isActive("/wallet") ? "bg-primary text-white font-bold shadow-md" : "text-slate-100 hover:text-white hover:bg-surface-container-high"
-              }`}
+            <Link
+              href={`/${lang}/register`}
+              onClick={() => setMobileMenuOpen(false)}
+              className="py-2.5 px-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs sm:text-sm text-center transition-all shadow-md shadow-blue-600/30"
             >
-              <span className="material-symbols-outlined text-lg">account_balance_wallet</span>
-              <span>{lang === "ar" ? "المحفظة والشحن" : "My Wallet"}</span>
+              {lang === "ar" ? "تسجيل" : "Register"}
             </Link>
-
-            <Link 
-              href={`/${lang}/blog`} 
-              onClick={() => setMobileMenuOpen(false)} 
-              className={`flex items-center gap-3 p-3.5 rounded-xl font-semibold text-sm transition-all ${
-                isActive("/blog") ? "bg-primary text-white font-bold shadow-md" : "text-slate-100 hover:text-white hover:bg-surface-container-high"
-              }`}
-            >
-              <span className="material-symbols-outlined text-lg">article</span>
-              {dict.blog}
-            </Link>
-
-            <Link 
-              href={`/${lang}/tutorials`} 
-              onClick={() => setMobileMenuOpen(false)} 
-              className={`flex items-center gap-3 p-3.5 rounded-xl font-semibold text-sm transition-all ${
-                isActive("/tutorials") ? "bg-primary text-white font-bold shadow-md" : "text-slate-100 hover:text-white hover:bg-surface-container-high"
-              }`}
-            >
-              <span className="material-symbols-outlined text-lg">play_circle</span>
-              {dict.tutorials}
-            </Link>
-
-            <Link 
-              href={`/${lang}/contact`} 
-              onClick={() => setMobileMenuOpen(false)} 
-              className={`flex items-center gap-3 p-3.5 rounded-xl font-semibold text-sm transition-all ${
-                isActive("/contact") ? "bg-primary text-white font-bold shadow-md" : "text-slate-100 hover:text-white hover:bg-surface-container-high"
-              }`}
-            >
-              <span className="material-symbols-outlined text-lg">mail</span>
-              {dict.contactUs}
-            </Link>
-
-            <div className="h-px bg-outline-variant/20 my-2"></div>
-
-            {!userSession && (
-              <Link 
-                href={`/${lang}/login`} 
-                onClick={() => setMobileMenuOpen(false)} 
-                className="btn-purple-glow p-3.5 rounded-full text-white font-bold text-center flex items-center justify-center gap-2"
-              >
-                <span className="material-symbols-outlined text-lg">lock</span>
-                {dict.login}
-              </Link>
-            )}
           </div>
         </div>
       )}
-    </header>
+
+      {/* 3. Navigation List - Exact Partitioning */}
+      <div className="flex-1 overflow-y-auto overscroll-contain divide-y divide-white/[0.06]">
+        {/* أسعار إعادة البيع */}
+        <Link
+          href={`/${lang}/pricing`}
+          onClick={() => setMobileMenuOpen(false)}
+          className="flex items-center justify-between px-4 py-3 text-slate-100 hover:text-white hover:bg-white/[0.04] transition-colors group"
+        >
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-7 h-7 rounded-lg bg-blue-500/15 border border-blue-500/30 flex items-center justify-center text-blue-400 shrink-0">
+              <span className="material-symbols-outlined text-base">payments</span>
+            </div>
+            <span className="font-bold text-xs sm:text-sm text-white group-hover:text-blue-400 transition-colors truncate">
+              {lang === "ar" ? "أسعار إعادة البيع" : "Reseller Pricing"}
+            </span>
+          </div>
+          <span className="text-[10px] px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20 font-semibold shrink-0">
+            {lang === "ar" ? "VIP" : "PRO"}
+          </span>
+        </Link>
+
+        {/* خدمة IMEI / iCloud / فتح القفل / التحقق */}
+        <Link
+          href={`/${lang}/pricing?category=imei`}
+          onClick={() => setMobileMenuOpen(false)}
+          className="flex items-center justify-between px-4 py-3 text-slate-200 hover:text-white hover:bg-white/[0.04] transition-colors group"
+        >
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-7 h-7 rounded-lg bg-cyan-500/15 border border-cyan-500/30 flex items-center justify-center text-cyan-400 shrink-0">
+              <span className="material-symbols-outlined text-base">phonelink_lock</span>
+            </div>
+            <span className="font-semibold text-xs sm:text-sm text-slate-200 group-hover:text-cyan-400 transition-colors truncate">
+              {lang === "ar" ? "خدمة IMEI / iCloud / فتح القفل" : "IMEI / iCloud / Unlock Services"}
+            </span>
+          </div>
+          <i className={`fas ${lang === "ar" ? "fa-chevron-left" : "fa-chevron-right"} text-xs text-slate-500 group-hover:text-cyan-400 group-hover:-translate-x-0.5 rtl:group-hover:-translate-x-0.5 ltr:group-hover:translate-x-0.5 transition-all shrink-0 ms-2`}></i>
+        </Link>
+
+        {/* خدمة الخادم / التفعيل / الرصيد / بطاقة الهدايا */}
+        <Link
+          href={`/${lang}/pricing?category=server`}
+          onClick={() => setMobileMenuOpen(false)}
+          className="flex items-center justify-between px-4 py-3 text-slate-200 hover:text-white hover:bg-white/[0.04] transition-colors group"
+        >
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-7 h-7 rounded-lg bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shrink-0">
+              <span className="material-symbols-outlined text-base">dns</span>
+            </div>
+            <span className="font-semibold text-xs sm:text-sm text-slate-200 group-hover:text-emerald-400 transition-colors truncate">
+              {lang === "ar" ? "خدمة الخادم / التفعيل / الرصيد" : "Server / Activation / Credits"}
+            </span>
+          </div>
+          <i className={`fas ${lang === "ar" ? "fa-chevron-left" : "fa-chevron-right"} text-xs text-slate-500 group-hover:text-emerald-400 group-hover:-translate-x-0.5 rtl:group-hover:-translate-x-0.5 ltr:group-hover:translate-x-0.5 transition-all shrink-0 ms-2`}></i>
+        </Link>
+
+        {/* خدمة عن بُعد / FRP / وسائل التواصل الاجتماعي */}
+        <Link
+          href={`/${lang}/pricing?category=remote`}
+          onClick={() => setMobileMenuOpen(false)}
+          className="flex items-center justify-between px-4 py-3 text-slate-200 hover:text-white hover:bg-white/[0.04] transition-colors group"
+        >
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-7 h-7 rounded-lg bg-purple-500/15 border border-purple-500/30 flex items-center justify-center text-purple-400 shrink-0">
+              <span className="material-symbols-outlined text-base">cast</span>
+            </div>
+            <span className="font-semibold text-xs sm:text-sm text-slate-200 group-hover:text-purple-400 transition-colors truncate">
+              {lang === "ar" ? "خدمة عن بُعد / FRP / الصيانة" : "Remote Support & FRP Services"}
+            </span>
+          </div>
+          <i className={`fas ${lang === "ar" ? "fa-chevron-left" : "fa-chevron-right"} text-xs text-slate-500 group-hover:text-purple-400 group-hover:-translate-x-0.5 rtl:group-hover:-translate-x-0.5 ltr:group-hover:translate-x-0.5 transition-all shrink-0 ms-2`}></i>
+        </Link>
+
+        {/* قناة التلجرام */}
+        <a
+          href="https://t.me/ARABTECHSUPPURT2"
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={() => setMobileMenuOpen(false)}
+          className="flex items-center justify-between px-4 py-3 text-slate-200 hover:text-white hover:bg-white/[0.04] transition-colors group"
+        >
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-7 h-7 rounded-lg bg-sky-500/15 border border-sky-500/30 flex items-center justify-center text-sky-400 shrink-0">
+              <i className="fab fa-telegram-plane text-xs"></i>
+            </div>
+            <span className="font-semibold text-xs sm:text-sm text-slate-200 group-hover:text-sky-400 transition-colors truncate">
+              {lang === "ar" ? "قناة التلجرام الرسمية" : "Official Telegram Channel"}
+            </span>
+          </div>
+          <i className={`fas ${lang === "ar" ? "fa-chevron-left" : "fa-chevron-right"} text-xs text-slate-500 group-hover:text-sky-400 group-hover:-translate-x-0.5 rtl:group-hover:-translate-x-0.5 ltr:group-hover:translate-x-0.5 transition-all shrink-0 ms-2`}></i>
+        </a>
+
+        {/* Quick Site Links */}
+        <div className="pt-3 pb-1.5 px-4 bg-white/[0.02]">
+          <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">
+            {lang === "ar" ? "أقسام الموقع" : "Platform Sections"}
+          </span>
+        </div>
+
+        <Link
+          href={`/${lang}`}
+          onClick={() => setMobileMenuOpen(false)}
+          className="flex items-center justify-between px-4 py-2.5 text-slate-300 hover:text-white hover:bg-white/[0.03] transition-colors text-xs sm:text-sm group"
+        >
+          <span className="flex items-center gap-2.5">
+            <span className="material-symbols-outlined text-base text-blue-400">home</span>
+            <span>{dict.home}</span>
+          </span>
+          <i className={`fas ${lang === "ar" ? "fa-chevron-left" : "fa-chevron-right"} text-[10px] text-slate-500`}></i>
+        </Link>
+
+        <Link
+          href={`/${lang}/orders`}
+          onClick={() => setMobileMenuOpen(false)}
+          className="flex items-center justify-between px-4 py-2.5 text-slate-300 hover:text-white hover:bg-white/[0.03] transition-colors text-xs sm:text-sm group"
+        >
+          <span className="flex items-center gap-2.5">
+            <span className="material-symbols-outlined text-base text-emerald-400">receipt_long</span>
+            <span>{lang === "ar" ? "الطلبات والعمليات" : "My Orders"}</span>
+          </span>
+          <i className={`fas ${lang === "ar" ? "fa-chevron-left" : "fa-chevron-right"} text-[10px] text-slate-500`}></i>
+        </Link>
+
+        <Link
+          href={`/${lang}/wallet`}
+          onClick={() => setMobileMenuOpen(false)}
+          className="flex items-center justify-between px-4 py-2.5 text-slate-300 hover:text-white hover:bg-white/[0.03] transition-colors text-xs sm:text-sm group"
+        >
+          <span className="flex items-center gap-2.5">
+            <span className="material-symbols-outlined text-base text-amber-400">account_balance_wallet</span>
+            <span>{lang === "ar" ? "المحفظة والشحن" : "My Wallet"}</span>
+          </span>
+          <i className={`fas ${lang === "ar" ? "fa-chevron-left" : "fa-chevron-right"} text-[10px] text-slate-500`}></i>
+        </Link>
+
+        <Link
+          href={`/${lang}/api-developer`}
+          onClick={() => setMobileMenuOpen(false)}
+          className="flex items-center justify-between px-4 py-2.5 text-slate-300 hover:text-white hover:bg-white/[0.03] transition-colors text-xs sm:text-sm group"
+        >
+          <span className="flex items-center gap-2.5">
+            <span className="material-symbols-outlined text-base text-purple-400">api</span>
+            <span>{lang === "ar" ? "ربط الـ API" : "API Developer"}</span>
+          </span>
+          <i className={`fas ${lang === "ar" ? "fa-chevron-left" : "fa-chevron-right"} text-[10px] text-slate-500`}></i>
+        </Link>
+
+        <Link
+          href={`/${lang}/blog`}
+          onClick={() => setMobileMenuOpen(false)}
+          className="flex items-center justify-between px-4 py-2.5 text-slate-300 hover:text-white hover:bg-white/[0.03] transition-colors text-xs sm:text-sm group"
+        >
+          <span className="flex items-center gap-2.5">
+            <span className="material-symbols-outlined text-base text-sky-400">article</span>
+            <span>{dict.blog}</span>
+          </span>
+          <i className={`fas ${lang === "ar" ? "fa-chevron-left" : "fa-chevron-right"} text-[10px] text-slate-500`}></i>
+        </Link>
+
+        <Link
+          href={`/${lang}/tutorials`}
+          onClick={() => setMobileMenuOpen(false)}
+          className="flex items-center justify-between px-4 py-2.5 text-slate-300 hover:text-white hover:bg-white/[0.03] transition-colors text-xs sm:text-sm group"
+        >
+          <span className="flex items-center gap-2.5">
+            <span className="material-symbols-outlined text-base text-indigo-400">play_circle</span>
+            <span>{dict.tutorials}</span>
+          </span>
+          <i className={`fas ${lang === "ar" ? "fa-chevron-left" : "fa-chevron-right"} text-[10px] text-slate-500`}></i>
+        </Link>
+
+        <Link
+          href={`/${lang}/contact`}
+          onClick={() => setMobileMenuOpen(false)}
+          className="flex items-center justify-between px-4 py-2.5 text-slate-300 hover:text-white hover:bg-white/[0.03] transition-colors text-xs sm:text-sm group"
+        >
+          <span className="flex items-center gap-2.5">
+            <span className="material-symbols-outlined text-base text-cyan-400">mail</span>
+            <span>{dict.contactUs}</span>
+          </span>
+          <i className={`fas ${lang === "ar" ? "fa-chevron-left" : "fa-chevron-right"} text-[10px] text-slate-500`}></i>
+        </Link>
+      </div>
+
+      {/* 4. Drawer Footer Controls */}
+      <div className="p-3 bg-[#090d15] border-t border-white/10 shrink-0 flex items-center justify-between gap-3">
+        <Link 
+          href={switchLanguage()} 
+          onClick={() => setMobileMenuOpen(false)}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-white/10 bg-white/5 text-slate-200 hover:text-white hover:bg-white/10 transition-colors text-xs font-bold"
+        >
+          <span className="material-symbols-outlined text-sm text-blue-400">language</span>
+          <span>{lang === "ar" ? "English" : "العربية"}</span>
+        </Link>
+
+        <div className="flex items-center gap-1.5 text-xs text-slate-300">
+          <span className="text-slate-500">{lang === "ar" ? "العملة:" : "Currency:"}</span>
+          <select
+            value={selectedCurrencyCode}
+            onChange={(e) => handleCurrencyChange(e.target.value)}
+            className="bg-surface-container-high border border-white/10 rounded-lg py-1 px-2 text-xs text-white focus:outline-none focus:border-blue-500 cursor-pointer"
+          >
+            {CURRENCIES.map((c) => (
+              <option key={c.code} value={c.code} className="bg-[#121929] text-white">
+                {c.code} ({lang === "ar" ? c.symbolAr : c.symbolEn})
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+    </aside>
     </>
   );
 }

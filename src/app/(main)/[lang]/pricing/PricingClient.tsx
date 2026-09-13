@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect, useMemo, useRef, useDeferredValue } from "react";
 import { categoryMatchesFilter, createInitialCollapsedGroups, sortDisplayGroups } from "../../../../lib/pricing-groups";
@@ -208,8 +208,12 @@ export default function PricingClient({
     );
   }, [userSession]);
 
-  // Read initial ?section= / ?group= / ?search= from URL
+  // Read initial ?section= / ?group= / ?search= / ?category= from URL
   useEffect(() => {
+    const catParam = searchParams.get("category") || searchParams.get("type");
+    if (catParam && ["all", "imei", "server", "remote"].includes(catParam.toLowerCase())) {
+      setSelectedCategory(catParam.toLowerCase());
+    }
     const sectionParam = searchParams.get("section") || searchParams.get("group") || searchParams.get("cat") || searchParams.get("search");
     if (sectionParam) {
       setActiveSection(sectionParam);

@@ -391,69 +391,73 @@ export default async function Home(props: { params: Promise<{ lang: Locale }> })
       {/* --- Service Lanes --- */}
       <section className="w-full cyber-container section-spotlight">
         <h2 className="sr-only">{isAr ? "مسارات الخدمات الرئيسية" : "Main Service Lanes"}</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-          <Link href={imeiUrl} data-aos="fade-up" data-aos-delay="100" suppressHydrationWarning className="lamp-card p-5 sm:p-6 rounded-2xl group transition-all relative overflow-hidden flex flex-col gap-3 sm:gap-4 shadow-lg">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-5 lg:gap-6">
+          <Link href={imeiUrl} data-aos="fade-up" data-aos-delay="100" suppressHydrationWarning className="lamp-card p-3.5 sm:p-4.5 md:p-5 lg:p-6 rounded-xl sm:rounded-2xl group transition-all relative overflow-hidden flex flex-col justify-between gap-2.5 sm:gap-4 shadow-lg min-h-[135px] sm:min-h-[150px] md:min-h-[160px] border border-white/10 hover:border-blue-400/40">
+            <div className="absolute top-0 inset-x-4 h-[2px] bg-gradient-to-r from-transparent via-blue-400/0 to-transparent group-hover:via-blue-400 group-hover:shadow-[0_0_12px_rgba(59,130,246,0.8)] transition-all duration-300 pointer-events-none"></div>
             <div 
-              className="absolute inset-0 bg-cover bg-center opacity-30 group-hover:opacity-50 transition-opacity duration-300 z-0 pointer-events-none" 
+              className="absolute inset-0 bg-cover bg-center opacity-25 group-hover:opacity-45 transition-opacity duration-300 z-0 pointer-events-none" 
               style={{ backgroundImage: "url('/images/promo_imei.webp')" }}
             ></div>
-            <div className="absolute inset-0 bg-gradient-to-t from-[#0B0F17]/95 via-[#0B0F17]/70 to-transparent z-0 pointer-events-none"></div>
-            <div className="relative z-10 w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 text-lg sm:text-xl group-hover:scale-105 transition-transform shadow-sm">
+            <div className="absolute inset-0 bg-gradient-to-t from-[#0B0F17]/95 via-[#0B0F17]/75 to-transparent z-0 pointer-events-none"></div>
+            <div className="relative z-10 w-9 h-9 sm:w-11 sm:h-11 md:w-12 md:h-12 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 text-base sm:text-xl group-hover:scale-105 transition-transform shadow-sm">
               <i className="fas fa-fingerprint"></i>
             </div>
             <div className="relative z-10">
-              <h3 className="font-bold text-base sm:text-lg text-white mb-1 group-hover:text-blue-400 transition-colors">{imeiTitle || "IMEI Services"}</h3>
-              <p className="text-xs sm:text-sm text-slate-300">{imeiDesc || "Unlocks, checks, and device services"}</p>
+              <h3 className="font-bold text-xs sm:text-base lg:text-lg text-white mb-0.5 sm:mb-1 group-hover:text-blue-400 transition-colors leading-snug line-clamp-1">{imeiTitle || "IMEI Services"}</h3>
+              <p className="text-[10px] sm:text-xs md:text-sm text-slate-300 line-clamp-2 leading-relaxed">{imeiDesc || "Unlocks, checks, and device services"}</p>
             </div>
-            <i className={`fas ${isAr ? "fa-arrow-left" : "fa-arrow-right"} text-blue-400 absolute bottom-5 sm:bottom-6 end-5 sm:end-6 opacity-0 group-hover:opacity-100 transition-all`}></i>
+            <i className={`fas ${isAr ? "fa-arrow-left" : "fa-arrow-right"} text-xs text-blue-400 absolute bottom-3 sm:bottom-5 end-3 sm:end-5 opacity-0 group-hover:opacity-100 transition-all`}></i>
           </Link>
 
-          <Link href={serverUrl} data-aos="fade-up" data-aos-delay="200" suppressHydrationWarning className="lamp-card p-5 sm:p-6 rounded-2xl group transition-all relative overflow-hidden flex flex-col gap-3 sm:gap-4 shadow-lg">
+          <Link href={serverUrl} data-aos="fade-up" data-aos-delay="200" suppressHydrationWarning className="lamp-card p-3.5 sm:p-4.5 md:p-5 lg:p-6 rounded-xl sm:rounded-2xl group transition-all relative overflow-hidden flex flex-col justify-between gap-2.5 sm:gap-4 shadow-lg min-h-[135px] sm:min-h-[150px] md:min-h-[160px] border border-white/10 hover:border-emerald-400/40">
+            <div className="absolute top-0 inset-x-4 h-[2px] bg-gradient-to-r from-transparent via-emerald-400/0 to-transparent group-hover:via-emerald-400 group-hover:shadow-[0_0_12px_rgba(52,211,153,0.8)] transition-all duration-300 pointer-events-none"></div>
             <div 
-              className="absolute inset-0 bg-cover bg-center opacity-30 group-hover:opacity-50 transition-opacity duration-300 z-0 pointer-events-none" 
+              className="absolute inset-0 bg-cover bg-center opacity-25 group-hover:opacity-45 transition-opacity duration-300 z-0 pointer-events-none" 
               style={{ backgroundImage: "url('/images/promo_server.webp')" }}
             ></div>
-            <div className="absolute inset-0 bg-gradient-to-t from-[#0B0F17]/95 via-[#0B0F17]/70 to-transparent z-0 pointer-events-none"></div>
-            <div className="relative z-10 w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 text-lg sm:text-xl group-hover:scale-105 transition-transform shadow-sm">
+            <div className="absolute inset-0 bg-gradient-to-t from-[#0B0F17]/95 via-[#0B0F17]/75 to-transparent z-0 pointer-events-none"></div>
+            <div className="relative z-10 w-9 h-9 sm:w-11 sm:h-11 md:w-12 md:h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 text-base sm:text-xl group-hover:scale-105 transition-transform shadow-sm">
               <i className="fas fa-server"></i>
             </div>
             <div className="relative z-10">
-              <h3 className="font-bold text-base sm:text-lg text-white mb-1 group-hover:text-emerald-400 transition-colors">{serverTitle || "Server Services"}</h3>
-              <p className="text-xs sm:text-sm text-slate-300">{serverDesc || "Credits, activations, and tools"}</p>
+              <h3 className="font-bold text-xs sm:text-base lg:text-lg text-white mb-0.5 sm:mb-1 group-hover:text-emerald-400 transition-colors leading-snug line-clamp-1">{serverTitle || "Server Services"}</h3>
+              <p className="text-[10px] sm:text-xs md:text-sm text-slate-300 line-clamp-2 leading-relaxed">{serverDesc || "Credits, activations, and tools"}</p>
             </div>
-            <i className={`fas ${isAr ? "fa-arrow-left" : "fa-arrow-right"} text-emerald-400 absolute bottom-5 sm:bottom-6 end-5 sm:end-6 opacity-0 group-hover:opacity-100 transition-all`}></i>
+            <i className={`fas ${isAr ? "fa-arrow-left" : "fa-arrow-right"} text-xs text-emerald-400 absolute bottom-3 sm:bottom-5 end-3 sm:end-5 opacity-0 group-hover:opacity-100 transition-all`}></i>
           </Link>
 
-          <Link href={remoteUrl} data-aos="fade-up" data-aos-delay="300" suppressHydrationWarning className="lamp-card p-5 sm:p-6 rounded-2xl group transition-all relative overflow-hidden flex flex-col gap-3 sm:gap-4 shadow-lg">
+          <Link href={remoteUrl} data-aos="fade-up" data-aos-delay="300" suppressHydrationWarning className="lamp-card p-3.5 sm:p-4.5 md:p-5 lg:p-6 rounded-xl sm:rounded-2xl group transition-all relative overflow-hidden flex flex-col justify-between gap-2.5 sm:gap-4 shadow-lg min-h-[135px] sm:min-h-[150px] md:min-h-[160px] border border-white/10 hover:border-sky-400/40">
+            <div className="absolute top-0 inset-x-4 h-[2px] bg-gradient-to-r from-transparent via-sky-400/0 to-transparent group-hover:via-sky-400 group-hover:shadow-[0_0_12px_rgba(56,189,248,0.8)] transition-all duration-300 pointer-events-none"></div>
             <div 
-              className="absolute inset-0 bg-cover bg-center opacity-30 group-hover:opacity-50 transition-opacity duration-300 z-0 pointer-events-none" 
+              className="absolute inset-0 bg-cover bg-center opacity-25 group-hover:opacity-45 transition-opacity duration-300 z-0 pointer-events-none" 
               style={{ backgroundImage: "url('/images/promo_remote.webp')" }}
             ></div>
-            <div className="absolute inset-0 bg-gradient-to-t from-[#0B0F17]/95 via-[#0B0F17]/70 to-transparent z-0 pointer-events-none"></div>
-            <div className="relative z-10 w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-sky-400 text-lg sm:text-xl group-hover:scale-105 transition-transform shadow-sm">
+            <div className="absolute inset-0 bg-gradient-to-t from-[#0B0F17]/95 via-[#0B0F17]/75 to-transparent z-0 pointer-events-none"></div>
+            <div className="relative z-10 w-9 h-9 sm:w-11 sm:h-11 md:w-12 md:h-12 rounded-xl bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-sky-400 text-base sm:text-xl group-hover:scale-105 transition-transform shadow-sm">
               <i className="fas fa-broadcast-tower"></i>
             </div>
             <div className="relative z-10">
-              <h3 className="font-bold text-base sm:text-lg text-white mb-1 group-hover:text-sky-400 transition-colors">{remoteTitle || "Remote Services"}</h3>
-              <p className="text-xs sm:text-sm text-slate-300">{remoteDesc || "Assisted sessions and support"}</p>
+              <h3 className="font-bold text-xs sm:text-base lg:text-lg text-white mb-0.5 sm:mb-1 group-hover:text-sky-400 transition-colors leading-snug line-clamp-1">{remoteTitle || "Remote Services"}</h3>
+              <p className="text-[10px] sm:text-xs md:text-sm text-slate-300 line-clamp-2 leading-relaxed">{remoteDesc || "Assisted sessions and support"}</p>
             </div>
-            <i className={`fas ${isAr ? "fa-arrow-left" : "fa-arrow-right"} text-sky-400 absolute bottom-5 sm:bottom-6 end-5 sm:end-6 opacity-0 group-hover:opacity-100 transition-all`}></i>
+            <i className={`fas ${isAr ? "fa-arrow-left" : "fa-arrow-right"} text-xs text-sky-400 absolute bottom-3 sm:bottom-5 end-3 sm:end-5 opacity-0 group-hover:opacity-100 transition-all`}></i>
           </Link>
 
-          <Link href={storeUrl} data-aos="fade-up" data-aos-delay="400" suppressHydrationWarning className="lamp-card p-5 sm:p-6 rounded-2xl group transition-all relative overflow-hidden flex flex-col gap-3 sm:gap-4 shadow-lg">
+          <Link href={storeUrl} data-aos="fade-up" data-aos-delay="400" suppressHydrationWarning className="lamp-card p-3.5 sm:p-4.5 md:p-5 lg:p-6 rounded-xl sm:rounded-2xl group transition-all relative overflow-hidden flex flex-col justify-between gap-2.5 sm:gap-4 shadow-lg min-h-[135px] sm:min-h-[150px] md:min-h-[160px] border border-white/10 hover:border-amber-400/40">
+            <div className="absolute top-0 inset-x-4 h-[2px] bg-gradient-to-r from-transparent via-amber-400/0 to-transparent group-hover:via-amber-400 group-hover:shadow-[0_0_12px_rgba(251,191,36,0.8)] transition-all duration-300 pointer-events-none"></div>
             <div 
-              className="absolute inset-0 bg-cover bg-center opacity-30 group-hover:opacity-50 transition-opacity duration-300 z-0 pointer-events-none" 
+              className="absolute inset-0 bg-cover bg-center opacity-25 group-hover:opacity-45 transition-opacity duration-300 z-0 pointer-events-none" 
               style={{ backgroundImage: "url('/images/promo_store.webp')" }}
             ></div>
-            <div className="absolute inset-0 bg-gradient-to-t from-[#0B0F17]/95 via-[#0B0F17]/70 to-transparent z-0 pointer-events-none"></div>
-            <div className="relative z-10 w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 text-lg sm:text-xl group-hover:scale-105 transition-transform shadow-sm">
+            <div className="absolute inset-0 bg-gradient-to-t from-[#0B0F17]/95 via-[#0B0F17]/75 to-transparent z-0 pointer-events-none"></div>
+            <div className="relative z-10 w-9 h-9 sm:w-11 sm:h-11 md:w-12 md:h-12 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 text-base sm:text-xl group-hover:scale-105 transition-transform shadow-sm">
               <i className="fas fa-shopping-bag"></i>
             </div>
             <div className="relative z-10">
-              <h3 className="font-bold text-base sm:text-lg text-white mb-1 group-hover:text-amber-400 transition-colors">{storeTitle || "Tools & Store"}</h3>
-              <p className="text-xs sm:text-sm text-slate-300">{storeDesc || "Licenses, products, and bundles"}</p>
+              <h3 className="font-bold text-xs sm:text-base lg:text-lg text-white mb-0.5 sm:mb-1 group-hover:text-amber-400 transition-colors leading-snug line-clamp-1">{storeTitle || "Tools & Store"}</h3>
+              <p className="text-[10px] sm:text-xs md:text-sm text-slate-300 line-clamp-2 leading-relaxed">{storeDesc || "Licenses, products, and bundles"}</p>
             </div>
-            <i className={`fas ${isAr ? "fa-arrow-left" : "fa-arrow-right"} text-amber-400 absolute bottom-5 sm:bottom-6 end-5 sm:end-6 opacity-0 group-hover:opacity-100 transition-all`}></i>
+            <i className={`fas ${isAr ? "fa-arrow-left" : "fa-arrow-right"} text-xs text-amber-400 absolute bottom-3 sm:bottom-5 end-3 sm:end-5 opacity-0 group-hover:opacity-100 transition-all`}></i>
           </Link>
         </div>
       </section>
@@ -494,50 +498,50 @@ export default async function Home(props: { params: Promise<{ lang: Locale }> })
       {/* --- Feature Ribbon --- */}
       <section data-aos="fade-up" suppressHydrationWarning className="w-full cyber-container section-spotlight">
         <h2 className="sr-only">{isAr ? "مميزات وموثوقية المنصة" : "Platform Trust & Features"}</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 bg-[#141d30]/95 rounded-2xl sm:rounded-3xl p-5 sm:p-8 border border-white/15 relative overflow-hidden backdrop-blur-md shadow-xl lamp-card">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5 md:gap-4 lg:gap-6 bg-[#141d30]/95 rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-5 lg:p-8 border border-white/15 relative overflow-hidden backdrop-blur-md shadow-xl lamp-card">
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 max-w-lg h-[2px] bg-gradient-to-r from-transparent via-blue-400 to-transparent shadow-[0_0_14px_2px_rgba(96,165,250,0.85)] z-20 pointer-events-none"></div>
 
           {/* Card 1: Specialized Support Team */}
-          <div className="group flex flex-col items-center text-center p-5 sm:p-6 rounded-2xl transition-all duration-200 relative lamp-card">
-            <div className="relative mb-4">
-              <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 shadow-sm transition-colors">
-                <i className="fas fa-headset text-2xl"></i>
+          <div className="group flex flex-col items-center text-center p-3.5 sm:p-5 md:p-3.5 lg:p-6 rounded-2xl transition-all duration-200 relative lamp-card">
+            <div className="relative mb-3 sm:mb-4">
+              <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-12 md:h-12 lg:w-16 lg:h-16 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 shadow-sm transition-colors">
+                <i className="fas fa-headset text-xl md:text-xl lg:text-2xl"></i>
               </div>
             </div>
-            <h3 className="font-bold text-lg sm:text-xl text-white mb-1.5 group-hover:text-blue-400 transition-colors">
+            <h3 className="font-bold text-base md:text-base lg:text-xl text-white mb-1.5 group-hover:text-blue-400 transition-colors">
               {feat1Title || (isAr ? "فريق دعم متخصص" : "Specialized Support Team")}
             </h3>
-            <p className="text-slate-300 text-xs sm:text-sm max-w-xs leading-relaxed">
+            <p className="text-slate-300 text-xs md:text-xs lg:text-sm max-w-xs leading-relaxed">
               {feat1Desc || (isAr ? "فريق دعم فني متواجد لمساعدتك والرد على كافة استفساراتك 24/7." : "Dedicated technical support team ready to assist you 24/7.")}
             </p>
           </div>
 
           {/* Card 2: 100% Safe Commission & Security */}
-          <div className="group flex flex-col items-center text-center p-5 sm:p-6 rounded-2xl transition-all duration-200 relative lamp-card">
-            <div className="relative mb-4">
-              <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 shadow-sm transition-colors">
-                <i className="fas fa-shield-alt text-2xl"></i>
+          <div className="group flex flex-col items-center text-center p-3.5 sm:p-5 md:p-3.5 lg:p-6 rounded-2xl transition-all duration-200 relative lamp-card">
+            <div className="relative mb-3 sm:mb-4">
+              <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-12 md:h-12 lg:w-16 lg:h-16 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 shadow-sm transition-colors">
+                <i className="fas fa-shield-alt text-xl md:text-xl lg:text-2xl"></i>
               </div>
             </div>
-            <h3 className="font-bold text-lg sm:text-xl text-white mb-1.5 group-hover:text-emerald-400 transition-colors">
+            <h3 className="font-bold text-base md:text-base lg:text-xl text-white mb-1.5 group-hover:text-emerald-400 transition-colors">
               {feat2Title || (isAr ? "عمولة أمنة 100%" : "100% Safe Commission")}
             </h3>
-            <p className="text-slate-300 text-xs sm:text-sm max-w-xs leading-relaxed">
+            <p className="text-slate-300 text-xs md:text-xs lg:text-sm max-w-xs leading-relaxed">
               {feat2Desc || (isAr ? "معاملات إلكترونية سريعة ومحمية بأعلى معايير الأمان والحماية التامة." : "Fast and secure electronic transactions protected with top safety protocols.")}
             </p>
           </div>
 
           {/* Card 3: Continuous Support & Development */}
-          <div className="group flex flex-col items-center text-center p-5 sm:p-6 rounded-2xl transition-all duration-200 relative lamp-card">
-            <div className="relative mb-4">
-              <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 shadow-sm transition-colors">
-                <i className="fas fa-sync-alt text-2xl"></i>
+          <div className="group flex flex-col items-center text-center p-3.5 sm:p-5 md:p-3.5 lg:p-6 rounded-2xl transition-all duration-200 relative lamp-card">
+            <div className="relative mb-3 sm:mb-4">
+              <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-12 md:h-12 lg:w-16 lg:h-16 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 shadow-sm transition-colors">
+                <i className="fas fa-sync-alt text-xl md:text-xl lg:text-2xl"></i>
               </div>
             </div>
-            <h3 className="font-bold text-lg sm:text-xl text-white mb-1.5 group-hover:text-amber-400 transition-colors">
+            <h3 className="font-bold text-base md:text-base lg:text-xl text-white mb-1.5 group-hover:text-amber-400 transition-colors">
               {feat3Title || (isAr ? "دعم مستمر وتطوير" : "Continuous Updates & Development")}
             </h3>
-            <p className="text-slate-300 text-xs sm:text-sm max-w-xs leading-relaxed">
+            <p className="text-slate-300 text-xs md:text-xs lg:text-sm max-w-xs leading-relaxed">
               {feat3Desc || (isAr ? "تحديثات مستمرة لأحدث برامج السوفت وير ودعم مستمر لكافة الأجهزة." : "Continuous updates for the latest GSM software and full device support.")}
             </p>
           </div>
