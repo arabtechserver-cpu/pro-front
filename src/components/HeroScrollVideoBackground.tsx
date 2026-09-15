@@ -7,51 +7,56 @@ interface HeroScrollVideoBackgroundProps {
 }
 
 const POSTER_URL = "/videos/hero_poster.jpg";
-const SCROLL_VIDEO_URL =
+const LOCAL_VIDEO_URL = "/videos/hero-showcase.mp4";
+const REMOTE_VIDEO_URL =
   process.env.NEXT_PUBLIC_HERO_VIDEO_URL ||
   "https://pub-3440f02b971d4054906dd63d89e3cdb0.r2.dev/hero-showcase.mp4";
-const MIN_SEEK_INTERVAL = 50;
 
 export default function HeroScrollVideoBackground({ lang }: HeroScrollVideoBackgroundProps) {
   const isAr = lang === "ar";
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
   const playPromiseRef = useRef<Promise<void> | null>(null);
-  const frameRef = useRef<number | null>(null);
-  const settleTimerRef = useRef<number | null>(null);
-  const lastSeekTimeRef = useRef(0);
 
-  const [playbackMode, setPlaybackMode] = useState<"scroll" | "auto">("scroll");
+  const [isPlaying, setIsPlaying] = useState(true);
   const [isMuted, setIsMuted] = useState(true);
+  const [isLoaded, setIsLoaded] = useState(false);
 
   const safePlay = useCallback(() => {
     const video = videoRef.current;
-    if (!video || !video.paused || playPromiseRef.current) return;
+    if (!video) return;
 
-    try {
-      const playPromise = video.play();
-      if (playPromise) {
-        playPromiseRef.current = playPromise;
-        playPromise.catch(() => {}).finally(() => {
+    video.muted = isMuted;
+    const promise = video.play();
+    if (promise !== undefined) {
+      playPromiseRef.current = promise;
+      promise
+        .then(() => {
+          setIsPlaying(true);
+        })
+        .catch(() => {
+          setIsPlaying(false);
+        })
+        .finally(() => {
           playPromiseRef.current = null;
         });
-      }
-    } catch {}
-  }, []);
+    }
+  }, [isMuted]);
 
   const safePause = useCallback(() => {
     const video = videoRef.current;
     if (!video) return;
 
     const pause = () => {
-      if (!video.paused) video.pause();
+      video.pause();
+      setIsPlaying(false);
     };
 
     if (playPromiseRef.current) {
-      void playPromiseRef.current.then(pause).catch(pause);
-      return;
+      playPromiseRef.current.then(pause).catch(pause);
+    } else {
+      pause();
     }
-
-    pause();
   }, []);
 
   useEffect(() => {
@@ -60,93 +65,82 @@ export default function HeroScrollVideoBackground({ lang }: HeroScrollVideoBackg
 
     video.muted = true;
     video.defaultMuted = true;
-    video.pause();
-  }, []);
+    video.playbackRate = 1.0;
+
+    const tryAutoPlay = () => {
+      const promise = video.play();
+      if (promise !== undefined) {
+        promise
+          .then(() => setIsPlaying(true))
+          .catch(() => {
+            setIsPlaying(false);
+            const handleFirstGesture = () => {
+              video.play().then(() => setIsPlaying(true)).catch(() => {});
+              window.removeEventListener("touchstart", handleFirstGesture);
+              window.removeEventListener("pointerdown", handleFirstGesture);
+              window.removeEventListener("scroll", handleFirstGesture);
+            };
+            window.addEventListener("touchstart", handleFirstGesture, { passive: true, once: true });
+            window.addEventListener("pointerdown", handleFirstGesture, { passive: true, once: true });
+            window.addEventListener("scroll", handleFirstGesture, { passive: true, once: true });
+          });
+      }
+    };
+
+    tryAutoPlay();
+
+    const handleVisibility = () => {
+      if (document.visibilityState === "hidden") {
+        safePause();
+      } else if (isPlaying) {
+        safePlay();
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibility);
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibility);
+    };
+  }, [safePause, safePlay]);
 
   useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
+    let ticking = false;
 
-    if (playbackMode === "auto") {
-      video.playbackRate = 0.85;
-      safePlay();
-      return safePause;
-    }
-
-    // Seek only after an actual scroll/resize. This keeps the video responsive without a
-    // permanent animation loop competing with the user's touch scroll.
-    const syncToScroll = () => {
-      frameRef.current = null;
-      if (!video.duration || Number.isNaN(video.duration)) return;
-
-      const maxScroll = Math.max(document.documentElement.scrollHeight - window.innerHeight, 1);
-      const progress = Math.min(Math.max(window.scrollY / maxScroll, 0), 1);
-      const target = progress * Math.max(0, video.duration - 0.05);
-
-      if (video.seeking) return;
-
-      const now = performance.now();
-      const elapsedSinceLastSeek = now - lastSeekTimeRef.current;
-      if (Math.abs(video.currentTime - target) < 0.04) return;
-
-      if (elapsedSinceLastSeek < MIN_SEEK_INTERVAL) {
-        if (settleTimerRef.current === null) {
-          settleTimerRef.current = window.setTimeout(() => {
-            settleTimerRef.current = null;
-            scheduleSync();
-          }, MIN_SEEK_INTERVAL - elapsedSinceLastSeek);
-        }
-        return;
-      }
-
-      lastSeekTimeRef.current = now;
-      try {
-        // Exact seeks prevent the visible keyframe jumps caused by fastSeek().
-        video.currentTime = target;
-      } catch {}
-    };
-
-    const scheduleSync = () => {
-      if (frameRef.current === null) {
-        frameRef.current = requestAnimationFrame(syncToScroll);
+    const handleScroll = () => {
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          if (containerRef.current) {
+            const scrollY = window.scrollY || window.pageYOffset;
+            const offset = Math.min(scrollY * 0.12, 120);
+            containerRef.current.style.transform = `translate3d(0, ${-offset}px, 0)`;
+          }
+          ticking = false;
+        });
+        ticking = true;
       }
     };
 
-    const handleSeeked = () => {
-      // Always evaluate the latest scroll position once decoding finishes.
-      scheduleSync();
-    };
-
-    video.pause();
-    video.addEventListener("seeked", handleSeeked);
-    video.addEventListener("loadedmetadata", scheduleSync);
-    window.addEventListener("scroll", scheduleSync, { passive: true });
-    window.addEventListener("resize", scheduleSync, { passive: true });
-    scheduleSync();
-
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => {
-      window.removeEventListener("scroll", scheduleSync);
-      window.removeEventListener("resize", scheduleSync);
-      video.removeEventListener("seeked", handleSeeked);
-      video.removeEventListener("loadedmetadata", scheduleSync);
-      if (frameRef.current !== null) cancelAnimationFrame(frameRef.current);
-      if (settleTimerRef.current !== null) clearTimeout(settleTimerRef.current);
-      frameRef.current = null;
-      settleTimerRef.current = null;
-      safePause();
+      window.removeEventListener("scroll", handleScroll);
     };
-  }, [playbackMode, safePause, safePlay]);
-
-  const togglePlaybackMode = useCallback(() => {
-    setPlaybackMode((mode) => (mode === "scroll" ? "auto" : "scroll"));
   }, []);
+
+  const togglePlayback = useCallback(() => {
+    if (isPlaying) {
+      safePause();
+    } else {
+      safePlay();
+    }
+  }, [isPlaying, safePause, safePlay]);
 
   const toggleMute = useCallback(() => {
     const video = videoRef.current;
     if (!video) return;
 
-    video.muted = !video.muted;
-    setIsMuted(video.muted);
+    const nextMuted = !video.muted;
+    video.muted = nextMuted;
+    setIsMuted(nextMuted);
   }, []);
 
   return (
@@ -156,58 +150,69 @@ export default function HeroScrollVideoBackground({ lang }: HeroScrollVideoBackg
         className="fixed inset-0 pointer-events-none z-0 overflow-hidden select-none bg-[#0b0f17]"
         aria-hidden="true"
       >
-        <img
-          src={POSTER_URL}
-          alt=""
-          aria-hidden="true"
-          decoding="async"
-          className="absolute inset-0 h-full w-full object-cover object-center"
-        />
+        <div
+          ref={containerRef}
+          className="absolute -inset-y-16 inset-x-0 w-full h-[calc(100%+128px)] will-change-transform"
+          style={{ transform: "translate3d(0, 0, 0)", backfaceVisibility: "hidden" }}
+        >
+          <img
+            src={POSTER_URL}
+            alt=""
+            aria-hidden="true"
+            decoding="async"
+            className={`absolute inset-0 h-full w-full object-cover object-center transition-opacity duration-700 ${
+              isLoaded ? "opacity-0" : "opacity-100"
+            }`}
+          />
 
-        <video
-          ref={videoRef}
-          src={SCROLL_VIDEO_URL}
-          poster={POSTER_URL}
-          loop={playbackMode === "auto"}
-          muted
-          playsInline
-          preload="auto"
-          disablePictureInPicture
-          disableRemotePlayback
-          className="absolute inset-0 h-full w-full object-cover object-center"
-        />
+          <video
+            ref={videoRef}
+            autoPlay
+            loop
+            muted
+            playsInline
+            preload="auto"
+            disablePictureInPicture
+            disableRemotePlayback
+            poster={POSTER_URL}
+            onPlaying={() => setIsLoaded(true)}
+            onLoadedData={() => setIsLoaded(true)}
+            className="absolute inset-0 h-full w-full object-cover object-center"
+          >
+            <source src={LOCAL_VIDEO_URL} type="video/mp4" />
+            <source src={REMOTE_VIDEO_URL} type="video/mp4" />
+          </video>
+        </div>
 
-        <div className="absolute inset-0 bg-gradient-to-b from-[#0b0f17]/25 via-[#0b1426]/15 to-[#0b0f17]/35" />
-        <div className="absolute inset-0 bg-blue-600/[0.05]" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_65%,rgba(11,15,23,0.15)_85%,rgba(11,15,23,0.35)_100%)]" />
-        <div className="absolute top-0 inset-x-0 h-16 bg-gradient-to-b from-[#0b0f17]/50 via-[#0b0f17]/15 to-transparent" />
-        <div className="absolute bottom-0 inset-x-0 h-12 bg-gradient-to-t from-[#0b0f17]/25 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#0b0f17]/30 via-[#0b1426]/20 to-[#0b0f17]/45" />
+        <div className="absolute inset-0 bg-blue-600/[0.04]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_60%,rgba(11,15,23,0.25)_85%,rgba(11,15,23,0.5)_100%)]" />
+        <div className="absolute top-0 inset-x-0 h-20 bg-gradient-to-b from-[#0b0f17]/60 via-[#0b0f17]/20 to-transparent" />
+        <div className="absolute bottom-0 inset-x-0 h-20 bg-gradient-to-t from-[#0b0f17]/40 to-transparent" />
       </div>
 
       <div className="fixed bottom-5 end-5 z-40 flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#0b1220]/80 backdrop-blur-xl border border-sky-400/40 shadow-[0_8px_25px_rgba(0,0,0,0.6)] text-xs text-slate-300 pointer-events-auto">
-          <span className="font-mono text-[10px] text-sky-300 font-bold hidden sm:inline">
-            {playbackMode === "scroll"
-              ? (isAr ? "متزامن مع التمرير" : "SCROLL SYNC")
-              : (isAr ? "تشغيل تلقائي" : "AUTO LOOP")}
-          </span>
-          <button
-            type="button"
-            onClick={togglePlaybackMode}
-            title={playbackMode === "scroll"
-              ? (isAr ? "التحويل للتشغيل التلقائي" : "Switch to Auto Loop")
-              : (isAr ? "التحويل للتحكم مع التمرير" : "Switch to Scroll Sync")}
-            className="px-2 py-0.5 rounded bg-white/10 hover:bg-white/20 font-mono text-[10px] font-bold text-sky-300 transition-colors"
-          >
-            {playbackMode === "scroll" ? (isAr ? "تمرير" : "Scroll") : (isAr ? "تلقائي" : "Auto")}
-          </button>
-          <button
-            type="button"
-            onClick={toggleMute}
-            aria-label={isMuted ? (isAr ? "تشغيل الصوت" : "Unmute audio") : (isAr ? "كتم الصوت" : "Mute audio")}
-            className="w-6 h-6 rounded-full bg-white/5 hover:bg-white/15 flex items-center justify-center text-slate-200"
-          >
-            <i className={`fas ${isMuted ? "fa-volume-mute" : "fa-volume-up"} text-sky-400 text-[11px]`} />
-          </button>
+        <span className="font-mono text-[10px] text-sky-300 font-bold hidden sm:inline">
+          {isAr ? "خلفية سينمائية" : "CINEMATIC BG"}
+        </span>
+        <button
+          type="button"
+          onClick={togglePlayback}
+          aria-label={isPlaying ? (isAr ? "إيقاف مؤقت" : "Pause") : (isAr ? "تشغيل" : "Play")}
+          title={isPlaying ? (isAr ? "إيقاف مؤقت" : "Pause") : (isAr ? "تشغيل" : "Play")}
+          className="w-6 h-6 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-sky-300 transition-colors"
+        >
+          <i className={`fas ${isPlaying ? "fa-pause" : "fa-play"} text-[10px]`} />
+        </button>
+        <button
+          type="button"
+          onClick={toggleMute}
+          aria-label={isMuted ? (isAr ? "تشغيل الصوت" : "Unmute audio") : (isAr ? "كتم الصوت" : "Mute audio")}
+          title={isMuted ? (isAr ? "تشغيل الصوت" : "Unmute audio") : (isAr ? "كتم الصوت" : "Mute audio")}
+          className="w-6 h-6 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-sky-300 transition-colors"
+        >
+          <i className={`fas ${isMuted ? "fa-volume-mute" : "fa-volume-up"} text-[10px]`} />
+        </button>
       </div>
     </>
   );
