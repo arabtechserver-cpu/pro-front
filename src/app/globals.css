@@ -293,14 +293,16 @@ body {
     display: none;
   }
 
-  /* Individual Card Lamp: Solid Opaque Cyber Surface */
+  /* Individual Card Lamp: Balanced Frosted Cyber Glass */
   .lamp-card,
   .card-spotlight,
   .curved-cockpit {
     position: relative;
-    background: #0d1527;
+    background: rgba(11, 19, 37, 0.50);
+    backdrop-filter: blur(12px) saturate(140%);
+    -webkit-backdrop-filter: blur(12px) saturate(140%);
     border: 1px solid rgba(255, 255, 255, 0.12);
-    box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.08);
+    box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.45), inset 0 1px 1px rgba(255, 255, 255, 0.08);
     transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
@@ -312,9 +314,9 @@ body {
   .lamp-card:hover,
   .card-spotlight:hover,
   .curved-cockpit:hover {
-    background: #121e36;
+    background: rgba(15, 26, 50, 0.72);
     border-color: rgba(96, 165, 250, 0.45) !important;
-    box-shadow: 0 16px 42px -4px rgba(0, 0, 0, 0.65), 0 0 24px rgba(59, 130, 246, 0.20), inset 0 1px 1px rgba(255, 255, 255, 0.15) !important;
+    box-shadow: 0 16px 42px -4px rgba(0, 0, 0, 0.60), 0 0 24px rgba(59, 130, 246, 0.20), inset 0 1px 1px rgba(255, 255, 255, 0.15) !important;
     transform: translateY(-2px);
   }
 

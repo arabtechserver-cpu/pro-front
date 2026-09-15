@@ -176,7 +176,7 @@ export default function AmrrCountersSection({ lang }: AmrrCountersSectionProps) 
             
             {/* Card 1: Supported Phone Models */}
             <div
-              className="group flex items-center gap-3 sm:gap-4 lg:gap-5 p-3.5 sm:p-4 md:p-3.5 lg:p-5 rounded-xl sm:rounded-2xl transition-all duration-200 relative bg-[#0b1426]/65 backdrop-blur-md border border-white/12 hover:border-blue-400/50 hover:bg-[#0e1c36]/80 shadow-sm"
+              className="group flex items-center gap-3 sm:gap-4 lg:gap-5 p-3.5 sm:p-4 md:p-3.5 lg:p-5 rounded-xl sm:rounded-2xl transition-all duration-200 relative bg-[#0b1426]/45 backdrop-blur-md border border-white/12 hover:border-blue-400/50 hover:bg-[#0e1c36]/80 shadow-sm"
               data-aos="fade-left"
               data-aos-delay="100"
             >
@@ -204,7 +204,7 @@ export default function AmrrCountersSection({ lang }: AmrrCountersSectionProps) 
 
             {/* Card 2: New Services Monthly */}
             <div
-              className="group flex items-center gap-3 sm:gap-4 lg:gap-5 p-3.5 sm:p-4 md:p-3.5 lg:p-5 rounded-xl sm:rounded-2xl transition-all duration-200 relative bg-[#0b1426]/65 backdrop-blur-md border border-white/12 hover:border-emerald-400/50 hover:bg-[#0e1c36]/80 shadow-sm"
+              className="group flex items-center gap-3 sm:gap-4 lg:gap-5 p-3.5 sm:p-4 md:p-3.5 lg:p-5 rounded-xl sm:rounded-2xl transition-all duration-200 relative bg-[#0b1426]/45 backdrop-blur-md border border-white/12 hover:border-emerald-400/50 hover:bg-[#0e1c36]/80 shadow-sm"
               data-aos="fade-left"
               data-aos-delay="200"
             >
@@ -232,7 +232,7 @@ export default function AmrrCountersSection({ lang }: AmrrCountersSectionProps) 
 
             {/* Card 3: 24/7 Automated Delivery & Live Support */}
             <div
-              className="group flex items-center gap-3 sm:gap-4 lg:gap-5 p-3.5 sm:p-4 md:p-3.5 lg:p-5 rounded-xl sm:rounded-2xl transition-all duration-200 relative bg-[#0b1426]/65 backdrop-blur-md border border-white/12 hover:border-amber-400/50 hover:bg-[#0e1c36]/80 shadow-sm"
+              className="group flex items-center gap-3 sm:gap-4 lg:gap-5 p-3.5 sm:p-4 md:p-3.5 lg:p-5 rounded-xl sm:rounded-2xl transition-all duration-200 relative bg-[#0b1426]/45 backdrop-blur-md border border-white/12 hover:border-amber-400/50 hover:bg-[#0e1c36]/80 shadow-sm"
               data-aos="fade-left"
               data-aos-delay="300"
             >

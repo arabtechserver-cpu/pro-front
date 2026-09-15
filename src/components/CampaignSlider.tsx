@@ -206,7 +206,7 @@ export default function CampaignSlider({
 
       {/* MODE 1: CINEMATIC SPOTLIGHT STAGE */}
       {viewMode === "spotlight" && activeCampaign && (
-        <div className="relative rounded-2xl sm:rounded-3xl p-5 sm:p-7 lg:p-9 bg-[#0b1322] border border-white/15 hover:border-blue-400/50 shadow-2xl shadow-black/80 transition-all duration-300 overflow-hidden group">
+        <div className="relative rounded-2xl sm:rounded-3xl p-5 sm:p-7 lg:p-9 bg-[#0b1322]/55 backdrop-blur-md border border-white/15 hover:border-blue-400/50 shadow-2xl shadow-black/80 transition-all duration-300 overflow-hidden group">
           {/* Top Laser Accent Beam */}
           <div className="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-transparent via-cyan-400 to-transparent opacity-75 shadow-[0_0_20px_2px_rgba(34,211,238,0.8)] pointer-events-none" />
 
@@ -384,7 +384,7 @@ export default function CampaignSlider({
             return (
               <div
                 key={idx}
-                className="relative rounded-2xl sm:rounded-3xl p-5 sm:p-6 bg-[#0b1322] border border-white/15 hover:border-blue-400/60 shadow-xl transition-all duration-300 hover:-translate-y-1 group flex flex-col justify-between overflow-hidden"
+                className="relative rounded-2xl sm:rounded-3xl p-5 sm:p-6 bg-[#0b1322]/55 backdrop-blur-md border border-white/15 hover:border-blue-400/60 shadow-xl transition-all duration-300 hover:-translate-y-1 group flex flex-col justify-between overflow-hidden"
               >
                 {/* Top Neon Accent Line */}
                 <div className="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-transparent via-blue-400/0 to-transparent group-hover:via-cyan-400 group-hover:shadow-[0_0_16px_2px_rgba(34,211,238,0.85)] transition-all duration-500 pointer-events-none" />

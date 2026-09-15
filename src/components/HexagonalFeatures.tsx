@@ -116,7 +116,7 @@ export default function HexagonalFeatures({ lang }: HexagonalFeaturesProps) {
             return (
               <div
                 key={f.id}
-                className="group relative rounded-xl sm:rounded-2xl lg:rounded-3xl p-3 sm:p-4.5 md:p-6 lg:p-7 transition-all duration-300 hover:-translate-y-1 sm:hover:-translate-y-1.5 shadow-lg flex flex-col justify-between overflow-hidden bg-[#0b1426]/65 backdrop-blur-md border border-white/12 hover:border-cyan-400/50 hover:bg-[#0e1c36]/80"
+                className="group relative rounded-xl sm:rounded-2xl lg:rounded-3xl p-3 sm:p-4.5 md:p-6 lg:p-7 transition-all duration-300 hover:-translate-y-1 sm:hover:-translate-y-1.5 shadow-lg flex flex-col justify-between overflow-hidden bg-[#0b1426]/45 backdrop-blur-md border border-white/15 hover:border-cyan-400/50 hover:bg-[#0e1c36]/65"
                 data-aos="fade-up"
                 data-aos-delay={f.delay}
                 suppressHydrationWarning

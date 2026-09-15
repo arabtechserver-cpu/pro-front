@@ -396,7 +396,7 @@ export default async function Home(props: { params: Promise<{ lang: Locale }> })
       <section className="w-full cyber-container">
         <h2 className="sr-only">{isAr ? "مسارات الخدمات الرئيسية" : "Main Service Lanes"}</h2>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-5 lg:gap-6">
-          <Link href={imeiUrl} data-aos="fade-up" data-aos-delay="100" suppressHydrationWarning className="lamp-card p-3.5 sm:p-4.5 md:p-5 lg:p-6 rounded-xl sm:rounded-2xl group transition-all relative overflow-hidden flex flex-col justify-between gap-2.5 sm:gap-4 shadow-lg min-h-[135px] sm:min-h-[150px] md:min-h-[160px] border border-white/12 hover:border-blue-400/50 bg-[#0b1426]/65 hover:bg-[#0e1c36]/80 backdrop-blur-md">
+          <Link href={imeiUrl} data-aos="fade-up" data-aos-delay="100" suppressHydrationWarning className="lamp-card p-3.5 sm:p-4.5 md:p-5 lg:p-6 rounded-xl sm:rounded-2xl group transition-all relative overflow-hidden flex flex-col justify-between gap-2.5 sm:gap-4 shadow-lg min-h-[135px] sm:min-h-[150px] md:min-h-[160px] border border-white/12 hover:border-blue-400/50 bg-[#0b1426]/45 hover:bg-[#0e1c36]/65 backdrop-blur-md">
             <div className="absolute top-0 inset-x-4 h-[2px] bg-gradient-to-r from-transparent via-blue-400/0 to-transparent group-hover:via-blue-400 group-hover:shadow-[0_0_12px_rgba(59,130,246,0.8)] transition-all duration-300 pointer-events-none"></div>
             <div 
               className="absolute inset-0 bg-cover bg-center opacity-20 group-hover:opacity-40 transition-opacity duration-300 z-0 pointer-events-none" 
@@ -413,7 +413,7 @@ export default async function Home(props: { params: Promise<{ lang: Locale }> })
             <i className={`fas ${isAr ? "fa-arrow-left" : "fa-arrow-right"} text-xs text-blue-400 absolute bottom-3 sm:bottom-5 end-3 sm:end-5 opacity-0 group-hover:opacity-100 transition-all`}></i>
           </Link>
 
-          <Link href={serverUrl} data-aos="fade-up" data-aos-delay="200" suppressHydrationWarning className="lamp-card p-3.5 sm:p-4.5 md:p-5 lg:p-6 rounded-xl sm:rounded-2xl group transition-all relative overflow-hidden flex flex-col justify-between gap-2.5 sm:gap-4 shadow-lg min-h-[135px] sm:min-h-[150px] md:min-h-[160px] border border-white/12 hover:border-emerald-400/50 bg-[#0b1426]/65 hover:bg-[#0e1c36]/80 backdrop-blur-md">
+          <Link href={serverUrl} data-aos="fade-up" data-aos-delay="200" suppressHydrationWarning className="lamp-card p-3.5 sm:p-4.5 md:p-5 lg:p-6 rounded-xl sm:rounded-2xl group transition-all relative overflow-hidden flex flex-col justify-between gap-2.5 sm:gap-4 shadow-lg min-h-[135px] sm:min-h-[150px] md:min-h-[160px] border border-white/12 hover:border-emerald-400/50 bg-[#0b1426]/45 hover:bg-[#0e1c36]/65 backdrop-blur-md">
             <div className="absolute top-0 inset-x-4 h-[2px] bg-gradient-to-r from-transparent via-emerald-400/0 to-transparent group-hover:via-emerald-400 group-hover:shadow-[0_0_12px_rgba(52,211,153,0.8)] transition-all duration-300 pointer-events-none"></div>
             <div 
               className="absolute inset-0 bg-cover bg-center opacity-20 group-hover:opacity-40 transition-opacity duration-300 z-0 pointer-events-none" 
@@ -430,7 +430,7 @@ export default async function Home(props: { params: Promise<{ lang: Locale }> })
             <i className={`fas ${isAr ? "fa-arrow-left" : "fa-arrow-right"} text-xs text-emerald-400 absolute bottom-3 sm:bottom-5 end-3 sm:end-5 opacity-0 group-hover:opacity-100 transition-all`}></i>
           </Link>
 
-          <Link href={remoteUrl} data-aos="fade-up" data-aos-delay="300" suppressHydrationWarning className="lamp-card p-3.5 sm:p-4.5 md:p-5 lg:p-6 rounded-xl sm:rounded-2xl group transition-all relative overflow-hidden flex flex-col justify-between gap-2.5 sm:gap-4 shadow-lg min-h-[135px] sm:min-h-[150px] md:min-h-[160px] border border-white/12 hover:border-sky-400/50 bg-[#0b1426]/65 hover:bg-[#0e1c36]/80 backdrop-blur-md">
+          <Link href={remoteUrl} data-aos="fade-up" data-aos-delay="300" suppressHydrationWarning className="lamp-card p-3.5 sm:p-4.5 md:p-5 lg:p-6 rounded-xl sm:rounded-2xl group transition-all relative overflow-hidden flex flex-col justify-between gap-2.5 sm:gap-4 shadow-lg min-h-[135px] sm:min-h-[150px] md:min-h-[160px] border border-white/12 hover:border-sky-400/50 bg-[#0b1426]/45 hover:bg-[#0e1c36]/65 backdrop-blur-md">
             <div className="absolute top-0 inset-x-4 h-[2px] bg-gradient-to-r from-transparent via-sky-400/0 to-transparent group-hover:via-sky-400 group-hover:shadow-[0_0_12px_rgba(56,189,248,0.8)] transition-all duration-300 pointer-events-none"></div>
             <div 
               className="absolute inset-0 bg-cover bg-center opacity-20 group-hover:opacity-40 transition-opacity duration-300 z-0 pointer-events-none" 
@@ -447,7 +447,7 @@ export default async function Home(props: { params: Promise<{ lang: Locale }> })
             <i className={`fas ${isAr ? "fa-arrow-left" : "fa-arrow-right"} text-xs text-sky-400 absolute bottom-3 sm:bottom-5 end-3 sm:end-5 opacity-0 group-hover:opacity-100 transition-all`}></i>
           </Link>
 
-          <Link href={storeUrl} data-aos="fade-up" data-aos-delay="400" suppressHydrationWarning className="lamp-card p-3.5 sm:p-4.5 md:p-5 lg:p-6 rounded-xl sm:rounded-2xl group transition-all relative overflow-hidden flex flex-col justify-between gap-2.5 sm:gap-4 shadow-lg min-h-[135px] sm:min-h-[150px] md:min-h-[160px] border border-white/12 hover:border-amber-400/50 bg-[#0b1426]/65 hover:bg-[#0e1c36]/80 backdrop-blur-md">
+          <Link href={storeUrl} data-aos="fade-up" data-aos-delay="400" suppressHydrationWarning className="lamp-card p-3.5 sm:p-4.5 md:p-5 lg:p-6 rounded-xl sm:rounded-2xl group transition-all relative overflow-hidden flex flex-col justify-between gap-2.5 sm:gap-4 shadow-lg min-h-[135px] sm:min-h-[150px] md:min-h-[160px] border border-white/12 hover:border-amber-400/50 bg-[#0b1426]/45 hover:bg-[#0e1c36]/65 backdrop-blur-md">
             <div className="absolute top-0 inset-x-4 h-[2px] bg-gradient-to-r from-transparent via-amber-400/0 to-transparent group-hover:via-amber-400 group-hover:shadow-[0_0_12px_rgba(251,191,36,0.8)] transition-all duration-300 pointer-events-none"></div>
             <div 
               className="absolute inset-0 bg-cover bg-center opacity-20 group-hover:opacity-40 transition-opacity duration-300 z-0 pointer-events-none" 
@@ -506,7 +506,7 @@ export default async function Home(props: { params: Promise<{ lang: Locale }> })
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 max-w-lg h-[2px] bg-gradient-to-r from-transparent via-blue-400 to-transparent shadow-[0_0_14px_2px_rgba(96,165,250,0.85)] z-20 pointer-events-none"></div>
 
           {/* Card 1: Specialized Support Team */}
-          <div className="group flex flex-col items-center text-center p-3.5 sm:p-5 md:p-3.5 lg:p-6 rounded-2xl transition-all duration-200 relative bg-[#0b1426]/65 backdrop-blur-md border border-white/12 hover:border-blue-400/50 hover:bg-[#0e1c36]/80 shadow-sm">
+          <div className="group flex flex-col items-center text-center p-3.5 sm:p-5 md:p-3.5 lg:p-6 rounded-2xl transition-all duration-200 relative bg-[#0b1426]/45 backdrop-blur-md border border-white/12 hover:border-blue-400/50 hover:bg-[#0e1c36]/65 shadow-sm">
             <div className="relative mb-3 sm:mb-4">
               <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-12 md:h-12 lg:w-16 lg:h-16 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 shadow-sm transition-colors">
                 <i className="fas fa-headset text-xl md:text-xl lg:text-2xl"></i>
@@ -521,7 +521,7 @@ export default async function Home(props: { params: Promise<{ lang: Locale }> })
           </div>
 
           {/* Card 2: 100% Safe Commission & Security */}
-          <div className="group flex flex-col items-center text-center p-3.5 sm:p-5 md:p-3.5 lg:p-6 rounded-2xl transition-all duration-200 relative bg-[#0b1426]/65 backdrop-blur-md border border-white/12 hover:border-emerald-400/50 hover:bg-[#0e1c36]/80 shadow-sm">
+          <div className="group flex flex-col items-center text-center p-3.5 sm:p-5 md:p-3.5 lg:p-6 rounded-2xl transition-all duration-200 relative bg-[#0b1426]/45 backdrop-blur-md border border-white/12 hover:border-emerald-400/50 hover:bg-[#0e1c36]/65 shadow-sm">
             <div className="relative mb-3 sm:mb-4">
               <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-12 md:h-12 lg:w-16 lg:h-16 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 shadow-sm transition-colors">
                 <i className="fas fa-shield-alt text-xl md:text-xl lg:text-2xl"></i>
@@ -536,7 +536,7 @@ export default async function Home(props: { params: Promise<{ lang: Locale }> })
           </div>
 
           {/* Card 3: Continuous Support & Development */}
-          <div className="group flex flex-col items-center text-center p-3.5 sm:p-5 md:p-3.5 lg:p-6 rounded-2xl transition-all duration-200 relative bg-[#0b1426]/65 backdrop-blur-md border border-white/12 hover:border-amber-400/50 hover:bg-[#0e1c36]/80 shadow-sm">
+          <div className="group flex flex-col items-center text-center p-3.5 sm:p-5 md:p-3.5 lg:p-6 rounded-2xl transition-all duration-200 relative bg-[#0b1426]/45 backdrop-blur-md border border-white/12 hover:border-amber-400/50 hover:bg-[#0e1c36]/65 shadow-sm">
             <div className="relative mb-3 sm:mb-4">
               <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-12 md:h-12 lg:w-16 lg:h-16 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 shadow-sm transition-colors">
                 <i className="fas fa-sync-alt text-xl md:text-xl lg:text-2xl"></i>
