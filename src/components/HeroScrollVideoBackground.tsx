@@ -6,14 +6,11 @@ interface HeroScrollVideoBackgroundProps {
   lang: string;
 }
 
-const DEFAULT_VIDEO_URL =
+const POSTER_URL = "/videos/hero_poster.jpg";
+const SCROLL_VIDEO_URL =
   process.env.NEXT_PUBLIC_HERO_VIDEO_URL ||
   "https://pub-3440f02b971d4054906dd63d89e3cdb0.r2.dev/hero-showcase.mp4";
-
-const POSTER_URL = "/videos/hero_poster.jpg";
-const MOBILE_SCROLL_VIDEO_URL = "/videos/hero_scrub.mp4";
-const MOTION_MEDIA_QUERY = "(prefers-reduced-motion: no-preference)";
-const MIN_SEEK_INTERVAL = 90;
+const MIN_SEEK_INTERVAL = 50;
 
 export default function HeroScrollVideoBackground({ lang }: HeroScrollVideoBackgroundProps) {
   const isAr = lang === "ar";
@@ -23,19 +20,8 @@ export default function HeroScrollVideoBackground({ lang }: HeroScrollVideoBackg
   const settleTimerRef = useRef<number | null>(null);
   const lastSeekTimeRef = useRef(0);
 
-  // The poster paints instantly; the video then starts syncing once its metadata is available.
-  const [shouldRenderVideo, setShouldRenderVideo] = useState(false);
   const [playbackMode, setPlaybackMode] = useState<"scroll" | "auto">("scroll");
   const [isMuted, setIsMuted] = useState(true);
-
-  useEffect(() => {
-    const mediaQuery = window.matchMedia(MOTION_MEDIA_QUERY);
-    const updateVideoEligibility = () => setShouldRenderVideo(mediaQuery.matches);
-
-    updateVideoEligibility();
-    mediaQuery.addEventListener("change", updateVideoEligibility);
-    return () => mediaQuery.removeEventListener("change", updateVideoEligibility);
-  }, []);
 
   const safePlay = useCallback(() => {
     const video = videoRef.current;
@@ -75,11 +61,11 @@ export default function HeroScrollVideoBackground({ lang }: HeroScrollVideoBackg
     video.muted = true;
     video.defaultMuted = true;
     video.pause();
-  }, [shouldRenderVideo]);
+  }, []);
 
   useEffect(() => {
     const video = videoRef.current;
-    if (!video || !shouldRenderVideo) return;
+    if (!video) return;
 
     if (playbackMode === "auto") {
       video.playbackRate = 0.85;
@@ -101,7 +87,7 @@ export default function HeroScrollVideoBackground({ lang }: HeroScrollVideoBackg
 
       const now = performance.now();
       const elapsedSinceLastSeek = now - lastSeekTimeRef.current;
-      if (Math.abs(video.currentTime - target) < 0.12) return;
+      if (Math.abs(video.currentTime - target) < 0.04) return;
 
       if (elapsedSinceLastSeek < MIN_SEEK_INTERVAL) {
         if (settleTimerRef.current === null) {
@@ -115,11 +101,8 @@ export default function HeroScrollVideoBackground({ lang }: HeroScrollVideoBackg
 
       lastSeekTimeRef.current = now;
       try {
-        if (typeof video.fastSeek === "function") {
-          video.fastSeek(target);
-        } else {
-          video.currentTime = target;
-        }
+        // Exact seeks prevent the visible keyframe jumps caused by fastSeek().
+        video.currentTime = target;
       } catch {}
     };
 
@@ -152,7 +135,7 @@ export default function HeroScrollVideoBackground({ lang }: HeroScrollVideoBackg
       settleTimerRef.current = null;
       safePause();
     };
-  }, [playbackMode, safePause, safePlay, shouldRenderVideo]);
+  }, [playbackMode, safePause, safePlay]);
 
   const togglePlaybackMode = useCallback(() => {
     setPlaybackMode((mode) => (mode === "scroll" ? "auto" : "scroll"));
@@ -181,22 +164,18 @@ export default function HeroScrollVideoBackground({ lang }: HeroScrollVideoBackg
           className="absolute inset-0 h-full w-full object-cover object-center"
         />
 
-        {shouldRenderVideo && (
-          <video
-            ref={videoRef}
-            poster={POSTER_URL}
-            loop={playbackMode === "auto"}
-            muted
-            playsInline
-            preload="metadata"
-            disablePictureInPicture
-            disableRemotePlayback
-            className="absolute inset-0 h-full w-full object-cover object-center"
-          >
-            <source media="(max-width: 768px)" src={MOBILE_SCROLL_VIDEO_URL} type="video/mp4" />
-            <source src={DEFAULT_VIDEO_URL} type="video/mp4" />
-          </video>
-        )}
+        <video
+          ref={videoRef}
+          src={SCROLL_VIDEO_URL}
+          poster={POSTER_URL}
+          loop={playbackMode === "auto"}
+          muted
+          playsInline
+          preload="auto"
+          disablePictureInPicture
+          disableRemotePlayback
+          className="absolute inset-0 h-full w-full object-cover object-center"
+        />
 
         <div className="absolute inset-0 bg-gradient-to-b from-[#0b0f17]/25 via-[#0b1426]/15 to-[#0b0f17]/35" />
         <div className="absolute inset-0 bg-blue-600/[0.05]" />
@@ -205,8 +184,7 @@ export default function HeroScrollVideoBackground({ lang }: HeroScrollVideoBackg
         <div className="absolute bottom-0 inset-x-0 h-12 bg-gradient-to-t from-[#0b0f17]/25 to-transparent" />
       </div>
 
-      {shouldRenderVideo && (
-        <div className="fixed bottom-5 end-5 z-40 flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#0b1220]/80 backdrop-blur-xl border border-sky-400/40 shadow-[0_8px_25px_rgba(0,0,0,0.6)] text-xs text-slate-300 pointer-events-auto">
+      <div className="fixed bottom-5 end-5 z-40 flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#0b1220]/80 backdrop-blur-xl border border-sky-400/40 shadow-[0_8px_25px_rgba(0,0,0,0.6)] text-xs text-slate-300 pointer-events-auto">
           <span className="font-mono text-[10px] text-sky-300 font-bold hidden sm:inline">
             {playbackMode === "scroll"
               ? (isAr ? "متزامن مع التمرير" : "SCROLL SYNC")
@@ -230,8 +208,7 @@ export default function HeroScrollVideoBackground({ lang }: HeroScrollVideoBackg
           >
             <i className={`fas ${isMuted ? "fa-volume-mute" : "fa-volume-up"} text-sky-400 text-[11px]`} />
           </button>
-        </div>
-      )}
+      </div>
     </>
   );
 }
