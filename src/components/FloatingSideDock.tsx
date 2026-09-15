@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
@@ -86,6 +86,98 @@ export default function FloatingSideDock({ lang = "ar" }: FloatingSideDockProps)
             <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
           </svg>
         </a>
+
+        {/* AI Support Robot Mascot Tab (Directly Under Facebook) */}
+        <div
+          role="button"
+          tabIndex={0}
+          onClick={() => {
+            if (typeof window !== "undefined") {
+              window.dispatchEvent(new CustomEvent("toggle-ai-chat"));
+            }
+          }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              if (typeof window !== "undefined") {
+                window.dispatchEvent(new CustomEvent("toggle-ai-chat"));
+              }
+            }
+          }}
+          className="flex flex-row items-center gap-1.5 sm:gap-2 group select-none hover:scale-105 active:scale-95 cursor-pointer pt-1.5 pl-0.5"
+          aria-label={isAr ? "المساعد الذكي AI 24/7" : "Open AI Support Chat"}
+        >
+          {/* Animated 3D/Vector Cyber Robot Mascot */}
+          <div className="relative w-12 h-16 sm:w-16 sm:h-20 flex items-center justify-center filter drop-shadow-[0_6px_16px_rgba(14,165,233,0.5)] group-hover:drop-shadow-[0_10px_24px_rgba(14,165,233,0.8)] transition-all shrink-0">
+            <div className="absolute bottom-0.5 w-9 sm:w-12 h-2.5 rounded-full bg-cyan-500/30 blur-md animate-pulse pointer-events-none" />
+            <svg
+              viewBox="0 0 120 160"
+              className="w-full h-full animate-[bounce_3s_ease-in-out_infinite] pointer-events-none"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <line x1="60" y1="12" x2="60" y2="28" stroke="#38bdf8" strokeWidth="3" strokeLinecap="round" />
+              <circle cx="60" cy="10" r="5" fill="#38bdf8" className="animate-pulse" />
+              <circle cx="60" cy="10" r="8" fill="#38bdf8" opacity="0.4" className="animate-ping" />
+              <rect x="22" y="38" width="9" height="18" rx="4.5" fill="#0284c7" stroke="#e0f2fe" strokeWidth="1.5" />
+              <rect x="89" y="38" width="9" height="18" rx="4.5" fill="#0284c7" stroke="#e0f2fe" strokeWidth="1.5" />
+              <rect x="30" y="26" width="60" height="42" rx="16" fill="#0f172a" stroke="#38bdf8" strokeWidth="2.5" />
+              <rect x="36" y="34" width="48" height="24" rx="10" fill="#082f49" stroke="#0ea5e9" strokeWidth="1.5" />
+              <ellipse cx="48" cy="46" rx="4.5" ry="6" fill="#38bdf8">
+                <animate attributeName="ry" values="6;6;0.5;6;6" dur="3s" repeatCount="indefinite" />
+              </ellipse>
+              <circle cx="50" cy="44" r="1.5" fill="#ffffff" />
+              <ellipse cx="72" cy="46" rx="4.5" ry="6" fill="#38bdf8">
+                <animate attributeName="ry" values="6;6;0.5;6;6" dur="3s" repeatCount="indefinite" />
+              </ellipse>
+              <circle cx="74" cy="44" r="1.5" fill="#ffffff" />
+              <path d="M52 52 Q60 57 68 52" stroke="#38bdf8" strokeWidth="2.5" strokeLinecap="round" fill="none" />
+              <rect x="53" y="68" width="14" height="8" rx="2" fill="#1e293b" stroke="#38bdf8" strokeWidth="1.5" />
+              <path d="M36 76 L84 76 L78 114 L42 114 Z" fill="#0f172a" stroke="#38bdf8" strokeWidth="2" />
+              <circle cx="60" cy="94" r="9" fill="#0284c7" stroke="#38bdf8" strokeWidth="2" />
+              <circle cx="60" cy="94" r="5" fill="#38bdf8" className="animate-pulse" />
+              <circle cx="60" cy="94" r="2" fill="#ffffff" />
+              <line x1="44" y1="84" x2="52" y2="84" stroke="#0ea5e9" strokeWidth="1.5" strokeLinecap="round" />
+              <line x1="68" y1="84" x2="76" y2="84" stroke="#0ea5e9" strokeWidth="1.5" strokeLinecap="round" />
+              <g className="origin-[36px_80px]">
+                <circle cx="36" cy="80" r="5" fill="#0284c7" stroke="#38bdf8" strokeWidth="1.5" />
+                <path d="M36 80 Q18 68 20 48" stroke="#0284c7" strokeWidth="4" strokeLinecap="round" fill="none">
+                  <animateTransform attributeName="transform" type="rotate" values="0 36 80; 12 36 80; -8 36 80; 0 36 80" dur="2s" repeatCount="indefinite" />
+                </path>
+                <circle cx="20" cy="46" r="5.5" fill="#38bdf8" stroke="#ffffff" strokeWidth="1.5">
+                  <animateTransform attributeName="transform" type="rotate" values="0 36 80; 12 36 80; -8 36 80; 0 36 80" dur="2s" repeatCount="indefinite" />
+                </circle>
+              </g>
+              <circle cx="84" cy="80" r="5" fill="#0284c7" stroke="#38bdf8" strokeWidth="1.5" />
+              <path d="M84 80 Q98 94 94 106" stroke="#0284c7" strokeWidth="4" strokeLinecap="round" fill="none" />
+              <circle cx="94" cy="108" r="4.5" fill="#38bdf8" stroke="#ffffff" strokeWidth="1" />
+              <rect x="42" y="114" width="36" height="6" rx="3" fill="#1e293b" stroke="#38bdf8" strokeWidth="1.5" />
+              <path d="M46 120 L54 120 L52 130 L48 130 Z" fill="#0284c7" stroke="#38bdf8" strokeWidth="1" />
+              <path d="M66 120 L74 120 L72 130 L68 130 Z" fill="#0284c7" stroke="#38bdf8" strokeWidth="1" />
+              <path d="M48 130 Q50 146 52 130" fill="#38bdf8" className="animate-pulse" />
+              <path d="M68 130 Q70 146 72 130" fill="#38bdf8" className="animate-pulse" />
+              <path d="M49 130 Q50 140 51 130" fill="#ffffff" />
+              <path d="M69 130 Q70 140 71 130" fill="#ffffff" />
+            </svg>
+          </div>
+
+          {/* Attached Cyber Speech Badge */}
+          <div className="flex flex-col items-start bg-[#0b0f19]/95 backdrop-blur-xl border border-cyan-400/50 rounded-2xl px-2.5 py-1 sm:px-3 sm:py-1.5 shadow-[0_8px_25px_rgba(0,0,0,0.6)] group-hover:border-cyan-400 transition-all pointer-events-none mb-1 sm:mb-0">
+            <div className="flex items-center gap-1.5">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-violet-400 opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-violet-500" />
+              </span>
+              <span className="text-[10px] sm:text-xs font-black text-white tracking-wide flex items-center gap-1 whitespace-nowrap">
+                <span>{isAr ? "المساعد الذكي AI" : "AI Support"}</span>
+                <span className="text-[9px] text-cyan-400 font-mono">24/7</span>
+              </span>
+            </div>
+            <div className="hidden sm:block text-[9px] sm:text-[10px] text-cyan-200/80 font-medium mt-0.5 whitespace-nowrap">
+              {isAr ? "دعم فني وتفاوض مباشر" : "Live Assistant"}
+            </div>
+          </div>
+        </div>
       </aside>
 
       {/* ── 2. SCROLL TO TOP FLOATING BUTTON (BOTTOM CORNER) ── */}

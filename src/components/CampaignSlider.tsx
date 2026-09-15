@@ -41,12 +41,14 @@ export default function CampaignSlider({
     return () => clearInterval(timer);
   }, [total, isPaused, viewMode]);
 
-  // Smooth scroll active tab button into center view horizontally
+  // Smooth scroll active tab button into center view horizontally within the tabs container only (never scrolling the page/window)
   useEffect(() => {
     if (!tabsContainerRef.current) return;
     const activeBtn = tabsContainerRef.current.querySelector<HTMLButtonElement>(`[data-tab-idx="${activeIndex}"]`);
     if (activeBtn) {
-      activeBtn.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+      const container = tabsContainerRef.current;
+      const scrollTarget = activeBtn.offsetLeft - (container.clientWidth - activeBtn.clientWidth) / 2;
+      container.scrollTo({ left: scrollTarget, behavior: "smooth" });
     }
   }, [activeIndex]);
 

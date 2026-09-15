@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useState, useRef, useEffect } from 'react';
 import { getUserAuthToken } from "../lib/client-auth-token";
@@ -21,61 +21,27 @@ export default function AiChatWidget() {
     "ما هي شروط وسياسة استرجاع الرصيد؟"
   ]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const [dragPos, setDragPos] = useState<{ x: number; y: number } | null>(null);
-  const [isDragging, setIsDragging] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const dragRef = useRef<{ startX: number; startY: number; initialX: number; initialY: number; moved: boolean }>({
-    startX: 0,
-    startY: 0,
-    initialX: 0,
-    initialY: 0,
-    moved: false,
-  });
 
-  const handlePointerDown = (e: React.PointerEvent) => {
-    if (!containerRef.current) return;
-    const rect = containerRef.current.getBoundingClientRect();
-    
-    dragRef.current = {
-      startX: e.clientX,
-      startY: e.clientY,
-      initialX: dragPos ? dragPos.x : rect.left,
-      initialY: dragPos ? dragPos.y : rect.top,
-      moved: false,
+  useEffect(() => {
+    const handleToggle = () => setIsOpen((prev) => !prev);
+    const handleOpen = () => setIsOpen(true);
+    const handleClose = () => setIsOpen(false);
+
+    window.addEventListener("toggle-ai-chat", handleToggle);
+    window.addEventListener("open-ai-chat", handleOpen);
+    window.addEventListener("close-ai-chat", handleClose);
+
+    return () => {
+      window.removeEventListener("toggle-ai-chat", handleToggle);
+      window.removeEventListener("open-ai-chat", handleOpen);
+      window.removeEventListener("close-ai-chat", handleClose);
     };
-
-    const handlePointerMove = (moveEvent: PointerEvent) => {
-      const deltaX = moveEvent.clientX - dragRef.current.startX;
-      const deltaY = moveEvent.clientY - dragRef.current.startY;
-
-      if (Math.hypot(deltaX, deltaY) > 8) {
-        dragRef.current.moved = true;
-        setIsDragging(true);
-
-        const newX = Math.max(8, Math.min(window.innerWidth - 90, dragRef.current.initialX + deltaX));
-        const newY = Math.max(8, Math.min(window.innerHeight - 110, dragRef.current.initialY + deltaY));
-        setDragPos({ x: newX, y: newY });
-      }
-    };
-
-    const handlePointerUp = () => {
-      window.removeEventListener('pointermove', handlePointerMove);
-      window.removeEventListener('pointerup', handlePointerUp);
-      setTimeout(() => setIsDragging(false), 50);
-    };
-
-    window.addEventListener('pointermove', handlePointerMove);
-    window.addEventListener('pointerup', handlePointerUp);
-  };
-
-  const handleToggleClick = () => {
-    if (!dragRef.current.moved) {
-      setIsOpen((prev) => !prev);
-    }
-  };
+  }, []);
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (isOpen) {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
   };
 
   useEffect(() => {
@@ -204,178 +170,9 @@ export default function AiChatWidget() {
 
   return (
     <>
-      {/* Floating Full-Body Animated AI Robot (Draggable & Touch Animated) */}
-      {!isOpen && (
-        <div
-          ref={containerRef}
-          role="button"
-          tabIndex={0}
-          onPointerDown={handlePointerDown}
-          onClick={handleToggleClick}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" || e.key === " ") {
-              e.preventDefault();
-              handleToggleClick();
-            }
-          }}
-          className={`fixed z-[9999] flex flex-col sm:flex-row items-center gap-1.5 sm:gap-2.5 group select-none touch-none ${
-            dragPos ? "" : "bottom-5 right-3 sm:bottom-8 sm:right-6"
-          } ${
-            isDragging ? 'scale-110 drop-shadow-[0_20px_40px_rgba(14,165,233,0.9)]' : 'hover:scale-105 active:scale-95 cursor-pointer'
-          }`}
-          style={
-            dragPos
-              ? {
-                  left: `${dragPos.x}px`,
-                  top: `${dragPos.y}px`,
-                  cursor: isDragging ? 'grabbing' : 'grab',
-                  transition: isDragging ? 'none' : 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
-                }
-              : undefined
-          }
-          aria-label="Open AI Support Chat"
-        >
-          {/* Interactive Speech Badge Attached to Robot (Mobile & Desktop Responsive) */}
-          <div className="flex flex-col items-center sm:items-end bg-[#0b0f19]/95 backdrop-blur-xl border border-cyan-400/50 rounded-2xl px-2.5 py-1 sm:px-3.5 sm:py-2 shadow-[0_8px_25px_rgba(0,0,0,0.6)] group-hover:border-cyan-400 transition-all pointer-events-none mb-1 sm:mb-0">
-            <div className="flex items-center gap-1.5">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-violet-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-violet-500"></span>
-              </span>
-              <span className="text-[10px] sm:text-xs font-black text-white tracking-wide flex items-center gap-1 whitespace-nowrap">
-                <span>المساعد الذكي AI</span>
-                <span className="text-[9px] text-cyan-400 font-mono">24/7</span>
-              </span>
-            </div>
-            <div className="hidden sm:block text-[9px] sm:text-[10px] text-cyan-200/80 font-medium mt-0.5 whitespace-nowrap">
-              دعم فني وتفاوض مباشر
-            </div>
-          </div>
-
-          {/* Full-Body Animated 3D/Vector Cyber Robot */}
-          <div className="relative w-14 h-18 sm:w-20 sm:h-24 flex items-center justify-center filter drop-shadow-[0_6px_16px_rgba(14,165,233,0.5)] group-hover:drop-shadow-[0_10px_24px_rgba(14,165,233,0.8)] transition-all">
-            
-            {/* Holographic Glowing Base Ring / Pulse Aura */}
-            <div className="absolute bottom-0.5 w-10 sm:w-14 h-3 rounded-full bg-cyan-500/30 blur-md animate-pulse pointer-events-none"></div>
-
-            {/* Complete Full-Body Robot SVG */}
-            <svg
-              viewBox="0 0 120 160"
-              className="w-full h-full animate-[bounce_3s_ease-in-out_infinite] pointer-events-none"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              {/* ── 1. ANTENNA & BEACON LIGHT ── */}
-              <line x1="60" y1="12" x2="60" y2="28" stroke="#38bdf8" strokeWidth="3" strokeLinecap="round" />
-              <circle cx="60" cy="10" r="5" fill="#38bdf8" className="animate-pulse" />
-              <circle cx="60" cy="10" r="8" fill="#38bdf8" opacity="0.4" className="animate-ping" />
-
-              {/* ── 2. HEAD & HELMET ── */}
-              {/* Left & Right Earphone Cushions */}
-              <rect x="22" y="38" width="9" height="18" rx="4.5" fill="#0284c7" stroke="#e0f2fe" strokeWidth="1.5" />
-              <rect x="89" y="38" width="9" height="18" rx="4.5" fill="#0284c7" stroke="#e0f2fe" strokeWidth="1.5" />
-
-              {/* Main Helmet Head */}
-              <rect x="30" y="26" width="60" height="42" rx="16" fill="#0f172a" stroke="#38bdf8" strokeWidth="2.5" />
-
-              {/* Visor Screen */}
-              <rect x="36" y="34" width="48" height="24" rx="10" fill="#082f49" stroke="#0ea5e9" strokeWidth="1.5" />
-
-              {/* Left Eye (Animated Blinking) */}
-              <ellipse cx="48" cy="46" rx="4.5" ry="6" fill="#38bdf8">
-                <animate
-                  attributeName="ry"
-                  values="6;6;0.5;6;6"
-                  dur="3s"
-                  repeatCount="indefinite"
-                />
-              </ellipse>
-              <circle cx="50" cy="44" r="1.5" fill="#ffffff" />
-
-              {/* Right Eye (Animated Blinking) */}
-              <ellipse cx="72" cy="46" rx="4.5" ry="6" fill="#38bdf8">
-                <animate
-                  attributeName="ry"
-                  values="6;6;0.5;6;6"
-                  dur="3s"
-                  repeatCount="indefinite"
-                />
-              </ellipse>
-              <circle cx="74" cy="44" r="1.5" fill="#ffffff" />
-
-              {/* Cheerful Robot Smile */}
-              <path d="M52 52 Q60 57 68 52" stroke="#38bdf8" strokeWidth="2.5" strokeLinecap="round" fill="none" />
-
-              {/* ── 3. NECK ── */}
-              <rect x="53" y="68" width="14" height="8" rx="2" fill="#1e293b" stroke="#38bdf8" strokeWidth="1.5" />
-
-              {/* ── 4. TORSO & CHEST ARMOR ── */}
-              <path
-                d="M36 76 L84 76 L78 114 L42 114 Z"
-                fill="#0f172a"
-                stroke="#38bdf8"
-                strokeWidth="2"
-              />
-
-              {/* Chest Core / Arc Reactor (Heart) */}
-              <circle cx="60" cy="94" r="9" fill="#0284c7" stroke="#38bdf8" strokeWidth="2" />
-              <circle cx="60" cy="94" r="5" fill="#38bdf8" className="animate-pulse" />
-              <circle cx="60" cy="94" r="2" fill="#ffffff" />
-
-              {/* Decorative Chest Lines */}
-              <line x1="44" y1="84" x2="52" y2="84" stroke="#0ea5e9" strokeWidth="1.5" strokeLinecap="round" />
-              <line x1="68" y1="84" x2="76" y2="84" stroke="#0ea5e9" strokeWidth="1.5" strokeLinecap="round" />
-
-              {/* ── 5. LEFT ARM (WAVING HAND!) ── */}
-              <g className="origin-[36px_80px]">
-                <circle cx="36" cy="80" r="5" fill="#0284c7" stroke="#38bdf8" strokeWidth="1.5" />
-                <path d="M36 80 Q18 68 20 48" stroke="#0284c7" strokeWidth="4" strokeLinecap="round" fill="none">
-                  <animateTransform
-                    attributeName="transform"
-                    type="rotate"
-                    values="0 36 80; 12 36 80; -8 36 80; 0 36 80"
-                    dur="2s"
-                    repeatCount="indefinite"
-                  />
-                </path>
-                {/* Cute Waving Glove Hand */}
-                <circle cx="20" cy="46" r="5.5" fill="#38bdf8" stroke="#ffffff" strokeWidth="1.5">
-                  <animateTransform
-                    attributeName="transform"
-                    type="rotate"
-                    values="0 36 80; 12 36 80; -8 36 80; 0 36 80"
-                    dur="2s"
-                    repeatCount="indefinite"
-                  />
-                </circle>
-              </g>
-
-              {/* ── 6. RIGHT ARM (POUSED AT SIDE) ── */}
-              <circle cx="84" cy="80" r="5" fill="#0284c7" stroke="#38bdf8" strokeWidth="1.5" />
-              <path d="M84 80 Q98 94 94 106" stroke="#0284c7" strokeWidth="4" strokeLinecap="round" fill="none" />
-              <circle cx="94" cy="108" r="4.5" fill="#38bdf8" stroke="#ffffff" strokeWidth="1" />
-
-              {/* ── 7. HOVER THRUSTERS & FLAMES ── */}
-              {/* Hip Belt */}
-              <rect x="42" y="114" width="36" height="6" rx="3" fill="#1e293b" stroke="#38bdf8" strokeWidth="1.5" />
-
-              {/* Left & Right Jet Thruster Nozzles */}
-              <path d="M46 120 L54 120 L52 130 L48 130 Z" fill="#0284c7" stroke="#38bdf8" strokeWidth="1" />
-              <path d="M66 120 L74 120 L72 130 L68 130 Z" fill="#0284c7" stroke="#38bdf8" strokeWidth="1" />
-
-              {/* Plasma Jet Flames (Animated) */}
-              <path d="M48 130 Q50 146 52 130" fill="#38bdf8" className="animate-pulse" />
-              <path d="M68 130 Q70 146 72 130" fill="#38bdf8" className="animate-pulse" />
-              <path d="M49 130 Q50 140 51 130" fill="#ffffff" />
-              <path d="M69 130 Q70 140 71 130" fill="#ffffff" />
-            </svg>
-          </div>
-        </div>
-      )}
-
       {/* Chat Box Modal (Fully Mobile & Desktop Responsive) */}
       {isOpen && (
-        <div className="fixed inset-x-2.5 bottom-2.5 sm:bottom-6 sm:right-6 sm:inset-x-auto w-auto sm:w-[420px] max-w-full h-[85vh] sm:h-[580px] bg-[#0b0f19]/95 backdrop-blur-2xl rounded-3xl border border-outline-variant/40 shadow-[0_20px_60px_rgba(0,0,0,0.85)] flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-5 duration-300 z-[9999]">
+        <div className="fixed inset-x-2.5 bottom-2.5 sm:bottom-6 sm:left-6 sm:inset-x-auto w-auto sm:w-[420px] max-w-full h-[85vh] sm:h-[580px] bg-[#0b0f19]/95 backdrop-blur-2xl rounded-3xl border border-outline-variant/40 shadow-[0_20px_60px_rgba(0,0,0,0.85)] flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-5 duration-300 z-[9999]">
           
           {/* Header */}
           <div className="p-3.5 sm:p-4 bg-gradient-to-r from-primary/20 via-blue-900/30 to-surface-container-high border-b border-outline-variant/30 flex items-center justify-between">
