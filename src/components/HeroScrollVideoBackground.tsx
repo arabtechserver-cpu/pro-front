@@ -184,13 +184,17 @@ export default function HeroScrollVideoBackground({ lang }: HeroScrollVideoBackg
         const current = vid.currentTime;
         const diff = target - current;
 
+        const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
+        const maxRate = isMobile ? 1.2 : 2.8;
+        const minSeekInterval = isMobile ? 80 : 40;
+
         if (isActivelyScrolling) {
           if (diff > 0.08) {
             // Forward scrolling: hardware decode playback
             if (diff > 1.2 && !vid.seeking) {
-              vid.currentTime = target - 0.15;
+              vid.currentTime = target - (isMobile ? 0.08 : 0.15);
             }
-            const rate = Math.min(2.8, Math.max(0.75, diff * 2.0));
+            const rate = Math.min(maxRate, Math.max(0.75, diff * (isMobile ? 1.3 : 2.0)));
             vid.playbackRate = rate;
             safePlay();
 
@@ -203,9 +207,10 @@ export default function HeroScrollVideoBackground({ lang }: HeroScrollVideoBackg
 
             // Guard against decoder overload: never seek while previous seek is decoding
             const isDecoderBusy = vid.seeking && now - lastSeekTimeRef.current < 250;
-            if (!isDecoderBusy && now - lastSeekTimeRef.current >= 40) {
+            if (!isDecoderBusy && now - lastSeekTimeRef.current >= minSeekInterval) {
               lastSeekTimeRef.current = now;
-              const nextTime = diff < -0.8 ? target : current + (target - current) * 0.45;
+              const smoothingFactor = isMobile ? 0.35 : 0.45;
+              const nextTime = diff < -0.8 ? target : current + (target - current) * smoothingFactor;
               const boundedTime = Math.max(0, Math.min(vid.duration - 0.02, nextTime));
 
               if (typeof vid.fastSeek === "function") {

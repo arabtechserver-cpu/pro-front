@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 
 interface PackagesSliderProps {
@@ -198,8 +198,8 @@ export default function PackagesSlider({ lang }: PackagesSliderProps) {
     return () => clearInterval(interval);
   }, [isPaused, total]);
 
-  const [touchStart, setTouchStart] = useState<number | null>(null);
-  const [touchEnd, setTouchEnd] = useState<number | null>(null);
+  const touchStartXRef = useRef<number | null>(null);
+  const touchStartYRef = useRef<number | null>(null);
 
   const handleNext = () => {
     setCurrentIndex((prev) => (prev + 1) % total);
@@ -210,19 +210,23 @@ export default function PackagesSlider({ lang }: PackagesSliderProps) {
   };
 
   const handleTouchStart = (e: React.TouchEvent) => {
-    setTouchEnd(null);
-    setTouchStart(e.targetTouches[0].clientX);
+    if (e.targetTouches.length > 0) {
+      touchStartXRef.current = e.targetTouches[0].clientX;
+      touchStartYRef.current = e.targetTouches[0].clientY;
+    }
   };
 
-  const handleTouchMove = (e: React.TouchEvent) => {
-    setTouchEnd(e.targetTouches[0].clientX);
-  };
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartXRef.current === null || touchStartYRef.current === null) return;
+    const endX = e.changedTouches[0]?.clientX;
+    const endY = e.changedTouches[0]?.clientY;
+    if (endX === undefined || endY === undefined) return;
 
-  const handleTouchEnd = () => {
-    if (touchStart === null || touchEnd === null) return;
-    const distance = touchStart - touchEnd;
-    if (Math.abs(distance) > 40) {
-      if (distance > 0) {
+    const diffX = touchStartXRef.current - endX;
+    const diffY = touchStartYRef.current - endY;
+
+    if (Math.abs(diffX) > 45 && Math.abs(diffX) > Math.abs(diffY)) {
+      if (diffX > 0) {
         if (isAr) handlePrev();
         else handleNext();
       } else {
@@ -230,6 +234,8 @@ export default function PackagesSlider({ lang }: PackagesSliderProps) {
         else handlePrev();
       }
     }
+    touchStartXRef.current = null;
+    touchStartYRef.current = null;
   };
 
   const visibleItems = [
@@ -244,7 +250,6 @@ export default function PackagesSlider({ lang }: PackagesSliderProps) {
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
       onTouchStart={handleTouchStart}
-      onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
       data-aos="fade-up"
       suppressHydrationWarning
@@ -301,7 +306,7 @@ export default function PackagesSlider({ lang }: PackagesSliderProps) {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 transition-all duration-500">
             {visibleItems.map((pkg, idx) => (
               <div
-                key={`${pkg.id}-${currentIndex}-${idx}`}
+                key={`${pkg.id}-${idx}`}
                 className={`relative rounded-2xl p-6 sm:p-7 bg-[#0b1426]/65 backdrop-blur-md border border-white/12 hover:border-blue-400/50 hover:bg-[#0e1c36]/80 !overflow-visible shadow-xl transition-all duration-200 group hover:-translate-y-1 flex flex-col justify-between ${
                   idx === 1 ? "hidden md:flex" : idx === 2 ? "hidden lg:flex" : "flex"
                 }`}

@@ -12,12 +12,11 @@ export default function AosInit() {
       window.scrollTo(0, 0);
     }
 
-    const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
-
-    // Fast AOS initialization for responsive instant animations
+    // Disable on mobile so touch momentum scroll has zero layout shifts or animation overhead
     const initTimer = setTimeout(() => {
       AOS.init({
-        duration: isMobile ? 220 : 400,
+        disable: () => (typeof window !== "undefined" ? window.innerWidth < 768 : false),
+        duration: 400,
         delay: 0,
         once: true,
         easing: "ease-out-cubic",

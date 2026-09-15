@@ -635,12 +635,51 @@ body {
 }
 
 /* ============================================================
-   Mobile Scroll Animation Acceleration (Instant Appearance)
+   Mobile Performance & Smooth Touch Scroll Optimizations
    ============================================================ */
 @media (max-width: 768px) {
+  /* Prevent smooth-scroll algorithm from conflicting with native touch momentum */
+  html {
+    scroll-behavior: auto !important;
+  }
+
+  /* Instant zero-lag rendering for animated elements on touch scroll */
   [data-aos] {
-    transition-delay: 0ms !important;
-    transition-duration: 220ms !important;
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+    animation: none !important;
+  }
+
+  /* Eliminate expensive multi-pass Gaussian blur on mobile GPUs */
+  .backdrop-blur-sm,
+  .backdrop-blur,
+  .backdrop-blur-md,
+  .backdrop-blur-lg,
+  .backdrop-blur-xl,
+  .backdrop-blur-2xl,
+  .backdrop-blur-3xl,
+  [class*="backdrop-blur"] {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  /* Solidify dark cyber surfaces for pristine contrast and 60/120fps scrolling */
+  .lamp-card,
+  .glass-card,
+  [class*="bg-[#0b1426]"],
+  [class*="bg-[#0b1322]"],
+  [class*="bg-[#0b1220]"] {
+    background-color: rgba(11, 20, 38, 0.94) !important;
+  }
+
+  /* Lighten heavy GPU blur shadows on mobile */
+  [class*="shadow-2xl"],
+  [class*="shadow-[0_20px_"],
+  [class*="shadow-[0_25px_"],
+  [class*="shadow-[0_35px_"] {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45) !important;
   }
 }
+
 
