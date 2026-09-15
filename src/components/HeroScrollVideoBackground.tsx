@@ -17,9 +17,20 @@ export default function HeroScrollVideoBackground({ lang }: HeroScrollVideoBackg
   const progressTextRef = useRef<HTMLSpanElement | null>(null);
   const statusLabelRef = useRef<HTMLSpanElement | null>(null);
 
-  // Mode: "scroll" (scroll-driven smooth playhead) or "auto" (continuous smooth loop)
-  const [playbackMode, setPlaybackMode] = useState<"scroll" | "auto">("scroll");
+  // Default to smooth auto loop to prevent scroll thread contention
+  const [playbackMode, setPlaybackMode] = useState<"scroll" | "auto">("auto");
   const [isMuted, setIsMuted] = useState(true);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Disable background video on mobile devices to prevent GPU scroll throttling
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768 || window.matchMedia("(max-width: 767px)").matches);
+    };
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
 
   // Playback promise locking to prevent browser unhandled interruption errors
   const playPromiseRef = useRef<Promise<void> | null>(null);
@@ -203,6 +214,10 @@ export default function HeroScrollVideoBackground({ lang }: HeroScrollVideoBackg
     video.muted = !video.muted;
     setIsMuted(video.muted);
   }, []);
+
+  if (isMobile) {
+    return null;
+  }
 
   return (
     <>
