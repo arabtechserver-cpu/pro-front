@@ -57,6 +57,12 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Hardware GPU acceleration for entrance animations to prevent scroll jank */
+[data-aos] {
+  backface-visibility: hidden;
+  transform: translateZ(0);
+}
+
 /* ============================================================
    Core Design Tokens — Enterprise Slate & Royal Tech Blue Theme
    ============================================================ */

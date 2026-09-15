@@ -7,7 +7,7 @@ interface HeroScrollVideoBackgroundProps {
 }
 
 const POSTER_URL = "/videos/hero_poster.jpg";
-const LOCAL_VIDEO_URL = "/videos/hero-showcase.mp4";
+const LOCAL_SCRUB_URL = "/videos/hero_scrub.mp4";
 const REMOTE_VIDEO_URL =
   process.env.NEXT_PUBLIC_HERO_VIDEO_URL ||
   "https://pub-3440f02b971d4054906dd63d89e3cdb0.r2.dev/hero-showcase.mp4";
@@ -15,41 +15,66 @@ const REMOTE_VIDEO_URL =
 export default function HeroScrollVideoBackground({ lang }: HeroScrollVideoBackgroundProps) {
   const isAr = lang === "ar";
   const videoRef = useRef<HTMLVideoElement | null>(null);
-  const containerRef = useRef<HTMLDivElement | null>(null);
+  const targetProgressRef = useRef<number>(0);
   const playPromiseRef = useRef<Promise<void> | null>(null);
 
-  const [isPlaying, setIsPlaying] = useState(true);
+  const [playbackMode, setPlaybackMode] = useState<"scroll" | "auto">("scroll");
   const [isMuted, setIsMuted] = useState(true);
-  const [isLoaded, setIsLoaded] = useState(false);
+  const [isVideoReady, setIsVideoReady] = useState(false);
+
+  useEffect(() => {
+    let isCancelled = false;
+    let blobUrl: string | null = null;
+
+    fetch(LOCAL_SCRUB_URL, { cache: "force-cache" })
+      .then((res) => {
+        if (!res.ok) throw new Error("Scrub video fetch failed");
+        return res.blob();
+      })
+      .then((blob) => {
+        if (isCancelled) return;
+        blobUrl = URL.createObjectURL(blob);
+        const video = videoRef.current;
+        if (video) {
+          const currentTime = video.currentTime;
+          video.src = blobUrl;
+          video.currentTime = currentTime;
+          setIsVideoReady(true);
+        }
+      })
+      .catch(() => {});
+
+    return () => {
+      isCancelled = true;
+      if (blobUrl) {
+        URL.revokeObjectURL(blobUrl);
+      }
+    };
+  }, []);
 
   const safePlay = useCallback(() => {
     const video = videoRef.current;
-    if (!video) return;
+    if (!video || !video.paused || playPromiseRef.current) return;
 
-    video.muted = isMuted;
-    const promise = video.play();
-    if (promise !== undefined) {
-      playPromiseRef.current = promise;
-      promise
-        .then(() => {
-          setIsPlaying(true);
-        })
-        .catch(() => {
-          setIsPlaying(false);
-        })
-        .finally(() => {
-          playPromiseRef.current = null;
-        });
-    }
-  }, [isMuted]);
+    try {
+      const promise = video.play();
+      if (promise !== undefined) {
+        playPromiseRef.current = promise;
+        promise
+          .catch(() => {})
+          .finally(() => {
+            playPromiseRef.current = null;
+          });
+      }
+    } catch {}
+  }, []);
 
   const safePause = useCallback(() => {
     const video = videoRef.current;
     if (!video) return;
 
     const pause = () => {
-      video.pause();
-      setIsPlaying(false);
+      if (!video.paused) video.pause();
     };
 
     if (playPromiseRef.current) {
@@ -65,74 +90,70 @@ export default function HeroScrollVideoBackground({ lang }: HeroScrollVideoBackg
 
     video.muted = true;
     video.defaultMuted = true;
-    video.playbackRate = 1.0;
-
-    const tryAutoPlay = () => {
-      const promise = video.play();
-      if (promise !== undefined) {
-        promise
-          .then(() => setIsPlaying(true))
-          .catch(() => {
-            setIsPlaying(false);
-            const handleFirstGesture = () => {
-              video.play().then(() => setIsPlaying(true)).catch(() => {});
-              window.removeEventListener("touchstart", handleFirstGesture);
-              window.removeEventListener("pointerdown", handleFirstGesture);
-              window.removeEventListener("scroll", handleFirstGesture);
-            };
-            window.addEventListener("touchstart", handleFirstGesture, { passive: true, once: true });
-            window.addEventListener("pointerdown", handleFirstGesture, { passive: true, once: true });
-            window.addEventListener("scroll", handleFirstGesture, { passive: true, once: true });
-          });
-      }
-    };
-
-    tryAutoPlay();
-
-    const handleVisibility = () => {
-      if (document.visibilityState === "hidden") {
-        safePause();
-      } else if (isPlaying) {
-        safePlay();
-      }
-    };
-
-    document.addEventListener("visibilitychange", handleVisibility);
-    return () => {
-      document.removeEventListener("visibilitychange", handleVisibility);
-    };
-  }, [safePause, safePlay]);
-
-  useEffect(() => {
-    let ticking = false;
-
-    const handleScroll = () => {
-      if (!ticking) {
-        requestAnimationFrame(() => {
-          if (containerRef.current) {
-            const scrollY = window.scrollY || window.pageYOffset;
-            const offset = Math.min(scrollY * 0.12, 120);
-            containerRef.current.style.transform = `translate3d(0, ${-offset}px, 0)`;
-          }
-          ticking = false;
-        });
-        ticking = true;
-      }
-    };
-
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
   }, []);
 
-  const togglePlayback = useCallback(() => {
-    if (isPlaying) {
-      safePause();
-    } else {
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    if (playbackMode === "auto") {
+      video.playbackRate = 0.85;
+      video.loop = true;
       safePlay();
+      return () => {
+        safePause();
+      };
     }
-  }, [isPlaying, safePause, safePlay]);
+
+    video.loop = false;
+    safePause();
+
+    let rafId: number | null = null;
+    let currentProgress = 0;
+
+    const updateScrollTarget = () => {
+      const maxScroll = Math.max(document.documentElement.scrollHeight - window.innerHeight, 1);
+      const scrollY = window.scrollY || window.pageYOffset || 0;
+      targetProgressRef.current = Math.min(Math.max(scrollY / maxScroll, 0), 1);
+    };
+
+    window.addEventListener("scroll", updateScrollTarget, { passive: true });
+    window.addEventListener("resize", updateScrollTarget, { passive: true });
+    updateScrollTarget();
+
+    const loop = () => {
+      if (video && video.duration && !Number.isNaN(video.duration)) {
+        const target = targetProgressRef.current;
+        currentProgress += (target - currentProgress) * 0.18;
+
+        const targetTime = currentProgress * Math.max(0, video.duration - 0.05);
+
+        if (!video.seeking && Math.abs(video.currentTime - targetTime) > 0.02) {
+          try {
+            if (typeof (video as any).fastSeek === "function") {
+              (video as any).fastSeek(targetTime);
+            } else {
+              video.currentTime = targetTime;
+            }
+          } catch {}
+        }
+      }
+      rafId = requestAnimationFrame(loop);
+    };
+
+    rafId = requestAnimationFrame(loop);
+
+    return () => {
+      window.removeEventListener("scroll", updateScrollTarget);
+      window.removeEventListener("resize", updateScrollTarget);
+      if (rafId !== null) cancelAnimationFrame(rafId);
+      safePause();
+    };
+  }, [playbackMode, safePause, safePlay]);
+
+  const togglePlaybackMode = useCallback(() => {
+    setPlaybackMode((prev) => (prev === "scroll" ? "auto" : "scroll"));
+  }, []);
 
   const toggleMute = useCallback(() => {
     const video = videoRef.current;
@@ -148,41 +169,44 @@ export default function HeroScrollVideoBackground({ lang }: HeroScrollVideoBackg
       <div
         id="homepage-motion-background"
         className="fixed inset-0 pointer-events-none z-0 overflow-hidden select-none bg-[#0b0f17]"
+        style={{ width: "100vw", height: "100vh", isolation: "isolate" }}
         aria-hidden="true"
       >
-        <div
-          ref={containerRef}
-          className="absolute -inset-y-16 inset-x-0 w-full h-[calc(100%+128px)] will-change-transform"
-          style={{ transform: "translate3d(0, 0, 0)", backfaceVisibility: "hidden" }}
-        >
-          <img
-            src={POSTER_URL}
-            alt=""
-            aria-hidden="true"
-            decoding="async"
-            className={`absolute inset-0 h-full w-full object-cover object-center transition-opacity duration-700 ${
-              isLoaded ? "opacity-0" : "opacity-100"
-            }`}
-          />
+        <img
+          src={POSTER_URL}
+          alt=""
+          aria-hidden="true"
+          decoding="async"
+          className={`absolute inset-0 w-full h-full object-cover object-center transition-opacity duration-700 ${
+            isVideoReady ? "opacity-0" : "opacity-100"
+          }`}
+          style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center" }}
+        />
 
-          <video
-            ref={videoRef}
-            autoPlay
-            loop
-            muted
-            playsInline
-            preload="auto"
-            disablePictureInPicture
-            disableRemotePlayback
-            poster={POSTER_URL}
-            onPlaying={() => setIsLoaded(true)}
-            onLoadedData={() => setIsLoaded(true)}
-            className="absolute inset-0 h-full w-full object-cover object-center"
-          >
-            <source src={LOCAL_VIDEO_URL} type="video/mp4" />
-            <source src={REMOTE_VIDEO_URL} type="video/mp4" />
-          </video>
-        </div>
+        <video
+          ref={videoRef}
+          poster={POSTER_URL}
+          muted
+          playsInline
+          preload="auto"
+          disablePictureInPicture
+          disableRemotePlayback
+          onLoadedData={() => setIsVideoReady(true)}
+          onCanPlay={() => setIsVideoReady(true)}
+          className="absolute inset-0 w-full h-full object-cover object-center"
+          style={{
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            objectPosition: "center",
+            transform: "translateZ(0)",
+            backfaceVisibility: "hidden",
+            willChange: "transform",
+          }}
+        >
+          <source src={LOCAL_SCRUB_URL} type="video/mp4" />
+          <source src={REMOTE_VIDEO_URL} type="video/mp4" />
+        </video>
 
         <div className="absolute inset-0 bg-gradient-to-b from-[#0b0f17]/30 via-[#0b1426]/20 to-[#0b0f17]/45" />
         <div className="absolute inset-0 bg-blue-600/[0.04]" />
@@ -193,16 +217,21 @@ export default function HeroScrollVideoBackground({ lang }: HeroScrollVideoBackg
 
       <div className="fixed bottom-5 end-5 z-40 flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#0b1220]/80 backdrop-blur-xl border border-sky-400/40 shadow-[0_8px_25px_rgba(0,0,0,0.6)] text-xs text-slate-300 pointer-events-auto">
         <span className="font-mono text-[10px] text-sky-300 font-bold hidden sm:inline">
-          {isAr ? "خلفية سينمائية" : "CINEMATIC BG"}
+          {playbackMode === "scroll"
+            ? (isAr ? "متزامن مع التمرير" : "SCROLL SYNC")
+            : (isAr ? "تشغيل تلقائي" : "AUTO LOOP")}
         </span>
         <button
           type="button"
-          onClick={togglePlayback}
-          aria-label={isPlaying ? (isAr ? "إيقاف مؤقت" : "Pause") : (isAr ? "تشغيل" : "Play")}
-          title={isPlaying ? (isAr ? "إيقاف مؤقت" : "Pause") : (isAr ? "تشغيل" : "Play")}
-          className="w-6 h-6 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-sky-300 transition-colors"
+          onClick={togglePlaybackMode}
+          title={
+            playbackMode === "scroll"
+              ? (isAr ? "التحويل للتشغيل التلقائي" : "Switch to Auto Loop")
+              : (isAr ? "التحويل للتحكم مع التمرير" : "Switch to Scroll Sync")
+          }
+          className="px-2 py-0.5 rounded bg-white/10 hover:bg-white/20 font-mono text-[10px] font-bold text-sky-300 transition-colors"
         >
-          <i className={`fas ${isPlaying ? "fa-pause" : "fa-play"} text-[10px]`} />
+          {playbackMode === "scroll" ? (isAr ? "تمرير" : "Scroll") : (isAr ? "تلقائي" : "Auto")}
         </button>
         <button
           type="button"

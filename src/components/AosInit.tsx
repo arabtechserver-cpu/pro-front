@@ -16,14 +16,14 @@ export default function AosInit() {
     const initTimer = setTimeout(() => {
       AOS.init({
         disable: () => (typeof window !== "undefined" ? window.innerWidth < 768 : false),
-        duration: 400,
+        duration: 350,
         delay: 0,
         once: true,
         easing: "ease-out-cubic",
-        offset: 0,
+        offset: 40,
         mirror: false,
-        throttleDelay: 16,
-        debounceDelay: 0,
+        throttleDelay: 50,
+        debounceDelay: 20,
       });
       AOS.refresh();
     }, 50);
