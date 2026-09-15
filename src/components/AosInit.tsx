@@ -12,28 +12,33 @@ export default function AosInit() {
       window.scrollTo(0, 0);
     }
 
-    // Delay AOS initialization slightly to allow React hydration to complete cleanly
+    const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
+
+    // Fast AOS initialization for responsive instant animations
     const initTimer = setTimeout(() => {
       AOS.init({
-        duration: 600,
+        duration: isMobile ? 220 : 400,
+        delay: 0,
         once: true,
         easing: "ease-out-cubic",
-        offset: 20,
+        offset: 0,
         mirror: false,
-        throttleDelay: 99,
-        debounceDelay: 50,
+        throttleDelay: 16,
+        debounceDelay: 0,
       });
       AOS.refresh();
-    }, 100);
+    }, 50);
 
     const handleRefresh = () => {
       AOS.refresh();
     };
 
     window.addEventListener("load", handleRefresh);
+    window.addEventListener("resize", handleRefresh, { passive: true });
 
     return () => {
       window.removeEventListener("load", handleRefresh);
+      window.removeEventListener("resize", handleRefresh);
       clearTimeout(initTimer);
     };
   }, []);

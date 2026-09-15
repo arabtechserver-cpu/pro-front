@@ -104,7 +104,8 @@ export default function FloatingSideDock({ lang = "ar" }: FloatingSideDockProps)
               }
             }
           }}
-          className="flex flex-row items-center gap-1.5 sm:gap-2 group select-none hover:scale-105 active:scale-95 cursor-pointer pt-1.5 pl-0.5"
+          title={isAr ? "المساعد الذكي AI 24/7" : "AI Support Assistant"}
+          className="flex items-center justify-center group select-none hover:scale-110 active:scale-95 cursor-pointer pt-1 pl-0.5 transition-transform"
           aria-label={isAr ? "المساعد الذكي AI 24/7" : "Open AI Support Chat"}
         >
           {/* Animated 3D/Vector Cyber Robot Mascot */}
@@ -159,23 +160,6 @@ export default function FloatingSideDock({ lang = "ar" }: FloatingSideDockProps)
               <path d="M49 130 Q50 140 51 130" fill="#ffffff" />
               <path d="M69 130 Q70 140 71 130" fill="#ffffff" />
             </svg>
-          </div>
-
-          {/* Attached Cyber Speech Badge */}
-          <div className="flex flex-col items-start bg-[#0b0f19]/95 backdrop-blur-xl border border-cyan-400/50 rounded-2xl px-2.5 py-1 sm:px-3 sm:py-1.5 shadow-[0_8px_25px_rgba(0,0,0,0.6)] group-hover:border-cyan-400 transition-all pointer-events-none mb-1 sm:mb-0">
-            <div className="flex items-center gap-1.5">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-violet-400 opacity-75" />
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-violet-500" />
-              </span>
-              <span className="text-[10px] sm:text-xs font-black text-white tracking-wide flex items-center gap-1 whitespace-nowrap">
-                <span>{isAr ? "المساعد الذكي AI" : "AI Support"}</span>
-                <span className="text-[9px] text-cyan-400 font-mono">24/7</span>
-              </span>
-            </div>
-            <div className="hidden sm:block text-[9px] sm:text-[10px] text-cyan-200/80 font-medium mt-0.5 whitespace-nowrap">
-              {isAr ? "دعم فني وتفاوض مباشر" : "Live Assistant"}
-            </div>
           </div>
         </div>
       </aside>

@@ -633,3 +633,14 @@ body {
   color: #6ee7b7;
   border-radius: 9999px;
 }
+
+/* ============================================================
+   Mobile Scroll Animation Acceleration (Instant Appearance)
+   ============================================================ */
+@media (max-width: 768px) {
+  [data-aos] {
+    transition-delay: 0ms !important;
+    transition-duration: 220ms !important;
+  }
+}
+
