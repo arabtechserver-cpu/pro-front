@@ -588,10 +588,15 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
         eventName: "service_view",
         sessionId,
         path: `/purchase?service=${selectedServiceId}`,
-        metadata: { serviceId: selectedServiceId }
+        metadata: {
+          serviceId: selectedServiceId,
+          userAgent: typeof navigator !== "undefined" ? navigator.userAgent : "",
+          userName: userSession?.fullName || null,
+          userEmail: userSession?.email || null
+        }
       })
     }).catch(() => {});
-  }, [selectedServiceId]);
+  }, [selectedServiceId, userSession]);
 
   // 3. Handle Submitting a New Order
   const handleOrderSubmit = async (e: React.FormEvent) => {

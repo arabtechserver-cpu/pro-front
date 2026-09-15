@@ -21,6 +21,19 @@ export default function AnalyticsTracker() {
 
     const trackEvent = async () => {
       try {
+        let userEmail: string | null = null;
+        let userName: string | null = null;
+        if (typeof window !== "undefined") {
+          const session = localStorage.getItem("user_session");
+          if (session) {
+            try {
+              const u = JSON.parse(session);
+              userEmail = u.email || null;
+              userName = u.fullName || u.name || null;
+            } catch {}
+          }
+        }
+
         const payload = JSON.stringify({
           eventName: "page_view",
           sessionId,
@@ -28,6 +41,8 @@ export default function AnalyticsTracker() {
           metadata: {
             timestamp: new Date().toISOString(),
             userAgent: typeof navigator !== "undefined" ? navigator.userAgent : "",
+            userEmail,
+            userName,
           },
         });
 

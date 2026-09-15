@@ -1,11 +1,17 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 export default function AnalyticsClient() {
+  const router = useRouter();
   const [data, setData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [days, setDays] = useState(30);
+
+  // Detail Modals State for KPI Cards
+  const [activeModal, setActiveModal] = useState<"services" | "visitors" | null>(null);
+  const [modalSearch, setModalSearch] = useState("");
 
   // Provider Orders Report State
   const [providerOrders, setProviderOrders] = useState<any[]>([]);
@@ -183,10 +189,44 @@ export default function AnalyticsClient() {
       {/* KPI Overview Cards */}
       {data && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <StatCard title="إجمالي الزوار الفريدين" value={data.uniqueSessions} icon="group" color="sky" />
-          <StatCard title="العملاء المسجلين" value={data.totalUsers} icon="person_add" color="emerald" />
-          <StatCard title="الطلبات المكتملة والمحتملة" value={data.totalOrders} icon="shopping_cart" color="amber" />
-          <StatCard title="زيارات الخدمات" value={data.counts.service_view || 0} icon="visibility" color="fuchsia" />
+          <StatCard
+            title="إجمالي الزوار الفريدين"
+            value={data.uniqueSessions}
+            icon="group"
+            color="sky"
+            actionText="عرض سجل الزوار والجلسات"
+            onClick={() => {
+              setModalSearch("");
+              setActiveModal("visitors");
+            }}
+          />
+          <StatCard
+            title="العملاء المسجلين"
+            value={data.totalUsers}
+            icon="person_add"
+            color="emerald"
+            actionText="إدارة وعرض قائمة العملاء"
+            onClick={() => router.push("/admin/users")}
+          />
+          <StatCard
+            title="الطلبات المكتملة والمحتملة"
+            value={data.totalOrders}
+            icon="shopping_cart"
+            color="amber"
+            actionText="إدارة وعرض جميع الطلبات"
+            onClick={() => router.push("/admin/orders")}
+          />
+          <StatCard
+            title="زيارات الخدمات"
+            value={data.counts.service_view || 0}
+            icon="visibility"
+            color="fuchsia"
+            actionText="عرض من زار وماذا زار"
+            onClick={() => {
+              setModalSearch("");
+              setActiveModal("services");
+            }}
+          />
         </div>
       )}
 
@@ -220,7 +260,7 @@ export default function AnalyticsClient() {
               { id: "7", label: "آخر 7 أيام" },
               { id: "30", label: "آخر 30 يوماً" },
               { id: "all", label: "كل الأوقات" },
-              { id: "custom", label: "مخصص 📅" }
+              { id: "custom", label: "مخصص" }
             ].map((p) => (
               <button
                 key={p.id}
@@ -641,36 +681,498 @@ export default function AnalyticsClient() {
           </div>
         </div>
       )}
+
+      {/* Services Visits Detail Modal */}
+      {activeModal === "services" && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md">
+          <div className="glass-card bg-surface-container/95 border border-outline-variant/30 rounded-3xl w-full max-w-5xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
+            {/* Modal Header */}
+            <div className="p-6 border-b border-outline-variant/20 flex items-center justify-between gap-4 shrink-0 bg-surface-container-high/30">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-2xl bg-fuchsia-500/15 border border-fuchsia-500/30 flex items-center justify-center text-fuchsia-400 shrink-0">
+                  <span className="material-symbols-outlined text-2xl">visibility</span>
+                </div>
+                <div>
+                  <div className="flex items-center gap-2.5 flex-wrap">
+                    <h3 className="text-xl font-bold text-on-surface">سجل زيارات وتصفح الخدمات</h3>
+                    <span className="text-xs px-2.5 py-0.5 rounded-full bg-fuchsia-500/15 text-fuchsia-300 border border-fuchsia-500/30 font-mono font-bold">
+                      {data?.counts?.service_view || 0} زيارة
+                    </span>
+                  </div>
+                  <p className="text-xs text-on-surface-variant mt-0.5">
+                    تتبع تفصيلي لمن زار كل خدمة (العميل أو معرف الجلسة)، المسار، ونوع الجهاز المستخدم
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setActiveModal(null);
+                  setModalSearch("");
+                }}
+                className="w-9 h-9 rounded-xl bg-surface-container-high hover:bg-surface-container-highest border border-outline-variant/30 flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-colors"
+              >
+                <span className="material-symbols-outlined text-lg">close</span>
+              </button>
+            </div>
+
+            {/* Top Services Chips Section */}
+            {data?.topServices && data.topServices.length > 0 && (
+              <div className="px-6 py-3 bg-surface-container-lowest/70 border-b border-outline-variant/15 shrink-0">
+                <p className="text-[11px] font-bold text-on-surface-variant mb-2 flex items-center gap-1.5">
+                  <span className="material-symbols-outlined text-sm text-fuchsia-400">trending_up</span>
+                  <span>الخدمات الأكثر طلباً وزيارة (انقر للفلترة):</span>
+                </p>
+                <div className="flex items-center gap-2 overflow-x-auto pb-1 text-xs">
+                  {data.topServices.map((ts: any) => (
+                    <button
+                      key={ts.id}
+                      type="button"
+                      onClick={() => setModalSearch(ts.name)}
+                      className="px-3 py-1 rounded-xl bg-surface-container-high/80 hover:bg-surface-container-highest border border-outline-variant/30 text-on-surface flex items-center gap-1.5 whitespace-nowrap transition-colors shrink-0"
+                    >
+                      <span className="font-medium truncate max-w-[200px]">{ts.name}</span>
+                      <span className="px-1.5 py-0.5 rounded-md bg-fuchsia-500/20 text-fuchsia-300 font-mono font-bold text-[10px]">
+                        {ts.views}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Search Toolbar */}
+            <div className="p-4 px-6 border-b border-outline-variant/15 flex items-center gap-3 shrink-0">
+              <div className="relative flex-1">
+                <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm">
+                  search
+                </span>
+                <input
+                  type="text"
+                  value={modalSearch}
+                  onChange={(e) => setModalSearch(e.target.value)}
+                  placeholder="ابحث باسم الخدمة، هوية العميل، الإيميل، أو معرف الجلسة..."
+                  className="w-full pl-3 pr-9 py-2 rounded-xl bg-surface-container-lowest border border-outline-variant/30 text-on-surface text-xs focus:outline-none focus:border-fuchsia-500/50"
+                />
+              </div>
+              {modalSearch && (
+                <button
+                  type="button"
+                  onClick={() => setModalSearch("")}
+                  className="px-3 py-2 rounded-xl bg-surface-container-high hover:bg-surface-container-highest text-xs text-on-surface-variant font-medium"
+                >
+                  إلغاء الفلتر
+                </button>
+              )}
+            </div>
+
+            {/* Table Content */}
+            <div className="flex-1 overflow-y-auto p-6 space-y-3">
+              {(() => {
+                const logs = (data?.serviceViewLogs || []).filter((log: any) => {
+                  if (!modalSearch.trim()) return true;
+                  const q = modalSearch.toLowerCase().trim();
+                  return (
+                    (log.serviceName && log.serviceName.toLowerCase().includes(q)) ||
+                    (log.serviceId && log.serviceId.toLowerCase().includes(q)) ||
+                    (log.sessionId && log.sessionId.toLowerCase().includes(q)) ||
+                    (log.userName && log.userName.toLowerCase().includes(q)) ||
+                    (log.userEmail && log.userEmail.toLowerCase().includes(q)) ||
+                    (log.path && log.path.toLowerCase().includes(q))
+                  );
+                });
+
+                if (logs.length === 0) {
+                  return (
+                    <div className="p-12 text-center space-y-3">
+                      <div className="w-14 h-14 rounded-2xl bg-surface-container-high border border-outline-variant/30 flex items-center justify-center text-on-surface-variant mx-auto">
+                        <span className="material-symbols-outlined text-3xl">visibility_off</span>
+                      </div>
+                      <p className="text-sm font-bold text-on-surface">لا توجد زيارات خدمات مسجلة</p>
+                      <p className="text-xs text-on-surface-variant max-w-md mx-auto">
+                        {modalSearch
+                          ? "لم يتم العثور على أي نتائج تطابق معايير البحث الحالية."
+                          : "يتم رصد زيارات الخدمات آلياً وتحديثها هنا فور فتح الزوار لأي خدمة في واجهة الشراء."}
+                      </p>
+                    </div>
+                  );
+                }
+
+                return (
+                  <div className="overflow-x-auto rounded-2xl border border-outline-variant/20">
+                    <table className="w-full text-right text-xs">
+                      <thead className="bg-surface-container-high/60 text-on-surface-variant border-b border-outline-variant/20 text-[11px] font-bold">
+                        <tr>
+                          <th className="p-3">الخدمة المستهدفة</th>
+                          <th className="p-3">هوية الزائر / العميل</th>
+                          <th className="p-3">الجهاز والبيئة</th>
+                          <th className="p-3">المسار</th>
+                          <th className="p-3">وقت الزيارة</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-outline-variant/10 bg-surface-container-lowest/50">
+                        {logs.map((log: any) => {
+                          const dev = parseDevice(log.userAgent);
+                          const isRegistered = Boolean(log.userName || log.userEmail);
+                          return (
+                            <tr key={log.id} className="hover:bg-surface-container-high/30 transition-colors">
+                              <td className="p-3">
+                                <div className="font-bold text-on-surface flex items-center gap-1.5">
+                                  <span className="w-2 h-2 rounded-full bg-fuchsia-400 shrink-0"></span>
+                                  <span className="truncate max-w-[240px]">{log.serviceName}</span>
+                                </div>
+                                {log.serviceId && (
+                                  <span className="text-[10px] text-on-surface-variant font-mono block mt-0.5">
+                                    #{log.serviceId}
+                                  </span>
+                                )}
+                              </td>
+                              <td className="p-3">
+                                {isRegistered ? (
+                                  <div className="space-y-0.5">
+                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 text-[11px] font-bold">
+                                      <span className="material-symbols-outlined text-xs">verified_user</span>
+                                      <span>{log.userName || log.userEmail}</span>
+                                    </span>
+                                    {log.userName && log.userEmail && (
+                                      <span className="text-[10px] text-on-surface-variant block font-mono">
+                                        {log.userEmail}
+                                      </span>
+                                    )}
+                                  </div>
+                                ) : (
+                                  <div className="flex items-center gap-1.5">
+                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-surface-container-high text-on-surface-variant font-mono text-[10px] border border-outline-variant/20">
+                                      <span className="material-symbols-outlined text-xs">person_outline</span>
+                                      <span>{log.sessionId.slice(0, 12)}...</span>
+                                    </span>
+                                    <button
+                                      type="button"
+                                      onClick={() => copyToClipboard(log.sessionId, log.id)}
+                                      className="text-[10px] text-primary hover:underline"
+                                    >
+                                      {copiedId === log.id ? "تم النسخ" : "نسخ"}
+                                    </button>
+                                  </div>
+                                )}
+                              </td>
+                              <td className="p-3">
+                                <div className="flex items-center gap-1.5 text-on-surface-variant">
+                                  <span className="material-symbols-outlined text-sm">{dev.icon}</span>
+                                  <span>{dev.name}</span>
+                                </div>
+                              </td>
+                              <td className="p-3">
+                                <span className="font-mono text-[11px] text-on-surface-variant dir-ltr text-left block truncate max-w-[180px]">
+                                  {log.path}
+                                </span>
+                              </td>
+                              <td className="p-3 whitespace-nowrap text-on-surface-variant font-mono text-[11px]">
+                                {formatLogDate(log.createdAt)}
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                );
+              })()}
+            </div>
+
+            {/* Modal Footer */}
+            <div className="p-4 px-6 border-t border-outline-variant/20 bg-surface-container-high/20 flex items-center justify-between shrink-0">
+              <span className="text-xs text-on-surface-variant">
+                يتم عرض آخر 100 سجل زيارة مسجلة بالترتيب الزمني الأحدث
+              </span>
+              <button
+                type="button"
+                onClick={() => {
+                  setActiveModal(null);
+                  setModalSearch("");
+                }}
+                className="px-5 py-2 rounded-xl bg-surface-container-high hover:bg-surface-container-highest text-on-surface text-xs font-bold transition-all"
+              >
+                إغلاق
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Visitors Detail Modal */}
+      {activeModal === "visitors" && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md">
+          <div className="glass-card bg-surface-container/95 border border-outline-variant/30 rounded-3xl w-full max-w-5xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
+            {/* Modal Header */}
+            <div className="p-6 border-b border-outline-variant/20 flex items-center justify-between gap-4 shrink-0 bg-surface-container-high/30">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-2xl bg-sky-500/15 border border-sky-500/30 flex items-center justify-center text-sky-400 shrink-0">
+                  <span className="material-symbols-outlined text-2xl">group</span>
+                </div>
+                <div>
+                  <div className="flex items-center gap-2.5 flex-wrap">
+                    <h3 className="text-xl font-bold text-on-surface">سجل الزوار والجلسات الفريدة</h3>
+                    <span className="text-xs px-2.5 py-0.5 rounded-full bg-sky-500/15 text-sky-300 border border-sky-500/30 font-mono font-bold">
+                      {data?.uniqueSessions || 0} جلسة فريدة
+                    </span>
+                  </div>
+                  <p className="text-xs text-on-surface-variant mt-0.5">
+                    تفاصيل الجلسات والزوار الفريدين مع الأجهزة المتصلة والصفحات التي تمت زيارتها
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setActiveModal(null);
+                  setModalSearch("");
+                }}
+                className="w-9 h-9 rounded-xl bg-surface-container-high hover:bg-surface-container-highest border border-outline-variant/30 flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-colors"
+              >
+                <span className="material-symbols-outlined text-lg">close</span>
+              </button>
+            </div>
+
+            {/* Search Toolbar */}
+            <div className="p-4 px-6 border-b border-outline-variant/15 flex items-center gap-3 shrink-0">
+              <div className="relative flex-1">
+                <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm">
+                  search
+                </span>
+                <input
+                  type="text"
+                  value={modalSearch}
+                  onChange={(e) => setModalSearch(e.target.value)}
+                  placeholder="ابحث برقم الجلسة، هوية العميل، أو المسار..."
+                  className="w-full pl-3 pr-9 py-2 rounded-xl bg-surface-container-lowest border border-outline-variant/30 text-on-surface text-xs focus:outline-none focus:border-sky-500/50"
+                />
+              </div>
+              {modalSearch && (
+                <button
+                  type="button"
+                  onClick={() => setModalSearch("")}
+                  className="px-3 py-2 rounded-xl bg-surface-container-high hover:bg-surface-container-highest text-xs text-on-surface-variant font-medium"
+                >
+                  إلغاء الفلتر
+                </button>
+              )}
+            </div>
+
+            {/* Table Content */}
+            <div className="flex-1 overflow-y-auto p-6 space-y-3">
+              {(() => {
+                const logs = (data?.visitorLogs || []).filter((log: any) => {
+                  if (!modalSearch.trim()) return true;
+                  const q = modalSearch.toLowerCase().trim();
+                  return (
+                    (log.sessionId && log.sessionId.toLowerCase().includes(q)) ||
+                    (log.userName && log.userName.toLowerCase().includes(q)) ||
+                    (log.userEmail && log.userEmail.toLowerCase().includes(q)) ||
+                    (log.path && log.path.toLowerCase().includes(q))
+                  );
+                });
+
+                if (logs.length === 0) {
+                  return (
+                    <div className="p-12 text-center space-y-3">
+                      <div className="w-14 h-14 rounded-2xl bg-surface-container-high border border-outline-variant/30 flex items-center justify-center text-on-surface-variant mx-auto">
+                        <span className="material-symbols-outlined text-3xl">person_off</span>
+                      </div>
+                      <p className="text-sm font-bold text-on-surface">لا توجد جلسات مسجلة</p>
+                      <p className="text-xs text-on-surface-variant max-w-md mx-auto">
+                        لم يتم العثور على أي جلسات زوار مطابقة لمعايير البحث الحالية.
+                      </p>
+                    </div>
+                  );
+                }
+
+                return (
+                  <div className="overflow-x-auto rounded-2xl border border-outline-variant/20">
+                    <table className="w-full text-right text-xs">
+                      <thead className="bg-surface-container-high/60 text-on-surface-variant border-b border-outline-variant/20 text-[11px] font-bold">
+                        <tr>
+                          <th className="p-3">معرف الجلسة / الزائر</th>
+                          <th className="p-3">الصفحة / المسار</th>
+                          <th className="p-3">الجهاز والبيئة</th>
+                          <th className="p-3">توقيت الجلسة</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-outline-variant/10 bg-surface-container-lowest/50">
+                        {logs.map((log: any) => {
+                          const dev = parseDevice(log.userAgent);
+                          const isRegistered = Boolean(log.userName || log.userEmail);
+                          return (
+                            <tr key={log.id} className="hover:bg-surface-container-high/30 transition-colors">
+                              <td className="p-3">
+                                {isRegistered ? (
+                                  <div className="space-y-0.5">
+                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 text-[11px] font-bold">
+                                      <span className="material-symbols-outlined text-xs">verified_user</span>
+                                      <span>{log.userName || log.userEmail}</span>
+                                    </span>
+                                    {log.userName && log.userEmail && (
+                                      <span className="text-[10px] text-on-surface-variant block font-mono">
+                                        {log.userEmail}
+                                      </span>
+                                    )}
+                                  </div>
+                                ) : (
+                                  <div className="flex items-center gap-1.5">
+                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-surface-container-high text-on-surface-variant font-mono text-[10px] border border-outline-variant/20">
+                                      <span className="material-symbols-outlined text-xs">person_outline</span>
+                                      <span>{log.sessionId}</span>
+                                    </span>
+                                    <button
+                                      type="button"
+                                      onClick={() => copyToClipboard(log.sessionId, log.id)}
+                                      className="text-[10px] text-primary hover:underline"
+                                    >
+                                      {copiedId === log.id ? "تم النسخ" : "نسخ"}
+                                    </button>
+                                  </div>
+                                )}
+                              </td>
+                              <td className="p-3">
+                                <span className="font-mono text-[11px] text-on-surface-variant dir-ltr text-left block truncate max-w-[240px]">
+                                  {log.path}
+                                </span>
+                              </td>
+                              <td className="p-3">
+                                <div className="flex items-center gap-1.5 text-on-surface-variant">
+                                  <span className="material-symbols-outlined text-sm">{dev.icon}</span>
+                                  <span>{dev.name}</span>
+                                </div>
+                              </td>
+                              <td className="p-3 whitespace-nowrap text-on-surface-variant font-mono text-[11px]">
+                                {formatLogDate(log.createdAt)}
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                );
+              })()}
+            </div>
+
+            {/* Modal Footer */}
+            <div className="p-4 px-6 border-t border-outline-variant/20 bg-surface-container-high/20 flex items-center justify-between shrink-0">
+              <span className="text-xs text-on-surface-variant">
+                يتم عرض أحدث 100 جلسة فريدة مسجلة
+              </span>
+              <button
+                type="button"
+                onClick={() => {
+                  setActiveModal(null);
+                  setModalSearch("");
+                }}
+                className="px-5 py-2 rounded-xl bg-surface-container-high hover:bg-surface-container-highest text-on-surface text-xs font-bold transition-all"
+              >
+                إغلاق
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
+}
+
+function parseDevice(ua?: string | null) {
+  if (!ua) return { name: "غير محدد", icon: "devices" };
+  if (/iphone/i.test(ua)) return { name: "iPhone / iOS", icon: "phone_iphone" };
+  if (/ipad/i.test(ua)) return { name: "iPad / iOS", icon: "tablet_mac" };
+  if (/android/i.test(ua)) return { name: "هاتف Android", icon: "phone_android" };
+  if (/windows/i.test(ua)) return { name: "كمبيوتر Windows", icon: "laptop_windows" };
+  if (/macintosh|mac os/i.test(ua)) return { name: "كمبيوتر Mac", icon: "laptop_mac" };
+  if (/linux/i.test(ua)) return { name: "نظام Linux", icon: "terminal" };
+  return { name: "متصفح ويب", icon: "language" };
+}
+
+function formatLogDate(dateStr?: string | null) {
+  if (!dateStr) return "—";
+  try {
+    const d = new Date(dateStr);
+    return d.toLocaleString("ar-EG", {
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true
+    });
+  } catch {
+    return dateStr;
+  }
 }
 
 function StatCard({
   title,
   value,
   icon,
-  color
+  color,
+  actionText,
+  onClick
 }: {
   title: string;
   value: number;
   icon: string;
   color: "sky" | "emerald" | "amber" | "fuchsia";
+  actionText: string;
+  onClick: () => void;
 }) {
   const colorMap = {
-    sky: { bg: "bg-sky-500/10", border: "border-sky-500/30", text1: "text-sky-300", text2: "text-sky-400" },
-    emerald: { bg: "bg-violet-500/10", border: "border-violet-500/30", text1: "text-violet-300", text2: "text-violet-400" },
-    amber: { bg: "bg-amber-500/10", border: "border-amber-500/30", text1: "text-amber-300", text2: "text-amber-400" },
-    fuchsia: { bg: "bg-fuchsia-500/10", border: "border-fuchsia-500/30", text1: "text-fuchsia-300", text2: "text-fuchsia-400" }
+    sky: {
+      bg: "bg-sky-500/10",
+      border: "border-sky-500/30",
+      text1: "text-sky-300",
+      text2: "text-sky-400",
+      hover: "hover:border-sky-500/60 hover:bg-sky-500/15"
+    },
+    emerald: {
+      bg: "bg-violet-500/10",
+      border: "border-violet-500/30",
+      text1: "text-violet-300",
+      text2: "text-violet-400",
+      hover: "hover:border-violet-500/60 hover:bg-violet-500/15"
+    },
+    amber: {
+      bg: "bg-amber-500/10",
+      border: "border-amber-500/30",
+      text1: "text-amber-300",
+      text2: "text-amber-400",
+      hover: "hover:border-amber-500/60 hover:bg-amber-500/15"
+    },
+    fuchsia: {
+      bg: "bg-fuchsia-500/10",
+      border: "border-fuchsia-500/30",
+      text1: "text-fuchsia-300",
+      text2: "text-fuchsia-400",
+      hover: "hover:border-fuchsia-500/60 hover:bg-fuchsia-500/15"
+    }
   };
   const c = colorMap[color];
 
   return (
-    <div className={`p-6 rounded-3xl ${c.bg} border ${c.border} flex items-center justify-between`}>
-      <div>
+    <button
+      type="button"
+      onClick={onClick}
+      className={`text-start w-full p-6 rounded-3xl ${c.bg} border ${c.border} ${c.hover} flex items-center justify-between transition-all transform hover:-translate-y-1 active:scale-[0.99] cursor-pointer group shadow-lg focus:outline-none`}
+    >
+      <div className="space-y-1">
         <p className={`text-sm font-bold ${c.text1}`}>{title}</p>
         <p className={`text-3xl font-bold ${c.text2} font-mono mt-2`}>{value}</p>
+        <p className="text-[11px] text-on-surface-variant group-hover:text-on-surface flex items-center gap-1 mt-1 transition-colors">
+          <span>{actionText}</span>
+          <span className="material-symbols-outlined text-xs transform group-hover:-translate-x-0.5 transition-transform">
+            arrow_back
+          </span>
+        </p>
       </div>
-      <span className={`material-symbols-outlined ${c.text2} text-4xl`}>{icon}</span>
-    </div>
+      <span className={`material-symbols-outlined ${c.text2} text-4xl group-hover:scale-110 transition-transform`}>
+        {icon}
+      </span>
+    </button>
   );
 }
