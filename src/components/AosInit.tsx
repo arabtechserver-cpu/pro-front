@@ -5,6 +5,13 @@ import AOS from "aos";
 
 export default function AosInit() {
   useEffect(() => {
+    if (typeof window !== "undefined") {
+      if ("scrollRestoration" in window.history) {
+        window.history.scrollRestoration = "manual";
+      }
+      window.scrollTo(0, 0);
+    }
+
     // Delay AOS initialization slightly to allow React hydration to complete cleanly
     const initTimer = setTimeout(() => {
       AOS.init({

@@ -61,6 +61,42 @@ export default function HeroScrollVideoBackground({ lang }: HeroScrollVideoBackg
     }
   }, []);
 
+  // Force scroll-to-top and reinitialize state on page refresh / reload
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    if ("scrollRestoration" in window.history) {
+      window.history.scrollRestoration = "manual";
+    }
+
+    const resetToTop = () => {
+      window.scrollTo(0, 0);
+      const vid = videoRef.current;
+      if (vid) {
+        vid.currentTime = 0.01;
+        vid.pause();
+      }
+      targetTimeRef.current = 0;
+      if (progressTextRef.current) {
+        progressTextRef.current.textContent = "0%";
+      }
+      if (statusLabelRef.current) {
+        statusLabelRef.current.textContent = isAr ? "متزامن مع التمرير" : "SCROLL SYNC";
+      }
+    };
+
+    resetToTop();
+    const t1 = setTimeout(resetToTop, 20);
+    const t2 = setTimeout(resetToTop, 100);
+
+    window.addEventListener("beforeunload", resetToTop);
+    return () => {
+      window.removeEventListener("beforeunload", resetToTop);
+      clearTimeout(t1);
+      clearTimeout(t2);
+    };
+  }, [isAr]);
+
   // Initialize video settings
   useEffect(() => {
     const video = videoRef.current;
@@ -71,9 +107,8 @@ export default function HeroScrollVideoBackground({ lang }: HeroScrollVideoBackg
     video.pause();
 
     const handleLoadedMetadata = () => {
-      if (video.currentTime === 0) {
-        video.currentTime = 0.01;
-      }
+      video.currentTime = 0.01;
+      video.pause();
     };
 
     video.addEventListener("loadedmetadata", handleLoadedMetadata);
