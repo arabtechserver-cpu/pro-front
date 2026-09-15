@@ -17,25 +17,15 @@ export default function HeroScrollVideoBackground({ lang }: HeroScrollVideoBackg
   const progressTextRef = useRef<HTMLSpanElement | null>(null);
   const statusLabelRef = useRef<HTMLSpanElement | null>(null);
 
-  // Default to smooth auto loop to prevent scroll thread contention
-  const [playbackMode, setPlaybackMode] = useState<"scroll" | "auto">("auto");
+  // Default to scroll-sync so video never autoplays without user interaction
+  const [playbackMode, setPlaybackMode] = useState<"scroll" | "auto">("scroll");
   const [isMuted, setIsMuted] = useState(true);
-  const [isMobile, setIsMobile] = useState(false);
-
-  // Disable background video on mobile devices to prevent GPU scroll throttling
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768 || window.matchMedia("(max-width: 767px)").matches);
-    };
-    checkMobile();
-    window.addEventListener("resize", checkMobile);
-    return () => window.removeEventListener("resize", checkMobile);
-  }, []);
 
   // Playback promise locking to prevent browser unhandled interruption errors
   const playPromiseRef = useRef<Promise<void> | null>(null);
   const targetTimeRef = useRef<number>(0);
   const rafIdRef = useRef<number | null>(null);
+  const lastScrollTimeRef = useRef<number>(0);
 
   const safePlay = useCallback(() => {
     const video = videoRef.current;
@@ -92,20 +82,20 @@ export default function HeroScrollVideoBackground({ lang }: HeroScrollVideoBackg
     };
   }, []);
 
-  // Main scroll-driven engine + RAF smooth playback interpolation
+  // Main scroll-driven engine with active scrolling tracking
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
 
     if (playbackMode === "auto") {
-      video.playbackRate = 0.75;
+      video.playbackRate = 0.85;
       safePlay();
       return () => {
         safePause();
       };
     }
 
-    // "scroll" mode: video smoothly plays towards scroll position
+    // Scroll mode: video strictly pauses until scroll events occur
     safePause();
 
     const updateScrollTarget = () => {
@@ -116,70 +106,68 @@ export default function HeroScrollVideoBackground({ lang }: HeroScrollVideoBackg
       );
 
       const progress = Math.min(Math.max(scrollY / maxScroll, 0), 1);
-      const ratio = Math.min(scrollY / 1200, 1);
 
-      // Fixed viewport fill - keep video anchored seamlessly to 100% of viewport
-      if (videoWrapperRef.current) {
-        videoWrapperRef.current.style.transform = "translate3d(0, 0, 0)";
-      }
-
-      // Update progress text
       if (progressTextRef.current) {
         progressTextRef.current.textContent = `${Math.round(progress * 100)}%`;
       }
 
-      // Calculate target time across the full page
       if (video.duration && !isNaN(video.duration)) {
-        targetTimeRef.current = progress * (video.duration - 0.04);
+        targetTimeRef.current = progress * Math.max(0, video.duration - 0.05);
       }
+
+      lastScrollTimeRef.current = performance.now();
     };
 
     const handleScroll = () => {
       updateScrollTarget();
     };
 
-    // Smooth RAF loop: plays forward toward target, rewinds toward target, pauses when reached
-    let isSeekingBackward = false;
-
+    // Smooth RAF loop: active scroll plays forward, rewinds smoothly on upward scroll, pauses when idle
     const renderLoop = () => {
       if (playbackMode !== "scroll") return;
 
       const vid = videoRef.current;
       if (vid && vid.duration && !isNaN(vid.duration)) {
+        const now = performance.now();
+        const isActivelyScrolling = now - lastScrollTimeRef.current < 220;
         const target = targetTimeRef.current;
         const current = vid.currentTime;
         const diff = target - current;
 
-        if (diff > 0.04) {
-          // Scroll moving down: Play video smoothly towards target time
-          if (diff > 1.2) {
-            vid.currentTime = target - 0.2;
-          }
-          const rate = Math.min(2.5, Math.max(0.8, diff * 2.2));
-          vid.playbackRate = rate;
-          safePlay();
+        if (isActivelyScrolling) {
+          if (diff > 0.04) {
+            // Forward scrolling: dynamically scale playback rate with scroll difference
+            if (diff > 1.5) {
+              vid.currentTime = target - 0.2;
+            }
+            const rate = Math.min(3.0, Math.max(0.75, diff * 2.2));
+            vid.playbackRate = rate;
+            safePlay();
 
-          if (statusLabelRef.current) {
-            statusLabelRef.current.textContent = isAr ? "تفاعل التمرير" : "SCROLLING";
-          }
-        } else if (diff < -0.04) {
-          // Scroll moving up: Rewind smoothly towards target time
-          safePause();
-          if (diff < -1.0) {
-            vid.currentTime = Math.max(0, target);
-          } else if (!isSeekingBackward) {
-            isSeekingBackward = true;
-            vid.currentTime = Math.max(0, current - 0.08);
-            setTimeout(() => {
-              isSeekingBackward = false;
-            }, 30);
-          }
+            if (statusLabelRef.current) {
+              statusLabelRef.current.textContent = isAr ? "تفاعل التمرير" : "SCROLLING";
+            }
+          } else if (diff < -0.04) {
+            // Backward scrolling: pause forward playback and interpolate backwards smoothly
+            safePause();
+            if (diff < -1.2) {
+              vid.currentTime = Math.max(0, target);
+            } else {
+              vid.currentTime = Math.max(0, current + (target - current) * 0.35);
+            }
 
-          if (statusLabelRef.current) {
-            statusLabelRef.current.textContent = isAr ? "تراجع" : "REWIND";
+            if (statusLabelRef.current) {
+              statusLabelRef.current.textContent = isAr ? "تراجع مع التمرير" : "REWIND";
+            }
+          } else {
+            // In sync with scroll position
+            safePause();
+            if (statusLabelRef.current) {
+              statusLabelRef.current.textContent = isAr ? "متزامن مع التمرير" : "SCROLL SYNC";
+            }
           }
         } else {
-          // Target reached: Pause cleanly on the exact frame
+          // User is NOT scrolling: strictly pause video
           safePause();
           if (statusLabelRef.current) {
             statusLabelRef.current.textContent = isAr ? "متزامن مع التمرير" : "SCROLL SYNC";
@@ -214,10 +202,6 @@ export default function HeroScrollVideoBackground({ lang }: HeroScrollVideoBackg
     video.muted = !video.muted;
     setIsMuted(video.muted);
   }, []);
-
-  if (isMobile) {
-    return null;
-  }
 
   return (
     <>
