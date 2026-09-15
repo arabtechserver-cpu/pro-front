@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useEffect, useRef } from "react";
 
@@ -76,40 +76,68 @@ export default function CyberMouseBackground() {
       if (auraRef.current) auraRef.current.style.opacity = "0";
     };
 
+    let isScrolling = false;
+    let scrollTimer: NodeJS.Timeout | null = null;
+
+    const handleScroll = () => {
+      isScrolling = true;
+      if (dotRef.current) dotRef.current.style.opacity = "0.3";
+      if (ringRef.current) ringRef.current.style.opacity = "0.3";
+      if (auraRef.current) auraRef.current.style.opacity = "0.1";
+
+      if (scrollTimer) clearTimeout(scrollTimer);
+      scrollTimer = setTimeout(() => {
+        isScrolling = false;
+        if (isVisible) {
+          if (dotRef.current) dotRef.current.style.opacity = "1";
+          if (ringRef.current) ringRef.current.style.opacity = "1";
+          if (auraRef.current) auraRef.current.style.opacity = "1";
+        }
+      }, 90);
+    };
+
     const renderLoop = () => {
       if (!isVisible) {
         isLoopRunning = false;
         return;
       }
 
-      const dx = mouseX - ringX;
-      const dy = mouseY - ringY;
-      ringX += dx * 0.18;
-      ringY += dy * 0.18;
+      if (!isScrolling) {
+        const dx = mouseX - ringX;
+        const dy = mouseY - ringY;
+        ringX += dx * 0.18;
+        ringY += dy * 0.18;
 
-      if (ringRef.current) {
-        ringRef.current.style.transform = `translate3d(${ringX}px, ${ringY}px, 0) translate(-50%, -50%) ${
-          isHovering ? "scale(1.4)" : "scale(1)"
-        }`;
-        ringRef.current.style.borderColor = isHovering ? "#a78bfa" : "rgba(34, 211, 238, 0.8)";
-        ringRef.current.style.boxShadow = isHovering
-          ? "0 0 20px rgba(139, 92, 246, 0.8), inset 0 0 10px rgba(139, 92, 246, 0.4)"
-          : "0 0 14px rgba(34, 211, 238, 0.6)";
-      }
+        if (ringRef.current) {
+          ringRef.current.style.transform = `translate3d(${ringX}px, ${ringY}px, 0) translate(-50%, -50%) ${
+            isHovering ? "scale(1.4)" : "scale(1)"
+          }`;
+          ringRef.current.style.borderColor = isHovering ? "#a78bfa" : "rgba(34, 211, 238, 0.8)";
+          ringRef.current.style.boxShadow = isHovering
+            ? "0 0 20px rgba(139, 92, 246, 0.8), inset 0 0 10px rgba(139, 92, 246, 0.4)"
+            : "0 0 14px rgba(34, 211, 238, 0.6)";
+        }
 
-      if (Math.abs(dx) > 0.2 || Math.abs(dy) > 0.2) {
-        rafId = requestAnimationFrame(renderLoop);
+        if (Math.abs(dx) > 0.2 || Math.abs(dy) > 0.2) {
+          rafId = requestAnimationFrame(renderLoop);
+        } else {
+          isLoopRunning = false;
+        }
       } else {
-        isLoopRunning = false;
+        // When scrolling, yield execution to free up compositor thread
+        rafId = requestAnimationFrame(renderLoop);
       }
     };
 
     window.addEventListener("mousemove", handleMouseMove, { passive: true });
+    window.addEventListener("scroll", handleScroll, { passive: true });
     document.addEventListener("mouseleave", handleMouseLeave);
 
     return () => {
       window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("scroll", handleScroll);
       document.removeEventListener("mouseleave", handleMouseLeave);
+      if (scrollTimer) clearTimeout(scrollTimer);
       if (rafId) cancelAnimationFrame(rafId);
     };
   }, []);
