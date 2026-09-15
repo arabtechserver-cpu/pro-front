@@ -433,11 +433,17 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
       const data = await res.json().catch(() => ({ success: false, error: "تعذر قراءة رد الخادم" }));
 
       if (res.ok && data.success) {
-        setSuccessMessage(
-          lang === "ar"
-            ? `تم إرسال طلب الشحن بقيمة $${parseFloat(depositAmount).toFixed(2)} وإرفاق إشعار التحويل بنجاح! جاري المراجعة والتفعيل فوراً.`
-            : `Deposit request of $${parseFloat(depositAmount).toFixed(2)} submitted & receipt attached successfully!`
-        );
+        const successMsg = lang === "ar"
+          ? `تم إرسال طلب الشحن بقيمة $${parseFloat(depositAmount).toFixed(2)} وإرفاق إشعار التحويل بنجاح! جاري المراجعة والتفعيل فوراً.`
+          : `Deposit request of $${parseFloat(depositAmount).toFixed(2)} submitted & receipt attached successfully!`;
+        
+        setSuccessMessage(successMsg);
+        
+        // Show an explicit alert and scroll to top to ensure user knows it succeeded
+        setTimeout(() => {
+          alert(successMsg);
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        }, 100);
 
         setTransactionRef("");
         setReceiptImage("");
