@@ -240,7 +240,7 @@ export default function PackagesSlider({ lang }: PackagesSliderProps) {
 
   return (
     <section
-      className="relative py-14 sm:py-20 bg-transparent overflow-hidden touch-pan-y section-spotlight"
+      className="relative py-14 sm:py-20 bg-transparent overflow-hidden touch-pan-y"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
       onTouchStart={handleTouchStart}
@@ -249,12 +249,9 @@ export default function PackagesSlider({ lang }: PackagesSliderProps) {
       data-aos="fade-up"
       suppressHydrationWarning
     >
-      {/* Background Ambient Glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-blue-600/5 rounded-full blur-[140px] pointer-events-none"></div>
-
       <div className="w-full cyber-container relative z-10">
         {/* Section Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 lg:mb-14 gap-6 lamp-header">
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 lg:mb-14 gap-6">
           <div>
             <div className="inline-flex items-center gap-2 bg-blue-500/10 text-blue-400 border border-blue-500/20 px-3.5 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wider mb-4 shadow-sm">
               <i className="fas fa-layer-group text-blue-400"></i>
@@ -278,14 +275,14 @@ export default function PackagesSlider({ lang }: PackagesSliderProps) {
             <button
               onClick={handlePrev}
               aria-label={isAr ? "الباقة السابقة" : "Previous Package"}
-              className="w-10 h-10 rounded-xl bg-[#111622] border border-white/10 text-slate-300 flex items-center justify-center hover:bg-[#1a2233] hover:text-white hover:border-blue-500/40 transition-all shadow-sm active:scale-95"
+              className="w-10 h-10 rounded-xl bg-white/[0.06] backdrop-blur-md border border-white/10 text-slate-300 flex items-center justify-center hover:bg-white/[0.15] hover:text-white hover:border-blue-500/40 transition-all shadow-sm active:scale-95"
             >
               <i className={`fas ${isAr ? "fa-arrow-right" : "fa-arrow-left"} text-sm`}></i>
             </button>
             <button
               onClick={handleNext}
               aria-label={isAr ? "الباقة التالية" : "Next Package"}
-              className="w-10 h-10 rounded-xl bg-[#111622] border border-white/10 text-slate-300 flex items-center justify-center hover:bg-[#1a2233] hover:text-white hover:border-blue-500/40 transition-all shadow-sm active:scale-95"
+              className="w-10 h-10 rounded-xl bg-white/[0.06] backdrop-blur-md border border-white/10 text-slate-300 flex items-center justify-center hover:bg-white/[0.15] hover:text-white hover:border-blue-500/40 transition-all shadow-sm active:scale-95"
             >
               <i className={`fas ${isAr ? "fa-arrow-left" : "fa-arrow-right"} text-sm`}></i>
             </button>
@@ -305,10 +302,12 @@ export default function PackagesSlider({ lang }: PackagesSliderProps) {
             {visibleItems.map((pkg, idx) => (
               <div
                 key={`${pkg.id}-${currentIndex}-${idx}`}
-                className={`relative rounded-2xl p-6 sm:p-7 lamp-card !overflow-visible shadow-xl transition-all duration-200 group hover:-translate-y-1 flex flex-col justify-between ${
+                className={`relative rounded-2xl p-6 sm:p-7 bg-[#0b1426]/65 backdrop-blur-md border border-white/12 hover:border-blue-400/50 hover:bg-[#0e1c36]/80 !overflow-visible shadow-xl transition-all duration-200 group hover:-translate-y-1 flex flex-col justify-between ${
                   idx === 1 ? "hidden md:flex" : idx === 2 ? "hidden lg:flex" : "flex"
                 }`}
               >
+                {/* Overhead Neon Light Beam on Hover */}
+                <div className="absolute top-0 inset-x-6 sm:inset-x-8 h-[2px] bg-gradient-to-r from-transparent via-blue-400/0 to-transparent group-hover:via-blue-400 group-hover:shadow-[0_0_14px_2px_rgba(96,165,250,0.85)] transition-all duration-500 pointer-events-none"></div>
                 {/* Popular / Promo Badge */}
                 {(pkg.badgeAr || pkg.badgeEn) && (
                   <div className="absolute -top-3.5 right-6 sm:right-7 rtl:right-auto rtl:left-6 sm:rtl:left-7 z-30 bg-gradient-to-r from-amber-500/25 to-amber-600/25 text-amber-300 border border-amber-400/40 text-xs font-bold px-3.5 py-1 rounded-full shadow-lg shadow-amber-950/40 flex items-center gap-1.5 whitespace-nowrap pointer-events-none">

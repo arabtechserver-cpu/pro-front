@@ -21,7 +21,7 @@ export default function AmrrStatsSection({ lang }: AmrrStatsSectionProps) {
   }, []);
 
   return (
-    <section className="relative my-6 sm:my-10 cyber-container section-spotlight">
+    <section className="relative my-6 sm:my-10 cyber-container">
       <div className="grid grid-cols-1 md:grid-cols-12 gap-5 md:gap-5 lg:gap-8 relative z-10">
         
         {/* Left Column: Ready to Unlock CTA Card */}
@@ -102,7 +102,7 @@ export default function AmrrStatsSection({ lang }: AmrrStatsSectionProps) {
           {/* Header */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3 mb-4 sm:mb-6">
             <div>
-              <div className="inline-flex items-center gap-2 bg-[#0B0F17] px-3.5 py-1.5 rounded-full border border-white/10 mb-1.5 shadow-sm">
+              <div className="inline-flex items-center gap-2 bg-white/[0.05] backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/10 mb-1.5 shadow-sm">
                 <span className="w-2 h-2 bg-emerald-400 rounded-full"></span>
                 <span className="text-slate-300 text-[10px] sm:text-xs font-semibold uppercase tracking-wider">
                   {isAr ? "سيرفر الأداء الفائق" : "ULTRA PERFORMANCE"}
@@ -181,7 +181,7 @@ export default function AmrrStatsSection({ lang }: AmrrStatsSectionProps) {
                 {isAr ? "مستقر ومثالي ● OPTIMAL" : "● OPTIMAL"}
               </span>
             </div>
-            <div className="w-full bg-[#0B0F17] rounded-full h-2 overflow-hidden border border-white/10">
+            <div className="w-full bg-white/[0.08] rounded-full h-2 overflow-hidden border border-white/10">
               <div className="bg-gradient-to-r from-blue-600 to-emerald-500 h-full rounded-full w-full"></div>
             </div>
           </div>

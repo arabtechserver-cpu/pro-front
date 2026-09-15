@@ -56,7 +56,7 @@ export default function NewsletterSection({ lang = "ar", className = "" }: Newsl
 
   return (
     <section className={`w-full cyber-container section-spotlight ${className}`}>
-      <div className="lamp-card p-6 sm:p-8 lg:p-10 rounded-2xl sm:rounded-3xl shadow-xl relative overflow-hidden flex flex-col md:flex-row items-center gap-6 sm:gap-8">
+      <div className="lamp-card p-6 sm:p-8 lg:p-10 rounded-2xl sm:rounded-3xl shadow-xl relative overflow-hidden flex flex-col md:flex-row items-center gap-6 sm:gap-8 border border-white/15 bg-gradient-to-br from-blue-950/20 via-[#09101c]/15 to-transparent backdrop-blur-md">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-72 sm:w-96 h-20 bg-blue-500/15 rounded-full blur-2xl pointer-events-none"></div>
         
         {/* Content text */}
@@ -134,7 +134,7 @@ export default function NewsletterSection({ lang = "ar", className = "" }: Newsl
                     type="email"
                     required
                     disabled={loading}
-                    className="w-full px-4 py-3 sm:py-3.5 pl-10 rtl:pl-4 rtl:pr-10 bg-[#0B0F17] border border-white/10 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all text-white text-sm placeholder:text-slate-400 shadow-inner"
+                    className="w-full px-4 py-3 sm:py-3.5 pl-10 rtl:pl-4 rtl:pr-10 bg-white/[0.06] backdrop-blur-md border border-white/15 rounded-xl focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 outline-none transition-all text-white text-sm placeholder:text-slate-400 shadow-inner"
                   />
                 </div>
 

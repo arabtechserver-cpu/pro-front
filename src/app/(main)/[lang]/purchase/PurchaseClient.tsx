@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
@@ -576,6 +576,22 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
       }
     }
   };
+
+  // Track service view event in Analytics
+  useEffect(() => {
+    if (!selectedServiceId) return;
+    const sessionId = typeof sessionStorage !== "undefined" ? sessionStorage.getItem("sessionId") || "" : "";
+    fetch("/api/analytics/events", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        eventName: "service_view",
+        sessionId,
+        path: `/purchase?service=${selectedServiceId}`,
+        metadata: { serviceId: selectedServiceId }
+      })
+    }).catch(() => {});
+  }, [selectedServiceId]);
 
   // 3. Handle Submitting a New Order
   const handleOrderSubmit = async (e: React.FormEvent) => {

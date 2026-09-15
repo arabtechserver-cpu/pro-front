@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
@@ -23,6 +23,7 @@ interface PaymentMethod {
   instructionsEn: string;
   isAutomaticPayPal?: boolean;
   isBankak?: boolean;
+  isFawry?: boolean;
 }
 
 interface CurrencyConfig {
@@ -30,14 +31,21 @@ interface CurrencyConfig {
   usdToEgp: number;
   usdToSar: number;
   usdToAed: number;
-  bankak: {
+  bankak?: {
     accountNumber: string;
     accountName: string;
     instructionsAr: string;
     instructionsEn: string;
     isActive: boolean;
   };
-  vodafone: {
+  fawry?: {
+    accountNumber: string;
+    accountName?: string;
+    instructionsAr: string;
+    instructionsEn: string;
+    isActive: boolean;
+  };
+  vodafone?: {
     walletNumber: string;
     instructionsAr: string;
     instructionsEn: string;
@@ -180,6 +188,24 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
         currencyConfig?.bankak?.instructionsEn ||
         "Transfer via Bankak app in Sudanese Pounds then upload receipt image for confirmation.",
       isBankak: true
+    },
+    {
+      id: "fawry",
+      nameAr: "فوري - بنك فيصل (الرقم الموحد)",
+      nameEn: "Fawri - Faisal Bank (Unified ID)",
+      badge: "FAWRI",
+      icon: "account_balance",
+      color: "from-purple-700 to-indigo-800",
+      copyValue: currencyConfig?.fawry?.accountNumber || "51589889",
+      detailLabelAr: "الرقم البنكي الموحد (تطبيق فوري):",
+      detailLabelEn: "Unified Banking ID (Fawri App):",
+      instructionsAr:
+        currencyConfig?.fawry?.instructionsAr ||
+        "حول المبلغ بالجنيه السوداني عبر تطبيق فوري إلى الرقم البنكي الموحد (51589889) ثم ارفع صورة إشعار التحويل للتأكيد.",
+      instructionsEn:
+        currencyConfig?.fawry?.instructionsEn ||
+        "Transfer in Sudanese Pounds via Fawri app to Unified Banking ID # 51589889 then upload receipt image for confirmation.",
+      isFawry: true
     },
     {
       id: "vodafone",
@@ -571,7 +597,7 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
                             <span className="text-base shrink-0">{m.badge}</span>
                           </div>
                           <p className={`text-[11px] mt-0.5 truncate font-medium ${isSelected ? "text-primary font-bold" : "text-slate-300"}`}>
-                            {m.isBankak
+                            {m.isBankak || m.isFawry
                               ? `سعر الصرف: 1$ = ${sdgRate} SDG`
                               : m.isAutomaticPayPal
                               ? (lang === "ar" ? "شحن تلقائي داخل الموقع" : "In-Page Direct Top-up")
@@ -586,13 +612,19 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
                 </div>
               </div>
 
-              {/* SPECIAL SPOTLIGHT FOR BANKAK (SUDANESE POUND) CALCULATION */}
-              {activeMethod.isBankak && (
+              {/* SPECIAL SPOTLIGHT FOR SUDAN METHODS (BANKAK & FAWRI - SDG CALCULATION) */}
+              {(activeMethod.isBankak || activeMethod.isFawry) && (
                 <div className="p-5 rounded-2xl bg-gradient-to-br from-violet-500/15 via-surface-container-high to-purple-500/15 border-2 border-violet-500/50 shadow-xl space-y-4 animate-in fade-in slide-in-from-top-2">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2 font-bold text-sm text-violet-400">
-                      <span className="text-xs font-mono font-bold px-1.5 py-0.5 rounded bg-violet-500/20 text-violet-300">SD</span>
-                      <span>{lang === "ar" ? "التحويل بالجنيه السوداني عبر بنكك (سعر الصرف المعتمد)" : "Bankak Sudanese Transfer"}</span>
+                      <span className="text-xs font-mono font-bold px-1.5 py-0.5 rounded bg-violet-500/20 text-violet-300">
+                        {activeMethod.badge}
+                      </span>
+                      <span>
+                        {activeMethod.isFawry
+                          ? (lang === "ar" ? "التحويل بالجنيه السوداني عبر فوري (الرقم البنكي الموحد)" : "Fawri Sudanese Transfer (Unified ID)")
+                          : (lang === "ar" ? "التحويل بالجنيه السوداني عبر بنكك (سعر الصرف المعتمد)" : "Bankak Sudanese Transfer")}
+                      </span>
                     </div>
 
                     <span className="text-xs font-mono font-bold text-violet-300 bg-violet-500/20 px-2.5 py-1 rounded-lg border border-violet-500/30">
@@ -635,10 +667,16 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
                   {/* Beneficiary Account Details */}
                   <div className="p-3.5 rounded-xl bg-[#0f172a] border border-violet-500/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                     <div>
-                      <div className="text-[11px] text-slate-400">رقم حساب بنك الخرطوم (بنكك):</div>
+                      <div className="text-[11px] text-slate-400">
+                        {activeMethod.isFawry
+                          ? (lang === "ar" ? "الرقم البنكي الموحد (تطبيق فوري):" : "Fawri Unified Banking ID:")
+                          : (lang === "ar" ? "رقم حساب بنك الخرطوم (بنكك):" : "Bankak Account #:")}
+                      </div>
                       <div className="text-base font-mono font-bold text-violet-300 select-all">{activeMethod.copyValue}</div>
                       <div className="text-xs text-slate-300 font-semibold mt-0.5">
-                        باسم: {currencyConfig?.bankak?.accountName || "حسن"}
+                        {activeMethod.isFawry
+                          ? (lang === "ar" ? "تطبيق فوري - الرقم البنكي الموحد: 51589889" : "Fawri App - Unified ID: 51589889")
+                          : `باسم: ${currencyConfig?.bankak?.accountName || "حسن"}`}
                       </div>
                     </div>
 
@@ -652,7 +690,13 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
                       <span className="material-symbols-outlined text-sm">
                         {copiedId === activeMethod.id ? "check" : "content_copy"}
                       </span>
-                      <span>{copiedId === activeMethod.id ? "تم النسخ" : "نسخ رقم الحساب"}</span>
+                      <span>
+                        {copiedId === activeMethod.id
+                          ? (lang === "ar" ? "تم النسخ" : "Copied")
+                          : activeMethod.isFawry
+                          ? (lang === "ar" ? "نسخ الرقم الموحد" : "Copy Unified ID")
+                          : (lang === "ar" ? "نسخ رقم الحساب" : "Copy Account #")}
+                      </span>
                     </button>
                   </div>
 
@@ -663,7 +707,7 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
               )}
 
               {/* OTHER MANUAL PAYMENT DETAILS CARD */}
-              {!activeMethod.isAutomaticPayPal && !activeMethod.isBankak && (
+              {!activeMethod.isAutomaticPayPal && !activeMethod.isBankak && !activeMethod.isFawry && (
                 <div className="p-5 rounded-2xl bg-gradient-to-r from-primary/15 via-surface-container-high to-primary/15 border-2 border-primary/50 shadow-xl space-y-3 animate-in fade-in slide-in-from-top-2">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2 font-extrabold text-sm text-primary">
@@ -697,8 +741,8 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
                 </div>
               )}
 
-              {/* Amount & Reference Input for Non-Bankak manual methods */}
-              {!activeMethod.isBankak && (
+              {/* Amount & Reference Input for Non-Sudan manual methods */}
+              {!activeMethod.isBankak && !activeMethod.isFawry && (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                   <div className="space-y-2">
                     <label className="text-xs font-extrabold text-slate-100 uppercase tracking-wider block">
@@ -735,18 +779,24 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
                 </div>
               )}
 
-              {/* Reference input for Bankak */}
-              {activeMethod.isBankak && (
+              {/* Reference input for Bankak & Fawri */}
+              {(activeMethod.isBankak || activeMethod.isFawry) && (
                 <div className="space-y-2">
                   <label className="text-xs font-extrabold text-slate-100 uppercase tracking-wider block">
-                    {lang === "ar" ? "رقم المعاملة في إشعار بنكك (Transaction ID / Reference):" : "Bankak Reference #:"}
+                    {activeMethod.isFawry
+                      ? (lang === "ar" ? "رقم المعاملة في إشعار فوري (Transaction ID / Reference):" : "Fawri Reference #:")
+                      : (lang === "ar" ? "رقم المعاملة في إشعار بنكك (Transaction ID / Reference):" : "Bankak Reference #:")}
                   </label>
                   <input
                     type="text"
                     required
                     value={transactionRef}
                     onChange={(e) => setTransactionRef(e.target.value)}
-                    placeholder="مثال: رقم العملية في إشعار بنكك أو رقم حسابك المحول منه"
+                    placeholder={
+                      activeMethod.isFawry
+                        ? (lang === "ar" ? "مثال: رقم العملية في إشعار فوري أو رقم حسابك المحول منه" : "e.g. Fawri Transaction ID or sender number")
+                        : (lang === "ar" ? "مثال: رقم العملية في إشعار بنكك أو رقم حسابك المحول منه" : "e.g. Bankak Transaction ID or sender number")
+                    }
                     className="w-full bg-[#0f172a] border-2 border-violet-500/50 rounded-xl py-3 px-4 text-white font-mono text-sm focus:border-violet-400 outline-none"
                   />
                 </div>

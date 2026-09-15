@@ -55,6 +55,7 @@ const nextConfig = {
               "style-src 'self' 'unsafe-inline' https://accounts.google.com",
               "font-src 'self' data:",
               "img-src 'self' data: blob: https:",
+              "media-src 'self' data: blob: https:",
               "connect-src 'self' https://api.arabtechproserver.tech https://accounts.google.com https://challenges.cloudflare.com https://www.paypal.com https://www.sandbox.paypal.com",
               "frame-src 'self' https://accounts.google.com https://challenges.cloudflare.com https://www.sandbox.paypal.com https://www.paypal.com",
               "object-src 'none'",
@@ -75,6 +76,19 @@ const nextConfig = {
           {
             key: 'Access-Control-Allow-Origin',
             value: '*',
+          },
+        ],
+      },
+      {
+        source: '/videos/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+          {
+            key: 'Accept-Ranges',
+            value: 'bytes',
           },
         ],
       },

@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect } from "react";
 
@@ -16,6 +16,13 @@ interface CurrencyConfig {
   };
   vodafone: {
     walletNumber: string;
+    instructionsAr: string;
+    instructionsEn: string;
+    isActive: boolean;
+  };
+  fawry?: {
+    accountNumber: string;
+    accountName?: string;
     instructionsAr: string;
     instructionsEn: string;
     isActive: boolean;
@@ -437,6 +444,58 @@ export default function CurrenciesClient() {
                     setConfig({
                       ...config,
                       vodafone: { ...config.vodafone, walletNumber: e.target.value }
+                    })
+                  }
+                  className="w-full px-3.5 py-2.5 bg-surface-container border border-outline-variant/40 rounded-xl font-mono text-xs font-bold text-on-surface text-left dir-ltr"
+                />
+              </div>
+            </div>
+
+            {/* Fawri / بنك فيصل الإسلامي */}
+            <div className="p-4 rounded-2xl bg-surface-container-lowest border border-outline-variant/20 space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="material-symbols-outlined text-purple-400 text-lg">account_balance</span>
+                  <span className="font-bold text-xs text-on-surface">فوري (الرقم البنكي الموحد)</span>
+                </div>
+                <input
+                  type="checkbox"
+                  checked={config.fawry?.isActive ?? true}
+                  onChange={(e) =>
+                    setConfig({
+                      ...config,
+                      fawry: {
+                        ...(config.fawry || {
+                          accountNumber: "51589889",
+                          accountName: "الرقم البنكي الموحد",
+                          instructionsAr: "",
+                          instructionsEn: ""
+                        }),
+                        isActive: e.target.checked
+                      }
+                    })
+                  }
+                  className="w-4 h-4 accent-primary"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-bold text-on-surface-variant mb-1">الرقم البنكي الموحد:</label>
+                <input
+                  type="text"
+                  value={config.fawry?.accountNumber || "51589889"}
+                  onChange={(e) =>
+                    setConfig({
+                      ...config,
+                      fawry: {
+                        ...(config.fawry || {
+                          accountName: "الرقم البنكي الموحد",
+                          instructionsAr: "",
+                          instructionsEn: "",
+                          isActive: true
+                        }),
+                        accountNumber: e.target.value
+                      }
                     })
                   }
                   className="w-full px-3.5 py-2.5 bg-surface-container border border-outline-variant/40 rounded-xl font-mono text-xs font-bold text-on-surface text-left dir-ltr"

@@ -21,7 +21,7 @@ export default function SupportCtaSection({
       <div className="w-full cyber-container relative z-10">
         
         {/* Support Card */}
-        <div className="lamp-card rounded-2xl sm:rounded-3xl p-8 sm:p-12 lg:p-16 shadow-xl relative overflow-hidden">
+        <div className="lamp-card rounded-2xl sm:rounded-3xl p-8 sm:p-12 lg:p-16 shadow-xl relative overflow-hidden border border-sky-400/30 bg-gradient-to-br from-blue-950/20 via-[#09101c]/15 to-transparent backdrop-blur-md">
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-72 sm:w-96 h-20 bg-blue-500/15 rounded-full blur-2xl pointer-events-none"></div>
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-blue-600/5 rounded-full blur-[100px] pointer-events-none"></div>
 

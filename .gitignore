@@ -4,4 +4,7 @@ node_modules/
 .env
 dist/
 *.tsbuildinfo
+kling_*.mp4
+*-orig.mp4
+public/videos/*-orig.mp4
 

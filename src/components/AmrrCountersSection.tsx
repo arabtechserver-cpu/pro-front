@@ -70,11 +70,13 @@ export default function AmrrCountersSection({ lang }: AmrrCountersSectionProps) 
   }, []);
 
   return (
-    <section className="relative w-full my-6 sm:my-10 section-spotlight">
+    <section className="relative w-full my-6 sm:my-10">
       <div
         ref={sectionRef}
-        className="relative w-full rounded-2xl sm:rounded-3xl lamp-card text-white p-5 sm:p-8 lg:p-10 shadow-xl overflow-hidden"
+        className="relative w-full rounded-2xl sm:rounded-3xl bg-[#0b1325]/50 border border-white/12 backdrop-blur-md shadow-xl text-white p-5 sm:p-8 lg:p-10 overflow-hidden"
       >
+        {/* Overhead Neon Light Beam */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 max-w-lg h-[2px] bg-gradient-to-r from-transparent via-blue-400 to-transparent shadow-[0_0_14px_2px_rgba(96,165,250,0.85)] z-20 pointer-events-none"></div>
         <div className="relative z-10 grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-6 lg:gap-10 items-center">
           
           {/* Left / Main Headline Side */}
@@ -82,12 +84,12 @@ export default function AmrrCountersSection({ lang }: AmrrCountersSectionProps) 
             
             {/* Status & Sync Badge */}
             <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 sm:gap-3 mb-3.5 sm:mb-5">
-              <div className="inline-flex items-center gap-2 bg-[#0B0F17] border border-white/10 px-3 sm:px-3.5 py-1 sm:py-1.5 rounded-full">
+              <div className="inline-flex items-center gap-2 bg-white/[0.05] backdrop-blur-md border border-white/10 px-3 sm:px-3.5 py-1 sm:py-1.5 rounded-full">
                 <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
                 <span className="text-slate-300 font-semibold text-xs tracking-wider">ONLINE</span>
               </div>
 
-              <div className="inline-flex items-center gap-1.5 text-xs text-slate-400 bg-white/5 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full border border-white/10">
+              <div className="inline-flex items-center gap-1.5 text-xs text-slate-400 bg-white/[0.05] backdrop-blur-md px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full border border-white/10">
                 <i className="fas fa-sync text-blue-400 text-xs"></i>
                 <span>{isAr ? "تحديث سيرفرات لحظي • 24/7" : "Live Real-Time Sync • 24/7"}</span>
               </div>
@@ -111,10 +113,10 @@ export default function AmrrCountersSection({ lang }: AmrrCountersSectionProps) 
             </div>
 
             {/* Description */}
-            <p className="text-xs sm:text-sm lg:text-base text-slate-400 mb-5 sm:mb-6 max-w-xl leading-relaxed">
+            <p className="text-xs sm:text-sm lg:text-base text-slate-300 mb-5 sm:mb-6 max-w-xl leading-relaxed">
               {isAr ? (
                 <>
-                  منصة <strong className="text-slate-200 font-semibold">عرب تك برو سيرفر (عرب تك)</strong>: المنظومة السحابية الموحدة لفك شفرات الشبكات (IMEI)، وتخطي FRP، وحذف حسابات iCloud، وشحن رصيد كافة السيرفرات والبوكسات فورياً وبأفضل أسعار الجملة.
+                  منصة <strong className="text-slate-100 font-semibold">عرب تك برو سيرفر (عرب تك)</strong>: المنظومة السحابية الموحدة لفك شفرات الشبكات (IMEI)، وتخطي FRP، وحذف حسابات iCloud، وشحن رصيد كافة السيرفرات والبوكسات فورياً وبأفضل أسعار الجملة.
                 </>
               ) : (
                 <>
@@ -125,21 +127,21 @@ export default function AmrrCountersSection({ lang }: AmrrCountersSectionProps) 
 
             {/* Feature Badges */}
             <div className="flex flex-wrap justify-center md:justify-start gap-2 sm:gap-2.5 lg:gap-3 mb-5 sm:mb-6 md:mb-5 lg:mb-8">
-              <div className="bg-[#0B0F17] border border-white/10 text-slate-300 text-xs sm:text-sm font-medium px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl flex items-center gap-1.5 sm:gap-2">
+              <div className="bg-white/[0.05] backdrop-blur-md border border-white/10 text-slate-200 text-xs sm:text-sm font-medium px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl flex items-center gap-1.5 sm:gap-2">
                 <div className="w-4.5 h-4.5 sm:w-5 sm:h-5 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-400 text-xs">
                   <i className="fas fa-lock-open"></i>
                 </div>
                 <span>{isAr ? "فك وتفعيل فوري" : "Instant Unlock"}</span>
               </div>
 
-              <div className="bg-[#0B0F17] border border-white/10 text-slate-300 text-xs sm:text-sm font-medium px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl flex items-center gap-1.5 sm:gap-2">
+              <div className="bg-white/[0.05] backdrop-blur-md border border-white/10 text-slate-200 text-xs sm:text-sm font-medium px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl flex items-center gap-1.5 sm:gap-2">
                 <div className="w-4.5 h-4.5 sm:w-5 sm:h-5 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-400 text-xs">
                   <i className="fas fa-shield-alt"></i>
                 </div>
                 <span>{isAr ? "حماية وتشفير SSL" : "SSL Encrypted"}</span>
               </div>
 
-              <div className="bg-[#0B0F17] border border-white/10 text-slate-300 text-xs sm:text-sm font-medium px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl flex items-center gap-1.5 sm:gap-2">
+              <div className="bg-white/[0.05] backdrop-blur-md border border-white/10 text-slate-200 text-xs sm:text-sm font-medium px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl flex items-center gap-1.5 sm:gap-2">
                 <div className="w-4.5 h-4.5 sm:w-5 sm:h-5 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-400 text-xs">
                   <i className="fas fa-globe"></i>
                 </div>
@@ -174,7 +176,7 @@ export default function AmrrCountersSection({ lang }: AmrrCountersSectionProps) 
             
             {/* Card 1: Supported Phone Models */}
             <div
-              className="lamp-card group rounded-xl sm:rounded-2xl p-3.5 sm:p-4 md:p-3.5 lg:p-5 flex items-center gap-3 sm:gap-4 lg:gap-5 transition-all duration-200 shadow-sm"
+              className="group flex items-center gap-3 sm:gap-4 lg:gap-5 p-3.5 sm:p-4 md:p-3.5 lg:p-5 rounded-xl sm:rounded-2xl transition-all duration-200 relative bg-[#0b1426]/65 backdrop-blur-md border border-white/12 hover:border-blue-400/50 hover:bg-[#0e1c36]/80 shadow-sm"
               data-aos="fade-left"
               data-aos-delay="100"
             >
@@ -202,7 +204,7 @@ export default function AmrrCountersSection({ lang }: AmrrCountersSectionProps) 
 
             {/* Card 2: New Services Monthly */}
             <div
-              className="lamp-card group rounded-xl sm:rounded-2xl p-3.5 sm:p-4 md:p-3.5 lg:p-5 flex items-center gap-3 sm:gap-4 lg:gap-5 transition-all duration-200 shadow-sm"
+              className="group flex items-center gap-3 sm:gap-4 lg:gap-5 p-3.5 sm:p-4 md:p-3.5 lg:p-5 rounded-xl sm:rounded-2xl transition-all duration-200 relative bg-[#0b1426]/65 backdrop-blur-md border border-white/12 hover:border-emerald-400/50 hover:bg-[#0e1c36]/80 shadow-sm"
               data-aos="fade-left"
               data-aos-delay="200"
             >
@@ -230,7 +232,7 @@ export default function AmrrCountersSection({ lang }: AmrrCountersSectionProps) 
 
             {/* Card 3: 24/7 Automated Delivery & Live Support */}
             <div
-              className="lamp-card group rounded-xl sm:rounded-2xl p-3.5 sm:p-4 md:p-3.5 lg:p-5 flex items-center gap-3 sm:gap-4 lg:gap-5 transition-all duration-200 shadow-sm"
+              className="group flex items-center gap-3 sm:gap-4 lg:gap-5 p-3.5 sm:p-4 md:p-3.5 lg:p-5 rounded-xl sm:rounded-2xl transition-all duration-200 relative bg-[#0b1426]/65 backdrop-blur-md border border-white/12 hover:border-amber-400/50 hover:bg-[#0e1c36]/80 shadow-sm"
               data-aos="fade-left"
               data-aos-delay="300"
             >

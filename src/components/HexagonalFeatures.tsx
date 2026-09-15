@@ -84,12 +84,10 @@ export default function HexagonalFeatures({ lang }: HexagonalFeaturesProps) {
   ];
 
   return (
-    <section className="relative py-14 sm:py-20 bg-transparent overflow-hidden section-spotlight">
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_40%_at_50%_0%,rgba(37,99,235,0.08),transparent)] pointer-events-none"></div>
-
+    <section className="relative py-14 sm:py-20 bg-transparent overflow-hidden">
       <div className="relative z-10 w-full cyber-container">
         {/* Section Header */}
-        <div className="text-center mb-12 lg:mb-16 lamp-header max-w-3xl mx-auto" data-aos="fade-up" suppressHydrationWarning>
+        <div className="text-center mb-12 lg:mb-16 max-w-3xl mx-auto" data-aos="fade-up" suppressHydrationWarning>
           <div className="inline-flex items-center gap-2 bg-blue-500/10 border border-blue-500/20 px-4 py-1.5 rounded-full mb-4 shadow-sm">
             <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
             <span className="text-cyan-400 font-semibold text-xs sm:text-sm uppercase tracking-wider">
@@ -118,16 +116,13 @@ export default function HexagonalFeatures({ lang }: HexagonalFeaturesProps) {
             return (
               <div
                 key={f.id}
-                className="lamp-card group relative rounded-xl sm:rounded-2xl lg:rounded-3xl p-3 sm:p-4.5 md:p-6 lg:p-7 transition-all duration-300 hover:-translate-y-1 sm:hover:-translate-y-1.5 shadow-xl flex flex-col justify-between overflow-hidden border border-white/10 hover:border-cyan-400/40"
+                className="group relative rounded-xl sm:rounded-2xl lg:rounded-3xl p-3 sm:p-4.5 md:p-6 lg:p-7 transition-all duration-300 hover:-translate-y-1 sm:hover:-translate-y-1.5 shadow-lg flex flex-col justify-between overflow-hidden bg-[#0b1426]/65 backdrop-blur-md border border-white/12 hover:border-cyan-400/50 hover:bg-[#0e1c36]/80"
                 data-aos="fade-up"
                 data-aos-delay={f.delay}
                 suppressHydrationWarning
               >
                 {/* Overhead Neon Light Beam */}
                 <div className="absolute top-0 inset-x-4 sm:inset-x-8 h-[2px] bg-gradient-to-r from-transparent via-cyan-400/0 to-transparent group-hover:via-cyan-400 group-hover:shadow-[0_0_16px_2px_rgba(34,211,238,0.9)] transition-all duration-500 pointer-events-none"></div>
-
-                {/* Subtle Ambient Glow on Hover */}
-                <div className="absolute -inset-px rounded-xl sm:rounded-2xl lg:rounded-3xl bg-gradient-to-b from-cyan-500/10 via-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
 
                 <div className="relative z-10">
                   {/* Top Row: Futuristic Glowing Cyber Badge + Monospace Index */}
@@ -137,8 +132,8 @@ export default function HexagonalFeatures({ lang }: HexagonalFeaturesProps) {
                       <div className="absolute -inset-1 bg-gradient-to-tr from-blue-600 via-sky-500 to-cyan-400 rounded-xl sm:rounded-2xl blur-sm sm:blur-md opacity-60 group-hover:opacity-95 group-hover:blur-lg transition-all duration-300"></div>
 
                       {/* Glassmorphic Cyber Badge */}
-                      <div className="relative w-9 h-9 sm:w-11 sm:h-11 md:w-13 md:h-13 lg:w-14 lg:h-14 rounded-xl sm:rounded-2xl bg-gradient-to-b from-[#182642] to-[#0d1627] border border-cyan-400/50 flex items-center justify-center p-0.5 shadow-[0_0_14px_rgba(56,189,248,0.3)] group-hover:shadow-[0_0_24px_rgba(56,189,248,0.7)] group-hover:border-cyan-300 transition-all duration-300">
-                        <div className="w-full h-full rounded-[10px] sm:rounded-[12px] md:rounded-[14px] bg-[#090f1a]/85 flex items-center justify-center backdrop-blur-md relative overflow-hidden">
+                      <div className="relative w-9 h-9 sm:w-11 sm:h-11 md:w-13 md:h-13 lg:w-14 lg:h-14 rounded-xl sm:rounded-2xl bg-cyan-500/15 border border-cyan-400/50 flex items-center justify-center p-0.5 shadow-[0_0_14px_rgba(56,189,248,0.2)] group-hover:shadow-[0_0_24px_rgba(56,189,248,0.6)] group-hover:border-cyan-300 transition-all duration-300">
+                        <div className="w-full h-full rounded-[10px] sm:rounded-[12px] md:rounded-[14px] bg-white/[0.05] flex items-center justify-center relative overflow-hidden">
                           {/* Subtle top reflection */}
                           <div className="absolute top-0 inset-x-1 h-px bg-gradient-to-r from-transparent via-cyan-300/80 to-transparent"></div>
                           {/* Lucide Icon in High-Voltage Neon Cyan */}

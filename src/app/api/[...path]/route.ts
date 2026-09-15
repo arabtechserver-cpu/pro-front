@@ -63,11 +63,13 @@ async function handler(
   { params }: { params: Promise<{ path: string[] }> }
 ) {
   const resolvedParams = await params;
-  const path = resolvedParams.path.join('/');
+  let path = resolvedParams.path.join('/');
   const search = request.nextUrl.search;
 
-  // Handle telemetry/analytics gracefully without 404 console errors
-  if (path.startsWith('telemetry')) {
+  // Forward telemetry events to backend analytics/events so they are saved to database
+  if (path.startsWith('telemetry/events')) {
+    path = 'analytics/events';
+  } else if (path.startsWith('telemetry')) {
     return NextResponse.json({ ok: true, success: true });
   }
 

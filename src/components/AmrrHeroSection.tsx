@@ -17,11 +17,11 @@ export default function AmrrHeroSection({ lang }: AmrrHeroSectionProps) {
       if (token && token !== "null" && token !== "undefined") {
         setIsLoggedIn(true);
       }
-    } catch {}
+    } catch { }
   }, []);
 
   return (
-    <section className="relative w-full bg-gradient-to-br from-[#0d1525] via-[#09101c] to-[#060a12] rounded-2xl sm:rounded-3xl border border-sky-500/25 shadow-[0_15px_45px_rgba(0,0,0,0.6),inset_0_1px_2px_rgba(255,255,255,0.12)] mb-6 sm:mb-8 overflow-hidden">
+    <section className="relative w-full bg-gradient-to-br from-[#0d1525]/60 via-[#091120]/50 to-[#060b14]/65 backdrop-blur-md rounded-2xl sm:rounded-3xl border border-sky-400/30 shadow-[0_20px_50px_rgba(0,0,0,0.4),0_0_30px_rgba(56,189,248,0.12),inset_0_1px_2px_rgba(255,255,255,0.15)] mb-6 sm:mb-8 overflow-hidden">
       {/* Cyber Grid */}
       <div
         className="absolute inset-0 bg-[linear-gradient(to_right,rgba(56,189,248,0.04)_1px,transparent_1px),linear-gradient(to_bottom,rgba(56,189,248,0.04)_1px,transparent_1px)] bg-[size:28px_28px] sm:bg-[size:36px_36px] [mask-image:radial-gradient(ellipse_75%_65%_at_50%_50%,#000_65%,transparent_100%)] pointer-events-none"
@@ -123,7 +123,7 @@ export default function AmrrHeroSection({ lang }: AmrrHeroSectionProps) {
 
           {/* Quick Stats */}
           <div
-            className="lamp-card rounded-xl sm:rounded-2xl p-2.5 sm:p-3 lg:p-4 grid grid-cols-3 gap-1.5 sm:gap-3 text-center shadow-lg border border-white/10"
+            className="rounded-xl sm:rounded-2xl p-2.5 sm:p-3 lg:p-4 grid grid-cols-3 gap-1.5 sm:gap-3 text-center shadow-lg border border-white/10 bg-[#0e172a]/20 backdrop-blur-md"
             data-aos="fade-right"
             data-aos-delay="500"
           >
@@ -154,7 +154,7 @@ export default function AmrrHeroSection({ lang }: AmrrHeroSectionProps) {
           </div>
 
           {/* Cockpit Glass Card */}
-          <div className="relative w-full rounded-2xl sm:rounded-3xl bg-[#0b1220]/90 backdrop-blur-xl border border-sky-400/30 shadow-[0_20px_50px_rgba(0,0,0,0.7),0_0_30px_rgba(56,189,248,0.12)] p-3 sm:p-4 lg:p-6 flex flex-col gap-3 lg:gap-4 z-10">
+          <div className="relative w-full rounded-2xl sm:rounded-3xl bg-[#0b1426]/65 backdrop-blur-md border border-sky-400/30 shadow-[0_20px_50px_rgba(0,0,0,0.5),0_0_30px_rgba(56,189,248,0.12)] p-3 sm:p-4 lg:p-6 flex flex-col gap-3 lg:gap-4 z-10">
 
             {/* Terminal Header */}
             <div className="flex items-center justify-between pb-2.5 border-b border-white/10">
@@ -174,7 +174,7 @@ export default function AmrrHeroSection({ lang }: AmrrHeroSectionProps) {
             </div>
 
             {/* Quick Metrics */}
-            <div className="grid grid-cols-3 gap-1.5 sm:gap-2 py-1 px-2 rounded-xl bg-[#0e172a]/70 border border-white/5 text-center">
+            <div className="grid grid-cols-3 gap-1.5 sm:gap-2 py-1 px-2 rounded-xl bg-[#0e172a]/50 backdrop-blur-sm border border-white/10 text-center">
               <div>
                 <span className="block text-[10px] text-slate-400">{isAr ? "تسليم فوري" : "Instant API"}</span>
                 <span className="text-xs font-bold text-sky-400">1-5 Mins</span>
@@ -193,7 +193,7 @@ export default function AmrrHeroSection({ lang }: AmrrHeroSectionProps) {
             <div className="grid grid-cols-2 gap-2 sm:gap-2.5 lg:gap-3">
 
               {/* Card 1: UnlockTool */}
-              <div className="p-2.5 sm:p-3 rounded-xl bg-[#111c30]/80 border border-white/10 hover:border-sky-400/40 transition-colors group/item flex items-center gap-2">
+              <div className="p-2.5 sm:p-3 rounded-xl bg-[#111c30]/25 backdrop-blur-sm border border-white/10 hover:border-sky-400/40 transition-colors group/item flex items-center gap-2">
                 <div className="w-7 h-7 sm:w-8 sm:h-8 lg:w-9 lg:h-9 rounded-lg bg-sky-500/20 text-sky-400 border border-sky-400/30 flex items-center justify-center text-xs sm:text-sm shrink-0 group-hover/item:scale-105 transition-transform">
                   <i className="fas fa-bolt" />
                 </div>
@@ -211,7 +211,7 @@ export default function AmrrHeroSection({ lang }: AmrrHeroSectionProps) {
               </div>
 
               {/* Card 2: Chimera */}
-              <div className="p-2.5 sm:p-3 rounded-xl bg-[#111c30]/80 border border-white/10 hover:border-amber-400/40 transition-colors group/item flex items-center gap-2">
+              <div className="p-2.5 sm:p-3 rounded-xl bg-[#111c30]/25 backdrop-blur-sm border border-white/10 hover:border-amber-400/40 transition-colors group/item flex items-center gap-2">
                 <div className="w-7 h-7 sm:w-8 sm:h-8 lg:w-9 lg:h-9 rounded-lg bg-amber-500/20 text-amber-400 border border-amber-400/30 flex items-center justify-center text-xs sm:text-sm shrink-0 group-hover/item:scale-105 transition-transform">
                   <i className="fas fa-tools" />
                 </div>
@@ -229,7 +229,7 @@ export default function AmrrHeroSection({ lang }: AmrrHeroSectionProps) {
               </div>
 
               {/* Card 3: iCloud */}
-              <div className="p-2.5 sm:p-3 rounded-xl bg-[#111c30]/80 border border-white/10 hover:border-indigo-400/40 transition-colors group/item flex items-center gap-2">
+              <div className="p-2.5 sm:p-3 rounded-xl bg-[#111c30]/25 backdrop-blur-sm border border-white/10 hover:border-indigo-400/40 transition-colors group/item flex items-center gap-2">
                 <div className="w-7 h-7 sm:w-8 sm:h-8 lg:w-9 lg:h-9 rounded-lg bg-indigo-500/20 text-indigo-400 border border-indigo-400/30 flex items-center justify-center text-xs sm:text-sm shrink-0 group-hover/item:scale-105 transition-transform">
                   <i className="fas fa-mobile-alt" />
                 </div>
@@ -247,7 +247,7 @@ export default function AmrrHeroSection({ lang }: AmrrHeroSectionProps) {
               </div>
 
               {/* Card 4: Borneo */}
-              <div className="p-2.5 sm:p-3 rounded-xl bg-[#111c30]/80 border border-white/10 hover:border-emerald-400/40 transition-colors group/item flex items-center gap-2">
+              <div className="p-2.5 sm:p-3 rounded-xl bg-[#111c30]/25 backdrop-blur-sm border border-white/10 hover:border-emerald-400/40 transition-colors group/item flex items-center gap-2">
                 <div className="w-7 h-7 sm:w-8 sm:h-8 lg:w-9 lg:h-9 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-400/30 flex items-center justify-center text-xs sm:text-sm shrink-0 group-hover/item:scale-105 transition-transform">
                   <i className="fas fa-microchip" />
                 </div>

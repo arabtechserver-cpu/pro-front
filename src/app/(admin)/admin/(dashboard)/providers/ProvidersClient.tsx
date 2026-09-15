@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect, useRef, useCallback, useDeferredValue, useMemo } from "react";
 import Link from "next/link";
@@ -650,7 +650,11 @@ export default function ProvidersClient() {
       const data = await res.json();
       if (res.ok && data.success) {
         setProviderServices((prev) =>
-          prev.map((s) => (s.id === service.id ? { ...s, isActive: nextActive } : s))
+          prev.map((s) =>
+            s.id === service.id || (service.dhruId && s.dhruId === service.dhruId)
+              ? { ...s, isActive: nextActive }
+              : s
+          )
         );
         showToast(nextActive ? `تم إظهار (${service.name}) للعملاء` : `تم إخفاء (${service.name}) عن العملاء`);
       } else {
@@ -1785,7 +1789,7 @@ export default function ProvidersClient() {
                                         {getProviderServiceTypeLabel(srvType)}
                                       </span>
                                       <span className="text-primary font-mono font-bold text-xs">
-                                        ${Number(srv.providerPrice || srv.price || 0).toFixed(2)}
+                                        ${Number(srv.credit ?? srv.providerPrice ?? srv.price ?? srv.originalPrice ?? 0).toFixed(2)}
                                       </span>
                                     </div>
 

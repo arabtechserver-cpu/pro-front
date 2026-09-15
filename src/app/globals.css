@@ -274,57 +274,36 @@ body {
     display: none;
   }
 
-  /* Universal Section Spotlight Utility (Smooth, unclipped ambient wash) */
+  /* Universal Section Spotlight Utility (Disabled overlay fog) */
   .section-spotlight {
     position: relative;
   }
   .section-spotlight::before {
-    content: "";
-    position: absolute;
-    top: -60px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 90%;
-    max-width: 1200px;
-    height: 480px;
-    background: radial-gradient(ellipse 75% 65% at 50% 0%, rgba(96, 165, 250, 0.16) 0%, rgba(59, 130, 246, 0.08) 45%, rgba(37, 99, 235, 0.02) 70%, transparent 85%);
-    filter: blur(60px);
-    pointer-events: none;
-    z-index: 0;
+    display: none;
   }
 
-  /* Section Header Lamp: Overhead spotlight shining down onto titles (Pure light, zero lines) */
+  /* Section Header Lamp: Pure clear header */
   .lamp-header {
     position: relative;
   }
   .lamp-header::before {
-    content: "";
-    position: absolute;
-    top: -24px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 70%;
-    max-width: 580px;
-    height: 200px;
-    background: radial-gradient(ellipse 70% 60% at 50% 0%, rgba(96, 165, 250, 0.25) 0%, rgba(59, 130, 246, 0.10) 50%, transparent 80%);
-    filter: blur(35px);
-    pointer-events: none;
-    z-index: 0;
+    display: none;
   }
   .lamp-header::after {
     display: none;
   }
 
-  /* Individual Card Lamp: Smooth dark cyber glass with ambient glow (Zero lines) */
+  /* Individual Card Lamp: Balanced Frosted Cyber Glass */
   .lamp-card,
   .card-spotlight,
   .curved-cockpit {
     position: relative;
-    background: radial-gradient(ellipse 90% 55% at 50% 0%, rgba(96, 165, 250, 0.18) 0%, rgba(59, 130, 246, 0.06) 45%, transparent 75%),
-                linear-gradient(180deg, #151f33 0%, #0e1524 100%) !important;
-    border: 1px solid rgba(148, 163, 184, 0.18) !important;
-    box-shadow: 0 10px 30px -4px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.15) !important;
-    transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    background: rgba(11, 19, 37, 0.65);
+    backdrop-filter: blur(12px) saturate(150%);
+    -webkit-backdrop-filter: blur(12px) saturate(150%);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.08);
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   .lamp-card::before,
@@ -335,8 +314,9 @@ body {
   .lamp-card:hover,
   .card-spotlight:hover,
   .curved-cockpit:hover {
+    background: rgba(15, 26, 50, 0.78);
     border-color: rgba(96, 165, 250, 0.45) !important;
-    box-shadow: 0 16px 42px -4px rgba(0, 0, 0, 0.65), 0 0 24px rgba(59, 130, 246, 0.20), inset 0 1px 1px rgba(255, 255, 255, 0.25) !important;
+    box-shadow: 0 16px 42px -4px rgba(0, 0, 0, 0.65), 0 0 24px rgba(59, 130, 246, 0.20), inset 0 1px 1px rgba(255, 255, 255, 0.15) !important;
     transform: translateY(-2px);
   }
 
@@ -384,31 +364,38 @@ body {
    Glass Cards & Panels
    ============================================================ */
 .glass-card {
-  background: #111622;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.35);
+  background: rgba(17, 22, 34, 0.7);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.45);
   transition: all 0.2s ease;
 }
 
 .glass-card:hover {
-  border-color: rgba(59, 130, 246, 0.35);
-  box-shadow: 0 12px 30px -4px rgba(0, 0, 0, 0.45);
+  border-color: rgba(59, 130, 246, 0.4);
+  box-shadow: 0 12px 30px -4px rgba(0, 0, 0, 0.55), 0 0 20px rgba(59, 130, 246, 0.15);
 }
 
 .glass-panel {
-  background: #182032;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(24, 32, 50, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .glass-card-cyan {
-  background: #111622;
-  border: 1px solid rgba(14, 165, 233, 0.2);
-  box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.35);
+  background: rgba(17, 22, 34, 0.7);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(14, 165, 233, 0.25);
+  box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.45);
   transition: all 0.2s ease;
 }
 
 .glass-card-cyan:hover {
-  border-color: rgba(14, 165, 233, 0.4);
+  border-color: rgba(14, 165, 233, 0.45);
+  box-shadow: 0 12px 30px -4px rgba(0, 0, 0, 0.55), 0 0 20px rgba(14, 165, 233, 0.2);
 }
 
 /* ============================================================

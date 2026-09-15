@@ -58,12 +58,10 @@ export default function FaqSection({ lang }: FaqSectionProps) {
   };
 
   return (
-    <section className="relative py-12 sm:py-16 md:py-20 bg-transparent text-white overflow-hidden section-spotlight">
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_40%_at_50%_50%,rgba(37,99,235,0.06),transparent)] pointer-events-none"></div>
-
+    <section className="relative py-12 sm:py-16 md:py-20 bg-transparent text-white overflow-hidden">
       <div className="w-full cyber-container relative z-10">
         {/* Section Header */}
-        <div className="lamp-header max-w-2xl mx-auto mb-8 sm:mb-12 text-center" data-aos="fade-down" suppressHydrationWarning>
+        <div className="max-w-2xl mx-auto mb-8 sm:mb-12 text-center" data-aos="fade-down" suppressHydrationWarning>
           <div className="inline-flex items-center gap-2 bg-blue-500/10 border border-blue-500/20 px-3.5 py-1 rounded-full mb-3 shadow-sm">
             <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
             <span className="text-cyan-400 font-bold text-xs uppercase tracking-wider font-mono">
@@ -91,10 +89,10 @@ export default function FaqSection({ lang }: FaqSectionProps) {
             return (
               <div
                 key={faq.id}
-                className={`lamp-card rounded-xl sm:rounded-2xl overflow-hidden shadow-lg transition-all duration-300 relative border ${
+                className={`rounded-xl sm:rounded-2xl overflow-hidden shadow-lg transition-all duration-300 relative border ${
                   isOpen
-                    ? "border-cyan-400/50 bg-[#0d1525]/90 shadow-[0_0_25px_rgba(56,189,248,0.15)]"
-                    : "border-white/10 hover:border-white/20 bg-[#0b101d]/70"
+                    ? "border-cyan-400/50 bg-[#0f203d]/75 backdrop-blur-md shadow-[0_0_25px_rgba(56,189,248,0.18)]"
+                    : "border-white/12 hover:border-cyan-400/40 bg-[#0b1426]/60 hover:bg-[#0e1c36]/75 backdrop-blur-md shadow-lg"
                 }`}
                 data-aos="fade-up"
                 data-aos-delay={idx * 100}
@@ -144,7 +142,7 @@ export default function FaqSection({ lang }: FaqSectionProps) {
                     className={`w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center border transition-all duration-300 shrink-0 ${
                       isOpen
                         ? "bg-cyan-500/20 border-cyan-400/50 text-cyan-300 rotate-45 shadow-[0_0_10px_rgba(34,211,238,0.4)]"
-                        : "bg-surface-container-high/80 border-white/10 text-slate-400 group-hover:text-white group-hover:border-white/20 rotate-0"
+                        : "bg-white/5 border-white/10 text-slate-400 group-hover:text-white group-hover:border-white/20 rotate-0"
                     }`}
                   >
                     <i className="fas fa-plus text-xs"></i>
@@ -152,7 +150,7 @@ export default function FaqSection({ lang }: FaqSectionProps) {
                 </button>
 
                 {isOpen && (
-                  <div className="px-3.5 sm:px-4.5 md:px-5 pb-4 sm:pb-5 pt-2 text-slate-300 text-xs sm:text-sm leading-relaxed border-t border-white/[0.08] bg-[#070b14]/70">
+                  <div className="px-3.5 sm:px-4.5 md:px-5 pb-4 sm:pb-5 pt-2 text-slate-300 text-xs sm:text-sm leading-relaxed border-t border-white/[0.08] bg-white/[0.02] backdrop-blur-sm">
                     <p className="border-s-2 border-cyan-400/60 ps-3 sm:ps-3.5 py-0.5">
                       {isAr ? faq.aAr : faq.aEn}
                     </p>
