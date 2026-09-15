@@ -59,7 +59,10 @@ export async function proxy(request: NextRequest) {
     }
 
     try {
-      await jwtVerify(token, new TextEncoder().encode(JWT_SECRET));
+      const { payload } = await jwtVerify(token, new TextEncoder().encode(JWT_SECRET));
+      if (payload.role !== 'admin' && payload.role !== 'super_admin') {
+        return NextResponse.redirect(new URL('/admin/login', request.url));
+      }
       return NextResponse.next();
     } catch {
       return NextResponse.redirect(new URL('/admin/login', request.url));
