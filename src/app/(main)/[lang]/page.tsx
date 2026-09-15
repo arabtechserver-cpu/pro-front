@@ -15,30 +15,30 @@ import SupportCtaSection from "@/components/SupportCtaSection";
 import NewsletterSection from "@/components/NewsletterSection";
 
 async function getHomepageConfig() {
-  const candidates = [
+  const candidates = [...new Set([
     process.env.INTERNAL_API_URL,
     "http://pro-b-i0r2xu:5000",
     "http://backend:5000",
     "http://localhost:5000",
     process.env.NEXT_PUBLIC_API_URL,
     "https://arabtechproserver.tech"
-  ].filter(Boolean) as string[];
+  ].filter(Boolean) as string[])];
 
-  for (const baseUrl of candidates) {
-    try {
+  try {
+    // The page has usable built-in defaults. Query all possible backend routes in parallel so
+    // an unavailable internal hostname cannot delay first render by several seconds.
+    return await Promise.any(candidates.map(async (baseUrl) => {
       const cleanBase = baseUrl.replace(/\/$/, "");
       const res = await fetch(`${cleanBase}/api/homepage`, {
         next: { revalidate: 60 },
-        signal: AbortSignal.timeout(1200)
+        signal: AbortSignal.timeout(900)
       });
-      if (res.ok) {
-        return await res.json();
-      }
-    } catch {
-      // try next candidate
-    }
+      if (!res.ok) throw new Error(`Homepage API returned ${res.status}`);
+      return res.json();
+    }));
+  } catch {
+    return null;
   }
-  return null;
 }
 
 export async function generateMetadata(props: { params: Promise<{ lang: Locale }> }): Promise<Metadata> {
