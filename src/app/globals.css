@@ -637,6 +637,13 @@ body {
 /* ============================================================
    Mobile Performance & Smooth Touch Scroll Optimizations
    ============================================================ */
+.homepage-static-content [data-aos] {
+  opacity: 1 !important;
+  transform: none !important;
+  transition: none !important;
+  animation: none !important;
+}
+
 @media (max-width: 768px) {
   /* Prevent smooth-scroll algorithm from conflicting with native touch momentum */
   html {
@@ -681,5 +688,4 @@ body {
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45) !important;
   }
 }
-
 

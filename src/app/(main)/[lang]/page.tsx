@@ -244,7 +244,7 @@ export default async function Home(props: { params: Promise<{ lang: Locale }> })
   }
 
   return (
-    <div className="relative flex flex-col gap-6 sm:gap-10 lg:gap-12 pb-12 sm:pb-20 overflow-x-clip">
+    <div className="homepage-static-content relative flex flex-col gap-6 sm:gap-10 lg:gap-12 pb-12 sm:pb-20 overflow-x-clip">
       {/* Cinematic Live Background Video */}
       <HeroScrollVideoBackground lang={params.lang} />
 

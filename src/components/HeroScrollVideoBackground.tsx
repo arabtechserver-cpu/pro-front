@@ -11,24 +11,25 @@ const DEFAULT_VIDEO_URL =
   "https://pub-3440f02b971d4054906dd63d89e3cdb0.r2.dev/hero-showcase.mp4";
 
 const POSTER_URL = "/videos/hero_poster.jpg";
-const DESKTOP_MEDIA_QUERY = "(min-width: 769px) and (prefers-reduced-motion: no-preference)";
+const MOBILE_SCROLL_VIDEO_URL = "/videos/hero_scrub.mp4";
+const MOTION_MEDIA_QUERY = "(prefers-reduced-motion: no-preference)";
+const MIN_SEEK_INTERVAL = 90;
 
 export default function HeroScrollVideoBackground({ lang }: HeroScrollVideoBackgroundProps) {
   const isAr = lang === "ar";
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const playPromiseRef = useRef<Promise<void> | null>(null);
   const frameRef = useRef<number | null>(null);
+  const settleTimerRef = useRef<number | null>(null);
   const lastSeekTimeRef = useRef(0);
-  const targetTimeRef = useRef(0);
 
-  // Keep the first render lightweight. On mobile the poster remains the final background,
-  // so the browser never downloads or repeatedly decodes a large video while touch-scrolling.
+  // The poster paints instantly; the video then starts syncing once its metadata is available.
   const [shouldRenderVideo, setShouldRenderVideo] = useState(false);
   const [playbackMode, setPlaybackMode] = useState<"scroll" | "auto">("scroll");
   const [isMuted, setIsMuted] = useState(true);
 
   useEffect(() => {
-    const mediaQuery = window.matchMedia(DESKTOP_MEDIA_QUERY);
+    const mediaQuery = window.matchMedia(MOTION_MEDIA_QUERY);
     const updateVideoEligibility = () => setShouldRenderVideo(mediaQuery.matches);
 
     updateVideoEligibility();
@@ -86,19 +87,31 @@ export default function HeroScrollVideoBackground({ lang }: HeroScrollVideoBackg
       return safePause;
     }
 
-    // Seeking on every animation frame was forcing mobile-class decoders to continuously
-    // discard frames. Limit seeks and only do work in response to an actual scroll/resize.
+    // Seek only after an actual scroll/resize. This keeps the video responsive without a
+    // permanent animation loop competing with the user's touch scroll.
     const syncToScroll = () => {
       frameRef.current = null;
-      if (!video.duration || Number.isNaN(video.duration) || video.seeking) return;
+      if (!video.duration || Number.isNaN(video.duration)) return;
 
       const maxScroll = Math.max(document.documentElement.scrollHeight - window.innerHeight, 1);
       const progress = Math.min(Math.max(window.scrollY / maxScroll, 0), 1);
       const target = progress * Math.max(0, video.duration - 0.05);
-      targetTimeRef.current = target;
+
+      if (video.seeking) return;
 
       const now = performance.now();
-      if (Math.abs(video.currentTime - target) < 0.12 || now - lastSeekTimeRef.current < 100) return;
+      const elapsedSinceLastSeek = now - lastSeekTimeRef.current;
+      if (Math.abs(video.currentTime - target) < 0.12) return;
+
+      if (elapsedSinceLastSeek < MIN_SEEK_INTERVAL) {
+        if (settleTimerRef.current === null) {
+          settleTimerRef.current = window.setTimeout(() => {
+            settleTimerRef.current = null;
+            scheduleSync();
+          }, MIN_SEEK_INTERVAL - elapsedSinceLastSeek);
+        }
+        return;
+      }
 
       lastSeekTimeRef.current = now;
       try {
@@ -117,8 +130,8 @@ export default function HeroScrollVideoBackground({ lang }: HeroScrollVideoBackg
     };
 
     const handleSeeked = () => {
-      // Apply the newest scroll position once the decoder is ready, rather than queueing seeks.
-      if (Math.abs(video.currentTime - targetTimeRef.current) >= 0.12) scheduleSync();
+      // Always evaluate the latest scroll position once decoding finishes.
+      scheduleSync();
     };
 
     video.pause();
@@ -134,7 +147,9 @@ export default function HeroScrollVideoBackground({ lang }: HeroScrollVideoBackg
       video.removeEventListener("seeked", handleSeeked);
       video.removeEventListener("loadedmetadata", scheduleSync);
       if (frameRef.current !== null) cancelAnimationFrame(frameRef.current);
+      if (settleTimerRef.current !== null) clearTimeout(settleTimerRef.current);
       frameRef.current = null;
+      settleTimerRef.current = null;
       safePause();
     };
   }, [playbackMode, safePause, safePlay, shouldRenderVideo]);
@@ -169,7 +184,6 @@ export default function HeroScrollVideoBackground({ lang }: HeroScrollVideoBackg
         {shouldRenderVideo && (
           <video
             ref={videoRef}
-            src={DEFAULT_VIDEO_URL}
             poster={POSTER_URL}
             loop={playbackMode === "auto"}
             muted
@@ -178,7 +192,10 @@ export default function HeroScrollVideoBackground({ lang }: HeroScrollVideoBackg
             disablePictureInPicture
             disableRemotePlayback
             className="absolute inset-0 h-full w-full object-cover object-center"
-          />
+          >
+            <source media="(max-width: 768px)" src={MOBILE_SCROLL_VIDEO_URL} type="video/mp4" />
+            <source src={DEFAULT_VIDEO_URL} type="video/mp4" />
+          </video>
         )}
 
         <div className="absolute inset-0 bg-gradient-to-b from-[#0b0f17]/25 via-[#0b1426]/15 to-[#0b0f17]/35" />
