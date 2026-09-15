@@ -26,6 +26,8 @@ export default function HeroScrollVideoBackground({ lang }: HeroScrollVideoBackg
   const targetTimeRef = useRef<number>(0);
   const rafIdRef = useRef<number | null>(null);
   const lastScrollTimeRef = useRef<number>(0);
+  const lastSeekTimeRef = useRef<number>(0);
+  const maxScrollRef = useRef<number>(1);
 
   const safePlay = useCallback(() => {
     const video = videoRef.current;
@@ -106,13 +108,24 @@ export default function HeroScrollVideoBackground({ lang }: HeroScrollVideoBackg
     video.defaultMuted = true;
     video.pause();
 
+    const updateDimensions = () => {
+      maxScrollRef.current = Math.max(
+        document.documentElement.scrollHeight - window.innerHeight,
+        1
+      );
+    };
+
     const handleLoadedMetadata = () => {
       video.currentTime = 0.01;
       video.pause();
+      updateDimensions();
     };
 
+    updateDimensions();
+    window.addEventListener("resize", updateDimensions, { passive: true });
     video.addEventListener("loadedmetadata", handleLoadedMetadata);
     return () => {
+      window.removeEventListener("resize", updateDimensions);
       video.removeEventListener("loadedmetadata", handleLoadedMetadata);
     };
   }, []);
@@ -133,14 +146,16 @@ export default function HeroScrollVideoBackground({ lang }: HeroScrollVideoBackg
     // Scroll mode: video strictly pauses until scroll events occur
     safePause();
 
-    const updateScrollTarget = () => {
-      const scrollY = window.scrollY || window.pageYOffset;
-      const maxScroll = Math.max(
+    const updateDimensions = () => {
+      maxScrollRef.current = Math.max(
         document.documentElement.scrollHeight - window.innerHeight,
         1
       );
+    };
 
-      const progress = Math.min(Math.max(scrollY / maxScroll, 0), 1);
+    const updateScrollTarget = () => {
+      const scrollY = window.scrollY || window.pageYOffset;
+      const progress = Math.min(Math.max(scrollY / maxScrollRef.current, 0), 1);
 
       if (progressTextRef.current) {
         progressTextRef.current.textContent = `${Math.round(progress * 100)}%`;
@@ -157,38 +172,47 @@ export default function HeroScrollVideoBackground({ lang }: HeroScrollVideoBackg
       updateScrollTarget();
     };
 
-    // Smooth RAF loop: active scroll plays forward, rewinds smoothly on upward scroll, pauses when idle
+    // Ultra-smooth RAF loop with decoder back-pressure protection
     const renderLoop = () => {
       if (playbackMode !== "scroll") return;
 
       const vid = videoRef.current;
       if (vid && vid.duration && !isNaN(vid.duration)) {
         const now = performance.now();
-        const isActivelyScrolling = now - lastScrollTimeRef.current < 220;
+        const isActivelyScrolling = now - lastScrollTimeRef.current < 200;
         const target = targetTimeRef.current;
         const current = vid.currentTime;
         const diff = target - current;
 
         if (isActivelyScrolling) {
-          if (diff > 0.04) {
-            // Forward scrolling: dynamically scale playback rate with scroll difference
-            if (diff > 1.5) {
-              vid.currentTime = target - 0.2;
+          if (diff > 0.08) {
+            // Forward scrolling: hardware decode playback
+            if (diff > 1.2 && !vid.seeking) {
+              vid.currentTime = target - 0.15;
             }
-            const rate = Math.min(3.0, Math.max(0.75, diff * 2.2));
+            const rate = Math.min(2.8, Math.max(0.75, diff * 2.0));
             vid.playbackRate = rate;
             safePlay();
 
             if (statusLabelRef.current) {
               statusLabelRef.current.textContent = isAr ? "تفاعل التمرير" : "SCROLLING";
             }
-          } else if (diff < -0.04) {
-            // Backward scrolling: pause forward playback and interpolate backwards smoothly
+          } else if (diff < -0.08) {
+            // Backward scrolling: pause forward playback
             safePause();
-            if (diff < -1.2) {
-              vid.currentTime = Math.max(0, target);
-            } else {
-              vid.currentTime = Math.max(0, current + (target - current) * 0.35);
+
+            // Guard against decoder overload: never seek while previous seek is decoding
+            const isDecoderBusy = vid.seeking && now - lastSeekTimeRef.current < 250;
+            if (!isDecoderBusy && now - lastSeekTimeRef.current >= 40) {
+              lastSeekTimeRef.current = now;
+              const nextTime = diff < -0.8 ? target : current + (target - current) * 0.45;
+              const boundedTime = Math.max(0, Math.min(vid.duration - 0.02, nextTime));
+
+              if (typeof vid.fastSeek === "function") {
+                vid.fastSeek(boundedTime);
+              } else {
+                vid.currentTime = boundedTime;
+              }
             }
 
             if (statusLabelRef.current) {
@@ -204,6 +228,19 @@ export default function HeroScrollVideoBackground({ lang }: HeroScrollVideoBackg
         } else {
           // User is NOT scrolling: strictly pause video
           safePause();
+
+          // Settle precisely on target when idle if slightly misaligned
+          const isDecoderBusy = vid.seeking && now - lastSeekTimeRef.current < 250;
+          if (Math.abs(diff) > 0.06 && !isDecoderBusy && now - lastSeekTimeRef.current >= 60) {
+            lastSeekTimeRef.current = now;
+            const finalTime = Math.max(0, Math.min(vid.duration - 0.02, target));
+            if (typeof vid.fastSeek === "function") {
+              vid.fastSeek(finalTime);
+            } else {
+              vid.currentTime = finalTime;
+            }
+          }
+
           if (statusLabelRef.current) {
             statusLabelRef.current.textContent = isAr ? "متزامن مع التمرير" : "SCROLL SYNC";
           }
@@ -213,11 +250,14 @@ export default function HeroScrollVideoBackground({ lang }: HeroScrollVideoBackg
       rafIdRef.current = requestAnimationFrame(renderLoop);
     };
 
+    updateDimensions();
+    window.addEventListener("resize", updateDimensions, { passive: true });
     window.addEventListener("scroll", handleScroll, { passive: true });
     updateScrollTarget();
     rafIdRef.current = requestAnimationFrame(renderLoop);
 
     return () => {
+      window.removeEventListener("resize", updateDimensions);
       window.removeEventListener("scroll", handleScroll);
       if (rafIdRef.current) cancelAnimationFrame(rafIdRef.current);
       safePause();
@@ -250,6 +290,9 @@ export default function HeroScrollVideoBackground({ lang }: HeroScrollVideoBackg
           className="absolute inset-0 w-full h-full"
           style={{
             transform: "translate3d(0, 0, 0)",
+            backfaceVisibility: "hidden",
+            WebkitBackfaceVisibility: "hidden",
+            willChange: "transform",
             opacity: 1,
           }}
         >
