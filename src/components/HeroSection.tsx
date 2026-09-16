@@ -53,7 +53,7 @@ export default function HeroSection({ lang, config }: HeroSectionProps) {
   const ArrowIcon = isAr ? ArrowLeft : ArrowRight;
 
   return (
-    <section className="relative w-full rounded-2xl sm:rounded-3xl bg-[#090e17]/80 border border-white/10 backdrop-blur-xl shadow-2xl overflow-hidden p-5 sm:p-8 lg:p-12 mb-8 sm:mb-12">
+    <section className="relative w-full bg-[#090e17]/80 border-b border-white/10 backdrop-blur-xl shadow-2xl overflow-hidden p-5 sm:px-8 lg:px-12 py-8 lg:py-12 mb-8 sm:mb-12">
       <div 
         className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_-10%,rgba(37,99,235,0.18),transparent_70%)] pointer-events-none" 
         aria-hidden="true" 
@@ -63,7 +63,7 @@ export default function HeroSection({ lang, config }: HeroSectionProps) {
         aria-hidden="true" 
       />
 
-      <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+      <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center cyber-container">
         <div className="lg:col-span-7 flex flex-col gap-4 sm:gap-6 text-start">
           <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-sky-500/10 border border-sky-400/30 text-sky-300 text-xs sm:text-sm font-semibold w-fit shadow-sm">
             <span className="relative flex h-2 w-2">

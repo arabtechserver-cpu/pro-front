@@ -21,7 +21,7 @@ export default function SupportCtaSection({
   const ArrowIcon = isAr ? ArrowLeft : ArrowRight;
 
   return (
-    <section className="w-full mb-10 sm:mb-14">
+    <section className="w-full">
       <div className="relative rounded-2xl sm:rounded-3xl p-8 sm:p-12 lg:p-16 border border-sky-400/30 bg-gradient-to-br from-[#0c1629]/90 via-[#09101c]/80 to-[#070b14]/90 backdrop-blur-xl shadow-2xl text-center overflow-hidden">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-80 h-24 bg-blue-500/15 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_40%_at_50%_50%,rgba(37,99,235,0.08),transparent_70%)] pointer-events-none" />

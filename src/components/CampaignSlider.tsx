@@ -13,7 +13,8 @@ import {
   ShieldCheck, 
   Zap, 
   Sparkles,
-  Layers
+  Layers,
+  CheckCircle2
 } from "lucide-react";
 import { Locale } from "@/i18n/config";
 
@@ -220,6 +221,26 @@ export default function CampaignSlider({ campaigns, lang }: CampaignSliderProps)
                 </div>
               </div>
             </div>
+          </div>
+
+          <div className="mt-6 pt-4 border-t border-white/10 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-400">
+            <div className="flex flex-wrap items-center gap-4 sm:gap-6">
+              <span className="flex items-center gap-1.5 text-slate-300">
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                <span>{isAr ? "موزع رسمي معتمد" : "Official Reseller"}</span>
+              </span>
+              <span className="flex items-center gap-1.5 text-slate-300">
+                <Zap className="w-3.5 h-3.5 text-sky-400 shrink-0" />
+                <span>{isAr ? "ربط فوري دون انتظار" : "Direct Server Link"}</span>
+              </span>
+              <span className="flex items-center gap-1.5 text-slate-300">
+                <ShieldCheck className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                <span>{isAr ? "حماية مالية وضمان 100%" : "100% Refund Protection"}</span>
+              </span>
+            </div>
+            <span className="text-[11px] font-mono text-cyan-400/90 font-semibold px-2.5 py-0.5 rounded-md bg-cyan-950/40 border border-cyan-500/20">
+              {isAr ? "تفعيل تلقائي متاح الآن" : "Instant Activation Ready"}
+            </span>
           </div>
         </div>
       )}

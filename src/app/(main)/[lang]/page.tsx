@@ -10,6 +10,7 @@ import ToolMarquee from "@/components/ToolMarquee";
 import CapabilitiesGrid from "@/components/CapabilitiesGrid";
 import PackagesSlider from "@/components/PackagesSlider";
 import CampaignSlider from "@/components/CampaignSlider";
+import WorkflowTrustSection from "@/components/WorkflowTrustSection";
 import FaqSection from "@/components/FaqSection";
 import SupportCtaSection from "@/components/SupportCtaSection";
 import NewsletterSection from "@/components/NewsletterSection";
@@ -233,7 +234,7 @@ export default async function Home(props: { params: Promise<{ lang: Locale }> })
       />
 
       {/* 2. Real-time Live Notice Marquee */}
-      <div className="w-full bg-[#0a0f18]/60 backdrop-blur-md border-b border-[#141d2e]/60 mb-4 sm:mb-6 relative z-20 overflow-hidden shadow-sm">
+      <div className="w-full bg-[#0a0f18]/60 backdrop-blur-md border-b border-[#141d2e]/60 relative z-20 overflow-hidden shadow-sm">
         <div className="w-full flex whitespace-nowrap overflow-hidden py-2 sm:py-2.5" dir="ltr">
           <div className="flex w-max animate-marquee hover:[animation-play-state:paused] cursor-pointer select-none text-xs sm:text-sm font-medium text-slate-300">
             <div className="flex shrink-0 items-center gap-6 sm:gap-8 px-4">
@@ -319,11 +320,11 @@ export default async function Home(props: { params: Promise<{ lang: Locale }> })
         </div>
       </div>
 
+      {/* Unified High-Performance Hero Cockpit */}
+      <HeroSection lang={params.lang} config={heroConfig} />
+
       {/* 3. Main Responsive Content Container */}
       <div className="w-full cyber-container space-y-8 sm:space-y-12">
-        {/* Unified High-Performance Hero Cockpit */}
-        <HeroSection lang={params.lang} config={heroConfig} />
-
         {/* 4 Primary Operational Service Portals */}
         <ServiceLanes lang={params.lang} config={serviceConfig} />
 
@@ -361,8 +362,8 @@ export default async function Home(props: { params: Promise<{ lang: Locale }> })
           </div>
         </section>
 
-        {/* Accordion FAQ Section */}
-        <FaqSection lang={params.lang} />
+        {/* 3-Step Instant Fulfillment & Platform Trust */}
+        <WorkflowTrustSection lang={params.lang} />
 
         {/* 24/7 VIP Support CTA */}
         <SupportCtaSection
