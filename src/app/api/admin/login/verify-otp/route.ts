@@ -4,13 +4,11 @@ import { cookies } from "next/headers";
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json().catch(() => ({}));
-    const username = body.username || body.email;
-    const password = body.password;
-    const turnstileToken = body["cf-turnstile-response"] || body.turnstileToken;
+    const { challengeToken, otp } = body;
 
-    if (!username || !password) {
+    if (!challengeToken || !otp) {
       return NextResponse.json(
-        { success: false, message: "اسم المستخدم وكلمة المرور مطلوبان" },
+        { success: false, message: "رمز التحقق ومعرف الجلسة مطلوبان" },
         { status: 400 }
       );
     }
@@ -28,30 +26,17 @@ export async function POST(request: NextRequest) {
 
     for (const apiUrl of uniqueUrls) {
       try {
-        const res = await fetch(`${apiUrl}/api/auth/login`, {
+        const res = await fetch(`${apiUrl}/api/auth/admin/verify-otp`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            email: username,
-            password,
-            "cf-turnstile-response": turnstileToken || "cf-turnstile-client-fallback"
-          }),
+          body: JSON.stringify({ challengeToken, otp }),
           cache: "no-store"
         });
 
         if (res.ok) {
           const data = await res.json();
 
-          if (data.success && data.requireOtp) {
-            return NextResponse.json({
-              success: true,
-              requireOtp: true,
-              challengeToken: data.challengeToken,
-              message: data.message || "يرجى إدخال رمز التحقق (OTP) المرسل إلى تيليجرام"
-            });
-          }
-
-          if (data.success && data.user && ["admin", "super_admin"].includes(data.user.role)) {
+          if (data.success && data.token && data.user && ["admin", "super_admin"].includes(data.user.role)) {
             const cookieStore = await cookies();
             cookieStore.set({
               name: "admin_token",
@@ -59,14 +44,14 @@ export async function POST(request: NextRequest) {
               httpOnly: true,
               secure: process.env.NODE_ENV === "production",
               sameSite: "lax",
-              maxAge: 60 * 60 * 12, // 12 Hours Session Limit
+              maxAge: 60 * 60 * 12,
               path: "/"
             });
             return NextResponse.json({ success: true, token: data.token, user: data.user });
           } else {
             return NextResponse.json(
-              { success: false, message: data.error || data.message || "ليس لديك صلاحيات الدخول للوحة التحكم" },
-              { status: 403 }
+              { success: false, message: data.error || data.message || "رمز التحقق غير صحيح" },
+              { status: 400 }
             );
           }
         } else {
@@ -76,17 +61,17 @@ export async function POST(request: NextRequest) {
           }
         }
       } catch {
-        // Continue to next candidate URL
+        // Try next candidate URL
       }
     }
 
     return NextResponse.json(
-      { success: false, message: lastErrorMessage || "تعذر الاتصال بخادم الباك إند، تأكد من تشغيل السيرفر" },
+      { success: false, message: lastErrorMessage || "تعذر التحقق من الكود، تأكد من اتصال السيرفر" },
       { status: 502 }
     );
   } catch (err: any) {
     return NextResponse.json(
-      { success: false, message: "حدث خطأ أثناء معالجة تسجيل الدخول" },
+      { success: false, message: "حدث خطأ أثناء التحقق من الرمز" },
       { status: 500 }
     );
   }

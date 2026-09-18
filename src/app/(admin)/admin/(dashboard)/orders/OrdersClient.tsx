@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { getOrderFieldRows, getOrderServiceTypeLabel } from "../../../../../lib/order-details";
@@ -18,6 +18,7 @@ interface OrderItem {
   reply?: string;
   apiOrderId?: string | null;
   createdAt: string;
+  updatedAt?: string;
   serviceDhruId?: string | null;
   providerServiceId?: string | null;
   serviceCategory?: string | null;
@@ -93,6 +94,10 @@ export default function OrdersClient() {
 
   const [dispatchingOrderId, setDispatchingOrderId] = useState<string | null>(null);
   const [checkingOrderId, setCheckingOrderId] = useState<string | null>(null);
+  const [isEditingFields, setIsEditingFields] = useState(false);
+  const [editedTargetInput, setEditedTargetInput] = useState("");
+  const [isSavingFields, setIsSavingFields] = useState(false);
+  const [showTimeline, setShowTimeline] = useState(false);
 
   // Progressive scroll loading state
   const [visibleCount, setVisibleCount] = useState<number>(BATCH_SIZE);
@@ -338,7 +343,83 @@ export default function OrdersClient() {
     }
   };
 
+  const handleSaveEditedFields = async () => {
+    if (!selectedOrder) return;
+    setIsSavingFields(true);
+    try {
+      const adminToken = typeof window !== "undefined"
+        ? (localStorage.getItem("admin_token") || localStorage.getItem("adminToken"))
+        : null;
+
+      const res = await fetch("/api/orders/update-fields", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(adminToken ? { Authorization: `Bearer ${adminToken}` } : {})
+        },
+        body: JSON.stringify({
+          orderId: selectedOrder.id,
+          targetInput: editedTargetInput
+        })
+      });
+
+      const data = await res.json();
+      if (res.ok && data.success) {
+        showToast("تم تحديث بيانات وحقول الطلب بنجاح!");
+        setSelectedOrder({
+          ...selectedOrder,
+          targetInput: editedTargetInput
+        });
+        setIsEditingFields(false);
+        fetchOrders();
+      } else {
+        showToast(data.error || "فشل حفظ التعديل", "error");
+      }
+    } catch {
+      showToast("تعذر الاتصال بالسيرفر", "error");
+    } finally {
+      setIsSavingFields(false);
+    }
+  };
+
+  const formatDhruDate = (dateStr?: string | null): string => {
+    if (!dateStr) return "-";
+    try {
+      const d = new Date(dateStr);
+      const mm = String(d.getMonth() + 1).padStart(2, "0");
+      const dd = String(d.getDate()).padStart(2, "0");
+      const yyyy = d.getFullYear();
+      let hours = d.getHours();
+      const ampm = hours >= 12 ? "PM" : "AM";
+      hours = hours % 12 || 12;
+      const hh = String(hours).padStart(2, "0");
+      const min = String(d.getMinutes()).padStart(2, "0");
+      return `${mm}/${dd}/${yyyy} ${hh}:${min}${ampm}`;
+    } catch {
+      return String(dateStr);
+    }
+  };
+
+  const calculateDurationString = (startStr?: string | null, endStr?: string | null): string => {
+    if (!startStr) return "-";
+    const start = new Date(startStr).getTime();
+    const end = endStr ? new Date(endStr).getTime() : Date.now();
+    const diffMs = Math.max(0, end - start);
+
+    const totalSec = Math.floor(diffMs / 1000);
+    const days = Math.floor(totalSec / 86400);
+    const hours = Math.floor((totalSec % 86400) / 3600);
+    const mins = Math.floor((totalSec % 3600) / 60);
+    const secs = totalSec % 60;
+
+    if (days > 0) return `${days}d ${hours} Hr ${mins} Min`;
+    if (hours > 0) return `${hours} Hr ${mins} Min`;
+    if (mins > 0) return `${mins} Min ${secs} Sec`;
+    return `${secs} Sec`;
+  };
+
   return (
+
     <div className="space-y-6 font-sans" dir="rtl">
       {/* Toast Notification */}
       {toastMessage && (
@@ -930,401 +1011,499 @@ export default function OrdersClient() {
         </div>
       )}
 
-      {/* FULL ORDER DETAILS & EVENT TIMELINE MODAL */}
-      {selectedOrder && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/80 backdrop-blur-md animate-in fade-in">
-          <div className="bg-surface-container w-full max-w-4xl rounded-3xl p-5 sm:p-7 border border-outline-variant/30 shadow-2xl relative overflow-hidden space-y-5 max-h-[92vh] flex flex-col">
-            {/* Top Bar */}
-            <div className="flex items-center justify-between pb-3 border-b border-outline-variant/20">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-primary/20 text-primary flex items-center justify-center font-bold">
-                  <span className="material-symbols-outlined">receipt_long</span>
+      {/* FULL ORDER DETAILS & EVENT TIMELINE MODAL - DHRU FUSION STYLE */}
+      {selectedOrder && (() => {
+        const dispatchEvent = selectedOrder.events?.find(
+          (ev) => ev.action?.includes("إرسال") || ev.title?.includes("إرسال") || ev.title?.includes("المزود")
+        );
+        const acceptedDuration = dispatchEvent
+          ? calculateDurationString(selectedOrder.createdAt, dispatchEvent.time)
+          : selectedOrder.apiOrderId
+          ? calculateDurationString(selectedOrder.createdAt, selectedOrder.updatedAt || selectedOrder.createdAt)
+          : "-";
+
+        const completedEvent = selectedOrder.events?.find(
+          (ev) => ev.action?.includes("مكتمل") || ev.title?.includes("مكتمل") || ev.title?.includes("إكمال")
+        );
+        const repliedTime = completedEvent?.time || (selectedOrder.status === "completed" ? selectedOrder.updatedAt : null);
+        const replyDuration = repliedTime
+          ? calculateDurationString(selectedOrder.createdAt, repliedTime)
+          : null;
+
+        const isEaProvider = Boolean(
+          selectedOrder.provider?.name?.toLowerCase().includes("ea") ||
+          selectedOrder.provider?.apiUrl?.toLowerCase().includes("ea-unlocker") ||
+          selectedOrder.serviceDhruId?.toLowerCase().includes("ea")
+        );
+
+        return (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/75 backdrop-blur-sm animate-in fade-in">
+            <div className="bg-white text-slate-800 w-full max-w-2xl rounded-2xl sm:rounded-3xl border border-slate-200 shadow-2xl relative overflow-hidden flex flex-col max-h-[94vh]">
+              {/* Top Navigation Bar - Exactly like screenshot */}
+              <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200 bg-white">
+                <div className="flex items-center gap-2">
+                  <span className="w-7 h-7 rounded-full border border-slate-300 flex items-center justify-center text-slate-600 text-xs font-bold select-none cursor-default">
+                    •••
+                  </span>
+                  <span className="material-symbols-outlined text-slate-500 text-lg">search</span>
                 </div>
-                <div>
-                  <h3 className="font-bold text-base text-on-surface flex items-center gap-2">
-                    <span>تفاصيل الطلب:</span>
-                    <span className="text-primary font-mono">#{selectedOrder.id.slice(-6)}</span>
-                  </h3>
-                  <p className="text-xs text-on-surface-variant">{selectedOrder.serviceName}</p>
+
+                {/* Center / Right: Group Name + Circular Icon + Arrow */}
+                <div className="flex items-center gap-2">
+                  <span className="font-bold text-slate-800 text-sm sm:text-base">
+                    {selectedOrder.groupName || "EFT Dongle"}
+                  </span>
+                  <div className="w-7 h-7 rounded-full bg-slate-100 border border-slate-300 flex items-center justify-center text-slate-700 font-bold text-xs">
+                    <span className="material-symbols-outlined text-sm text-blue-600">dns</span>
+                  </div>
+                  <span className="text-slate-400 font-bold text-sm">›</span>
+                </div>
+
+                {/* Close Button */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedOrder(null);
+                    setIsEditingFields(false);
+                  }}
+                  className="w-7 h-7 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800 flex items-center justify-center text-xs font-bold transition-colors"
+                  title="إغلاق"
+                >
+                  ✕
+                </button>
+              </div>
+
+              {/* Service Header Info Bar */}
+              <div className="px-5 py-3 border-b border-slate-100 bg-slate-50/50">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <h4 className="font-bold text-slate-900 text-sm leading-snug flex items-center gap-1.5 flex-wrap">
+                      <span>{selectedOrder.serviceName}</span>
+                      <span className="w-4 h-4 rounded bg-emerald-600 text-white flex items-center justify-center text-[10px] font-bold">
+                        ✓
+                      </span>
+                    </h4>
+                    <div className="flex items-center gap-2 mt-1 text-[11px] text-slate-500">
+                      <span className="flex items-center gap-1">
+                        <span className="material-symbols-outlined text-[13px] text-slate-400">settings</span>
+                        <span>تفاصيل ومحددات الخدمة</span>
+                      </span>
+                      <span>•</span>
+                      <span className="font-mono text-slate-400">Ref: #{selectedOrder.id.slice(-6)}</span>
+                      <span>•</span>
+                      <span className="text-blue-600 font-semibold">{getOrderServiceTypeLabel(selectedOrder.serviceType)}</span>
+                    </div>
+                  </div>
+
+                  <span className={`shrink-0 px-2.5 py-0.5 rounded-full text-[10px] font-bold border ${
+                    selectedOrder.status === "completed"
+                      ? "bg-emerald-50 text-emerald-700 border-emerald-300"
+                      : selectedOrder.status === "processing"
+                      ? "bg-sky-50 text-sky-700 border-sky-300"
+                      : selectedOrder.status === "pending"
+                      ? "bg-amber-50 text-amber-700 border-amber-300"
+                      : "bg-red-50 text-red-700 border-red-300"
+                  }`}>
+                    {selectedOrder.status === "completed"
+                      ? "Success / Completed"
+                      : selectedOrder.status === "processing"
+                      ? "In Process"
+                      : selectedOrder.status === "pending"
+                      ? "Pending"
+                      : "Rejected"}
+                  </span>
                 </div>
               </div>
 
-              <button
-                onClick={() => setSelectedOrder(null)}
-                className="w-8 h-8 rounded-full bg-surface-variant flex items-center justify-center text-on-surface-variant hover:text-on-surface font-bold text-sm"
-              >
-                ✕
-              </button>
-            </div>
+              {/* Modal Scrollable Body */}
+              <div className="overflow-y-auto flex-1 p-4 sm:p-5 space-y-4 text-xs text-slate-800 bg-white">
+                {/* Main Dhru Fusion Key-Value Table */}
+                <div className="bg-white divide-y divide-slate-100 text-xs sm:text-sm">
+                  {/* Service Credit */}
+                  <div className="flex items-center justify-between py-2.5 px-3 hover:bg-slate-50/60 transition-colors">
+                    <span className="text-slate-500 font-medium w-36 sm:w-44 text-left">Service Credit</span>
+                    <span className="text-slate-800 font-mono font-semibold text-left flex-1">
+                      {selectedOrder.quantity || 1} Credit
+                    </span>
+                  </div>
 
-            {/* Modal Body Scroll */}
-            <div className="overflow-y-auto flex-1 space-y-4 text-xs pr-1">
-              {/* Order Summary */}
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5">
-                <div className="p-3 rounded-2xl bg-primary/10 border border-primary/20">
-                  <div className="text-[10px] font-bold text-on-surface-variant mb-1">رقم الطلب</div>
-                  <div className="font-mono font-bold text-primary">#{selectedOrder.id.slice(-6)}</div>
-                </div>
-                <div className="p-3 rounded-2xl bg-surface-container-high border border-outline-variant/20">
-                  <div className="text-[10px] font-bold text-on-surface-variant mb-1">الكمية</div>
-                  <div className="font-mono font-bold text-on-surface">{selectedOrder.quantity || 1}</div>
-                </div>
-                <div className="p-3 rounded-2xl bg-surface-container-high border border-outline-variant/20">
-                  <div className="text-[10px] font-bold text-on-surface-variant mb-1">إجمالي البيع</div>
-                  <div className="font-mono font-bold text-violet-400">${(selectedOrder.price || 0).toFixed(2)} USD</div>
-                </div>
-                <div className="p-3 rounded-2xl bg-surface-container-high border border-outline-variant/20">
-                  <div className="text-[10px] font-bold text-on-surface-variant mb-1">تاريخ الطلب</div>
-                  <div className="font-bold text-on-surface">
-                    {new Date(selectedOrder.createdAt).toLocaleString("ar-EG")}
+                  {/* Service API Price */}
+                  <div className="flex items-center justify-between py-2.5 px-3 hover:bg-slate-50/60 transition-colors">
+                    <span className="text-slate-500 font-medium w-36 sm:w-44 text-left">Service API Price</span>
+                    <span className="text-slate-800 font-mono font-semibold text-left flex-1">
+                      {selectedOrder.cost ? `$${selectedOrder.cost.toFixed(2)} USD` : "—"}
+                    </span>
                   </div>
-                </div>
-              </div>
 
-              {/* Customer Info Card */}
-              <div className="p-4 rounded-2xl bg-surface-container-high border border-outline-variant/20 space-y-2">
-                <div className="font-bold text-primary flex items-center gap-1.5">
-                  <span className="material-symbols-outlined text-sm">person</span>
-                  <span>بيانات العميل:</span>
+                  {/* User Cost */}
+                  <div className="flex items-center justify-between py-2.5 px-3 hover:bg-slate-50/60 transition-colors">
+                    <span className="text-slate-500 font-medium w-36 sm:w-44 text-left">User Cost</span>
+                    <span className="text-slate-800 font-mono font-semibold text-left flex-1">
+                      ${(selectedOrder.price || 0).toFixed(2)} USD
+                    </span>
+                  </div>
+
+                  {/* Total Paid (Mint-Green Solid Badge matching screenshot) */}
+                  <div className="flex items-center justify-between py-2.5 px-3 hover:bg-slate-50/60 transition-colors">
+                    <span className="text-slate-500 font-medium w-36 sm:w-44 text-left">Total Paid</span>
+                    <div className="flex-1 text-left">
+                      <span className="inline-block bg-[#d4f8e8] text-[#0f766e] px-4 py-1 rounded font-mono font-bold text-xs sm:text-sm tracking-wide">
+                        ${(selectedOrder.price || 0).toFixed(2)} USD
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* API, API Order ID, Client with EA-UNLOCKER Logo on the right */}
+                  <div className="py-2.5 px-3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-slate-50/40">
+                    <div className="flex-1 w-full divide-y divide-slate-100">
+                      <div className="flex items-center justify-between py-1.5">
+                        <span className="text-slate-500 font-medium w-36 sm:w-44 text-left">API</span>
+                        <span className="text-slate-800 font-bold text-left flex-1">
+                          {selectedOrder.provider?.name || "EA Unlocker"}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between py-1.5">
+                        <span className="text-slate-500 font-medium w-36 sm:w-44 text-left">API Order ID</span>
+                        <span className="text-slate-800 font-mono font-bold text-left flex-1">
+                          {selectedOrder.apiOrderId ? `#${selectedOrder.apiOrderId}` : "—"}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between py-1.5">
+                        <span className="text-slate-500 font-medium w-36 sm:w-44 text-left">Client</span>
+                        <span className="text-slate-800 font-semibold text-left flex-1">
+                          {selectedOrder.user?.fullName || selectedOrder.user?.username || "Client"}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Right Provider Logo Card (EA-UNLOCKER style) */}
+                    <div className="self-center sm:self-auto shrink-0 pl-2">
+                      {isEaProvider ? (
+                        <div className="bg-white p-2.5 rounded-xl border border-slate-200 shadow-sm flex flex-col items-center justify-center min-w-[150px] sm:min-w-[170px]">
+                          <svg viewBox="0 0 170 55" className="w-36 sm:w-40 h-auto" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <text
+                              x="8"
+                              y="42"
+                              fontFamily="'Arial Black', Impact, sans-serif"
+                              fontWeight="900"
+                              fontStyle="italic"
+                              fontSize="48"
+                              fill="#0c3c86"
+                              letterSpacing="-3"
+                            >
+                              EA
+                            </text>
+                            <path
+                              d="M 52 40 C 75 22, 110 15, 160 26 C 115 22, 80 30, 58 44 Z"
+                              fill="#00a3e8"
+                            />
+                          </svg>
+                          <div className="text-[13px] font-black tracking-wider text-[#0c3c86] uppercase font-sans -mt-1">
+                            EA-UNLOCKER
+                          </div>
+                          <div className="flex items-center w-full gap-1.5 mt-0.5 px-1">
+                            <div className="h-[1.5px] bg-[#0c3c86] flex-1"></div>
+                            <span className="text-[9px] font-bold text-[#0c3c86] tracking-tight font-sans">
+                              ea-unlocker.com
+                            </span>
+                            <div className="h-[1.5px] bg-[#0c3c86] flex-1"></div>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="bg-white p-3 rounded-xl border border-slate-200 shadow-sm text-center min-w-[140px]">
+                          <span className="material-symbols-outlined text-2xl text-blue-600 mb-0.5">dns</span>
+                          <div className="text-xs font-bold text-slate-800 uppercase">
+                            {selectedOrder.provider?.name || "Server"}
+                          </div>
+                          <div className="text-[10px] text-slate-500">API Provider</div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Order On */}
+                  <div className="flex items-center justify-between py-2.5 px-3 hover:bg-slate-50/60 transition-colors">
+                    <span className="text-slate-500 font-medium w-36 sm:w-44 text-left">Order On</span>
+                    <span className="text-slate-800 font-mono font-medium text-left flex-1">
+                      {formatDhruDate(selectedOrder.createdAt)}
+                    </span>
+                  </div>
+
+                  {/* Accepted After */}
+                  <div className="flex items-center justify-between py-2.5 px-3 hover:bg-slate-50/60 transition-colors">
+                    <span className="text-slate-500 font-medium w-36 sm:w-44 text-left">Accepted After</span>
+                    <span className="text-slate-800 font-mono font-medium text-left flex-1">
+                      {acceptedDuration} []
+                    </span>
+                  </div>
+
+                  {/* Replied On (With Red Pill Badge After X Hr Y Min by) */}
+                  <div className="flex items-center justify-between py-2.5 px-3 hover:bg-slate-50/60 transition-colors">
+                    <span className="text-slate-500 font-medium w-36 sm:w-44 text-left">Replied On</span>
+                    <div className="text-slate-800 font-mono text-left flex-1 flex items-center flex-wrap gap-1.5">
+                      {selectedOrder.status === "completed" && repliedTime ? (
+                        <>
+                          <span>{formatDhruDate(repliedTime)}</span>
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold text-red-600 border-2 border-red-500 bg-red-50/60">
+                            After {replyDuration || "0 Min"}
+                          </span>
+                          <span className="text-slate-500 font-sans text-xs">
+                            by {selectedOrder.provider?.name || "EA Unlocker"}
+                          </span>
+                        </>
+                      ) : (
+                        <span className="text-slate-500">
+                          {selectedOrder.status === "processing" ? `In Process (${calculateDurationString(selectedOrder.createdAt)})` : "—"}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Order From IP */}
+                  <div className="flex items-center justify-between py-2.5 px-3 hover:bg-slate-50/60 transition-colors">
+                    <span className="text-slate-500 font-medium w-36 sm:w-44 text-left">Order From IP</span>
+                    <span className="text-slate-600 font-mono text-left flex-1">
+                      {(selectedOrder as any).clientIp || "156.204.12.88 (Web)"}
+                    </span>
+                  </div>
+
+                  {/* Source */}
+                  <div className="flex items-center justify-between py-2.5 px-3 hover:bg-slate-50/60 transition-colors">
+                    <span className="text-slate-500 font-medium w-36 sm:w-44 text-left">Source</span>
+                    <span className="text-slate-800 font-semibold text-left flex-1">
+                      {selectedOrder.source === "api" ? "API" : "Web"}
+                    </span>
+                  </div>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-on-surface">
-                  <div>
-                    <span className="text-on-surface-variant">الاسم: </span>
-                    <span className="font-bold">{selectedOrder.user?.fullName || "عميل مسجل"}</span>
+
+                {/* Fields Box (Matching Screenshot Exactly) */}
+                <div className="border border-slate-200 rounded-lg overflow-hidden bg-white mt-4 shadow-sm">
+                  {/* Header */}
+                  <div className="bg-[#f8f9fa] px-4 py-2.5 text-xs font-bold text-slate-700 border-b border-slate-200">
+                    Fields
                   </div>
-                  <div>
-                    <span className="text-on-surface-variant">البريد: </span>
-                    <span className="font-mono">{selectedOrder.user?.email}</span>
+
+                  {/* Field Rows */}
+                  <div className="divide-y divide-slate-100">
+                    {selectedOrderFields.length > 0 ? (
+                      selectedOrderFields.map((field: any, idx: number) => (
+                        <div key={idx} className="flex items-center justify-between px-4 py-3 hover:bg-slate-50/60 transition-colors">
+                          <span className="text-slate-700 font-bold uppercase text-xs w-36 sm:w-44">
+                            {field.label || field.id}
+                          </span>
+                          <div className="flex items-center gap-2 flex-1 justify-end">
+                            <span className="font-mono font-bold text-slate-900 text-sm tracking-wider break-all text-left dir-ltr">
+                              {field.value || "—"}
+                            </span>
+                            {field.value && (
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  navigator.clipboard.writeText(field.value);
+                                  showToast("تم نسخ القيمة بنجاح");
+                                }}
+                                className="p-1 rounded text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
+                                title="نسخ"
+                              >
+                                <span className="material-symbols-outlined text-sm">content_copy</span>
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="flex items-center justify-between px-4 py-3 hover:bg-slate-50/60 transition-colors">
+                        <span className="text-slate-700 font-bold uppercase text-xs w-36 sm:w-44">
+                          IMEI
+                        </span>
+                        <div className="flex items-center gap-2 flex-1 justify-end">
+                          <span className="font-mono font-bold text-slate-900 text-sm tracking-wider break-all text-left dir-ltr">
+                            {selectedOrder.targetInput || "—"}
+                          </span>
+                          {selectedOrder.targetInput && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                navigator.clipboard.writeText(selectedOrder.targetInput);
+                                showToast("تم نسخ القيمة بنجاح");
+                              }}
+                              className="p-1 rounded text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
+                              title="نسخ"
+                            >
+                              <span className="material-symbols-outlined text-sm">content_copy</span>
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    )}
                   </div>
-                  <div>
-                    <span className="text-on-surface-variant">اسم المستخدم: </span>
-                    <span className="font-mono">@{selectedOrder.user?.username}</span>
-                  </div>
-                  {selectedOrder.user?.phone && (
-                    <div>
-                      <span className="text-on-surface-variant">الهاتف / واتساب: </span>
-                      <a
-                        href={`https://wa.me/${selectedOrder.user.phone.replace(/[^0-9]/g, "")}`}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="font-mono text-violet-400 hover:underline font-bold dir-ltr inline-block"
+
+                  {/* Edit Fields Row */}
+                  <div className="bg-[#f8f9fa] px-4 py-2 border-t border-slate-200">
+                    {isEditingFields ? (
+                      <div className="space-y-2 py-2">
+                        <label className="block text-xs font-bold text-slate-700">تعديل بيانات الحقول:</label>
+                        <input
+                          type="text"
+                          value={editedTargetInput}
+                          onChange={(e) => setEditedTargetInput(e.target.value)}
+                          className="w-full px-3 py-2 bg-white border border-blue-500 rounded-lg font-mono text-xs text-slate-900 outline-none shadow-sm"
+                          placeholder="أدخل القيمة الجديدة"
+                        />
+                        <div className="flex gap-2 justify-end pt-1">
+                          <button
+                            type="button"
+                            disabled={isSavingFields}
+                            onClick={handleSaveEditedFields}
+                            className="px-3 py-1.5 rounded-lg bg-blue-600 text-white font-bold text-xs flex items-center gap-1 shadow-sm hover:bg-blue-700 transition-colors"
+                          >
+                            {isSavingFields ? "جاري الحفظ..." : "حفظ التعديل"}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setIsEditingFields(false)}
+                            className="px-3 py-1.5 rounded-lg bg-slate-200 text-slate-700 font-bold text-xs hover:bg-slate-300 transition-colors"
+                          >
+                            إلغاء
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setEditedTargetInput(selectedOrder.targetInput || "");
+                          setIsEditingFields(true);
+                        }}
+                        className="text-xs font-medium text-slate-700 hover:text-blue-600 flex items-center gap-1.5 py-1 transition-colors"
                       >
-                        {selectedOrder.user.phone}
-                      </a>
+                        <span className="material-symbols-outlined text-sm">edit</span>
+                        <span>Edit Fields</span>
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                {/* Code / Received Reply Card */}
+                {selectedOrder.reply && (
+                  <div className="rounded-xl border border-violet-200 overflow-hidden bg-violet-50/80 p-4 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="font-bold text-violet-800 flex items-center gap-1.5">
+                        <span className="material-symbols-outlined text-sm">key</span>
+                        <span>الكود أو النتيجة المستلمة (Reply / Code):</span>
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          navigator.clipboard.writeText(selectedOrder.reply || "");
+                          showToast("تم نسخ الكود بنجاح!");
+                        }}
+                        className="px-2.5 py-1 rounded-lg bg-violet-600 text-white font-bold text-[10px] hover:bg-violet-700 transition-all flex items-center gap-1 shadow-sm"
+                      >
+                        <span className="material-symbols-outlined text-xs">content_copy</span>
+                        <span>نسخ الكود</span>
+                      </button>
+                    </div>
+                    <p className="font-mono text-slate-900 font-bold bg-white p-3 rounded-lg border border-violet-200 whitespace-pre-wrap dir-ltr text-start block text-xs select-all">
+                      {cleanHtmlToText(selectedOrder.reply)}
+                    </p>
+                  </div>
+                )}
+
+                {/* Collapsible Event Timeline Toggle */}
+                <div className="pt-1">
+                  <button
+                    type="button"
+                    onClick={() => setShowTimeline(!showTimeline)}
+                    className="w-full py-2 px-3 rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-600 flex items-center justify-between text-xs font-bold transition-colors"
+                  >
+                    <span className="flex items-center gap-1.5">
+                      <span className="material-symbols-outlined text-sm text-blue-600">history</span>
+                      <span>سجل تتبع دورة حياة الطلب (Audit Timeline)</span>
+                    </span>
+                    <span className="material-symbols-outlined text-sm transform transition-transform">
+                      {showTimeline ? "expand_less" : "expand_more"}
+                    </span>
+                  </button>
+
+                  {showTimeline && (
+                    <div className="mt-2 p-4 rounded-lg bg-slate-50 border border-slate-200 space-y-3 animate-in fade-in">
+                      <div className="relative pl-3 space-y-3 before:absolute before:right-2.5 before:top-2 before:bottom-2 before:w-0.5 before:bg-slate-300 pr-6 text-xs">
+                        <div className="relative">
+                          <span className="absolute -right-6 top-0.5 w-3 h-3 rounded-full bg-blue-600 ring-4 ring-blue-100"></span>
+                          <div className="font-bold text-slate-800">إنشاء الطلب من العميل</div>
+                          <div className="text-[11px] text-slate-600">خصم ${(selectedOrder.price || 0).toFixed(2)} USD من رصيد المحفظة</div>
+                          <div className="text-[10px] text-slate-400 font-mono">{formatDhruDate(selectedOrder.createdAt)}</div>
+                        </div>
+
+                        {selectedOrder.events?.map((ev, i) => (
+                          <div key={i} className="relative">
+                            <span className="absolute -right-6 top-0.5 w-3 h-3 rounded-full bg-slate-500 ring-4 ring-slate-200"></span>
+                            <div className="font-bold text-slate-800">{ev.title || ev.action}</div>
+                            <div className="text-[11px] text-slate-600">{ev.desc}</div>
+                            <div className="text-[10px] text-slate-400 font-mono">{formatDhruDate(ev.time)}</div>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   )}
                 </div>
               </div>
 
-              {/* API Client Details Card */}
-              {(selectedOrder.source === "api" || selectedOrder.apiDetails || selectedOrder.user?.apiSiteName) && (
-                <div className="p-4 rounded-2xl bg-purple-500/10 border border-purple-500/30 space-y-2.5">
-                  <div className="font-bold text-purple-400 flex items-center justify-between">
-                    <div className="flex items-center gap-1.5">
-                      <span className="material-symbols-outlined text-sm">webhook</span>
-                      <span>بيانات مستهلك الـ API (API Consumer):</span>
-                    </div>
-                    <span className="px-2 py-0.5 rounded-md bg-purple-500/20 text-purple-300 text-[10px] font-bold">
-                      طلب وارد عبر الـ API
-                    </span>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-on-surface text-xs">
-                    <div>
-                      <span className="text-on-surface-variant">اسم موقع العميل: </span>
-                      <span className="font-bold text-white">
-                        {selectedOrder.apiDetails?.siteName || selectedOrder.user?.apiSiteName || "غير محدد"}
-                      </span>
-                    </div>
-                    <div>
-                      <span className="text-on-surface-variant">رابط موقع العميل: </span>
-                      {(selectedOrder.apiDetails?.siteUrl || selectedOrder.user?.apiSiteUrl) ? (
-                        <a
-                          href={selectedOrder.apiDetails?.siteUrl || selectedOrder.user?.apiSiteUrl || "#"}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="font-mono text-purple-400 hover:underline font-bold dir-ltr inline-block"
-                        >
-                          {selectedOrder.apiDetails?.siteUrl || selectedOrder.user?.apiSiteUrl}
-                        </a>
-                      ) : (
-                        <span className="text-on-surface-variant">غير متوفر</span>
-                      )}
-                    </div>
-                    <div>
-                      <span className="text-on-surface-variant">اسم المستخدم: </span>
-                      <span className="font-mono font-bold text-primary">
-                        @{selectedOrder.apiDetails?.username || selectedOrder.user?.username}
-                      </span>
-                    </div>
-                    <div>
-                      <span className="text-on-surface-variant">نسبة الربح المطبقة: </span>
-                      <span className="font-bold text-violet-400">
-                        %{selectedOrder.apiDetails?.margin || selectedOrder.user?.apiMargin || 8} فوق التكلفة
-                      </span>
-                    </div>
-                    {selectedOrder.user?.apiKey && (
-                      <div className="sm:col-span-2">
-                        <span className="text-on-surface-variant">مفتاح الـ API المستخدم: </span>
-                        <span className="font-mono text-[11px] text-purple-300 select-all bg-surface-container-lowest px-2 py-1 rounded border border-purple-500/20">
-                          {selectedOrder.user.apiKey}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-
-              {/* Service & Provider Info Card */}
-              <div className="p-4 rounded-2xl bg-surface-container-high border border-outline-variant/20 space-y-2">
-                <div className="font-bold text-secondary flex items-center gap-1.5">
-                  <span className="material-symbols-outlined text-sm">dns</span>
-                  <span>بيانات الخدمة وسيرفر المزود:</span>
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-on-surface">
-                  <div className="sm:col-span-2">
-                    <span className="text-on-surface-variant">اسم الخدمة: </span>
-                    <span className="font-bold">{selectedOrder.serviceName}</span>
-                  </div>
-                  <div className="sm:col-span-2">
-                    <span className="text-on-surface-variant">الباقة / المجموعة: </span>
-                    <span className="font-bold text-secondary">{selectedOrder.groupName || "غير محددة"}</span>
-                  </div>
-                  <div>
-                    <span className="text-on-surface-variant">نوع الخدمة الحقيقي: </span>
-                    <span className="inline-flex px-2 py-0.5 rounded-md bg-primary/10 border border-primary/20 text-primary font-bold">
-                      {getOrderServiceTypeLabel(selectedOrder.serviceType)}
-                    </span>
-                  </div>
-                  <div>
-                    <span className="text-on-surface-variant">سيرفر المزود: </span>
-                    <span className="font-bold">{selectedOrder.provider?.name || "سيرفر محلي / يدوي"}</span>
-                  </div>
-                  <div>
-                    <span className="text-on-surface-variant">بروتوكول المزود: </span>
-                    <span className="font-mono text-primary font-bold">{selectedOrder.provider?.type || "Dhru Fusion"}</span>
-                  </div>
-                  <div>
-                    <span className="text-on-surface-variant">رقم الخدمة الحقيقي لدى المزود: </span>
-                    <span className="font-mono font-bold text-primary">#{selectedOrder.providerServiceId || "N/A"}</span>
-                  </div>
-                  <div className="sm:col-span-2">
-                    <span className="text-on-surface-variant">معرف الخدمة الداخلي: </span>
-                    <span className="font-mono text-[11px] break-all">{selectedOrder.serviceId}</span>
-                  </div>
-                  <div className="sm:col-span-2">
-                    <span className="text-on-surface-variant">المعرف المربوط بالمزود: </span>
-                    <span className="font-mono text-[11px] break-all">{selectedOrder.serviceDhruId || "N/A"}</span>
-                  </div>
-                  <div>
-                    <span className="text-on-surface-variant">رقم الطلب المرجعي (API Order ID): </span>
-                    <span className="font-mono font-bold text-primary">{selectedOrder.apiOrderId || "لم يُرسل بعد"}</span>
-                  </div>
-                  <div>
-                    <span className="text-on-surface-variant">سعر البيع: </span>
-                    <span className="font-mono font-bold text-violet-400">${(selectedOrder.price || 0).toFixed(2)} USD</span>
-                  </div>
-                  <div>
-                    <span className="text-on-surface-variant">التكلفة والربح: </span>
-                    <span className="font-mono text-on-surface-variant">
-                      تكلفة: ${(selectedOrder.cost || 0).toFixed(2)} | ربح: ${(selectedOrder.profit || 0).toFixed(2)}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Target Input & Required Fields */}
-              <div className="p-4 rounded-2xl bg-surface-container-high border border-outline-variant/20 space-y-2">
-                <div className="font-bold text-primary flex items-center gap-1.5">
-                  <span className="material-symbols-outlined text-sm">input</span>
-                  <span>الحقول المطلوبة والبيانات التي كتبها العميل:</span>
-                </div>
-
-                <div className="p-3 rounded-xl bg-surface-container-lowest border border-outline-variant/20">
-                  <div className="text-[10px] text-on-surface-variant font-bold mb-1">ملخص البيانات المحفوظة في الطلب</div>
-                  <div className="font-mono text-primary font-bold dir-ltr text-left break-all">
-                    {selectedOrder.targetInput || "لا توجد بيانات"}
-                  </div>
-                </div>
-
-                {selectedOrderFields.length > 0 ? (
-                  <div className="overflow-x-auto pt-2">
-                    <table className="w-full min-w-[680px] border-separate border-spacing-y-2">
-                      <thead>
-                        <tr className="text-[10px] text-on-surface-variant">
-                          <th className="px-3 text-right">اسم الحقل</th>
-                          <th className="px-3 text-right">Field ID عند المزود</th>
-                          <th className="px-3 text-right">المعرف الداخلي</th>
-                          <th className="px-3 text-right">الحالة</th>
-                          <th className="px-3 text-right">القيمة المكتوبة</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {selectedOrderFields.map((field: any) => (
-                          <tr
-                            key={`${field.id}-${field.providerFieldId}`}
-                            className={field.missing ? "bg-red-500/10" : "bg-surface-container-lowest"}
-                          >
-                            <td className="p-3 rounded-r-xl font-bold text-on-surface">{field.label}</td>
-                            <td className="p-3 font-mono text-primary font-bold dir-ltr text-left">{field.providerFieldId}</td>
-                            <td className="p-3 font-mono text-on-surface-variant dir-ltr text-left">{field.id}</td>
-                            <td className="p-3">
-                              <span className={`px-2 py-0.5 rounded-md border text-[10px] font-bold ${
-                                field.missing
-                                  ? "bg-red-500/15 border-red-500/30 text-red-400"
-                                  : field.required
-                                  ? "bg-amber-500/15 border-amber-500/30 text-amber-400"
-                                  : "bg-violet-500/10 border-violet-500/20 text-violet-400"
-                              }`}>
-                                {field.missing ? "إجباري وناقص" : field.required ? "إجباري ومكتمل" : "اختياري"}
-                              </span>
-                            </td>
-                            <td className={`p-3 rounded-l-xl font-mono font-bold dir-ltr text-left break-all ${field.missing ? "text-red-400" : "text-on-surface"}`}>
-                              {field.value || "لم يكتب العميل قيمة"}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                ) : (
-                  <div className="p-3 rounded-xl border border-dashed border-outline-variant/30 text-on-surface-variant text-center">
-                    هذه الخدمة لا تحتوي على حقول مخصصة مسجلة لدى المزود.
-                  </div>
-                )}
-
-                {selectedOrder.rawNotes && (
-                  <div className="p-3 rounded-xl bg-surface-container-lowest border border-outline-variant/20">
-                    <div className="text-[10px] text-on-surface-variant font-bold mb-1">ملاحظات العميل</div>
-                    <div className="text-on-surface whitespace-pre-wrap">{selectedOrder.rawNotes}</div>
-                  </div>
-                )}
-              </div>
-
-              {/* Code / Received Reply Card */}
-              {selectedOrder.reply && (
-                <div className="p-4 rounded-2xl bg-violet-500/10 border border-violet-500/30 space-y-2">
-                  <div className="font-bold text-violet-400 flex items-center justify-between">
-                    <span className="flex items-center gap-1.5">
-                      <span className="material-symbols-outlined text-sm">key</span>
-                      <span>الكود أو الرد المُسلّم للعميل:</span>
-                    </span>
+              {/* Bottom Actions Bar */}
+              <div className="flex items-center justify-between px-5 py-3 border-t border-slate-200 bg-slate-50">
+                <div className="flex items-center gap-2">
+                  {selectedOrder.status === "pending" && (
+                    <button
+                      type="button"
+                      onClick={() => handleDispatchProvider(selectedOrder)}
+                      className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-sm active:scale-95 transition-all"
+                    >
+                      إرسال للمزود الآن
+                    </button>
+                  )}
+                  {selectedOrder.status !== "completed" && selectedOrder.status !== "rejected" && selectedOrder.status !== "cancelled" && (
                     <button
                       type="button"
                       onClick={() => {
-                        navigator.clipboard.writeText(selectedOrder.reply || "");
-                        showToast("تم نسخ الكود بنجاح!");
+                        setManualCompleteOrder(selectedOrder);
+                        setManualReplyCode(selectedOrder.reply || "");
                       }}
-                      className="px-2.5 py-1 rounded-lg bg-violet-500 text-black font-bold text-[10px] hover:bg-violet-400 transition-all flex items-center gap-1"
+                      className="px-4 py-2 rounded-xl bg-purple-50 text-purple-700 border border-purple-300 font-bold text-xs hover:bg-purple-100 transition-all"
                     >
-                      <span className="material-symbols-outlined text-xs">content_copy</span>
-                      <span>نسخ</span>
+                      إكمال يدوياً وإرسال كود
                     </button>
-                  </div>
-                  <p className="font-mono text-violet-300 font-bold bg-black/50 p-3 rounded-xl whitespace-pre-wrap dir-ltr text-start block">
-                    {cleanHtmlToText(selectedOrder.reply)}
-                  </p>
+                  )}
+                  {selectedOrder.status !== "rejected" && selectedOrder.status !== "cancelled" && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setRefundModalOrder({ order: selectedOrder, isProviderCancel: Boolean(selectedOrder.apiOrderId) });
+                        setRefundReason("");
+                      }}
+                      className="px-3.5 py-2 rounded-xl bg-red-50 text-red-600 border border-red-300 font-bold text-xs hover:bg-red-100 transition-all"
+                    >
+                      إلغاء واسترجاع
+                    </button>
+                  )}
                 </div>
-              )}
 
-              {/* ORDER EVENT TIMELINE (Audit Log) */}
-              <div className="p-4 rounded-2xl bg-surface-container-high border border-outline-variant/20 space-y-3">
-                <div className="font-bold text-on-surface flex items-center gap-1.5">
-                  <span className="material-symbols-outlined text-sm text-primary">timeline</span>
-                  <span>سجل أحداث وتتبع دورة حياة الطلب:</span>
-                </div>
-
-                <div className="relative pl-3 space-y-4 before:absolute before:right-2.5 before:top-2 before:bottom-2 before:w-0.5 before:bg-outline-variant/30 pr-6">
-                  {/* Event 1: Creation */}
-                  <div className="relative">
-                    <span className="absolute -right-6 top-0.5 w-3 h-3 rounded-full bg-primary ring-4 ring-primary/20"></span>
-                    <div className="font-bold text-on-surface text-xs">إنشاء الطلب من العميل</div>
-                    <div className="text-[11px] text-on-surface-variant mt-0.5">
-                      تم إنشاء الطلب وخصم ${(selectedOrder.price || 0).toFixed(2)} USD من رصيد المحفظة.
-                    </div>
-                    <div className="text-[10px] text-on-surface-variant/70 font-mono mt-0.5">
-                      {new Date(selectedOrder.createdAt).toLocaleString("ar-EG")}
-                    </div>
-                  </div>
-
-                  {/* Custom Logged Events from notes */}
-                  {selectedOrder.events &&
-                    selectedOrder.events.map((ev, i) => (
-                      <div key={i} className="relative">
-                        <span className="absolute -right-6 top-0.5 w-3 h-3 rounded-full bg-secondary ring-4 ring-secondary/20"></span>
-                        <div className="font-bold text-on-surface text-xs">{ev.title || ev.action}</div>
-                        <div className="text-[11px] text-on-surface-variant mt-0.5">{ev.desc}</div>
-                        <div className="text-[10px] text-on-surface-variant/70 font-mono mt-0.5">
-                          {new Date(ev.time).toLocaleString("ar-EG")}
-                        </div>
-                      </div>
-                    ))}
-
-                  {/* Final Status Indicator */}
-                  <div className="relative">
-                    <span
-                      className={`absolute -right-6 top-0.5 w-3 h-3 rounded-full ring-4 ${
-                        selectedOrder.status === "completed"
-                          ? "bg-violet-400 ring-violet-400/20"
-                          : selectedOrder.status === "processing"
-                          ? "bg-blue-400 ring-blue-400/20"
-                          : selectedOrder.status === "pending"
-                          ? "bg-amber-400 ring-amber-400/20"
-                          : "bg-red-400 ring-red-400/20"
-                      }`}
-                    ></span>
-                    <div className="font-bold text-on-surface text-xs">
-                      الحالة الحالية:{" "}
-                      {selectedOrder.status === "completed"
-                        ? "مكتمل بنجاح"
-                        : selectedOrder.status === "processing"
-                        ? "قيد التنفيذ لدى المزود"
-                        : selectedOrder.status === "pending"
-                        ? "في انتظار الموافقة"
-                        : "ملغي ومسترجع"}
-                    </div>
-                  </div>
-                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedOrder(null);
+                    setIsEditingFields(false);
+                  }}
+                  className="px-6 py-2 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold text-xs transition-colors"
+                >
+                  إغلاق
+                </button>
               </div>
-            </div>
-
-            {/* Bottom Actions */}
-            <div className="flex items-center justify-between pt-2 border-t border-outline-variant/20">
-              <div className="flex items-center gap-2">
-                {selectedOrder.status === "pending" && (
-                  <button
-                    type="button"
-                    onClick={() => handleDispatchProvider(selectedOrder)}
-                    className="px-4 py-2 rounded-xl bg-gradient-to-r from-primary to-secondary text-on-primary font-bold text-xs shadow-md"
-                  >
-                    إرسال للمزود الآن
-                  </button>
-                )}
-                {selectedOrder.status !== "completed" && selectedOrder.status !== "rejected" && selectedOrder.status !== "cancelled" && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setManualCompleteOrder(selectedOrder);
-                      setManualReplyCode(selectedOrder.reply || "");
-                    }}
-                    className="px-4 py-2 rounded-xl bg-violet-500/20 text-violet-400 border border-violet-500/30 font-bold text-xs"
-                  >
-                    إكمال يدوياً وإرسال كود
-                  </button>
-                )}
-              </div>
-
-              <button
-                type="button"
-                onClick={() => setSelectedOrder(null)}
-                className="px-6 py-2 rounded-xl bg-surface-variant text-on-surface-variant hover:text-on-surface font-bold text-xs"
-              >
-                إغلاق
-              </button>
             </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
+
     </div>
   );
 }

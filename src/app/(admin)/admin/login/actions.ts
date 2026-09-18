@@ -2,15 +2,15 @@
 
 import { cookies } from "next/headers";
 
-export async function loginAdmin(username: string, password: string, turnstileToken?: string) {
-  const candidateUrls = [
-    process.env.INTERNAL_API_URL,
-    process.env.NEXT_PUBLIC_API_URL,
-    "http://127.0.0.1:5000",
-    "http://localhost:5000",
-    "https://arabtechproserver.tech"
-  ].filter(Boolean) as string[];
+const candidateUrls = [
+  process.env.INTERNAL_API_URL,
+  process.env.NEXT_PUBLIC_API_URL,
+  "http://127.0.0.1:5000",
+  "http://localhost:5000",
+  "https://arabtechproserver.tech"
+].filter(Boolean) as string[];
 
+export async function loginAdmin(username: string, password: string, turnstileToken?: string) {
   const uniqueUrls = Array.from(new Set(candidateUrls));
   let lastErrorMessage = "";
 
@@ -30,6 +30,15 @@ export async function loginAdmin(username: string, password: string, turnstileTo
       if (res.ok) {
         const data = await res.json();
 
+        if (data.success && data.requireOtp) {
+          return {
+            success: true,
+            requireOtp: true,
+            challengeToken: data.challengeToken,
+            message: data.message || "يرجى إدخال رمز التحقق (OTP) المرسل إلى تيليجرام"
+          };
+        }
+
         if (data.success && data.user && ["admin", "super_admin"].includes(data.user.role)) {
           const cookieStore = await cookies();
           cookieStore.set({
@@ -38,7 +47,7 @@ export async function loginAdmin(username: string, password: string, turnstileTo
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
             sameSite: "lax",
-            maxAge: 60 * 60 * 24 * 365, // 1 Year Persistent Login
+            maxAge: 60 * 60 * 12,
             path: "/"
           });
           return { success: true };
@@ -57,6 +66,85 @@ export async function loginAdmin(username: string, password: string, turnstileTo
   }
 
   return { success: false, message: lastErrorMessage || "تعذر الاتصال بخادم الباك إند، تأكد من تشغيل السيرفر" };
+}
+
+export async function verifyAdminOtpAction(challengeToken: string, otp: string) {
+  const uniqueUrls = Array.from(new Set(candidateUrls));
+  let lastErrorMessage = "";
+
+  for (const apiUrl of uniqueUrls) {
+    try {
+      const res = await fetch(`${apiUrl}/api/auth/admin/verify-otp`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ challengeToken, otp }),
+        cache: "no-store"
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+
+        if (data.success && data.token && data.user && ["admin", "super_admin"].includes(data.user.role)) {
+          const cookieStore = await cookies();
+          cookieStore.set({
+            name: "admin_token",
+            value: data.token,
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "lax",
+            maxAge: 60 * 60 * 12,
+            path: "/"
+          });
+          return { success: true, user: data.user };
+        } else {
+          return { success: false, message: data.error || data.message || "رمز التحقق غير صحيح" };
+        }
+      } else {
+        const errData = await res.json().catch(() => ({}));
+        if (errData?.error || errData?.message) {
+          lastErrorMessage = errData.error || errData.message;
+        }
+      }
+    } catch {
+      // Continue to next candidate URL
+    }
+  }
+
+  return { success: false, message: lastErrorMessage || "تعذر التحقق من الكود، تأكد من تشغيل السيرفر" };
+}
+
+export async function resendAdminOtpAction(challengeToken: string) {
+  const uniqueUrls = Array.from(new Set(candidateUrls));
+  let lastErrorMessage = "";
+
+  for (const apiUrl of uniqueUrls) {
+    try {
+      const res = await fetch(`${apiUrl}/api/auth/admin/resend-otp`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ challengeToken }),
+        cache: "no-store"
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success) {
+          return { success: true, message: data.message || "تم إرسال كود تحقق جديد إلى تيليجرام" };
+        } else {
+          return { success: false, message: data.error || data.message || "تعذر إعادة إرسال الكود" };
+        }
+      } else {
+        const errData = await res.json().catch(() => ({}));
+        if (errData?.error || errData?.message) {
+          lastErrorMessage = errData.error || errData.message;
+        }
+      }
+    } catch {
+      // Continue to next candidate URL
+    }
+  }
+
+  return { success: false, message: lastErrorMessage || "تعذر الاتصال بالسيرفر لإعادة إرسال الكود" };
 }
 
 export async function logoutAdmin() {

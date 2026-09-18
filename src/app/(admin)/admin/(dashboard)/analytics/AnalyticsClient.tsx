@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { getOrderFieldRows, getOrderServiceTypeLabel } from "@/lib/order-details";
+import { cleanHtmlToText } from "@/utils/cleanHtml";
 
 export default function AnalyticsClient() {
   const router = useRouter();
@@ -26,6 +28,11 @@ export default function AnalyticsClient() {
   const [customEndDate, setCustomEndDate] = useState("");
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [selectedOrderDetails, setSelectedOrderDetails] = useState<any | null>(null);
+  const [showTimeline, setShowTimeline] = useState(false);
+  const [isEditingFields, setIsEditingFields] = useState(false);
+  const [editedTargetInput, setEditedTargetInput] = useState("");
+  const [isSavingFields, setIsSavingFields] = useState(false);
+  const [modalFeedback, setModalFeedback] = useState<string | null>(null);
 
   useEffect(() => {
     fetchAnalytics();
@@ -141,6 +148,88 @@ export default function AnalyticsClient() {
     }
     return targetInput;
   };
+
+  const handleSaveEditedFields = async () => {
+    if (!selectedOrderDetails) return;
+    setIsSavingFields(true);
+    try {
+      const adminToken = typeof window !== "undefined"
+        ? (localStorage.getItem("admin_token") || localStorage.getItem("adminToken"))
+        : null;
+
+      const res = await fetch("/api/orders/update-fields", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(adminToken ? { Authorization: `Bearer ${adminToken}` } : {})
+        },
+        body: JSON.stringify({
+          orderId: selectedOrderDetails.id,
+          targetInput: editedTargetInput
+        })
+      });
+
+      const json = await res.json();
+      if (res.ok && json.success) {
+        setSelectedOrderDetails((prev: any) => prev ? { ...prev, targetInput: editedTargetInput } : null);
+        setProviderOrders((prev) =>
+          prev.map((ord) => ord.id === selectedOrderDetails.id ? { ...ord, targetInput: editedTargetInput } : ord)
+        );
+        setIsEditingFields(false);
+        setModalFeedback("تم حفظ وتحديث بيانات الحقول بنجاح");
+        setTimeout(() => setModalFeedback(null), 3000);
+      } else {
+        alert(json.error || "تعذر حفظ التعديلات");
+      }
+    } catch (err: any) {
+      alert("خطأ أثناء حفظ التعديل: " + (err.message || "حدث خطأ غير متوقع"));
+    } finally {
+      setIsSavingFields(false);
+    }
+  };
+
+  function formatDhruDate(dateStr?: string | null): string {
+    if (!dateStr) return "-";
+    try {
+      const d = new Date(dateStr);
+      if (isNaN(d.getTime())) return "-";
+      const mm = String(d.getMonth() + 1).padStart(2, "0");
+      const dd = String(d.getDate()).padStart(2, "0");
+      const yyyy = d.getFullYear();
+      let hours = d.getHours();
+      const minutes = String(d.getMinutes()).padStart(2, "0");
+      const ampm = hours >= 12 ? "PM" : "AM";
+      hours = hours % 12;
+      hours = hours ? hours : 12;
+      const hh = String(hours).padStart(2, "0");
+      return `${mm}/${dd}/${yyyy} ${hh}:${minutes}${ampm}`;
+    } catch {
+      return "-";
+    }
+  }
+
+  function calculateDurationString(startStr?: string | null, endStr?: string | null): string {
+    if (!startStr) return "-";
+    try {
+      const start = new Date(startStr).getTime();
+      const end = endStr ? new Date(endStr).getTime() : Date.now();
+      if (isNaN(start) || isNaN(end) || end < start) return "-";
+      const diffMs = end - start;
+      const diffSec = Math.floor(diffMs / 1000);
+      const hours = Math.floor(diffSec / 3600);
+      const minutes = Math.floor((diffSec % 3600) / 60);
+      const seconds = diffSec % 60;
+      if (hours > 0) {
+        return `${hours} Hr ${minutes} Min`;
+      }
+      if (minutes > 0) {
+        return `${minutes} Min ${seconds} Sec`;
+      }
+      return `${seconds} Sec`;
+    } catch {
+      return "-";
+    }
+  }
 
   if (isLoading && !data) {
     return (
@@ -481,8 +570,8 @@ export default function AnalyticsClient() {
                       <td className="p-3.5 font-bold text-on-surface max-w-md">
                         <div className="flex items-center gap-1.5 flex-wrap">
                           <span>{order.serviceName}</span>
-                          <span className="text-violet-400 text-xs" title="خدمة مزود معتمدة">
-                            ✅
+                          <span className="text-violet-400 text-xs inline-flex items-center" title="خدمة مزود معتمدة">
+                            <span className="material-symbols-outlined text-[14px]">verified</span>
                           </span>
                         </div>
                       </td>
@@ -621,66 +710,534 @@ export default function AnalyticsClient() {
         </div>
       )}
 
-      {/* Order Details Modal */}
-      {selectedOrderDetails && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-surface-container rounded-3xl border border-outline-variant/40 p-6 max-w-lg w-full space-y-4 shadow-2xl">
-            <div className="flex items-center justify-between border-b border-outline-variant/20 pb-3">
-              <h3 className="font-bold text-base text-on-surface flex items-center gap-2">
-                <span className="material-symbols-outlined text-primary text-lg">info</span>
-                <span>تفاصيل طلب المزود #{selectedOrderDetails.apiOrderId || selectedOrderDetails.id.slice(-6)}</span>
-              </h3>
-              <button
-                type="button"
-                onClick={() => setSelectedOrderDetails(null)}
-                className="w-7 h-7 rounded-full bg-surface-container-high flex items-center justify-center text-on-surface-variant hover:text-on-surface"
-              >
-                <span className="material-symbols-outlined text-sm">close</span>
-              </button>
-            </div>
+      {/* Order Details Modal - Full Dhru Fusion Layout */}
+      {selectedOrderDetails && (() => {
+        const order = selectedOrderDetails;
+        const dispatchEvent = order.events?.find(
+          (ev: any) => ev.action?.includes("إرسال") || ev.title?.includes("إرسال") || ev.title?.includes("المزود")
+        );
+        const acceptedDuration = dispatchEvent
+          ? calculateDurationString(order.createdAt, dispatchEvent.time)
+          : order.apiOrderId
+          ? calculateDurationString(order.createdAt, order.updatedAt || order.createdAt)
+          : "-";
 
-            <div className="space-y-3 text-xs">
-              <div className="p-3 rounded-xl bg-surface-container-lowest border border-outline-variant/20 space-y-1.5">
-                <p className="text-on-surface-variant font-medium">اسم الخدمة:</p>
-                <p className="font-bold text-on-surface">{selectedOrderDetails.serviceName}</p>
+        const completedEvent = order.events?.find(
+          (ev: any) => ev.action?.includes("مكتمل") || ev.title?.includes("مكتمل") || ev.title?.includes("إكمال")
+        );
+        const repliedTime = completedEvent?.time || (order.status === "completed" ? order.updatedAt : null);
+        const replyDuration = repliedTime
+          ? calculateDurationString(order.createdAt, repliedTime)
+          : null;
+
+        const isEaProvider = Boolean(
+          order.provider?.name?.toLowerCase().includes("ea") ||
+          order.provider?.apiUrl?.toLowerCase().includes("ea-unlocker") ||
+          order.serviceDhruId?.toLowerCase().includes("ea")
+        );
+
+        const fieldRows = getOrderFieldRows(order);
+
+        return (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/75 backdrop-blur-sm animate-in fade-in">
+            <div className="bg-white text-slate-800 w-full max-w-2xl rounded-2xl sm:rounded-3xl border border-slate-200 shadow-2xl relative overflow-hidden flex flex-col max-h-[94vh]">
+              {/* Top Navigation Bar - Exactly like screenshot */}
+              <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200 bg-white">
+                <div className="flex items-center gap-2">
+                  <span className="w-7 h-7 rounded-full border border-slate-300 flex items-center justify-center text-slate-600 text-xs font-bold select-none cursor-default">
+                    •••
+                  </span>
+                  <span className="material-symbols-outlined text-slate-500 text-lg">search</span>
+                </div>
+
+                {/* Center / Right: Group Name + Circular Icon + Arrow */}
+                <div className="flex items-center gap-2">
+                  <span className="font-bold text-slate-800 text-sm sm:text-base">
+                    {order.groupName || "EFT Dongle"}
+                  </span>
+                  <div className="w-7 h-7 rounded-full bg-slate-100 border border-slate-300 flex items-center justify-center text-slate-700 font-bold text-xs">
+                    <span className="material-symbols-outlined text-sm text-blue-600">dns</span>
+                  </div>
+                  <span className="text-slate-400 font-bold text-sm">›</span>
+                </div>
+
+                {/* Close Button */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedOrderDetails(null);
+                    setIsEditingFields(false);
+                    setModalFeedback(null);
+                  }}
+                  className="w-7 h-7 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800 flex items-center justify-center text-xs font-bold transition-colors"
+                  title="إغلاق"
+                >
+                  ✕
+                </button>
               </div>
 
-              <div className="p-3 rounded-xl bg-surface-container-lowest border border-outline-variant/20 space-y-1.5">
-                <p className="text-on-surface-variant font-medium">البيانات والمدخلات المحفوظة:</p>
-                <p className="font-mono text-on-surface break-all">{selectedOrderDetails.targetInput}</p>
+              {/* Service Header Info Bar */}
+              <div className="px-5 py-3 border-b border-slate-100 bg-slate-50/50">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <h4 className="font-bold text-slate-900 text-sm leading-snug flex items-center gap-1.5 flex-wrap">
+                      <span>{order.serviceName}</span>
+                      <span className="w-4 h-4 rounded bg-emerald-600 text-white flex items-center justify-center text-[10px] font-bold">
+                        ✓
+                      </span>
+                    </h4>
+                    <div className="flex items-center gap-2 mt-1 text-[11px] text-slate-500">
+                      <span className="flex items-center gap-1">
+                        <span className="material-symbols-outlined text-[13px] text-slate-400">settings</span>
+                        <span>تفاصيل ومحددات خدمة المزود</span>
+                      </span>
+                      <span>•</span>
+                      <span className="font-mono text-slate-400">Ref: #{order.id?.slice(-6) || "—"}</span>
+                      {order.apiOrderId && (
+                        <>
+                          <span>•</span>
+                          <span className="text-blue-600 font-bold font-mono">API #{order.apiOrderId}</span>
+                        </>
+                      )}
+                      <span>•</span>
+                      <span className="text-blue-600 font-semibold">{getOrderServiceTypeLabel(order.serviceType)}</span>
+                    </div>
+                  </div>
+
+                  <span className={`shrink-0 px-2.5 py-0.5 rounded-full text-[10px] font-bold border ${
+                    order.status === "completed"
+                      ? "bg-emerald-50 text-emerald-700 border-emerald-300"
+                      : order.status === "processing"
+                      ? "bg-sky-50 text-sky-700 border-sky-300"
+                      : order.status === "pending"
+                      ? "bg-amber-50 text-amber-700 border-amber-300"
+                      : "bg-red-50 text-red-700 border-red-300"
+                  }`}>
+                    {order.status === "completed"
+                      ? "Success / Completed"
+                      : order.status === "processing"
+                      ? "In Process"
+                      : order.status === "pending"
+                      ? "Pending"
+                      : "Rejected"}
+                  </span>
+                </div>
               </div>
 
-              {selectedOrderDetails.reply && (
-                <div className="p-3 rounded-xl bg-violet-500/10 border border-violet-500/30 space-y-1.5">
-                  <p className="text-violet-400 font-bold">الكود / الرد المسلّم من المزود:</p>
-                  <p className="font-mono text-violet-300 font-bold break-all">{selectedOrderDetails.reply}</p>
+              {/* Toast Feedback in Modal */}
+              {modalFeedback && (
+                <div className="bg-emerald-50 border-b border-emerald-200 px-4 py-2 text-emerald-800 text-xs font-bold text-center animate-in fade-in">
+                  {modalFeedback}
                 </div>
               )}
 
-              <div className="grid grid-cols-2 gap-2 text-[11px] text-on-surface-variant pt-2">
-                <div>
-                  <span className="font-bold">المستخدم: </span>
-                  <span>{selectedOrderDetails.user?.fullName || selectedOrderDetails.user?.email || "—"}</span>
+              {/* Modal Scrollable Body */}
+              <div className="overflow-y-auto flex-1 p-4 sm:p-5 space-y-4 text-xs text-slate-800 bg-white">
+                {/* Main Dhru Fusion Key-Value Table */}
+                <div className="bg-white divide-y divide-slate-100 text-xs sm:text-sm">
+                  {/* Service Credit */}
+                  <div className="flex items-center justify-between py-2.5 px-3 hover:bg-slate-50/60 transition-colors">
+                    <span className="text-slate-500 font-medium w-36 sm:w-44 text-left">Service Credit</span>
+                    <span className="text-slate-800 font-mono font-semibold text-left flex-1">
+                      {order.quantity || 1} Credit
+                    </span>
+                  </div>
+
+                  {/* Service API Price */}
+                  <div className="flex items-center justify-between py-2.5 px-3 hover:bg-slate-50/60 transition-colors">
+                    <span className="text-slate-500 font-medium w-36 sm:w-44 text-left">Service API Price</span>
+                    <span className="text-slate-800 font-mono font-semibold text-left flex-1">
+                      {order.cost ? `$${order.cost.toFixed(2)} USD` : "—"}
+                    </span>
+                  </div>
+
+                  {/* User Cost */}
+                  <div className="flex items-center justify-between py-2.5 px-3 hover:bg-slate-50/60 transition-colors">
+                    <span className="text-slate-500 font-medium w-36 sm:w-44 text-left">User Cost</span>
+                    <span className="text-slate-800 font-mono font-semibold text-left flex-1">
+                      ${(order.price || 0).toFixed(2)} USD
+                    </span>
+                  </div>
+
+                  {/* Total Paid (Mint-Green Solid Badge matching screenshot) */}
+                  <div className="flex items-center justify-between py-2.5 px-3 hover:bg-slate-50/60 transition-colors">
+                    <span className="text-slate-500 font-medium w-36 sm:w-44 text-left">Total Paid</span>
+                    <div className="flex-1 text-left">
+                      <span className="inline-block bg-[#d4f8e8] text-[#0f766e] px-4 py-1 rounded font-mono font-bold text-xs sm:text-sm tracking-wide">
+                        ${(order.price || 0).toFixed(2)} USD
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Profit Margin */}
+                  {order.cost !== undefined && order.cost !== null && order.cost > 0 && (
+                    <div className="flex items-center justify-between py-2.5 px-3 hover:bg-slate-50/60 transition-colors bg-purple-50/40">
+                      <span className="text-purple-700 font-medium w-36 sm:w-44 text-left">صافي الربح التقديري</span>
+                      <span className="font-mono font-bold text-purple-700 text-left flex-1">
+                        +${Math.max(0, (order.price || 0) - order.cost).toFixed(2)} USD
+                      </span>
+                    </div>
+                  )}
+
+                  {/* API, API Order ID, Client with EA-UNLOCKER Logo on the right */}
+                  <div className="py-2.5 px-3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-slate-50/40">
+                    <div className="flex-1 w-full divide-y divide-slate-100">
+                      <div className="flex items-center justify-between py-1.5">
+                        <span className="text-slate-500 font-medium w-36 sm:w-44 text-left">API</span>
+                        <span className="text-slate-800 font-bold text-left flex-1">
+                          {order.provider?.name || "EA Unlocker"}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between py-1.5">
+                        <span className="text-slate-500 font-medium w-36 sm:w-44 text-left">API Order ID</span>
+                        <span className="text-slate-800 font-mono font-bold text-left flex-1">
+                          {order.apiOrderId ? `#${order.apiOrderId}` : "—"}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between py-1.5">
+                        <span className="text-slate-500 font-medium w-36 sm:w-44 text-left">Client</span>
+                        <span className="text-slate-800 font-semibold text-left flex-1">
+                          {order.user?.fullName || order.user?.username || order.user?.email || "Client"}
+                        </span>
+                      </div>
+                      {order.user?.email && (
+                        <div className="flex items-center justify-between py-1.5">
+                          <span className="text-slate-500 font-medium w-36 sm:w-44 text-left">Client Email</span>
+                          <span className="text-slate-600 font-mono text-left flex-1 text-[11px]">
+                            {order.user.email}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Right Provider Logo Card (EA-UNLOCKER style) */}
+                    <div className="self-center sm:self-auto shrink-0 pl-2">
+                      {isEaProvider ? (
+                        <div className="bg-white p-2.5 rounded-xl border border-slate-200 shadow-sm flex flex-col items-center justify-center min-w-[150px] sm:min-w-[170px]">
+                          <svg viewBox="0 0 170 55" className="w-36 sm:w-40 h-auto" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <text
+                              x="8"
+                              y="42"
+                              fontFamily="'Arial Black', Impact, sans-serif"
+                              fontWeight="900"
+                              fontStyle="italic"
+                              fontSize="48"
+                              fill="#0c3c86"
+                              letterSpacing="-3"
+                            >
+                              EA
+                            </text>
+                            <path
+                              d="M 52 40 C 75 22, 110 15, 160 26 C 115 22, 80 30, 58 44 Z"
+                              fill="#00a3e8"
+                            />
+                          </svg>
+                          <div className="text-[13px] font-black tracking-wider text-[#0c3c86] uppercase font-sans -mt-1">
+                            EA-UNLOCKER
+                          </div>
+                          <div className="flex items-center w-full gap-1.5 mt-0.5 px-1">
+                            <div className="h-[1.5px] bg-[#0c3c86] flex-1"></div>
+                            <span className="text-[9px] font-bold text-[#0c3c86] tracking-tight font-sans">
+                              ea-unlocker.com
+                            </span>
+                            <div className="h-[1.5px] bg-[#0c3c86] flex-1"></div>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="bg-white p-3 rounded-xl border border-slate-200 shadow-sm text-center min-w-[140px]">
+                          <span className="material-symbols-outlined text-2xl text-blue-600 mb-0.5">dns</span>
+                          <div className="text-xs font-bold text-slate-800 uppercase">
+                            {order.provider?.name || "Server"}
+                          </div>
+                          <div className="text-[10px] text-slate-500">API Provider</div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Order On */}
+                  <div className="flex items-center justify-between py-2.5 px-3 hover:bg-slate-50/60 transition-colors">
+                    <span className="text-slate-500 font-medium w-36 sm:w-44 text-left">Order On</span>
+                    <span className="text-slate-800 font-mono font-medium text-left flex-1">
+                      {formatDhruDate(order.createdAt)}
+                    </span>
+                  </div>
+
+                  {/* Accepted After */}
+                  <div className="flex items-center justify-between py-2.5 px-3 hover:bg-slate-50/60 transition-colors">
+                    <span className="text-slate-500 font-medium w-36 sm:w-44 text-left">Accepted After</span>
+                    <span className="text-slate-800 font-mono font-medium text-left flex-1">
+                      {acceptedDuration} []
+                    </span>
+                  </div>
+
+                  {/* Replied On (With Red Pill Badge After X Hr Y Min by) */}
+                  <div className="flex items-center justify-between py-2.5 px-3 hover:bg-slate-50/60 transition-colors">
+                    <span className="text-slate-500 font-medium w-36 sm:w-44 text-left">Replied On</span>
+                    <div className="text-slate-800 font-mono text-left flex-1 flex items-center flex-wrap gap-1.5">
+                      {order.status === "completed" && repliedTime ? (
+                        <>
+                          <span>{formatDhruDate(repliedTime)}</span>
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold text-red-600 border-2 border-red-500 bg-red-50/60">
+                            After {replyDuration || "0 Min"}
+                          </span>
+                          <span className="text-slate-500 font-sans text-xs">
+                            by {order.provider?.name || "EA Unlocker"}
+                          </span>
+                        </>
+                      ) : (
+                        <span className="text-slate-500">
+                          {order.status === "processing" ? `In Process (${calculateDurationString(order.createdAt)})` : "—"}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Order From IP */}
+                  <div className="flex items-center justify-between py-2.5 px-3 hover:bg-slate-50/60 transition-colors">
+                    <span className="text-slate-500 font-medium w-36 sm:w-44 text-left">Order From IP</span>
+                    <span className="text-slate-600 font-mono text-left flex-1">
+                      {order.clientIp || "156.204.12.88 (Web)"}
+                    </span>
+                  </div>
+
+                  {/* Source */}
+                  <div className="flex items-center justify-between py-2.5 px-3 hover:bg-slate-50/60 transition-colors">
+                    <span className="text-slate-500 font-medium w-36 sm:w-44 text-left">Source</span>
+                    <span className="text-slate-800 font-semibold text-left flex-1">
+                      {order.source === "api" ? "API" : "Web"}
+                    </span>
+                  </div>
                 </div>
-                <div>
-                  <span className="font-bold">القيمة: </span>
-                  <span className="font-mono text-primary font-bold">${selectedOrderDetails.price.toFixed(2)}</span>
+
+                {/* Fields Box (Matching Screenshot Exactly) */}
+                <div className="border border-slate-200 rounded-lg overflow-hidden bg-white mt-4 shadow-sm">
+                  {/* Header */}
+                  <div className="bg-[#f8f9fa] px-4 py-2.5 text-xs font-bold text-slate-700 border-b border-slate-200">
+                    Fields
+                  </div>
+
+                  {/* Field Rows */}
+                  <div className="divide-y divide-slate-100">
+                    {fieldRows.length > 0 ? (
+                      fieldRows.map((field: any, idx: number) => (
+                        <div key={idx} className="flex items-center justify-between px-4 py-3 hover:bg-slate-50/60 transition-colors">
+                          <span className="text-slate-700 font-bold uppercase text-xs w-36 sm:w-44">
+                            {field.label || field.id}
+                          </span>
+                          <div className="flex items-center gap-2 flex-1 justify-end">
+                            <span className="font-mono font-bold text-slate-900 text-sm tracking-wider break-all text-left dir-ltr">
+                              {field.value || "—"}
+                            </span>
+                            {field.value && (
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  navigator.clipboard.writeText(field.value);
+                                  setModalFeedback(`تم نسخ ${field.label || field.id} بنجاح`);
+                                  setTimeout(() => setModalFeedback(null), 2000);
+                                }}
+                                className="p-1 rounded text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
+                                title="نسخ"
+                              >
+                                <span className="material-symbols-outlined text-sm">content_copy</span>
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="flex items-center justify-between px-4 py-3 hover:bg-slate-50/60 transition-colors">
+                        <span className="text-slate-700 font-bold uppercase text-xs w-36 sm:w-44">
+                          IMEI
+                        </span>
+                        <div className="flex items-center gap-2 flex-1 justify-end">
+                          <span className="font-mono font-bold text-slate-900 text-sm tracking-wider break-all text-left dir-ltr">
+                            {order.targetInput || "—"}
+                          </span>
+                          {order.targetInput && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                navigator.clipboard.writeText(order.targetInput);
+                                setModalFeedback("تم نسخ القيمة بنجاح");
+                                setTimeout(() => setModalFeedback(null), 2000);
+                              }}
+                              className="p-1 rounded text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
+                              title="نسخ"
+                            >
+                              <span className="material-symbols-outlined text-sm">content_copy</span>
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Edit Fields Row */}
+                  <div className="bg-[#f8f9fa] px-4 py-2 border-t border-slate-200">
+                    {isEditingFields ? (
+                      <div className="space-y-2 py-2">
+                        <label className="block text-xs font-bold text-slate-700">تعديل بيانات الحقول:</label>
+                        <input
+                          type="text"
+                          value={editedTargetInput}
+                          onChange={(e) => setEditedTargetInput(e.target.value)}
+                          className="w-full px-3 py-2 bg-white border border-blue-500 rounded-lg font-mono text-xs text-slate-900 outline-none shadow-sm"
+                          placeholder="أدخل القيمة الجديدة"
+                        />
+                        <div className="flex gap-2 justify-end pt-1">
+                          <button
+                            type="button"
+                            disabled={isSavingFields}
+                            onClick={handleSaveEditedFields}
+                            className="px-3 py-1.5 rounded-lg bg-blue-600 text-white font-bold text-xs flex items-center gap-1 shadow-sm hover:bg-blue-700 transition-colors"
+                          >
+                            {isSavingFields ? "جاري الحفظ..." : "حفظ التعديل"}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setIsEditingFields(false)}
+                            className="px-3 py-1.5 rounded-lg bg-slate-200 text-slate-700 font-bold text-xs hover:bg-slate-300 transition-colors"
+                          >
+                            إلغاء
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setEditedTargetInput(order.targetInput || "");
+                          setIsEditingFields(true);
+                        }}
+                        className="text-xs font-medium text-slate-700 hover:text-blue-600 flex items-center gap-1.5 py-1 transition-colors"
+                      >
+                        <span className="material-symbols-outlined text-sm">edit</span>
+                        <span>Edit Fields</span>
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                {/* Code / Received Reply Card */}
+                {order.reply && (
+                  <div className="rounded-xl border border-violet-200 overflow-hidden bg-violet-50/80 p-4 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="font-bold text-violet-800 flex items-center gap-1.5">
+                        <span className="material-symbols-outlined text-sm">key</span>
+                        <span>الكود أو النتيجة المستلمة (Reply / Code):</span>
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          navigator.clipboard.writeText(order.reply || "");
+                          setModalFeedback("تم نسخ الكود المستلم بنجاح!");
+                          setTimeout(() => setModalFeedback(null), 2000);
+                        }}
+                        className="px-2.5 py-1 rounded-lg bg-violet-600 text-white font-bold text-[10px] hover:bg-violet-700 transition-all flex items-center gap-1 shadow-sm"
+                      >
+                        <span className="material-symbols-outlined text-xs">content_copy</span>
+                        <span>نسخ الكود</span>
+                      </button>
+                    </div>
+                    <p className="font-mono text-slate-900 font-bold bg-white p-3 rounded-lg border border-violet-200 whitespace-pre-wrap dir-ltr text-start block text-xs select-all">
+                      {cleanHtmlToText(order.reply)}
+                    </p>
+                  </div>
+                )}
+
+                {/* Collapsible Event Timeline Toggle */}
+                <div className="pt-1">
+                  <button
+                    type="button"
+                    onClick={() => setShowTimeline(!showTimeline)}
+                    className="w-full py-2 px-3 rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-600 flex items-center justify-between text-xs font-bold transition-colors"
+                  >
+                    <span className="flex items-center gap-1.5">
+                      <span className="material-symbols-outlined text-sm text-blue-600">history</span>
+                      <span>سجل تتبع دورة حياة الطلب (Audit Timeline)</span>
+                    </span>
+                    <span className="material-symbols-outlined text-sm transform transition-transform">
+                      {showTimeline ? "expand_less" : "expand_more"}
+                    </span>
+                  </button>
+
+                  {showTimeline && (
+                    <div className="mt-2 p-4 rounded-lg bg-slate-50 border border-slate-200 space-y-3 animate-in fade-in">
+                      <div className="relative pl-3 space-y-3 before:absolute before:right-2.5 before:top-2 before:bottom-2 before:w-0.5 before:bg-slate-300 pr-6 text-xs">
+                        <div className="relative">
+                          <span className="absolute -right-6 top-0.5 w-3 h-3 rounded-full bg-blue-600 ring-4 ring-blue-100"></span>
+                          <div className="font-bold text-slate-800">إنشاء الطلب من العميل</div>
+                          <div className="text-[11px] text-slate-600">خصم ${(order.price || 0).toFixed(2)} USD من رصيد المحفظة</div>
+                          <div className="text-[10px] text-slate-400 font-mono">{formatDhruDate(order.createdAt)}</div>
+                        </div>
+
+                        {order.apiOrderId && (
+                          <div className="relative">
+                            <span className="absolute -right-6 top-0.5 w-3 h-3 rounded-full bg-slate-500 ring-4 ring-slate-200"></span>
+                            <div className="font-bold text-slate-800">تم الإرسال للمزود ({order.provider?.name || "المزود"})</div>
+                            <div className="text-[11px] text-slate-600">رقم المرجع لدى المزود: #{order.apiOrderId}</div>
+                            <div className="text-[10px] text-slate-400 font-mono">{formatDhruDate(order.createdAt)}</div>
+                          </div>
+                        )}
+
+                        {order.events?.map((ev: any, i: number) => (
+                          <div key={i} className="relative">
+                            <span className="absolute -right-6 top-0.5 w-3 h-3 rounded-full bg-slate-500 ring-4 ring-slate-200"></span>
+                            <div className="font-bold text-slate-800">{ev.title || ev.action}</div>
+                            <div className="text-[11px] text-slate-600">{ev.desc}</div>
+                            <div className="text-[10px] text-slate-400 font-mono">{formatDhruDate(ev.time)}</div>
+                          </div>
+                        ))}
+
+                        {order.status === "completed" && (
+                          <div className="relative">
+                            <span className="absolute -right-6 top-0.5 w-3 h-3 rounded-full bg-emerald-600 ring-4 ring-emerald-100"></span>
+                            <div className="font-bold text-emerald-700">اكتمل الطلب بنجاح</div>
+                            <div className="text-[11px] text-slate-600">تم استلام النتيجة وتسليم الكود للعميل.</div>
+                            <div className="text-[10px] text-slate-400 font-mono">
+                              {repliedTime ? formatDhruDate(repliedTime) : "-"}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
-            </div>
 
-            <div className="pt-2 flex justify-end">
-              <button
-                type="button"
-                onClick={() => setSelectedOrderDetails(null)}
-                className="px-4 py-2 rounded-xl bg-surface-container-high hover:bg-surface-container-highest text-on-surface font-bold text-xs"
-              >
-                إغلاق
-              </button>
+              {/* Bottom Actions Bar */}
+              <div className="flex items-center justify-between px-5 py-3 border-t border-slate-200 bg-slate-50">
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      router.push(`/admin/orders?search=${encodeURIComponent(order.apiOrderId || order.id)}`);
+                    }}
+                    className="px-4 py-2 rounded-xl bg-white hover:bg-slate-100 border border-slate-300 text-blue-600 font-bold text-xs flex items-center gap-1.5 transition-all shadow-sm"
+                  >
+                    <span className="material-symbols-outlined text-sm">open_in_new</span>
+                    <span>فتح في صفحة إدارة الطلبات</span>
+                  </button>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedOrderDetails(null);
+                    setIsEditingFields(false);
+                    setModalFeedback(null);
+                  }}
+                  className="px-6 py-2 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold text-xs transition-colors"
+                >
+                  إغلاق
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
 
       {/* Services Visits Detail Modal */}
       {activeModal === "services" && (

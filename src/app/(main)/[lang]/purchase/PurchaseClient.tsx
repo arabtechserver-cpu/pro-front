@@ -468,13 +468,24 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
     return Number((c + m).toFixed(2));
   };
 
-  const unitPrice = getCalculatedUnitPrice(selectedService);
-  const isFreeService = Boolean(selectedService && unitPrice === 0 && (
+  // Membership discount from the authenticated session (synced from backend)
+  const membershipDiscount = Math.max(
+    userSession?.effectiveDiscount || 0,
+    userSession?.membershipTier?.discountPercentage || 0,
+    userSession?.customDiscount || 0
+  );
+
+  const unitPriceBase = getCalculatedUnitPrice(selectedService);
+  const unitPrice = membershipDiscount > 0
+    ? Number((unitPriceBase * (1 - membershipDiscount / 100)).toFixed(2))
+    : unitPriceBase;
+
+  const isFreeService = Boolean(selectedService && unitPriceBase === 0 && (
     selectedService.name?.toLowerCase().includes("free") || 
     selectedService.name?.includes("مجاني") || 
     selectedService.name?.includes("مجانا")
   ));
-  const isZeroUnpriced = Boolean(selectedService && unitPrice === 0 && !isFreeService);
+  const isZeroUnpriced = Boolean(selectedService && unitPriceBase === 0 && !isFreeService);
 
   const rawTotalPrice = serviceSupportsQty ? unitPrice * (quantity > 0 ? quantity : 1) : unitPrice;
   const couponDiscount = appliedCoupon ? Number(((rawTotalPrice * appliedCoupon.discountPercent) / 100).toFixed(2)) : 0;
@@ -1175,20 +1186,28 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
                   <span className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider block">
                     {lang === 'ar' ? 'سعر الخدمة' : 'Service Price'}
                   </span>
-                  {unitPrice > 0 ? (
+                  {unitPriceBase > 0 ? (
                     <div className="flex flex-col items-start sm:items-end gap-1 mt-0.5">
                       <div className="flex items-center gap-2">
-                        <span className="text-xs text-on-surface-variant/70 line-through font-mono">
-                          ${(unitPrice / 0.9).toFixed(2)} USD
-                        </span>
+                        {membershipDiscount > 0 && (
+                          <span className="text-xs text-on-surface-variant/70 line-through font-mono">
+                            ${unitPriceBase.toFixed(2)} USD
+                          </span>
+                        )}
                         <span className="text-2xl font-bold font-mono text-primary glow-cyan">
                           ${unitPrice.toFixed(2)} USD
                         </span>
                       </div>
-                      <span className="text-[10px] font-bold text-violet-400 bg-violet-500/15 border border-violet-500/30 px-2 py-0.5 rounded-full flex items-center gap-1">
-                        <span className="material-symbols-outlined text-[12px]">local_offer</span>
-                        <span>{lang === 'ar' ? 'خصم 10% مطبق' : '10% OFF Applied'}</span>
-                      </span>
+                      {membershipDiscount > 0 && (
+                        <span className="text-[10px] font-bold text-violet-400 bg-violet-500/15 border border-violet-500/30 px-2 py-0.5 rounded-full flex items-center gap-1">
+                          <span className="material-symbols-outlined text-[12px]">local_offer</span>
+                          <span>
+                            {lang === 'ar'
+                              ? `خصم VIP ${membershipDiscount}% مطبق`
+                              : `VIP ${membershipDiscount}% OFF Applied`}
+                          </span>
+                        </span>
+                      )}
                     </div>
                   ) : isFreeService ? (
                     <span className="text-sm font-bold text-violet-400 bg-violet-500/10 border border-violet-500/30 px-3 py-1 rounded-xl inline-block mt-1">
@@ -1629,27 +1648,31 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
               <div>
                 <p className="text-xs font-bold text-on-surface-variant">{lang === 'ar' ? 'إجمالي التكلفة المطلوبة:' : 'Total Cost Required:'}</p>
                 <div className="flex items-baseline gap-2.5 flex-wrap">
-                  {rawTotalPrice > 0 && (
+                  {membershipDiscount > 0 && rawTotalPrice > 0 && (
                     <span className="text-sm line-through text-on-surface-variant/60 font-mono dir-ltr">
-                      ${(rawTotalPrice / 0.9).toFixed(2)} USD
+                      ${(unitPriceBase * (serviceSupportsQty ? (quantity > 0 ? quantity : 1) : 1)).toFixed(2)} USD
                     </span>
                   )}
                   <p className="text-xl font-bold font-mono text-primary glow-cyan dir-ltr">${totalPrice.toFixed(2)} USD</p>
-                  {rawTotalPrice > 0 && (
+                  {membershipDiscount > 0 && rawTotalPrice > 0 && (
                     <span className="text-[11px] font-bold text-violet-400 bg-violet-500/15 border border-violet-500/30 px-2 py-0.5 rounded-md flex items-center gap-1 dir-ltr">
-                      <span>-10% (${((rawTotalPrice / 0.9) - rawTotalPrice).toFixed(2)})</span>
+                      <span>-{membershipDiscount}% VIP</span>
                     </span>
                   )}
                   {appliedCoupon && (
                     <span className="text-[11px] font-bold text-secondary bg-secondary/15 border border-secondary/30 px-2 py-0.5 rounded-md dir-ltr">
-                      -{appliedCoupon.discountPercent}% كود إضافي
+                      -{appliedCoupon.discountPercent}% {lang === 'ar' ? 'كود إضافي' : 'Coupon'}
                     </span>
                   )}
                 </div>
-                {rawTotalPrice > 0 && (
+                {membershipDiscount > 0 && rawTotalPrice > 0 && (
                   <p className="text-[11px] text-violet-400/90 mt-1 flex items-center gap-1">
                     <span className="material-symbols-outlined text-xs">verified</span>
-                    <span>{lang === 'ar' ? 'تم تطبيق خصم 10% الترويجي تلقائياً على هذا الطلب' : '10% promotional discount automatically applied'}</span>
+                    <span>
+                      {lang === 'ar'
+                        ? `تم تطبيق خصم عضوية VIP ${membershipDiscount}% تلقائياً`
+                        : `VIP membership discount of ${membershipDiscount}% applied automatically`}
+                    </span>
                   </p>
                 )}
               </div>
@@ -1699,9 +1722,13 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
                 <span>
                   {isFreeService
                     ? (lang === 'ar' ? 'تأكيد وإرسال الطلب (مجاناً)' : 'Confirm & Send Order (Free)')
-                    : (lang === 'ar' 
-                        ? `تأكيد وإرسال الطلب ($${totalPrice.toFixed(2)} USD) - شامل خصم 10%` 
-                        : `Confirm & Send Order ($${totalPrice.toFixed(2)} USD) - 10% OFF Included`)}
+                    : (lang === 'ar'
+                        ? `تأكيد وإرسال الطلب ($${totalPrice.toFixed(2)} USD)${
+                            membershipDiscount > 0 ? ` - خصم VIP ${membershipDiscount}%` : ''
+                          }`
+                        : `Confirm & Send Order ($${totalPrice.toFixed(2)} USD)${
+                            membershipDiscount > 0 ? ` - VIP ${membershipDiscount}% OFF` : ''
+                          }`)}
                 </span>
               </>
             )}
