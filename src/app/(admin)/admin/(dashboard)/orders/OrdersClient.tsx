@@ -1030,11 +1030,7 @@ export default function OrdersClient() {
           ? calculateDurationString(selectedOrder.createdAt, repliedTime)
           : null;
 
-        const isEaProvider = Boolean(
-          selectedOrder.provider?.name?.toLowerCase().includes("ea") ||
-          selectedOrder.provider?.apiUrl?.toLowerCase().includes("ea-unlocker") ||
-          selectedOrder.serviceDhruId?.toLowerCase().includes("ea")
-        );
+
 
         return (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/75 backdrop-blur-sm animate-in fade-in">
@@ -1153,9 +1149,9 @@ export default function OrdersClient() {
                     </div>
                   </div>
 
-                  {/* API, API Order ID, Client with EA-UNLOCKER Logo on the right */}
-                  <div className="py-2.5 px-3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-slate-50/40">
-                    <div className="flex-1 w-full divide-y divide-slate-100">
+                  {/* API, API Order ID, Client */}
+                  <div className="py-2.5 px-3 bg-slate-50/40">
+                    <div className="w-full divide-y divide-slate-100">
                       <div className="flex items-center justify-between py-1.5">
                         <span className="text-slate-500 font-medium w-36 sm:w-44 text-left">API</span>
                         <span className="text-slate-800 font-bold text-left flex-1">
@@ -1174,50 +1170,6 @@ export default function OrdersClient() {
                           {selectedOrder.user?.fullName || selectedOrder.user?.username || "Client"}
                         </span>
                       </div>
-                    </div>
-
-                    {/* Right Provider Logo Card (EA-UNLOCKER style) */}
-                    <div className="self-center sm:self-auto shrink-0 pl-2">
-                      {isEaProvider ? (
-                        <div className="bg-white p-2.5 rounded-xl border border-slate-200 shadow-sm flex flex-col items-center justify-center min-w-[150px] sm:min-w-[170px]">
-                          <svg viewBox="0 0 170 55" className="w-36 sm:w-40 h-auto" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <text
-                              x="8"
-                              y="42"
-                              fontFamily="'Arial Black', Impact, sans-serif"
-                              fontWeight="900"
-                              fontStyle="italic"
-                              fontSize="48"
-                              fill="#0c3c86"
-                              letterSpacing="-3"
-                            >
-                              EA
-                            </text>
-                            <path
-                              d="M 52 40 C 75 22, 110 15, 160 26 C 115 22, 80 30, 58 44 Z"
-                              fill="#00a3e8"
-                            />
-                          </svg>
-                          <div className="text-[13px] font-black tracking-wider text-[#0c3c86] uppercase font-sans -mt-1">
-                            EA-UNLOCKER
-                          </div>
-                          <div className="flex items-center w-full gap-1.5 mt-0.5 px-1">
-                            <div className="h-[1.5px] bg-[#0c3c86] flex-1"></div>
-                            <span className="text-[9px] font-bold text-[#0c3c86] tracking-tight font-sans">
-                              ea-unlocker.com
-                            </span>
-                            <div className="h-[1.5px] bg-[#0c3c86] flex-1"></div>
-                          </div>
-                        </div>
-                      ) : (
-                        <div className="bg-white p-3 rounded-xl border border-slate-200 shadow-sm text-center min-w-[140px]">
-                          <span className="material-symbols-outlined text-2xl text-blue-600 mb-0.5">dns</span>
-                          <div className="text-xs font-bold text-slate-800 uppercase">
-                            {selectedOrder.provider?.name || "Server"}
-                          </div>
-                          <div className="text-[10px] text-slate-500">API Provider</div>
-                        </div>
-                      )}
                     </div>
                   </div>
 
