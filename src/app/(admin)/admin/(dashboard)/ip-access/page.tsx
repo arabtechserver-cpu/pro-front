@@ -63,7 +63,6 @@ export default function IpAccessManagementPage() {
   const [isRestrictionEnabled, setIsRestrictionEnabled] = useState(false);
   const [currentClientIp, setCurrentClientIp] = useState<string>("");
   const [isCurrentIpAllowed, setIsCurrentIpAllowed] = useState(false);
-  const [isAutoResetEnabled, setIsAutoResetEnabled] = useState(true);
 
   // Device & WebRTC states
   const [currentDeviceToken, setCurrentDeviceToken] = useState<string>("");
@@ -139,11 +138,10 @@ export default function IpAccessManagementPage() {
   // Fetch status, stats, allowed list, and devices
   const loadData = useCallback(async () => {
     try {
-      const [statusRes, allowedRes, statsRes, autoResetRes, devicesRes] = await Promise.all([
+      const [statusRes, allowedRes, statsRes, devicesRes] = await Promise.all([
         fetch("/api/admin/ip-access/status"),
         fetch("/api/admin/ip-access/allowed-ips"),
         fetch("/api/admin/ip-access/stats"),
-        fetch("/api/admin/ip-access/auto-reset").catch(() => null),
         fetch("/api/admin/ip-access/devices").catch(() => null)
       ]);
 
@@ -162,13 +160,6 @@ export default function IpAccessManagementPage() {
       if (statsRes.ok) {
         const statsObj = await statsRes.json();
         setStats(statsObj.stats || null);
-      }
-
-      if (autoResetRes && autoResetRes.ok) {
-        const autoData = await autoResetRes.json().catch(() => ({}));
-        if (typeof autoData.enabled === "boolean") {
-          setIsAutoResetEnabled(autoData.enabled);
-        }
       }
 
       if (devicesRes && devicesRes.ok) {
@@ -337,25 +328,6 @@ export default function IpAccessManagementPage() {
     }
   };
 
-  const handleToggleAutoReset = async () => {
-    const nextVal = !isAutoResetEnabled;
-    try {
-      const res = await fetch("/api/admin/ip-access/toggle-auto-reset", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ enabled: nextVal })
-      });
-      const data = await res.json().catch(() => ({}));
-      if (res.ok && data.success) {
-        setIsAutoResetEnabled(nextVal);
-        showSuccess(data.message || (nextVal ? "تم تفعيل المسح التلقائي" : "تم إيقاف المسح التلقائي"));
-      } else {
-        showError(data.error || "فشل في تحديث حالة المسح التلقائي");
-      }
-    } catch {
-      showError("تعذر الاتصال بالسيرفر لتحديث حالة المسح التلقائي");
-    }
-  };
 
   // Get current client IP from backend and refresh WebRTC
   const handleGetMyIp = async () => {
@@ -603,38 +575,6 @@ export default function IpAccessManagementPage() {
       )}
 
       {/* Statistics Cards Grid */}
-      {/* Auto-Reset on Dokploy Deployment Control Card */}
-      <div className="bg-surface-container border border-outline-variant/30 rounded-2xl p-4 md:p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div className="space-y-1">
-          <div className="flex items-center gap-2 flex-wrap">
-            <span className="material-symbols-outlined text-amber-400 text-lg">published_with_changes</span>
-            <span className="text-xs font-bold text-on-surface">مسح قيود الـ IP تلقائياً عند الرفع على Dokploy أو إعادة التشغيل</span>
-            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-lg border ${
-              isAutoResetEnabled ? "bg-amber-500/10 text-amber-400 border-amber-500/20" : "bg-zinc-500/10 text-zinc-400 border-zinc-500/20"
-            }`}>
-              {isAutoResetEnabled ? "مفعل (يتم فك الحظر تلقائياً مع كل رفع)" : "معطل (الحظر يظل سارياً)"}
-            </span>
-          </div>
-          <p className="text-[11px] text-on-surface-variant leading-relaxed">
-            عند تفعيل هذا الخيار، سيقوم السيرفر بمسح قائمة الـ IP وتعطيل الحظر تلقائياً فور تشغيل الحاوية الجديدة لتفادي إغلاق اللوحة عليك، ويمكنك قفله من هنا لاحقاً.
-          </p>
-        </div>
-
-        <button
-          type="button"
-          onClick={handleToggleAutoReset}
-          className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shrink-0 border ${
-            isAutoResetEnabled
-              ? "bg-amber-500/15 hover:bg-amber-500/25 text-amber-400 border-amber-500/30"
-              : "bg-surface hover:bg-surface-container-high text-on-surface border-outline-variant/40"
-          }`}
-        >
-          <span className="material-symbols-outlined text-base">
-            {isAutoResetEnabled ? "lock_open" : "lock"}
-          </span>
-          <span>{isAutoResetEnabled ? "إيقاف المسح التلقائي عند الرفع" : "تشغيل المسح التلقائي عند الرفع"}</span>
-        </button>
-      </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
         {/* Card 1: Allowed IPs */}
