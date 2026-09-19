@@ -14,15 +14,21 @@ export async function loginAdmin(username: string, password: string, turnstileTo
   const uniqueUrls = Array.from(new Set(candidateUrls));
   let lastErrorMessage = "";
 
+  const cookieStore = await cookies();
+  const deviceToken = cookieStore.get("admin_device_token")?.value;
+  const headers: Record<string, string> = { "Content-Type": "application/json" };
+  if (deviceToken) headers["x-device-token"] = deviceToken;
+
   for (const apiUrl of uniqueUrls) {
     try {
       const res = await fetch(`${apiUrl}/api/auth/login`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers,
         body: JSON.stringify({
           email: username,
           password,
-          "cf-turnstile-response": turnstileToken || "cf-turnstile-client-fallback"
+          "cf-turnstile-response": turnstileToken || "cf-turnstile-client-fallback",
+          deviceToken
         }),
         cache: "no-store"
       });
@@ -72,12 +78,17 @@ export async function verifyAdminOtpAction(challengeToken: string, otp: string) 
   const uniqueUrls = Array.from(new Set(candidateUrls));
   let lastErrorMessage = "";
 
+  const cookieStore = await cookies();
+  const deviceToken = cookieStore.get("admin_device_token")?.value;
+  const headers: Record<string, string> = { "Content-Type": "application/json" };
+  if (deviceToken) headers["x-device-token"] = deviceToken;
+
   for (const apiUrl of uniqueUrls) {
     try {
       const res = await fetch(`${apiUrl}/api/auth/admin/verify-otp`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ challengeToken, otp }),
+        headers,
+        body: JSON.stringify({ challengeToken, otp, deviceToken }),
         cache: "no-store"
       });
 

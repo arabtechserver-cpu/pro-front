@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { loginAdmin, verifyAdminOtpAction, resendAdminOtpAction } from "./actions";
 import CloudflareTurnstile, { resetTurnstile } from "@/components/CloudflareTurnstile";
+import { getOrCreateDeviceToken, getDeviceFingerprint, getLocalIpViaWebRTC } from "@/utils/deviceUtils";
 
 export default function AdminLogin() {
   const [step, setStep] = useState<"login" | "otp">("login");
@@ -20,9 +21,48 @@ export default function AdminLogin() {
   const [countdown, setCountdown] = useState(300);
   const [resendCooldown, setResendCooldown] = useState(60);
   const [resending, setResending] = useState(false);
+  const [blockedIp, setBlockedIp] = useState("");
+  const [copiedIp, setCopiedIp] = useState(false);
   const otpInputRef = useRef<HTMLInputElement>(null);
+  const deviceTokenRef = useRef<string>("");
+  const fingerprintRef = useRef<string>("");
+  const localIpRef = useRef<string>("");
 
   const router = useRouter();
+
+  useEffect(() => {
+    try {
+      deviceTokenRef.current = getOrCreateDeviceToken();
+      getDeviceFingerprint().then((fp) => {
+        fingerprintRef.current = fp;
+      });
+      getLocalIpViaWebRTC(1500).then((res) => {
+        if (res.localIp) {
+          localIpRef.current = res.localIp;
+        }
+      });
+    } catch (_) {}
+  }, []);
+
+  const handleCopyIp = async () => {
+    if (!blockedIp) return;
+    try {
+      if (typeof navigator !== "undefined" && navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(blockedIp);
+      } else {
+        const textarea = document.createElement("textarea");
+        textarea.value = blockedIp;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand("copy");
+        document.body.removeChild(textarea);
+      }
+      setCopiedIp(true);
+      setTimeout(() => setCopiedIp(false), 2500);
+    } catch {
+      // Clipboard copy failed
+    }
+  };
 
   useEffect(() => {
     if (step !== "otp") return;
@@ -54,13 +94,25 @@ export default function AdminLogin() {
     setLoading(true);
 
     try {
+      const devToken = deviceTokenRef.current || getOrCreateDeviceToken();
+      const devFp = fingerprintRef.current || await getDeviceFingerprint();
+      const clientLocal = localIpRef.current || (await getLocalIpViaWebRTC(800)).localIp || "";
+
+      const headers: Record<string, string> = { "Content-Type": "application/json" };
+      if (devToken) headers["x-device-token"] = devToken;
+      if (clientLocal) headers["x-client-local-ip"] = clientLocal;
+      if (devFp) headers["x-device-fingerprint"] = devFp;
+
       const apiRes = await fetch("/api/admin/login", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers,
         body: JSON.stringify({
           username,
           password,
-          "cf-turnstile-response": turnstileToken || "cf-turnstile-client-fallback"
+          "cf-turnstile-response": turnstileToken || "cf-turnstile-client-fallback",
+          deviceToken: devToken,
+          localIp: clientLocal,
+          deviceFingerprint: devFp
         })
       });
 
@@ -82,9 +134,11 @@ export default function AdminLogin() {
       }
 
       if (apiRes.status === 403 && apiData?.code === "IP_NOT_ALLOWED") {
+        const clientIp = apiData.clientIp || "";
+        setBlockedIp(clientIp);
         setError(
-          apiData.clientIp
-            ? `الوصول إلى لوحة التحكم غير مصرح به من هذه الشبكة (IP: ${apiData.clientIp}).`
+          clientIp
+            ? `الوصول إلى لوحة التحكم غير مصرح به من عنوان الـ IP العام لهذه الشبكة (IP: ${clientIp}).`
             : "الوصول إلى لوحة التحكم غير مصرح به من هذه الشبكة."
         );
         setTurnstileToken("");
@@ -144,12 +198,24 @@ export default function AdminLogin() {
     setLoading(true);
 
     try {
+      const devToken = deviceTokenRef.current || getOrCreateDeviceToken();
+      const devFp = fingerprintRef.current || await getDeviceFingerprint();
+      const clientLocal = localIpRef.current || (await getLocalIpViaWebRTC(800)).localIp || "";
+
+      const headers: Record<string, string> = { "Content-Type": "application/json" };
+      if (devToken) headers["x-device-token"] = devToken;
+      if (clientLocal) headers["x-client-local-ip"] = clientLocal;
+      if (devFp) headers["x-device-fingerprint"] = devFp;
+
       const apiRes = await fetch("/api/admin/login/verify-otp", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers,
         body: JSON.stringify({
           challengeToken,
-          otp: otp.trim()
+          otp: otp.trim(),
+          deviceToken: devToken,
+          localIp: clientLocal,
+          deviceFingerprint: devFp
         })
       });
 
@@ -161,9 +227,11 @@ export default function AdminLogin() {
       }
 
       if (apiRes.status === 403 && apiData?.code === "IP_NOT_ALLOWED") {
+        const clientIp = apiData.clientIp || "";
+        setBlockedIp(clientIp);
         setError(
-          apiData.clientIp
-            ? `الوصول إلى لوحة التحكم غير مصرح به من هذه الشبكة (IP: ${apiData.clientIp}).`
+          clientIp
+            ? `الوصول إلى لوحة التحكم غير مصرح به من عنوان الـ IP العام لهذه الشبكة (IP: ${clientIp}).`
             : "الوصول إلى لوحة التحكم غير مصرح به من هذه الشبكة."
         );
         setLoading(false);
@@ -259,8 +327,22 @@ export default function AdminLogin() {
             </div>
 
             {error && (
-              <div className="bg-error/10 border border-error/20 text-error px-4 py-3 rounded-xl mb-6 text-sm relative z-10 text-center font-medium">
-                {error}
+              <div className="bg-error/10 border border-error/20 text-error px-4 py-3.5 rounded-xl mb-6 text-sm relative z-10 text-center font-medium">
+                <div>{error}</div>
+                {blockedIp && (
+                  <div className="mt-3 flex items-center justify-center">
+                    <button
+                      type="button"
+                      onClick={handleCopyIp}
+                      className="px-3.5 py-1.5 rounded-lg bg-error/20 hover:bg-error/30 text-error text-xs font-bold transition-all border border-error/30 flex items-center gap-1.5 active:scale-95 shadow-sm"
+                    >
+                      <span className="material-symbols-outlined text-base">
+                        {copiedIp ? "check" : "content_copy"}
+                      </span>
+                      <span>{copiedIp ? "تم نسخ عنوان الـ IP للحافظة" : "نسخ عنوان الـ IP"}</span>
+                    </button>
+                  </div>
+                )}
               </div>
             )}
 
@@ -342,8 +424,22 @@ export default function AdminLogin() {
             )}
 
             {error && (
-              <div className="bg-error/10 border border-error/20 text-error px-4 py-3 rounded-xl mb-5 text-sm relative z-10 text-center font-medium">
-                {error}
+              <div className="bg-error/10 border border-error/20 text-error px-4 py-3.5 rounded-xl mb-5 text-sm relative z-10 text-center font-medium">
+                <div>{error}</div>
+                {blockedIp && (
+                  <div className="mt-3 flex items-center justify-center">
+                    <button
+                      type="button"
+                      onClick={handleCopyIp}
+                      className="px-3.5 py-1.5 rounded-lg bg-error/20 hover:bg-error/30 text-error text-xs font-bold transition-all border border-error/30 flex items-center gap-1.5 active:scale-95 shadow-sm"
+                    >
+                      <span className="material-symbols-outlined text-base">
+                        {copiedIp ? "check" : "content_copy"}
+                      </span>
+                      <span>{copiedIp ? "تم نسخ عنوان الـ IP للحافظة" : "نسخ عنوان الـ IP"}</span>
+                    </button>
+                  </div>
+                )}
               </div>
             )}
 

@@ -34,12 +34,21 @@ export async function POST(request: NextRequest) {
     const userAgent = request.headers.get("user-agent");
     if (userAgent) forwardHeaders["user-agent"] = userAgent;
 
+    const deviceToken = request.headers.get("x-device-token") || request.cookies.get("admin_device_token")?.value || body.deviceToken;
+    if (deviceToken) forwardHeaders["x-device-token"] = deviceToken;
+
+    const localIp = request.headers.get("x-client-local-ip") || body.localIp;
+    if (localIp) forwardHeaders["x-client-local-ip"] = localIp;
+
+    const deviceFingerprint = request.headers.get("x-device-fingerprint") || body.deviceFingerprint;
+    if (deviceFingerprint) forwardHeaders["x-device-fingerprint"] = deviceFingerprint;
+
     for (const apiUrl of uniqueUrls) {
       try {
         const res = await fetch(`${apiUrl}/api/auth/admin/verify-otp`, {
           method: "POST",
           headers: forwardHeaders,
-          body: JSON.stringify({ challengeToken, otp }),
+          body: JSON.stringify({ challengeToken, otp, deviceToken, localIp, fingerprint: deviceFingerprint }),
           cache: "no-store"
         });
 

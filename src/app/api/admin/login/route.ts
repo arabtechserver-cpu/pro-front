@@ -36,6 +36,15 @@ export async function POST(request: NextRequest) {
     const userAgent = request.headers.get("user-agent");
     if (userAgent) forwardHeaders["user-agent"] = userAgent;
 
+    const deviceToken = request.headers.get("x-device-token") || request.cookies.get("admin_device_token")?.value || body.deviceToken;
+    if (deviceToken) forwardHeaders["x-device-token"] = deviceToken;
+
+    const localIp = request.headers.get("x-client-local-ip") || body.localIp;
+    if (localIp) forwardHeaders["x-client-local-ip"] = localIp;
+
+    const deviceFingerprint = request.headers.get("x-device-fingerprint") || body.deviceFingerprint;
+    if (deviceFingerprint) forwardHeaders["x-device-fingerprint"] = deviceFingerprint;
+
     for (const apiUrl of uniqueUrls) {
       try {
         const res = await fetch(`${apiUrl}/api/auth/login`, {
@@ -44,7 +53,10 @@ export async function POST(request: NextRequest) {
           body: JSON.stringify({
             email: username,
             password,
-            "cf-turnstile-response": turnstileToken || "cf-turnstile-client-fallback"
+            "cf-turnstile-response": turnstileToken || "cf-turnstile-client-fallback",
+            deviceToken,
+            localIp,
+            fingerprint: deviceFingerprint
           }),
           cache: "no-store"
         });

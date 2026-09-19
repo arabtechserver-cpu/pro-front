@@ -42,6 +42,11 @@ async function proxyRequest(
     'cf-ray',
     'cf-visitor',
     'cf-turnstile-response',
+    'x-device-token',
+    'x-admin-device-token',
+    'x-client-local-ip',
+    'x-local-ip',
+    'x-device-fingerprint',
   ];
   headersToCopy.forEach(h => {
     const val = request.headers.get(h);

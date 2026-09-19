@@ -1,6 +1,12 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import {
+  getOrCreateDeviceToken,
+  getDeviceFingerprint,
+  getLocalIpViaWebRTC,
+  getDeviceDescription
+} from "@/utils/deviceUtils";
 
 interface AllowedIp {
   id: string;
@@ -13,11 +19,27 @@ interface AllowedIp {
   lastAccessAt: string | null;
 }
 
+interface AllowedDevice {
+  id: string;
+  deviceToken: string;
+  fingerprint: string | null;
+  label: string | null;
+  localIp: string | null;
+  lastIp: string | null;
+  isActive: boolean;
+  createdBy: string | null;
+  createdAt: string;
+  updatedAt: string;
+  lastAccessAt: string | null;
+}
+
 interface AccessLog {
   id: string;
   userId: string | null;
   username: string | null;
   ipAddress: string;
+  localIp?: string | null;
+  deviceToken?: string | null;
   userAgent: string | null;
   status: "allowed" | "blocked";
   reason: string | null;
@@ -26,6 +48,7 @@ interface AccessLog {
 
 interface StatsData {
   allowedCount: number;
+  devicesCount?: number;
   maxLimit: number;
   successfulAccess: number;
   blockedAttempts: number;
@@ -36,9 +59,22 @@ interface StatsData {
 export default function IpAccessManagementPage() {
   const [stats, setStats] = useState<StatsData | null>(null);
   const [allowedIps, setAllowedIps] = useState<AllowedIp[]>([]);
+  const [devices, setDevices] = useState<AllowedDevice[]>([]);
   const [isRestrictionEnabled, setIsRestrictionEnabled] = useState(false);
   const [currentClientIp, setCurrentClientIp] = useState<string>("");
   const [isCurrentIpAllowed, setIsCurrentIpAllowed] = useState(false);
+  const [isAutoResetEnabled, setIsAutoResetEnabled] = useState(true);
+
+  // Device & WebRTC states
+  const [currentDeviceToken, setCurrentDeviceToken] = useState<string>("");
+  const [currentFingerprint, setCurrentFingerprint] = useState<string>("");
+  const [webrtcLocalIp, setWebrtcLocalIp] = useState<string | null>(null);
+  const [isMdnsLocal, setIsMdnsLocal] = useState<boolean>(false);
+  const [isDetectingWebRtc, setIsDetectingWebRtc] = useState<boolean>(false);
+  const [isAuthorizingDevice, setIsAuthorizingDevice] = useState<boolean>(false);
+  const [isDeletingDevice, setIsDeletingDevice] = useState<string | null>(null);
+  const [isTogglingDevice, setIsTogglingDevice] = useState<string | null>(null);
+  const [deviceLabelInput, setDeviceLabelInput] = useState<string>("");
 
   // Loading states
   const [isInitialLoading, setIsInitialLoading] = useState(true);
@@ -80,13 +116,35 @@ export default function IpAccessManagementPage() {
     setTimeout(() => setErrorMessage(""), 6000);
   };
 
-  // Fetch status, stats and allowed list
+  // Extract client device token and WebRTC local IP on mount
+  useEffect(() => {
+    try {
+      const token = getOrCreateDeviceToken();
+      setCurrentDeviceToken(token);
+      setDeviceLabelInput(getDeviceDescription());
+      getDeviceFingerprint().then((fp) => setCurrentFingerprint(fp));
+
+      setIsDetectingWebRtc(true);
+      getLocalIpViaWebRTC(2000)
+        .then((res) => {
+          setWebrtcLocalIp(res.localIp);
+          setIsMdnsLocal(res.isMdns);
+        })
+        .finally(() => {
+          setIsDetectingWebRtc(false);
+        });
+    } catch (_) {}
+  }, []);
+
+  // Fetch status, stats, allowed list, and devices
   const loadData = useCallback(async () => {
     try {
-      const [statusRes, allowedRes, statsRes] = await Promise.all([
+      const [statusRes, allowedRes, statsRes, autoResetRes, devicesRes] = await Promise.all([
         fetch("/api/admin/ip-access/status"),
         fetch("/api/admin/ip-access/allowed-ips"),
-        fetch("/api/admin/ip-access/stats")
+        fetch("/api/admin/ip-access/stats"),
+        fetch("/api/admin/ip-access/auto-reset").catch(() => null),
+        fetch("/api/admin/ip-access/devices").catch(() => null)
       ]);
 
       if (statusRes.ok) {
@@ -105,8 +163,20 @@ export default function IpAccessManagementPage() {
         const statsObj = await statsRes.json();
         setStats(statsObj.stats || null);
       }
+
+      if (autoResetRes && autoResetRes.ok) {
+        const autoData = await autoResetRes.json().catch(() => ({}));
+        if (typeof autoData.enabled === "boolean") {
+          setIsAutoResetEnabled(autoData.enabled);
+        }
+      }
+
+      if (devicesRes && devicesRes.ok) {
+        const devData = await devicesRes.json().catch(() => ({}));
+        setDevices(devData.devices || []);
+      }
     } catch {
-      showError("تعذر تحميل بيانات إدارة الـ IP من السيرفر");
+      showError("تعذر تحميل بيانات إدارة الـ IP والأجهزة من السيرفر");
     } finally {
       setIsInitialLoading(false);
     }
@@ -145,17 +215,101 @@ export default function IpAccessManagementPage() {
     loadLogs(logsPage, logStatusFilter, logSearch);
   }, [loadLogs, logsPage, logStatusFilter, logSearch]);
 
+  const currentDeviceRecord = devices.find((d) => d.deviceToken === currentDeviceToken);
+  const isCurrentDeviceAuthorized = Boolean(currentDeviceRecord && currentDeviceRecord.isActive);
+
+  // Authorize Current Device (Trusted Device Fingerprint)
+  const handleAuthorizeCurrentDevice = async () => {
+    const token = currentDeviceToken || getOrCreateDeviceToken();
+    if (!token) {
+      showError("تعذر استخراج رمز الجهاز السري");
+      return;
+    }
+
+    setIsAuthorizingDevice(true);
+    try {
+      const res = await fetch("/api/admin/ip-access/devices", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          deviceToken: token,
+          fingerprint: currentFingerprint,
+          label: deviceLabelInput.trim() || getDeviceDescription(),
+          localIp: webrtcLocalIp
+        })
+      });
+
+      const data = await res.json();
+      if (res.ok && data.success) {
+        showSuccess(data.message || "تم اعتماد هذا الجهاز بنجاح. يمكنك الآن الدخول من هذا الجهاز بحرية تامة من أي مكان.");
+        await loadData();
+      } else {
+        showError(data.error || "فشل في اعتماد الجهاز");
+      }
+    } catch {
+      showError("تعذر الاتصال بالسيرفر لاعتماد الجهاز");
+    } finally {
+      setIsAuthorizingDevice(false);
+    }
+  };
+
+  const handleToggleDeviceStatus = async (id: string, currentStatus: boolean) => {
+    setIsTogglingDevice(id);
+    try {
+      const res = await fetch(`/api/admin/ip-access/devices/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isActive: !currentStatus })
+      });
+
+      const data = await res.json();
+      if (res.ok && data.success) {
+        showSuccess(data.message || "تم تحديث حالة الجهاز بنجاح");
+        await loadData();
+      } else {
+        showError(data.error || "فشل في تحديث حالة الجهاز");
+      }
+    } catch {
+      showError("تعذر الاتصال بالسيرفر لتحديث حالة الجهاز");
+    } finally {
+      setIsTogglingDevice(null);
+    }
+  };
+
+  const handleDeleteDevice = async (id: string) => {
+    if (!confirm("هل أنت متأكد من رغبتك في إلغاء اعتماد هذا الجهاز؟ لن يتمكن هذا الجهاز من الدخول إلا إذا كان عنوان الـ IP الخاص به مسموحاً.")) return;
+
+    setIsDeletingDevice(id);
+    try {
+      const res = await fetch(`/api/admin/ip-access/devices/${id}`, {
+        method: "DELETE"
+      });
+
+      const data = await res.json();
+      if (res.ok && data.success) {
+        showSuccess(data.message || "تم إلغاء اعتماد الجهاز وحذفه بنجاح");
+        await loadData();
+      } else {
+        showError(data.error || "فشل في حذف الجهاز");
+      }
+    } catch {
+      showError("تعذر الاتصال بالسيرفر لحذف الجهاز");
+    } finally {
+      setIsDeletingDevice(null);
+    }
+  };
+
   // Master switch toggle
   const handleToggleRestriction = async () => {
     const targetState = !isRestrictionEnabled;
 
-    if (targetState && !isCurrentIpAllowed) {
-      showError("يجب إضافة عنوان الـ IP الحالي وتفعيله قبل تشغيل نظام حماية الـ IP لمنع قفل لوحة التحكم.");
+    if (targetState && !isCurrentIpAllowed && !isCurrentDeviceAuthorized) {
+      showError("يجب إضافة عنوان الـ IP الحالي أو اعتماد هذا الجهاز أولاً قبل تشغيل نظام حماية الـ IP لمنع قفل لوحة التحكم.");
       return;
     }
 
     const confirmMsg = targetState
-      ? "هل أنت متأكد من رغبتك في تفعيل حماية الـ IP؟ لن يتمكن أي جهاز من فتح لوحة التحكم إلا إذا كان عنوان الـ IP الخاص به مسموحاً ونشطاً."
+      ? "هل أنت متأكد من رغبتك في تفعيل حماية الـ IP؟ لن يتمكن أي جهاز من فتح لوحة التحكم إلا إذا كان مضافاً في عناوين الـ IP المسموحة أو مسجلاً كجهاز معتمد."
       : "هل أنت متأكد من رغبتك في تعطيل حماية الـ IP؟ سيتمكن أي حساب إداري من الدخول من أي شبكة.";
 
     if (!confirm(confirmMsg)) return;
@@ -165,7 +319,7 @@ export default function IpAccessManagementPage() {
       const res = await fetch("/api/admin/ip-access/toggle-restriction", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ enabled: targetState })
+        body: JSON.stringify({ enabled: targetState, currentDeviceToken })
       });
 
       const data = await res.json();
@@ -183,11 +337,32 @@ export default function IpAccessManagementPage() {
     }
   };
 
-  // Get current client IP from backend
+  const handleToggleAutoReset = async () => {
+    const nextVal = !isAutoResetEnabled;
+    try {
+      const res = await fetch("/api/admin/ip-access/toggle-auto-reset", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ enabled: nextVal })
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && data.success) {
+        setIsAutoResetEnabled(nextVal);
+        showSuccess(data.message || (nextVal ? "تم تفعيل المسح التلقائي" : "تم إيقاف المسح التلقائي"));
+      } else {
+        showError(data.error || "فشل في تحديث حالة المسح التلقائي");
+      }
+    } catch {
+      showError("تعذر الاتصال بالسيرفر لتحديث حالة المسح التلقائي");
+    }
+  };
+
+  // Get current client IP from backend and refresh WebRTC
   const handleGetMyIp = async () => {
     setIsDetectingIp(true);
     try {
-      const res = await fetch("/api/admin/ip-access/my-ip");
+      const token = currentDeviceToken || getOrCreateDeviceToken();
+      const res = await fetch(`/api/admin/ip-access/my-ip?deviceToken=${encodeURIComponent(token)}`);
       if (res.ok) {
         const data = await res.json();
         setCurrentClientIp(data.ip || "");
@@ -196,6 +371,12 @@ export default function IpAccessManagementPage() {
       } else {
         showError("تعذر كشف عنوان الـ IP من السيرفر");
       }
+
+      // Refresh WebRTC Local IP
+      getLocalIpViaWebRTC(2000).then((rtc) => {
+        setWebrtcLocalIp(rtc.localIp);
+        setIsMdnsLocal(rtc.isMdns);
+      });
     } catch {
       showError("حدث خطأ أثناء فحص عنوان الـ IP");
     } finally {
@@ -219,6 +400,11 @@ export default function IpAccessManagementPage() {
     e.preventDefault();
     if (!inputIp.trim()) {
       showError("يرجى إدخال عنوان الـ IP");
+      return;
+    }
+
+    if (/^(10\.|192\.168\.|172\.(1[6-9]|2[0-9]|3[0-1])\.|127\.|169\.254\.)/.test(inputIp.trim())) {
+      showError("عنوان الـ IP المدخل هو عنوان محلي خاص بالجهاز (مثل 192.168). يجب استخدام عنوان الـ IP العام للشبكة (Public IP).");
       return;
     }
 
@@ -417,7 +603,40 @@ export default function IpAccessManagementPage() {
       )}
 
       {/* Statistics Cards Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* Auto-Reset on Dokploy Deployment Control Card */}
+      <div className="bg-surface-container border border-outline-variant/30 rounded-2xl p-4 md:p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="space-y-1">
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="material-symbols-outlined text-amber-400 text-lg">published_with_changes</span>
+            <span className="text-xs font-bold text-on-surface">مسح قيود الـ IP تلقائياً عند الرفع على Dokploy أو إعادة التشغيل</span>
+            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-lg border ${
+              isAutoResetEnabled ? "bg-amber-500/10 text-amber-400 border-amber-500/20" : "bg-zinc-500/10 text-zinc-400 border-zinc-500/20"
+            }`}>
+              {isAutoResetEnabled ? "مفعل (يتم فك الحظر تلقائياً مع كل رفع)" : "معطل (الحظر يظل سارياً)"}
+            </span>
+          </div>
+          <p className="text-[11px] text-on-surface-variant leading-relaxed">
+            عند تفعيل هذا الخيار، سيقوم السيرفر بمسح قائمة الـ IP وتعطيل الحظر تلقائياً فور تشغيل الحاوية الجديدة لتفادي إغلاق اللوحة عليك، ويمكنك قفله من هنا لاحقاً.
+          </p>
+        </div>
+
+        <button
+          type="button"
+          onClick={handleToggleAutoReset}
+          className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shrink-0 border ${
+            isAutoResetEnabled
+              ? "bg-amber-500/15 hover:bg-amber-500/25 text-amber-400 border-amber-500/30"
+              : "bg-surface hover:bg-surface-container-high text-on-surface border-outline-variant/40"
+          }`}
+        >
+          <span className="material-symbols-outlined text-base">
+            {isAutoResetEnabled ? "lock_open" : "lock"}
+          </span>
+          <span>{isAutoResetEnabled ? "إيقاف المسح التلقائي عند الرفع" : "تشغيل المسح التلقائي عند الرفع"}</span>
+        </button>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
         {/* Card 1: Allowed IPs */}
         <div className="bg-surface-container border border-outline-variant/30 rounded-2xl p-5 relative overflow-hidden">
           <div className="flex items-center justify-between">
@@ -428,7 +647,7 @@ export default function IpAccessManagementPage() {
             <span className="text-2xl md:text-3xl font-mono font-bold text-on-surface">
               {currentCount} / {maxLimit}
             </span>
-            <span className="text-xs text-on-surface-variant font-medium">عناوين نشطة</span>
+            <span className="text-xs text-on-surface-variant font-medium">عناوين</span>
           </div>
           <div className="w-full bg-surface-container-high h-1.5 rounded-full mt-3 overflow-hidden">
             <div
@@ -440,7 +659,22 @@ export default function IpAccessManagementPage() {
           </div>
         </div>
 
-        {/* Card 2: Successful Access */}
+        {/* Card 2: Authorized Devices */}
+        <div className="bg-surface-container border border-outline-variant/30 rounded-2xl p-5">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold text-on-surface-variant">الأجهزة المعتمدة</span>
+            <span className="material-symbols-outlined text-emerald-400 text-xl">devices</span>
+          </div>
+          <div className="mt-3 flex items-baseline gap-2">
+            <span className="text-2xl md:text-3xl font-mono font-bold text-emerald-400">
+              {devices.length} / 5
+            </span>
+            <span className="text-xs text-on-surface-variant font-medium">أجهزة</span>
+          </div>
+          <p className="text-[11px] text-on-surface-variant mt-2">دخول غير مقيد بالـ IP</p>
+        </div>
+
+        {/* Card 3: Successful Access */}
         <div className="bg-surface-container border border-outline-variant/30 rounded-2xl p-5">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-on-surface-variant">عمليات الدخول الناجحة</span>
@@ -452,10 +686,10 @@ export default function IpAccessManagementPage() {
             </span>
             <span className="text-xs text-on-surface-variant font-medium">عملية مصرحة</span>
           </div>
-          <p className="text-[11px] text-on-surface-variant mt-2">من عناوين IP المعتمدة</p>
+          <p className="text-[11px] text-on-surface-variant mt-2">من عناوين وأجهزة مسموحة</p>
         </div>
 
-        {/* Card 3: Blocked Attempts */}
+        {/* Card 4: Blocked Attempts */}
         <div className="bg-surface-container border border-outline-variant/30 rounded-2xl p-5">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-on-surface-variant">المحاولات المحظورة</span>
@@ -465,12 +699,12 @@ export default function IpAccessManagementPage() {
             <span className="text-2xl md:text-3xl font-mono font-bold text-red-400">
               {stats?.blockedAttempts ?? 0}
             </span>
-            <span className="text-xs text-on-surface-variant font-medium">محاولة دخول</span>
+            <span className="text-xs text-on-surface-variant font-medium">محاولة</span>
           </div>
           <p className="text-[11px] text-on-surface-variant mt-2">تم رفضها برمز 403</p>
         </div>
 
-        {/* Card 4: Active Admins */}
+        {/* Card 5: Active Admins */}
         <div className="bg-surface-container border border-outline-variant/30 rounded-2xl p-5">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-on-surface-variant">حسابات الإدارة النشطة</span>
@@ -480,57 +714,302 @@ export default function IpAccessManagementPage() {
             <span className="text-2xl md:text-3xl font-mono font-bold text-on-surface">
               {stats?.activeAdmins ?? 1}
             </span>
-            <span className="text-xs text-on-surface-variant font-medium">مشرفين مؤهلين</span>
+            <span className="text-xs text-on-surface-variant font-medium">مشرفين</span>
           </div>
-          <p className="text-[11px] text-on-surface-variant mt-2">أدوار Super Admin و Admin</p>
+          <p className="text-[11px] text-on-surface-variant mt-2">Super Admin و Admin</p>
         </div>
       </div>
 
-      {/* Current IP Detection Box */}
-      <div className="bg-surface-container border border-outline-variant/30 rounded-2xl p-5 md:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div className="space-y-1">
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-bold text-on-surface-variant">عنوان الـ IP العام لطلبك الحالي:</span>
-            <code className="font-mono text-sm font-bold text-primary bg-primary/10 px-3 py-1 rounded-xl border border-primary/20" dir="ltr">
-              {currentClientIp || "لم يتم التحديد"}
-            </code>
-            <span
-              className={`text-[11px] font-bold px-2 py-0.5 rounded-lg border ${
-                isCurrentIpAllowed
-                  ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
-                  : "bg-amber-500/10 text-amber-400 border-amber-500/20"
-              }`}
-            >
-              {isCurrentIpAllowed ? "مسموح ومعتمد" : "غير مضاف للقائمة"}
-            </span>
+      {/* Trusted Device & WebRTC Local IP Panel */}
+      <div className="bg-surface-container border border-outline-variant/40 rounded-3xl p-5 md:p-6 space-y-6 shadow-sm">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-outline-variant/30 pb-5">
+          <div className="flex items-start md:items-center gap-3">
+            <div className={`w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 border ${
+              isCurrentDeviceAuthorized
+                ? "bg-emerald-500/15 border-emerald-500/30 text-emerald-400"
+                : "bg-amber-500/15 border-amber-500/30 text-amber-400"
+            }`}>
+              <span className="material-symbols-outlined text-2xl">
+                {isCurrentDeviceAuthorized ? "verified_user" : "devices"}
+              </span>
+            </div>
+            <div>
+              <div className="flex items-center gap-2 flex-wrap">
+                <h3 className="text-base font-bold text-on-surface">
+                  نظام «الجهاز المعتمد» (Trusted Device Fingerprint)
+                </h3>
+                <span className={`text-[11px] font-bold px-2.5 py-0.5 rounded-lg border ${
+                  isCurrentDeviceAuthorized
+                    ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+                    : "bg-amber-500/10 text-amber-400 border-amber-500/20"
+                }`}>
+                  {isCurrentDeviceAuthorized ? "هذا الجهاز معتمد ومصرح له" : "هذا الجهاز غير معتمد بعد"}
+                </span>
+              </div>
+              <p className="text-xs text-on-surface-variant mt-0.5">
+                {isCurrentDeviceAuthorized
+                  ? "تم تسجيل بصمة هذا المتصفح والهاتف بنجاح في قاعدة البيانات. يمكنك الدخول للوحة التحكم من أي مكان بالعالم (4G أو واي فاي) دون حظر."
+                  : "سجل هذا الهاتف كجهاز معتمد بضغطة زر واحدة لتتمكن من الدخول من أي شبكة 4G دون القلق من تغير عنوان الـ IP المتكرر."}
+              </p>
+            </div>
           </div>
-          <p className="text-xs text-on-surface-variant">
-            يتم استخراج عنوان الـ IP من السيرفر مباشرة عبر اتصالات موثوقة مع معالجة حقيقية لأي بروكسي.
-          </p>
+
+          <div className="flex items-center gap-2 shrink-0">
+            {!isCurrentDeviceAuthorized ? (
+              <div className="flex items-center gap-2 w-full sm:w-auto">
+                <input
+                  type="text"
+                  value={deviceLabelInput}
+                  onChange={(e) => setDeviceLabelInput(e.target.value)}
+                  placeholder="اسم هذا الجهاز (مثال: هاتف الآدمن)"
+                  className="bg-surface border border-outline-variant/40 rounded-xl px-3 py-2 text-xs text-on-surface outline-none focus:border-primary transition-all w-44"
+                />
+                <button
+                  type="button"
+                  onClick={handleAuthorizeCurrentDevice}
+                  disabled={isAuthorizingDevice}
+                  className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all shadow-md shadow-emerald-600/20 flex items-center gap-1.5 shrink-0 disabled:opacity-50"
+                >
+                  <span className="material-symbols-outlined text-base">verified</span>
+                  <span>{isAuthorizingDevice ? "جاري الاعتماد..." : "اعتماد هذا الجهاز الآن"}</span>
+                </button>
+              </div>
+            ) : (
+              <div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5">
+                <span className="material-symbols-outlined text-base">check_circle</span>
+                <span>محمي ومصرح له من أي شبكة</span>
+              </div>
+            )}
+          </div>
         </div>
 
-        <div className="flex items-center gap-2.5 shrink-0">
-          <button
-            type="button"
-            onClick={handleGetMyIp}
-            disabled={isDetectingIp}
-            className="px-4 py-2.5 rounded-xl bg-surface hover:bg-surface-container-high border border-outline-variant/40 text-xs font-semibold text-on-surface transition-all flex items-center gap-1.5 disabled:opacity-50"
-          >
-            <span className="material-symbols-outlined text-base">my_location</span>
-            <span>{isDetectingIp ? "جاري الفحص..." : "معرفة الـ IP الحالي"}</span>
-          </button>
+        {/* Network & Local IP WebRTC Details Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Public IP */}
+          <div className="bg-surface border border-outline-variant/30 rounded-2xl p-4 flex items-center justify-between">
+            <div className="space-y-1">
+              <span className="text-[11px] font-bold text-on-surface-variant flex items-center gap-1">
+                <span className="material-symbols-outlined text-sm text-primary">public</span>
+                <span>الـ IP العام لشبكة الإنترنت (Public Network IP):</span>
+              </span>
+              <div className="flex items-center gap-2">
+                <code className="font-mono text-sm font-bold text-primary" dir="ltr">
+                  {currentClientIp || "لم يتم الكشف"}
+                </code>
+                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md border ${
+                  isCurrentIpAllowed
+                    ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+                    : "bg-zinc-500/10 text-zinc-400 border-zinc-500/20"
+                }`}>
+                  {isCurrentIpAllowed ? "مسموح بالـ IP" : "غير مضاف بالـ IP"}
+                </span>
+              </div>
+            </div>
 
-          {!isCurrentIpAllowed && (
+            <div className="flex items-center gap-1.5">
+              <button
+                type="button"
+                onClick={handleGetMyIp}
+                disabled={isDetectingIp}
+                className="p-2 rounded-xl bg-surface-container hover:bg-surface-container-high border border-outline-variant/30 text-on-surface text-xs transition-all"
+                title="تحديث فحص عنوان الشبكة"
+              >
+                <span className={`material-symbols-outlined text-base ${isDetectingIp ? "animate-spin" : ""}`}>
+                  sync
+                </span>
+              </button>
+              {!isCurrentIpAllowed && (
+                <button
+                  type="button"
+                  onClick={handleAddCurrentIp}
+                  disabled={allowedIps.length >= (stats?.maxLimit || 2)}
+                  className="px-3 py-1.5 rounded-xl bg-primary hover:bg-primary/90 text-on-primary text-xs font-bold transition-all flex items-center gap-1 disabled:opacity-40"
+                >
+                  <span className="material-symbols-outlined text-sm">add</span>
+                  <span>إضافة</span>
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* WebRTC Local IP */}
+          <div className="bg-surface border border-outline-variant/30 rounded-2xl p-4 flex items-center justify-between">
+            <div className="space-y-1">
+              <span className="text-[11px] font-bold text-on-surface-variant flex items-center gap-1">
+                <span className="material-symbols-outlined text-sm text-amber-400">lan</span>
+                <span>الـ IP الداخلي لكرت الشبكة (WebRTC Local IP):</span>
+              </span>
+              <div className="flex items-center gap-2 flex-wrap">
+                {isDetectingWebRtc ? (
+                  <span className="text-xs text-on-surface-variant flex items-center gap-1">
+                    <span className="material-symbols-outlined text-xs animate-spin">progress_activity</span>
+                    <span>جاري استخراج العنوان الداخلي عبر RTCPeerConnection...</span>
+                  </span>
+                ) : webrtcLocalIp ? (
+                  <>
+                    <code className="font-mono text-sm font-bold text-amber-400" dir="ltr">
+                      {webrtcLocalIp}
+                    </code>
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-md border bg-amber-500/10 text-amber-400 border-amber-500/20">
+                      {isMdnsLocal ? "حماية خصوصية (mDNS Host)" : "كرت الشبكة الداخلي (LAN)"}
+                    </span>
+                  </>
+                ) : (
+                  <span className="text-xs text-on-surface-variant">
+                    محمي بواسطة إعدادات خصوصية المتصفح
+                  </span>
+                )}
+              </div>
+            </div>
+
             <button
               type="button"
-              onClick={handleAddCurrentIp}
-              disabled={isMaxReached}
-              className="px-4 py-2.5 rounded-xl bg-primary hover:bg-primary/90 text-on-primary text-xs font-bold transition-all shadow-md shadow-primary/20 flex items-center gap-1.5 disabled:opacity-50"
+              onClick={() => {
+                setIsDetectingWebRtc(true);
+                getLocalIpViaWebRTC(2000).then((res) => {
+                  setWebrtcLocalIp(res.localIp);
+                  setIsMdnsLocal(res.isMdns);
+                }).finally(() => setIsDetectingWebRtc(false));
+              }}
+              disabled={isDetectingWebRtc}
+              className="p-2 rounded-xl bg-surface-container hover:bg-surface-container-high border border-outline-variant/30 text-on-surface text-xs transition-all"
+              title="إعادة فحص الـ IP الداخلي عبر WebRTC"
             >
-              <span className="material-symbols-outlined text-base">add_moderator</span>
-              <span>إضافة الـ IP الحالي</span>
+              <span className={`material-symbols-outlined text-base ${isDetectingWebRtc ? "animate-spin" : ""}`}>
+                refresh
+              </span>
             </button>
-          )}
+          </div>
+        </div>
+      </div>
+
+      {/* Authorized Devices Section */}
+      <div className="bg-surface-container border border-outline-variant/30 rounded-2xl overflow-hidden">
+        <div className="p-5 border-b border-outline-variant/30 flex items-center justify-between flex-wrap gap-4">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+              <span className="material-symbols-outlined text-xl">devices</span>
+            </div>
+            <div>
+              <h2 className="text-base md:text-lg font-bold text-on-surface">
+                الأجهزة المعتمدة في النظام (Authorized Trusted Devices)
+              </h2>
+              <p className="text-xs text-on-surface-variant mt-0.5">
+                أجهزة المشرفين المصرح لها بتخطي قيود الـ IP والدخول من أي مكان
+              </p>
+            </div>
+            <span className="text-xs font-mono font-bold bg-surface-container-high px-2.5 py-1 rounded-lg border border-outline-variant/30 text-on-surface-variant">
+              {devices.length} / 5 أجهزة
+            </span>
+          </div>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="w-full text-right text-xs">
+            <thead>
+              <tr className="border-b border-outline-variant/20 bg-surface-container-high/40 text-on-surface-variant font-semibold">
+                <th className="p-4">الجهاز / المتصفح</th>
+                <th className="p-4">الـ IP الداخلي (WebRTC)</th>
+                <th className="p-4">آخر IP عام تم الدخول منه</th>
+                <th className="p-4">الحالة</th>
+                <th className="p-4">تاريخ الاعتماد</th>
+                <th className="p-4">آخر دخول</th>
+                <th className="p-4 text-center">الإجراءات</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-outline-variant/20">
+              {devices.length === 0 ? (
+                <tr>
+                  <td colSpan={7} className="p-8 text-center text-on-surface-variant">
+                    <div className="flex flex-col items-center justify-center gap-2">
+                      <span className="material-symbols-outlined text-3xl text-on-surface-variant/40">phonelink_off</span>
+                      <p className="font-semibold text-xs">لا يوجد أي جهاز معتمد مسجل حالياً</p>
+                      <p className="text-[11px] text-on-surface-variant/70">
+                        اضغط على &quot;اعتماد هذا الجهاز الآن&quot; بالأعلى لتسجيل هاتفك أو جهازك الحالي وتفادي قفل الحساب عند تغير الـ IP.
+                      </p>
+                    </div>
+                  </td>
+                </tr>
+              ) : (
+                devices.map((device) => {
+                  const isCurrent = device.deviceToken === currentDeviceToken;
+                  return (
+                    <tr key={device.id} className="hover:bg-surface-container-high/30 transition-colors">
+                      <td className="p-4">
+                        <div className="flex items-center gap-2">
+                          <span className="font-bold text-on-surface">
+                            {device.label || "جهاز مشرف"}
+                          </span>
+                          {isCurrent && (
+                            <span className="text-[10px] font-bold bg-primary/15 text-primary border border-primary/20 px-2 py-0.5 rounded-md">
+                              هذا الجهاز الحالي
+                            </span>
+                          )}
+                        </div>
+                      </td>
+
+                      <td className="p-4 font-mono text-on-surface-variant" dir="ltr">
+                        {device.localIp || "-"}
+                      </td>
+
+                      <td className="p-4 font-mono font-bold text-on-surface" dir="ltr">
+                        {device.lastIp || "-"}
+                      </td>
+
+                      <td className="p-4">
+                        <button
+                          type="button"
+                          onClick={() => handleToggleDeviceStatus(device.id, device.isActive)}
+                          disabled={isTogglingDevice === device.id}
+                          className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold border transition-all ${
+                            device.isActive
+                              ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20 hover:bg-emerald-500/20"
+                              : "bg-zinc-500/10 text-zinc-400 border-zinc-500/20 hover:bg-zinc-500/20"
+                          }`}
+                        >
+                          <span className={`w-1.5 h-1.5 rounded-full ${device.isActive ? "bg-emerald-400" : "bg-zinc-500"}`} />
+                          <span>{device.isActive ? "معتمد ونشط" : "معطل"}</span>
+                        </button>
+                      </td>
+
+                      <td className="p-4 text-on-surface-variant font-mono">
+                        {new Date(device.createdAt).toLocaleString("ar-EG", {
+                          month: "short",
+                          day: "numeric",
+                          year: "numeric"
+                        })}
+                      </td>
+
+                      <td className="p-4 text-on-surface-variant font-mono">
+                        {device.lastAccessAt ? (
+                          new Date(device.lastAccessAt).toLocaleString("ar-EG", {
+                            month: "short",
+                            day: "numeric",
+                            hour: "2-digit",
+                            minute: "2-digit"
+                          })
+                        ) : (
+                          <span className="text-on-surface-variant/50">-</span>
+                        )}
+                      </td>
+
+                      <td className="p-4 text-center">
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteDevice(device.id)}
+                          disabled={isDeletingDevice === device.id}
+                          className="p-1.5 rounded-lg hover:bg-red-500/10 text-on-surface-variant hover:text-red-400 transition-colors"
+                          title="إلغاء اعتماد الجهاز وحذفه"
+                        >
+                          <span className="material-symbols-outlined text-base">delete</span>
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
+            </tbody>
+          </table>
         </div>
       </div>
 
@@ -809,8 +1288,21 @@ export default function IpAccessManagementPage() {
                     </td>
 
                     {/* IP */}
-                    <td className="p-4 font-mono font-bold text-on-surface" dir="ltr">
-                      {log.ipAddress}
+                    <td className="p-4 font-mono text-on-surface" dir="ltr">
+                      <div className="font-bold">{log.ipAddress}</div>
+                      {log.localIp && (
+                        <div className="text-[10px] text-amber-400 font-sans flex items-center gap-1 mt-0.5" dir="rtl">
+                          <span className="material-symbols-outlined text-xs">lan</span>
+                          <span className="font-mono" dir="ltr">{log.localIp}</span>
+                          <span>(داخلي)</span>
+                        </div>
+                      )}
+                      {log.deviceToken && (
+                        <div className="text-[10px] text-emerald-400 font-sans flex items-center gap-1 mt-0.5" dir="rtl">
+                          <span className="material-symbols-outlined text-xs">verified</span>
+                          <span>جهاز معتمد</span>
+                        </div>
+                      )}
                     </td>
 
                     {/* Status */}
@@ -902,18 +1394,38 @@ export default function IpAccessManagementPage() {
 
             <form onSubmit={handleSubmitAddIp} className="space-y-4">
               <div>
-                <label className="block text-xs font-bold text-on-surface mb-2">
-                  عنوان الـ IP (IPv4 أو IPv6) *
-                </label>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="block text-xs font-bold text-on-surface">
+                    عنوان الـ IP العام للشبكة (أو نطاق مثل 197.252.98.*) *
+                  </label>
+                  {currentClientIp && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setInputIp(currentClientIp);
+                        if (!inputLabel) setInputLabel("شبكة الاتصال الحالية");
+                      }}
+                      className="text-[11px] font-bold text-primary hover:underline flex items-center gap-1"
+                    >
+                      <span className="material-symbols-outlined text-xs">my_location</span>
+                      <span>استخدام عنوان شبكتي الحالية</span>
+                    </button>
+                  )}
+                </div>
                 <input
                   type="text"
                   required
                   value={inputIp}
                   onChange={(e) => setInputIp(e.target.value)}
-                  placeholder="مثال: 41.233.12.34"
+                  placeholder="مثال: 197.252.98.196 أو 197.252.98.*"
                   className="w-full bg-surface border border-outline-variant/40 rounded-xl px-4 py-2.5 text-xs text-on-surface font-mono outline-none focus:border-primary transition-all"
                   dir="ltr"
                 />
+                {/^(10\.|192\.168\.|172\.(1[6-9]|2[0-9]|3[0-1])\.|127\.|169\.254\.)/.test(inputIp.trim()) && (
+                  <p className="text-[11px] text-amber-400 mt-1.5 font-medium">
+                    تنبيه: هذا عنوان داخلي خاص بالجهاز فقط ولا يعمل عبر الإنترنت. يرجى إدخال عنوان الـ IP العام للشبكة.
+                  </p>
+                )}
               </div>
 
               <div>
