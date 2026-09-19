@@ -50,11 +50,11 @@ export async function generateMetadata(props: { params: Promise<{ lang: Locale }
   const title = isAr
     ? "عرب تك برو سيرفر | منصة فك شفرات وتفعيل الهواتف"
     : "Arab Tech Pro Server | GSM & Remote Unlock Services";
-  const description = isAr 
+  const description = isAr
     ? "منصة عرب تك برو سيرفر لفك شفرات الهواتف، تخطي حسابات آيكلود وFRP، وتفعيل البوكسات والدونجل وسيرفرات IMEI بأسعار الجملة المعتمدة."
     : "Arab Tech Pro Server: Professional phone unlocking, iCloud and FRP bypass, box activations, and high-speed IMEI server services.";
 
-  const shareImg = isAr 
+  const shareImg = isAr
     ? "https://arabtechproserver.tech/images/og_share_ar.png"
     : "https://arabtechproserver.tech/images/og_share_en.png";
 

@@ -1,9 +1,10 @@
-﻿"use client";
+"use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { logoutAdmin } from "../login/actions";
+import DashboardAccessRestricted from "@/components/admin/DashboardAccessRestricted";
 
 const NAV_ITEMS = [
   { href: "/admin", label: "ملخص الإحصائيات", icon: "dashboard" },
@@ -23,6 +24,7 @@ const NAV_ITEMS = [
   { href: "/admin/newsletter", label: "النشرة البريدية والمشتركون", icon: "forward_to_inbox" },
   { href: "/admin/analytics", label: "الإحصائيات", icon: "bar_chart" },
   { href: "/admin/backups", label: "النسخ الاحتياطي", icon: "backup" },
+  { href: "/admin/ip-access", label: "إدارة عناوين الـ IP", icon: "shield" },
   { href: "/admin/settings", label: "إعدادات الحساب", icon: "settings" },
 ];
 
@@ -34,6 +36,57 @@ export default function AdminLayout({
   const pathname = usePathname();
   const router = useRouter();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [isIpRestricted, setIsIpRestricted] = useState(false);
+  const [blockedIp, setBlockedIp] = useState("");
+  const [blockedReason, setBlockedReason] = useState("");
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const checkAccess = async () => {
+      try {
+        const res = await fetch("/api/admin/ip-access/check");
+        if (res.status === 403) {
+          const data = await res.json().catch(() => ({}));
+          if (data.code === "IP_NOT_ALLOWED" || data.error?.includes("network")) {
+            if (isMounted) {
+              setIsIpRestricted(true);
+              setBlockedIp(data.clientIp || "");
+              setBlockedReason(data.error || "شبكتك الحالية غير مصرح لها بالوصول إلى لوحة التحكم.");
+            }
+          }
+        }
+      } catch {
+        // Ignore network errors
+      }
+    };
+
+    checkAccess();
+
+    const originalFetch = window.fetch;
+    window.fetch = async (...args) => {
+      const response = await originalFetch(...args);
+      if (response.status === 403) {
+        try {
+          const cloned = response.clone();
+          const body = await cloned.json();
+          if (body?.code === "IP_NOT_ALLOWED" || body?.error?.includes("network")) {
+            if (isMounted) {
+              setIsIpRestricted(true);
+              setBlockedIp(body.clientIp || "");
+              setBlockedReason(body.error || "شبكتك الحالية غير مصرح لها بالوصول إلى لوحة التحكم.");
+            }
+          }
+        } catch {}
+      }
+      return response;
+    };
+
+    return () => {
+      isMounted = false;
+      window.fetch = originalFetch;
+    };
+  }, []);
 
   const handleLogout = async () => {
     if (confirm("هل أنت متأكد من تسجيل الخروج من لوحة الإدارة؟")) {
@@ -52,6 +105,10 @@ export default function AdminLayout({
       }
     }
   };
+
+  if (isIpRestricted) {
+    return <DashboardAccessRestricted currentIp={blockedIp} reason={blockedReason} />;
+  }
 
   return (
     <div className="min-h-screen bg-surface flex flex-col md:flex-row font-sans text-on-surface" dir="rtl">

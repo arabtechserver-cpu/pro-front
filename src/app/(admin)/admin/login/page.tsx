@@ -81,6 +81,18 @@ export default function AdminLogin() {
         return;
       }
 
+      if (apiRes.status === 403 && apiData?.code === "IP_NOT_ALLOWED") {
+        setError(
+          apiData.clientIp
+            ? `الوصول إلى لوحة التحكم غير مصرح به من هذه الشبكة (IP: ${apiData.clientIp}).`
+            : "الوصول إلى لوحة التحكم غير مصرح به من هذه الشبكة."
+        );
+        setTurnstileToken("");
+        resetTurnstile();
+        setLoading(false);
+        return;
+      }
+
       if (apiData?.message || apiData?.error) {
         setError(apiData.message || apiData.error);
         setTurnstileToken("");
@@ -145,6 +157,16 @@ export default function AdminLogin() {
 
       if (apiRes.ok && apiData.success) {
         window.location.href = "/admin";
+        return;
+      }
+
+      if (apiRes.status === 403 && apiData?.code === "IP_NOT_ALLOWED") {
+        setError(
+          apiData.clientIp
+            ? `الوصول إلى لوحة التحكم غير مصرح به من هذه الشبكة (IP: ${apiData.clientIp}).`
+            : "الوصول إلى لوحة التحكم غير مصرح به من هذه الشبكة."
+        );
+        setLoading(false);
         return;
       }
 

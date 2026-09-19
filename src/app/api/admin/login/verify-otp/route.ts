@@ -24,11 +24,21 @@ export async function POST(request: NextRequest) {
     const uniqueUrls = Array.from(new Set(candidateUrls));
     let lastErrorMessage = "";
 
+    const forwardHeaders: Record<string, string> = { "Content-Type": "application/json" };
+    const xff = request.headers.get("x-forwarded-for");
+    if (xff) forwardHeaders["x-forwarded-for"] = xff;
+    const xRealIp = request.headers.get("x-real-ip");
+    if (xRealIp) forwardHeaders["x-real-ip"] = xRealIp;
+    const cfIp = request.headers.get("cf-connecting-ip");
+    if (cfIp) forwardHeaders["cf-connecting-ip"] = cfIp;
+    const userAgent = request.headers.get("user-agent");
+    if (userAgent) forwardHeaders["user-agent"] = userAgent;
+
     for (const apiUrl of uniqueUrls) {
       try {
         const res = await fetch(`${apiUrl}/api/auth/admin/verify-otp`, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: forwardHeaders,
           body: JSON.stringify({ challengeToken, otp }),
           cache: "no-store"
         });
@@ -56,6 +66,17 @@ export async function POST(request: NextRequest) {
           }
         } else {
           const errData = await res.json().catch(() => ({}));
+          if (res.status === 403 && (errData?.code === "IP_NOT_ALLOWED" || errData?.error?.includes("network"))) {
+            return NextResponse.json(
+              {
+                success: false,
+                code: "IP_NOT_ALLOWED",
+                message: errData.error || errData.message || "Access to the dashboard is not allowed from this network.",
+                clientIp: errData.clientIp
+              },
+              { status: 403 }
+            );
+          }
           if (errData?.error || errData?.message) {
             lastErrorMessage = errData.error || errData.message;
           }

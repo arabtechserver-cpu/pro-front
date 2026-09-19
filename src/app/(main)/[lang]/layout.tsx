@@ -7,6 +7,8 @@ import Footer from "@/components/Footer";
 import { getDictionary } from "@/i18n/get-dictionary";
 import { Locale, i18n } from "@/i18n/config";
 import ClientWidgets from "@/components/ClientWidgets";
+import ArabCountriesMarquee from "@/components/ArabCountriesMarquee";
+import ArabSolidarityModal from "@/components/ArabSolidarityModal";
 
 const cairo = Cairo({
   subsets: ["arabic", "latin"],
@@ -310,9 +312,13 @@ export default async function RootLayout(
         {/* Client Enhancement Widgets (Lazy loaded, non-blocking) */}
         <ClientWidgets lang={lang} />
 
+        {/* Full Arab Solidarity Announcement Modal */}
+        <ArabSolidarityModal lang={lang} />
+
         <Navbar lang={lang} dict={dict.nav} />
         
         <main className="flex-grow w-full pt-16 sm:pt-20 pb-12 overflow-x-clip bg-transparent">
+          <ArabCountriesMarquee lang={lang} />
           {children}
         </main>
 
