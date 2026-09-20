@@ -21,6 +21,14 @@ export async function GET(
 ) {
   const resolvedParams = await params;
   const filename = resolvedParams.path.join('/');
+
+  if (filename.toLowerCase().includes('receipt')) {
+    return NextResponse.json(
+      { error: 'Access denied: Payment receipts require authenticated access via transactions API.' },
+      { status: 403 }
+    );
+  }
+
   const candidates = getBackendCandidates(cachedBackendUrl, process.env.INTERNAL_API_URL);
 
   for (const baseUrl of candidates) {

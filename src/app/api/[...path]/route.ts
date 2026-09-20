@@ -24,13 +24,20 @@ async function proxyRequest(
 ): Promise<Response> {
   const forwardHeaders = new Headers();
 
-  // Forward all authentication & session headers — including cookies (admin_token lives here)
+  // Forward all authentication & session headers — including cookies and origin for CSRF checks
   const headersToCopy = [
     'content-type',
     'authorization',
-    'cookie',          // ← Critical: admin_token is an httpOnly cookie
+    'cookie',
+    'origin',
+    'referer',
     'accept',
     'accept-language',
+    'sec-fetch-site',
+    'sec-fetch-mode',
+    'sec-fetch-dest',
+    'idempotency-key',
+    'x-idempotency-key',
     'x-admin-token',
     'x-user-token',
     'x-forwarded-for',
@@ -83,13 +90,14 @@ async function handler(
   }
 
   const candidates = getBackendCandidates(cachedBackendUrl, process.env.INTERNAL_API_URL);
-  const body = ['GET', 'HEAD'].includes(request.method)
-    ? undefined
-    : await request.arrayBuffer();
+  const isIdempotent = ['GET', 'HEAD', 'OPTIONS'].includes(request.method);
+  const targets = isIdempotent ? candidates : candidates.slice(0, 1);
+
+  const body = isIdempotent ? undefined : await request.arrayBuffer();
 
   let lastError: unknown;
 
-  for (const baseUrl of candidates) {
+  for (const baseUrl of targets) {
     const targetUrl = `${baseUrl}/api/${path}${search}`;
     try {
       const res = await proxyRequest(request, targetUrl, body);

@@ -250,7 +250,8 @@ export default function ProvidersClient() {
         body: JSON.stringify({
           apiUrl: formData.apiUrl,
           username: formData.username,
-          apiKey: formData.apiKey
+          apiKey: formData.apiKey,
+          providerId: editingProvider?.id
         })
       });
 
