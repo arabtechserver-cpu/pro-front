@@ -700,7 +700,7 @@ export default function PricingClient({
                 ? 'phone_iphone' 
                 : categorySection.categoryName.toLowerCase().includes('server') 
                   ? 'dns' 
-                  : 'remote_access';
+                  : 'cast';
 
               return (
                 <div key={catIdx} className="space-y-6 animate-in fade-in duration-300">

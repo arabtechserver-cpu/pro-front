@@ -1172,11 +1172,11 @@ export default function ServicesPage() {
                   <div className="flex items-center gap-4 mb-6 pb-4 border-b border-outline-variant/30">
                     <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
                       <span className="material-symbols-outlined text-2xl">
-                        {category.name.includes("IMEI")
+                        {category.name.toLowerCase().includes("imei")
                           ? "phone_iphone"
-                          : category.name.includes("Server")
+                          : category.name.toLowerCase().includes("server")
                           ? "dns"
-                          : "remote_access"}
+                          : "cast"}
                       </span>
                     </div>
                     <div>
