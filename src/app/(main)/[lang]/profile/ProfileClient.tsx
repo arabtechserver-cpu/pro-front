@@ -210,7 +210,7 @@ export default function ProfileClient({ lang, dict }: { lang: string; dict: any 
       const query = userSession.id ? `userId=${encodeURIComponent(userSession.id)}` : `email=${encodeURIComponent(userSession.email)}`;
       const res = await fetch(`/api/orders?${query}`, {
         headers,
-        credentials: "omit"
+        credentials: "include"
       });
 
       if (res.ok) {
@@ -240,7 +240,7 @@ export default function ProfileClient({ lang, dict }: { lang: string; dict: any 
       const query = userSession.id ? `userId=${encodeURIComponent(userSession.id)}` : `email=${encodeURIComponent(userSession.email)}`;
       const res = await fetch(`/api/transactions?${query}`, {
         headers,
-        credentials: "omit"
+        credentials: "include"
       });
 
       if (res.ok) {

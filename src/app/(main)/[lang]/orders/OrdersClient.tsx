@@ -14,6 +14,7 @@ export default function OrdersClient({ lang, dict }: { lang: string, dict: any }
   const [loadingOrders, setLoadingOrders] = useState(true);
   const [filterStatus, setFilterStatus] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const [authExpired, setAuthExpired] = useState(false);
 
   // 1. Load User Session & Sync Live Balance
   useEffect(() => {
@@ -67,13 +68,16 @@ export default function OrdersClient({ lang, dict }: { lang: string, dict: any }
       }
       const res = await fetch(`/api/orders?${param}`, {
         headers,
-        credentials: "omit"
+        credentials: "include"
       });
       if (res.ok) {
+        setAuthExpired(false);
         const data = await res.json().catch(() => ({ orders: [] }));
         if (data.orders && Array.isArray(data.orders)) {
           setOrdersList(data.orders);
         }
+      } else if (res.status === 401) {
+        setAuthExpired(true);
       }
     } catch (e) {
       console.error("Error fetching orders list:", e);
@@ -164,6 +168,25 @@ export default function OrdersClient({ lang, dict }: { lang: string, dict: any }
           <Link
             href={`/${lang}/login`}
             className="px-5 py-2.5 rounded-xl bg-amber-500 text-black font-bold text-xs hover:bg-amber-400 transition-all shrink-0 shadow-md"
+          >
+            {lang === 'ar' ? 'تسجيل الدخول' : 'Sign In'}
+          </Link>
+        </div>
+      )}
+
+      {/* SESSION EXPIRED WARNING */}
+      {userSession && authExpired && (
+        <div className="p-6 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-300 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <span className="material-symbols-outlined text-3xl text-amber-400">warning</span>
+            <div>
+              <p className="font-bold text-sm text-on-surface">{lang === 'ar' ? 'انتهت صلاحية جلسة تسجيل الدخول' : 'Session Expired'}</p>
+              <p className="text-xs text-on-surface-variant mt-0.5">{lang === 'ar' ? 'يرجى تسجيل الدخول مجدداً لتحديث ومشاهدة سجل طلباتك.' : 'Please sign in again to view and update your orders.'}</p>
+            </div>
+          </div>
+          <Link
+            href={`/${lang}/login`}
+            className="px-5 py-2.5 rounded-xl bg-primary text-on-primary font-bold text-xs hover:bg-primary-container transition-all shrink-0 shadow-md"
           >
             {lang === 'ar' ? 'تسجيل الدخول' : 'Sign In'}
           </Link>

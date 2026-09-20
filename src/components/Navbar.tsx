@@ -488,21 +488,21 @@ export default function Navbar({ lang, dict }: NavbarProps) {
                       </Link>
 
                       <Link 
-                        href={`/${lang}/pricing`} 
-                        onClick={() => setUserDropdownOpen(false)} 
-                        className="flex items-center gap-2.5 p-2.5 rounded-xl text-slate-200 hover:text-white hover:bg-surface-container-high transition-all"
-                      >
-                        <span className="material-symbols-outlined text-secondary text-base">receipt_long</span>
-                        <span>{lang === "ar" ? "طلباتي وسجل الخدمات" : "My Orders & Services"}</span>
-                      </Link>
-
-                      <Link 
                         href={`/${lang}/orders`} 
                         onClick={() => setUserDropdownOpen(false)} 
                         className="flex items-center gap-2.5 p-2.5 rounded-xl text-slate-200 hover:text-white hover:bg-surface-container-high transition-all"
                       >
-                        <span className="material-symbols-outlined text-tertiary text-base">history</span>
-                        <span>{lang === "ar" ? "متابعة الطلبات المباشرة" : "Track Live Orders"}</span>
+                        <span className="material-symbols-outlined text-secondary text-base">receipt_long</span>
+                        <span>{lang === "ar" ? "طلباتي وسجل العمليات" : "My Orders & History"}</span>
+                      </Link>
+
+                      <Link 
+                        href={`/${lang}/pricing`} 
+                        onClick={() => setUserDropdownOpen(false)} 
+                        className="flex items-center gap-2.5 p-2.5 rounded-xl text-slate-200 hover:text-white hover:bg-surface-container-high transition-all"
+                      >
+                        <span className="material-symbols-outlined text-tertiary text-base">payments</span>
+                        <span>{lang === "ar" ? "قائمة الخدمات والأسعار" : "Services & Pricing"}</span>
                       </Link>
 
                       <Link 
@@ -636,22 +636,30 @@ export default function Navbar({ lang, dict }: NavbarProps) {
               {lang === "ar" ? "خروج" : "Logout"}
             </button>
           </div>
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-3 gap-1.5">
             <Link
               href={`/${lang}/profile`}
               onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center justify-center gap-1.5 py-2 px-2 rounded-lg bg-white/5 hover:bg-white/10 text-xs font-semibold text-slate-200 transition-colors"
+              className="flex items-center justify-center gap-1 py-2 px-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-xs font-semibold text-slate-200 transition-colors"
             >
               <span className="material-symbols-outlined text-sm text-blue-400">account_circle</span>
               <span>{lang === "ar" ? "حسابي" : "Profile"}</span>
             </Link>
             <Link
+              href={`/${lang}/orders`}
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex items-center justify-center gap-1 py-2 px-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-xs font-semibold text-slate-200 transition-colors"
+            >
+              <span className="material-symbols-outlined text-sm text-emerald-400">receipt_long</span>
+              <span>{lang === "ar" ? "طلباتي" : "Orders"}</span>
+            </Link>
+            <Link
               href={`/${lang}/wallet`}
               onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center justify-center gap-1.5 py-2 px-2 rounded-lg bg-blue-500/15 hover:bg-blue-500/25 border border-blue-500/20 text-xs font-bold text-blue-300 transition-colors"
+              className="flex items-center justify-center gap-1 py-2 px-1.5 rounded-lg bg-blue-500/15 hover:bg-blue-500/25 border border-blue-500/20 text-xs font-bold text-blue-300 transition-colors"
             >
               <span className="material-symbols-outlined text-sm text-blue-400">account_balance_wallet</span>
-              <span>{lang === "ar" ? "شحن الرصيد" : "Top Up"}</span>
+              <span>{lang === "ar" ? "المحفظة" : "Wallet"}</span>
             </Link>
           </div>
         </div>

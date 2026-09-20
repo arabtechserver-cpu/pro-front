@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect } from "react";
 
@@ -537,7 +537,7 @@ export default function AdminMembershipsPage() {
                                 ? "bg-violet-500/15 text-violet-400 border border-violet-500/30"
                                 : "bg-surface-container-high text-on-surface-variant"
                             }`}>
-                              {effectiveDiscount > 0 ? `🔥 ${effectiveDiscount}% خصم` : "سعر أساسي (0%)"}
+                              {effectiveDiscount > 0 ? `${effectiveDiscount}% خصم` : "سعر أساسي (0%)"}
                             </span>
                           </td>
 
