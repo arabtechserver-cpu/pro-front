@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
@@ -149,7 +149,7 @@ export default function AdminDashboardClient() {
                 <p className="text-xs font-bold text-on-surface-variant">إجمالي الطلبات المسجلة</p>
                 <h3 className="text-3xl font-bold text-on-surface font-mono">{data.orders.total}</h3>
                 <p className="text-[11px] text-primary font-semibold">
-                  {data.orders.completed} طلب مكتمل • {data.orders.pending} قيد التنفيذ
+                  {data.orders.completed} طلب مكتمل • {data.orders.pending} قيد الانتظار
                 </p>
               </div>
               <div className="w-14 h-14 rounded-2xl bg-primary/10 border border-primary/20 text-primary flex items-center justify-center group-hover:scale-110 transition-transform">
@@ -319,7 +319,7 @@ export default function AdminDashboardClient() {
                             o.status === "pending" ? "bg-amber-500/15 text-amber-400 border border-amber-500/30" :
                             "bg-red-500/15 text-red-400 border border-red-500/30"
                           }`}>
-                            {o.status === "completed" ? "مكتمل" : o.status === "pending" ? "قيد التنفيذ" : "مرفوض"}
+                            {o.status === "completed" ? "مكتمل" : o.status === "pending" ? "قيد الانتظار" : "مرفوض"}
                           </span>
                         </td>
                         <td className="p-4 text-on-surface-variant font-mono">{new Date(o.createdAt).toLocaleString("ar-EG")}</td>

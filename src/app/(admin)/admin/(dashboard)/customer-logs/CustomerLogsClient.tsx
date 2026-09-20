@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 
@@ -187,7 +187,7 @@ export default function CustomerLogsClient() {
                         order.status === "pending" ? "bg-amber-500/15 text-amber-400 border border-amber-500/30" :
                         "bg-red-500/15 text-red-400 border border-red-500/30"
                       }`}>
-                        {order.status === "completed" ? "مكتمل" : order.status === "pending" ? "قيد التنفيذ" : "مرفوض"}
+                        {order.status === "completed" ? "مكتمل" : order.status === "pending" ? "قيد الانتظار" : "مرفوض"}
                       </span>
                     </td>
                     <td className="p-4 font-mono text-on-surface-variant">{new Date(order.createdAt).toLocaleString("ar-EG")}</td>

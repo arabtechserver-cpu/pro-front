@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
@@ -599,7 +599,7 @@ export default function ProfileClient({ lang, dict }: { lang: string; dict: any 
               </span>
               <span className="text-amber-400 font-mono flex items-center gap-1">
                 <span className="material-symbols-outlined text-xs">schedule</span>
-                <span>{pendingOrdersCount} {isAr ? "قيد التنفيذ" : "pending"}</span>
+                <span>{pendingOrdersCount} {isAr ? "قيد الانتظار" : "pending"}</span>
               </span>
             </div>
           </div>
@@ -744,7 +744,7 @@ export default function ProfileClient({ lang, dict }: { lang: string; dict: any 
                   onClick={() => setOrderFilter("processing")}
                   className={`px-3 py-1.5 rounded-lg transition-all ${orderFilter === "processing" ? "bg-amber-500 text-white shadow-sm" : "text-on-surface-variant hover:text-on-surface"}`}
                 >
-                  {isAr ? "جاري التنفيذ" : "Processing"}
+                  {isAr ? "قيد الانتظار" : "Pending"}
                 </button>
                 <button
                   onClick={() => setOrderFilter("completed")}
@@ -889,7 +889,7 @@ export default function ProfileClient({ lang, dict }: { lang: string; dict: any 
                           {isPending && (
                             <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-500/15 text-amber-400 border border-amber-500/30">
                               <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
-                              {isAr ? "جاري المعالجة" : "Processing"}
+                              {isAr ? "قيد الانتظار" : "Pending"}
                             </span>
                           )}
                           {isFailed && (

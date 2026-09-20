@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
@@ -204,7 +204,7 @@ export default function OrdersClient({ lang, dict }: { lang: string, dict: any }
                 onClick={() => setFilterStatus("processing")}
                 className={`px-3 py-1.5 rounded-lg transition-all ${filterStatus === "processing" ? "bg-amber-500 text-white shadow-sm" : "text-on-surface-variant hover:text-on-surface"}`}
               >
-                {lang === 'ar' ? 'جاري التنفيذ' : 'Processing'}
+                {lang === 'ar' ? 'قيد الانتظار' : 'Pending'}
               </button>
               <button 
                 onClick={() => setFilterStatus("completed")}
@@ -345,7 +345,7 @@ export default function OrdersClient({ lang, dict }: { lang: string, dict: any }
                         {isProcessing && (
                           <span className="px-3.5 py-1 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-400 font-bold text-[11px] inline-flex items-center gap-1.5 animate-pulse">
                             <span className="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
-                            <span>{lang === 'ar' ? 'قيد التنفيذ' : 'Processing'}</span>
+                            <span>{lang === 'ar' ? 'قيد الانتظار' : 'Pending'}</span>
                           </span>
                         )}
                         {isFailed && (

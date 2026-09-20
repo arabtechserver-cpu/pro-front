@@ -820,7 +820,7 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
               </h3>
               <p className="text-xs text-on-surface-variant leading-relaxed">
                 {lang === 'ar'
-                  ? 'طلبك الآن قيد المراجعة والمعالجة من قبل الإدارة، وسيتم تسليم النتيجة فور إتمامها.'
+                  ? 'طلبك الآن قيد الانتظار والمراجعة من قبل الإدارة، وسيتم تسليم النتيجة فور إتمامها.'
                   : 'Your order is currently pending review & processing. Result will be delivered upon completion.'}
               </p>
             </div>
