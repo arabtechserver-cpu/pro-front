@@ -1,8 +1,9 @@
-﻿"use client";
+"use client";
 
 import { useState, useDeferredValue, useEffect, useMemo, useRef, useCallback } from "react";
 import { getServiceRequiredFields } from "../providers/ProvidersClient";
 import { takeInitialGroups } from "../../../../../lib/service-list-window";
+import AddBundleModal from "./AddBundleModal";
 
 export default function ServicesPage() {
   const [categories, setCategories] = useState<any[]>([]);
@@ -43,6 +44,13 @@ export default function ServicesPage() {
   const [bulkMarginValue, setBulkMarginValue] = useState<string>("10");
   const [bulkMarginApplyTo, setBulkMarginApplyTo] = useState<"all" | "active">("all");
   const [isApplyingBulkMargin, setIsApplyingBulkMargin] = useState(false);
+
+  // Add Bundle Modal State
+  const [isAddBundleModalOpen, setIsAddBundleModalOpen] = useState(false);
+
+  // Delete Single Service State
+  const [deletingService, setDeletingService] = useState<any | null>(null);
+  const [isDeletingService, setIsDeletingService] = useState(false);
 
   const fetchServices = async () => {
     setLoading(true);
@@ -116,6 +124,39 @@ export default function ServicesPage() {
       showToast("تعذر الاتصال بالسيرفر لحذف الخدمات", "error");
     } finally {
       setIsDeletingAll(false);
+    }
+  };
+
+  // Delete Single Service
+  const handleDeleteService = async () => {
+    if (!deletingService) return;
+    setIsDeletingService(true);
+    try {
+      const res = await fetch("/api/dhru/services/delete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ serviceId: deletingService.id })
+      });
+
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setCategories((prev) =>
+          prev
+            .map((cat) => ({
+              ...cat,
+              services: cat.services.filter((s: any) => s.id !== deletingService.id)
+            }))
+            .filter((cat) => cat.services.length > 0)
+        );
+        showToast(data.message || `تم حذف الخدمة (${deletingService.name}) بنجاح`);
+        setDeletingService(null);
+      } else {
+        showToast(data.error || "فشل حذف الخدمة", "error");
+      }
+    } catch {
+      showToast("تعذر الاتصال بالسيرفر لحذف الخدمة", "error");
+    } finally {
+      setIsDeletingService(false);
     }
   };
 
@@ -880,6 +921,70 @@ export default function ServicesPage() {
         </div>
       )}
 
+      {/* Delete Single Service Confirmation Modal */}
+      {deletingService && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-in fade-in">
+          <div className="bg-surface-container border border-error/40 rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl space-y-5">
+            <div className="flex items-center gap-3 text-error">
+              <div className="w-12 h-12 rounded-2xl bg-error/20 border border-error/30 flex items-center justify-center">
+                <span className="material-symbols-outlined text-3xl">delete</span>
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-on-surface">حذف الخدمة</h3>
+                <p className="text-xs text-error font-semibold">تأكيد حذف هذه الخدمة نهائياً</p>
+              </div>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-error/10 border border-error/20 text-xs text-on-surface space-y-2 leading-relaxed">
+              <p className="font-bold">
+                هل أنت متأكد من رغبتك في حذف الخدمة التالية؟
+              </p>
+              <div className="p-3 bg-surface rounded-xl border border-outline-variant/30 text-xs font-bold text-primary">
+                {deletingService.name}
+              </div>
+              <p className="text-on-surface-variant text-[11px]">
+                سيتم حذف هذه الخدمة نهائياً من قاعدة البيانات ولن يتمكن العملاء من طلبها.
+              </p>
+            </div>
+
+            <div className="flex gap-3 pt-2">
+              <button
+                type="button"
+                onClick={handleDeleteService}
+                disabled={isDeletingService}
+                className="flex-1 bg-error hover:bg-error/90 text-surface py-3 rounded-xl font-bold transition-all flex items-center justify-center gap-2 shadow-lg disabled:opacity-50"
+              >
+                {isDeletingService ? (
+                  <span className="material-symbols-outlined animate-spin text-sm">refresh</span>
+                ) : (
+                  <span className="material-symbols-outlined text-sm">delete</span>
+                )}
+                <span>تأكيد الحذف</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setDeletingService(null)}
+                disabled={isDeletingService}
+                className="px-5 bg-surface-variant text-on-surface-variant hover:text-on-surface py-3 rounded-xl font-bold transition-all"
+              >
+                إلغاء
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Add Bundle Modal */}
+      <AddBundleModal
+        isOpen={isAddBundleModalOpen}
+        onClose={() => setIsAddBundleModalOpen(false)}
+        categories={categories}
+        onSuccess={() => {
+          showToast("تمت إضافة الباقة والخدمات بنجاح في قاعدة البيانات!");
+          fetchServices();
+        }}
+      />
+
       {/* Header & Controls */}
       <div className="flex flex-col gap-5 border-b border-outline-variant/20 pb-6">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
@@ -895,6 +1000,16 @@ export default function ServicesPage() {
 
           {/* Action Buttons Toolbar */}
           <div className="flex flex-wrap items-center gap-2.5">
+            {/* ADD BUNDLE BUTTON */}
+            <button
+              onClick={() => setIsAddBundleModalOpen(true)}
+              className="bg-gradient-to-r from-primary to-secondary hover:opacity-95 text-on-primary px-4 py-2.5 rounded-xl font-bold text-xs transition-all flex items-center gap-1.5 shadow-md active:scale-95"
+              title="إضافة باقة جديدة وخدمات مخصصة بحقول إدخال"
+            >
+              <span className="material-symbols-outlined text-sm">add_box</span>
+              <span>إضافة باقة جديدة</span>
+            </button>
+
             {/* BULK MARGIN BUTTON */}
             <button
               onClick={() => setIsBulkMarginModalOpen(true)}
@@ -1260,6 +1375,15 @@ export default function ServicesPage() {
                                     >
                                       <span className="material-symbols-outlined text-xs">edit</span>
                                       <span>تعديل</span>
+                                    </button>
+
+                                    {/* Delete Single Service Button */}
+                                    <button
+                                      onClick={() => setDeletingService(service)}
+                                      className="w-9 h-9 rounded-xl flex items-center justify-center transition-all bg-error/10 text-error hover:bg-error/20 border border-error/20"
+                                      title="حذف هذه الخدمة"
+                                    >
+                                      <span className="material-symbols-outlined text-sm">delete</span>
                                     </button>
                                   </div>
                                 </div>
