@@ -46,6 +46,12 @@ export default function AdminLayout({
     const checkAccess = async () => {
       try {
         const res = await fetch("/api/admin/ip-access/check");
+        if (res.status === 401) {
+          if (typeof window !== "undefined" && !window.location.pathname.includes("/admin/login")) {
+            window.location.href = "/admin/login";
+          }
+          return;
+        }
         if (res.status === 403) {
           const data = await res.json().catch(() => ({}));
           if (data.code === "IP_NOT_ALLOWED" || data.error?.includes("network")) {
@@ -66,7 +72,11 @@ export default function AdminLayout({
     const originalFetch = window.fetch;
     window.fetch = async (...args) => {
       const response = await originalFetch(...args);
-      if (response.status === 403) {
+      if (response.status === 401) {
+        if (typeof window !== "undefined" && !window.location.pathname.includes("/admin/login")) {
+          window.location.href = "/admin/login";
+        }
+      } else if (response.status === 403) {
         try {
           const cloned = response.clone();
           const body = await cloned.json();
