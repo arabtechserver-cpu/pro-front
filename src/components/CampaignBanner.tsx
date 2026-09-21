@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import {
@@ -15,7 +15,8 @@ import {
   Layers,
   Sparkles,
   Pause,
-  Play
+  Play,
+  Grid
 } from "lucide-react";
 
 export interface CampaignItem {
@@ -58,7 +59,7 @@ const DEFAULT_CAMPAIGNS: CampaignItem[] = [
     guaranteeAr: "ضمان مالي 100%",
     connectionEn: "DIRECT API",
     connectionAr: "ربط فوري API",
-    theme: "purple",
+    theme: "blue",
     image: "/images/promo_samsung_clean.png",
     url: "/pricing?search=Samsung",
     buttonTextEn: "Order & Activate Now",
@@ -141,8 +142,6 @@ interface ThemeStyle {
   shadowDark: string;
   auraLight: string;
   auraDark: string;
-  accentTextLight: string;
-  accentTextDark: string;
   pillBgLight: string;
   pillBgDark: string;
   progressGradient: string;
@@ -151,84 +150,74 @@ interface ThemeStyle {
 
 const THEME_STYLES: Record<string, ThemeStyle> = {
   purple: {
-    bgLight: "from-purple-50/90 via-white/95 to-indigo-50/80",
-    bgDark: "from-[#0f0b24]/95 via-[#150f33]/90 to-[#0c091d]/95",
-    borderLight: "border-purple-200/90",
-    borderDark: "border-purple-500/35",
-    shadowLight: "shadow-purple-500/10",
-    shadowDark: "shadow-purple-950/60",
-    auraLight: "bg-purple-400/20",
-    auraDark: "bg-purple-600/30",
-    accentTextLight: "text-purple-700",
-    accentTextDark: "text-purple-300",
-    pillBgLight: "bg-purple-100/90 border-purple-300 text-purple-800",
-    pillBgDark: "bg-purple-950/60 border-purple-500/40 text-purple-300",
-    progressGradient: "from-purple-600 via-indigo-500 to-purple-400",
-    buttonGradient: "from-purple-600 via-indigo-600 to-purple-700 hover:from-purple-500 hover:to-indigo-500"
+    bgLight: "from-slate-50 via-white to-blue-50/50",
+    bgDark: "from-[#060e22] via-[#0b1b42] to-[#040916]",
+    borderLight: "border-blue-200/90 hover:border-blue-300",
+    borderDark: "border-blue-500/35 hover:border-blue-400/50",
+    shadowLight: "shadow-xl shadow-blue-950/5",
+    shadowDark: "shadow-2xl shadow-blue-950/60",
+    auraLight: "bg-blue-400/15",
+    auraDark: "bg-blue-600/25",
+    pillBgLight: "bg-blue-100/80 border-blue-300 text-blue-900",
+    pillBgDark: "bg-blue-950/90 border-blue-500/40 text-blue-300",
+    progressGradient: "from-blue-600 via-indigo-600 to-sky-500",
+    buttonGradient: "from-blue-600 via-indigo-600 to-blue-700 hover:from-blue-500 hover:to-indigo-500 text-white shadow-md shadow-blue-600/25"
   },
   cyan: {
-    bgLight: "from-cyan-50/90 via-white/95 to-sky-50/80",
-    bgDark: "from-[#051524]/95 via-[#081d33]/90 to-[#040e1a]/95",
-    borderLight: "border-cyan-200/90",
-    borderDark: "border-cyan-500/35",
-    shadowLight: "shadow-cyan-500/10",
-    shadowDark: "shadow-cyan-950/60",
-    auraLight: "bg-cyan-400/20",
-    auraDark: "bg-cyan-500/30",
-    accentTextLight: "text-cyan-800",
-    accentTextDark: "text-cyan-300",
-    pillBgLight: "bg-cyan-100/90 border-cyan-300 text-cyan-800",
-    pillBgDark: "bg-cyan-950/60 border-cyan-500/40 text-cyan-300",
+    bgLight: "from-cyan-50/40 via-white to-sky-50/40",
+    bgDark: "from-[#031322] via-[#062038] to-[#020b14]",
+    borderLight: "border-cyan-200/90 hover:border-cyan-300",
+    borderDark: "border-cyan-500/35 hover:border-cyan-400/50",
+    shadowLight: "shadow-xl shadow-cyan-950/5",
+    shadowDark: "shadow-2xl shadow-cyan-950/60",
+    auraLight: "bg-cyan-400/15",
+    auraDark: "bg-cyan-500/25",
+    pillBgLight: "bg-cyan-100/80 border-cyan-300 text-cyan-900",
+    pillBgDark: "bg-cyan-950/90 border-cyan-500/40 text-cyan-300",
     progressGradient: "from-cyan-500 via-sky-400 to-blue-500",
-    buttonGradient: "from-cyan-600 via-sky-600 to-blue-600 hover:from-cyan-500 hover:to-sky-500"
+    buttonGradient: "from-cyan-600 via-sky-600 to-blue-600 hover:from-cyan-500 hover:to-sky-500 text-white shadow-md shadow-cyan-600/25"
   },
   blue: {
-    bgLight: "from-blue-50/90 via-white/95 to-slate-50/80",
-    bgDark: "from-[#081226]/95 via-[#0c1a38]/90 to-[#060d1c]/95",
-    borderLight: "border-blue-200/90",
-    borderDark: "border-blue-500/35",
-    shadowLight: "shadow-blue-500/10",
-    shadowDark: "shadow-blue-950/60",
-    auraLight: "bg-blue-400/20",
-    auraDark: "bg-blue-600/30",
-    accentTextLight: "text-blue-800",
-    accentTextDark: "text-blue-300",
-    pillBgLight: "bg-blue-100/90 border-blue-300 text-blue-800",
-    pillBgDark: "bg-blue-950/60 border-blue-500/40 text-blue-300",
+    bgLight: "from-blue-50/40 via-white to-slate-50",
+    bgDark: "from-[#051026] via-[#091b40] to-[#030a18]",
+    borderLight: "border-blue-200/90 hover:border-blue-300",
+    borderDark: "border-blue-500/35 hover:border-blue-400/50",
+    shadowLight: "shadow-xl shadow-blue-950/5",
+    shadowDark: "shadow-2xl shadow-blue-950/60",
+    auraLight: "bg-blue-400/15",
+    auraDark: "bg-blue-500/25",
+    pillBgLight: "bg-blue-100/80 border-blue-300 text-blue-900",
+    pillBgDark: "bg-blue-950/90 border-blue-500/40 text-sky-300",
     progressGradient: "from-blue-600 via-indigo-500 to-sky-400",
-    buttonGradient: "from-blue-600 via-indigo-600 to-blue-700 hover:from-blue-500 hover:to-indigo-500"
+    buttonGradient: "from-blue-600 via-indigo-600 to-blue-700 hover:from-blue-500 hover:to-indigo-500 text-white shadow-md shadow-blue-600/25"
   },
   emerald: {
-    bgLight: "from-emerald-50/90 via-white/95 to-teal-50/80",
-    bgDark: "from-[#041913]/95 via-[#06241b]/90 to-[#03130e]/95",
-    borderLight: "border-emerald-200/90",
-    borderDark: "border-emerald-500/35",
-    shadowLight: "shadow-emerald-500/10",
-    shadowDark: "shadow-emerald-950/60",
-    auraLight: "bg-emerald-400/20",
-    auraDark: "bg-emerald-500/30",
-    accentTextLight: "text-emerald-800",
-    accentTextDark: "text-emerald-300",
-    pillBgLight: "bg-emerald-100/90 border-emerald-300 text-emerald-800",
-    pillBgDark: "bg-emerald-950/60 border-emerald-500/40 text-emerald-300",
+    bgLight: "from-emerald-50/40 via-white to-teal-50/40",
+    bgDark: "from-[#031510] via-[#06241b] to-[#020c09]",
+    borderLight: "border-emerald-200/90 hover:border-emerald-300",
+    borderDark: "border-emerald-500/35 hover:border-emerald-400/50",
+    shadowLight: "shadow-xl shadow-emerald-950/5",
+    shadowDark: "shadow-2xl shadow-emerald-950/60",
+    auraLight: "bg-emerald-400/15",
+    auraDark: "bg-emerald-500/25",
+    pillBgLight: "bg-emerald-100/80 border-emerald-300 text-emerald-900",
+    pillBgDark: "bg-emerald-950/90 border-emerald-500/40 text-emerald-300",
     progressGradient: "from-emerald-500 via-teal-400 to-green-500",
-    buttonGradient: "from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-500 hover:to-teal-500"
+    buttonGradient: "from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-500 hover:to-teal-500 text-white shadow-md shadow-emerald-600/25"
   },
   amber: {
-    bgLight: "from-amber-50/90 via-white/95 to-orange-50/80",
-    bgDark: "from-[#1b1204]/95 via-[#291b07]/90 to-[#140d03]/95",
-    borderLight: "border-amber-200/90",
-    borderDark: "border-amber-500/35",
-    shadowLight: "shadow-amber-500/10",
-    shadowDark: "shadow-amber-950/60",
-    auraLight: "bg-amber-400/20",
-    auraDark: "bg-amber-500/30",
-    accentTextLight: "text-amber-800",
-    accentTextDark: "text-amber-300",
-    pillBgLight: "bg-amber-100/90 border-amber-300 text-amber-800",
-    pillBgDark: "bg-amber-950/60 border-amber-500/40 text-amber-300",
+    bgLight: "from-amber-50/40 via-white to-orange-50/40",
+    bgDark: "from-[#160f03] via-[#261a05] to-[#0c0801]",
+    borderLight: "border-amber-200/90 hover:border-amber-300",
+    borderDark: "border-amber-500/35 hover:border-amber-400/50",
+    shadowLight: "shadow-xl shadow-amber-950/5",
+    shadowDark: "shadow-2xl shadow-amber-950/60",
+    auraLight: "bg-amber-400/15",
+    auraDark: "bg-amber-500/25",
+    pillBgLight: "bg-amber-100/80 border-amber-300 text-amber-900",
+    pillBgDark: "bg-amber-950/90 border-amber-500/40 text-amber-300",
     progressGradient: "from-amber-500 via-orange-400 to-amber-600",
-    buttonGradient: "from-amber-600 via-orange-600 to-amber-700 hover:from-amber-500 hover:to-orange-500"
+    buttonGradient: "from-amber-600 via-orange-600 to-amber-700 hover:from-amber-500 hover:to-orange-500 text-white shadow-md shadow-amber-600/25"
   }
 };
 
@@ -250,6 +239,7 @@ export default function CampaignBanner({
   const [activeIndex, setActiveIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [showDrawer, setShowDrawer] = useState(false);
 
   const durationMs = 6500;
   const tickIntervalMs = 50;
@@ -282,7 +272,7 @@ export default function CampaignBanner({
   }, [total, isPaused, handleNext]);
 
   const current = items[activeIndex % total] || items[0];
-  const themeKey = current.theme && THEME_STYLES[current.theme] ? current.theme : "purple";
+  const themeKey = current.theme && THEME_STYLES[current.theme] ? current.theme : "blue";
   const theme = THEME_STYLES[themeKey];
 
   const ArrowIcon = isAr ? ArrowLeft : ArrowRight;
@@ -298,15 +288,15 @@ export default function CampaignBanner({
 
   return (
     <section className="w-full mb-8 sm:mb-12">
-      {/* 1. Header Bar: Section Identification, Status Beacon, Controls */}
+      {/* 1. Top Section Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-3.5 sm:mb-5">
         <div className="space-y-0.5 text-start">
           <div className="inline-flex items-center gap-2">
-            <span className="h-[2px] w-5 sm:w-6 bg-purple-500 dark:bg-purple-400 rounded-full" />
+            <span className="h-[2px] w-5 sm:w-6 bg-blue-600 dark:bg-cyan-400 rounded-full" />
             <h2 className="text-base sm:text-xl font-black text-slate-900 dark:text-white tracking-tight">
               {isAr ? "عروض وحملات الترويج الساخنة" : "Hot Promotional Campaigns"}
             </h2>
-            <span className="h-[2px] w-5 sm:w-6 bg-purple-500 dark:bg-purple-400 rounded-full" />
+            <span className="h-[2px] w-5 sm:w-6 bg-blue-600 dark:bg-cyan-400 rounded-full" />
           </div>
           <p className="text-[11px] sm:text-xs text-slate-600 dark:text-slate-400">
             {isAr
@@ -315,7 +305,7 @@ export default function CampaignBanner({
           </p>
         </div>
 
-        {/* Live Indicator & Slider Controls */}
+        {/* Live Deals Badge and Quick Controls */}
         <div className="flex items-center gap-2.5 self-end sm:self-center shrink-0">
           <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-[10px] sm:text-[11px] font-bold">
             <span className="relative flex h-2 w-2">
@@ -326,12 +316,12 @@ export default function CampaignBanner({
           </div>
 
           {total > 1 && (
-            <div className="flex items-center gap-1 bg-white/70 dark:bg-[#071120]/80 p-0.5 rounded-xl border border-slate-200/80 dark:border-white/10 shadow-xs">
+            <div className="flex items-center gap-1 bg-white/80 dark:bg-white/10 p-0.5 rounded-xl border border-slate-200/90 dark:border-white/15 shadow-xs">
               <button
                 type="button"
                 onClick={handlePrev}
                 aria-label={isAr ? "السابق" : "Previous"}
-                className="w-7 h-7 rounded-lg flex items-center justify-center text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10 transition-colors"
+                className="w-7 h-7 rounded-lg flex items-center justify-center text-slate-700 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10 transition-colors"
               >
                 <PrevIcon className="w-3.5 h-3.5" />
               </button>
@@ -339,17 +329,17 @@ export default function CampaignBanner({
               <button
                 type="button"
                 onClick={() => setIsPaused(!isPaused)}
-                aria-label={isPaused ? (isAr ? "تشغيل" : "Play") : (isAr ? "إيقاف مؤقت" : "Pause")}
-                className="w-7 h-7 rounded-lg flex items-center justify-center text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10 transition-colors"
+                aria-label={isPaused ? "Play" : "Pause"}
+                className="w-7 h-7 rounded-lg flex items-center justify-center text-slate-700 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10 transition-colors"
               >
-                {isPaused ? <Play className="w-3 h-3 text-cyan-500" /> : <Pause className="w-3 h-3 text-slate-400" />}
+                {isPaused ? <Play className="w-3 h-3 text-cyan-600 dark:text-cyan-400" /> : <Pause className="w-3 h-3 text-slate-500 dark:text-slate-400" />}
               </button>
 
               <button
                 type="button"
                 onClick={handleNext}
                 aria-label={isAr ? "التالي" : "Next"}
-                className="w-7 h-7 rounded-lg flex items-center justify-center text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10 transition-colors"
+                className="w-7 h-7 rounded-lg flex items-center justify-center text-slate-700 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10 transition-colors"
               >
                 <NextIcon className="w-3.5 h-3.5" />
               </button>
@@ -358,15 +348,15 @@ export default function CampaignBanner({
         </div>
       </div>
 
-      {/* 2. Flagship Modern Cockpit Card */}
+      {/* 2. Flagship Modern Cockpit Card (Supports Both Light and Dark Modes with Zero Pink) */}
       <div
-        className={`relative w-full rounded-2xl sm:rounded-3xl p-5 sm:p-7 md:p-8 lg:p-9 bg-gradient-to-br ${theme.bgLight} dark:${theme.bgDark} border ${theme.borderLight} dark:${theme.borderDark} backdrop-blur-2xl shadow-xl ${theme.shadowLight} dark:${theme.shadowDark} overflow-hidden transition-all duration-500 group`}
+        className={`relative w-full rounded-2xl sm:rounded-3xl p-5 sm:p-7 md:p-8 lg:p-9 bg-gradient-to-br ${theme.bgLight} dark:${theme.bgDark} border ${theme.borderLight} dark:${theme.borderDark} backdrop-blur-2xl ${theme.shadowLight} dark:${theme.shadowDark} overflow-hidden transition-all duration-500 group`}
         onMouseEnter={() => setIsPaused(true)}
         onMouseLeave={() => setIsPaused(false)}
       >
-        {/* Top Active Progress Track */}
+        {/* Top Progress Track */}
         {total > 1 && (
-          <div className="absolute top-0 inset-x-0 h-[2.5px] bg-slate-200/60 dark:bg-white/10 overflow-hidden">
+          <div className="absolute top-0 inset-x-0 h-[2.5px] bg-slate-200/80 dark:bg-white/10 overflow-hidden">
             <div
               className={`h-full bg-gradient-to-r ${theme.progressGradient} transition-all ease-linear`}
               style={{ width: `${progress}%` }}
@@ -376,7 +366,7 @@ export default function CampaignBanner({
 
         {/* Ambient Animated Cyber Sheen Gliding Across Card */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden select-none">
-          <div className="w-1/2 h-full bg-gradient-to-r from-transparent via-white/25 dark:via-cyan-300/10 to-transparent -skew-x-12 animate-banner-sheen" />
+          <div className="w-1/2 h-full bg-gradient-to-r from-transparent via-white/30 dark:via-white/[0.08] to-transparent -skew-x-12 animate-banner-sheen" />
         </div>
 
         {/* Atmospheric Radial Aura Behind Graphic */}
@@ -385,85 +375,87 @@ export default function CampaignBanner({
         />
 
         {/* Card Content Grid */}
-        <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6 lg:gap-8 items-center">
+        <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6 lg:gap-8 items-stretch">
           
           {/* Main Info Column (7 Cols on Desktop) */}
-          <div className="lg:col-span-7 space-y-3.5 sm:space-y-4 text-start">
+          <div className="lg:col-span-7 flex flex-col justify-between space-y-4 sm:space-y-5 text-start">
             
-            {/* Badges Bar: Flame Tag + Sub Badge */}
-            <div className="flex flex-wrap items-center gap-2">
-              <span
-                className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] sm:text-xs font-bold border shadow-xs ${theme.pillBgLight} dark:${theme.pillBgDark}`}
-              >
-                <Flame className="w-3.5 h-3.5 text-amber-500 animate-pulse" />
-                <span>
-                  {isAr
-                    ? current.tagAr || current.tagEn || "عرض حصري"
-                    : current.tagEn || current.tagAr || "Exclusive Deal"}
-                </span>
-              </span>
-
-              {(current.badgeAr || current.badgeEn) && (
-                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-slate-100/90 dark:bg-white/10 border border-slate-300/80 dark:border-white/15 text-slate-700 dark:text-slate-200 text-[10px] sm:text-[11px] font-semibold">
-                  <ShieldCheck className="w-3 h-3 text-emerald-500 dark:text-emerald-400" />
+            {/* Top Badges Bar: Flame Tag + Sub Badge */}
+            <div className="space-y-3.5">
+              <div className="flex flex-wrap items-center gap-2">
+                <span
+                  className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] sm:text-xs font-bold border shadow-xs ${theme.pillBgLight} dark:${theme.pillBgDark}`}
+                >
+                  <Flame className="w-3.5 h-3.5 text-amber-500 dark:text-amber-400 animate-pulse" />
                   <span>
                     {isAr
-                      ? current.badgeAr || current.badgeEn
-                      : current.badgeEn || current.badgeAr}
+                      ? current.tagAr || current.tagEn || "عرض حصري"
+                      : current.tagEn || current.tagAr || "Exclusive Deal"}
                   </span>
                 </span>
-              )}
-            </div>
 
-            {/* Headline and Description with Smooth Fade */}
-            <div className="space-y-1.5 sm:space-y-2">
-              <h3 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black text-slate-900 dark:text-white leading-tight tracking-tight">
-                {isAr
-                  ? current.titleAr || current.titleEn || "خدمة معتمدة"
-                  : current.titleEn || current.titleAr || "Certified Service"}
-              </h3>
-              <p className="text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed max-w-xl">
-                {isAr
-                  ? current.descAr || current.descEn || "تفعيل فوري وأسعار حصرية مع ضمان استرجاع الرصيد بالكامل."
-                  : current.descEn || current.descAr || "Instant automated fulfillment with full refund protection."}
-              </p>
-            </div>
-
-            {/* 3 Operational Metric Proof Cards */}
-            <div className="grid grid-cols-3 gap-2 sm:gap-3 pt-1">
-              <div className="p-2 sm:p-2.5 rounded-xl bg-white/80 dark:bg-[#071224]/80 border border-slate-200/90 dark:border-white/10 text-center shadow-xs">
-                <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-500 mx-auto mb-0.5 sm:mb-1" />
-                <div className="text-[9px] sm:text-[10px] text-slate-500 dark:text-slate-400 font-medium truncate">
-                  {isAr ? "سرعة الإنجاز" : "Speed"}
-                </div>
-                <div className="text-[11px] sm:text-xs font-black text-slate-900 dark:text-white font-mono mt-0.5 truncate">
-                  {isAr
-                    ? current.turnaroundAr || current.turnaroundEn || "1 - 5 دقائق"
-                    : current.turnaroundEn || current.turnaroundAr || "1 - 5 Mins"}
-                </div>
+                {(current.badgeAr || current.badgeEn) && (
+                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-slate-100/90 dark:bg-white/10 border border-slate-300/80 dark:border-white/15 text-slate-800 dark:text-slate-200 text-[10px] sm:text-[11px] font-semibold">
+                    <ShieldCheck className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
+                    <span>
+                      {isAr
+                        ? current.badgeAr || current.badgeEn
+                        : current.badgeEn || current.badgeAr}
+                    </span>
+                  </span>
+                )}
               </div>
 
-              <div className="p-2 sm:p-2.5 rounded-xl bg-white/80 dark:bg-[#071224]/80 border border-slate-200/90 dark:border-white/10 text-center shadow-xs">
-                <ShieldCheck className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-500 mx-auto mb-0.5 sm:mb-1" />
-                <div className="text-[9px] sm:text-[10px] text-slate-500 dark:text-slate-400 font-medium truncate">
-                  {isAr ? "الضمان المالي" : "Guarantee"}
-                </div>
-                <div className="text-[11px] sm:text-xs font-black text-emerald-600 dark:text-emerald-400 font-mono mt-0.5 truncate">
+              {/* Headline and Description */}
+              <div className="space-y-1.5 sm:space-y-2">
+                <h3 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black text-slate-900 dark:text-white leading-tight tracking-tight">
                   {isAr
-                    ? current.guaranteeAr || current.guaranteeEn || "ضمان 100%"
-                    : current.guaranteeEn || current.guaranteeAr || "100% REFUND"}
-                </div>
+                    ? current.titleAr || current.titleEn || "خدمة معتمدة"
+                    : current.titleEn || current.titleAr || "Certified Service"}
+                </h3>
+                <p className="text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed max-w-xl">
+                  {isAr
+                    ? current.descAr || current.descEn || "تفعيل فوري وأسعار حصرية مع ضمان استرجاع الرصيد بالكامل."
+                    : current.descEn || current.descAr || "Instant automated fulfillment with full refund protection."}
+                </p>
               </div>
 
-              <div className="p-2 sm:p-2.5 rounded-xl bg-white/80 dark:bg-[#071224]/80 border border-slate-200/90 dark:border-white/10 text-center shadow-xs">
-                <Zap className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-sky-500 mx-auto mb-0.5 sm:mb-1" />
-                <div className="text-[9px] sm:text-[10px] text-slate-500 dark:text-slate-400 font-medium truncate">
-                  {isAr ? "نوع الربط" : "Gateway"}
+              {/* 3 Operational Metric Proof Cards */}
+              <div className="grid grid-cols-3 gap-2 sm:gap-3 pt-1">
+                <div className="p-2 sm:p-2.5 rounded-xl bg-white/80 dark:bg-[#071224]/80 border border-slate-200/90 dark:border-white/10 text-center shadow-xs">
+                  <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-500 dark:text-amber-400 mx-auto mb-0.5 sm:mb-1" />
+                  <div className="text-[9px] sm:text-[10px] text-slate-500 dark:text-slate-400 font-medium truncate">
+                    {isAr ? "سرعة الإنجاز" : "Speed"}
+                  </div>
+                  <div className="text-[11px] sm:text-xs font-black text-slate-900 dark:text-white font-mono mt-0.5 truncate">
+                    {isAr
+                      ? current.turnaroundAr || current.turnaroundEn || "1 - 5 دقائق"
+                      : current.turnaroundEn || current.turnaroundAr || "1 - 5 Mins"}
+                  </div>
                 </div>
-                <div className="text-[11px] sm:text-xs font-black text-sky-600 dark:text-cyan-400 font-mono mt-0.5 truncate">
-                  {isAr
-                    ? current.connectionAr || current.connectionEn || "ربط فوري API"
-                    : current.connectionEn || current.connectionAr || "DIRECT API"}
+
+                <div className="p-2 sm:p-2.5 rounded-xl bg-white/80 dark:bg-[#071224]/80 border border-slate-200/90 dark:border-white/10 text-center shadow-xs">
+                  <ShieldCheck className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-500 dark:text-emerald-400 mx-auto mb-0.5 sm:mb-1" />
+                  <div className="text-[9px] sm:text-[10px] text-slate-500 dark:text-slate-400 font-medium truncate">
+                    {isAr ? "الضمان المالي" : "Guarantee"}
+                  </div>
+                  <div className="text-[11px] sm:text-xs font-black text-emerald-600 dark:text-emerald-400 font-mono mt-0.5 truncate">
+                    {isAr
+                      ? current.guaranteeAr || current.guaranteeEn || "ضمان 100%"
+                      : current.guaranteeEn || current.guaranteeAr || "100% REFUND"}
+                  </div>
+                </div>
+
+                <div className="p-2 sm:p-2.5 rounded-xl bg-white/80 dark:bg-[#071224]/80 border border-slate-200/90 dark:border-white/10 text-center shadow-xs">
+                  <Zap className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-sky-500 dark:text-sky-400 mx-auto mb-0.5 sm:mb-1" />
+                  <div className="text-[9px] sm:text-[10px] text-slate-500 dark:text-slate-400 font-medium truncate">
+                    {isAr ? "نوع الربط" : "Gateway"}
+                  </div>
+                  <div className="text-[11px] sm:text-xs font-black text-sky-600 dark:text-cyan-400 font-mono mt-0.5 truncate">
+                    {isAr
+                      ? current.connectionAr || current.connectionEn || "ربط فوري API"
+                      : current.connectionEn || current.connectionAr || "DIRECT API"}
+                  </div>
                 </div>
               </div>
             </div>
@@ -473,7 +465,7 @@ export default function CampaignBanner({
               {isPreview ? (
                 <button
                   type="button"
-                  className={`inline-flex items-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl text-xs sm:text-sm font-bold bg-gradient-to-r ${theme.buttonGradient} text-white shadow-md shadow-purple-600/25 transition-all`}
+                  className={`inline-flex items-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl text-xs sm:text-sm font-bold bg-gradient-to-r ${theme.buttonGradient} text-white shadow-lg transition-all`}
                 >
                   <Sparkles className="w-3.5 h-3.5 text-white/90" />
                   <span>
@@ -486,7 +478,7 @@ export default function CampaignBanner({
               ) : (
                 <Link
                   href={formatTargetUrl(current.url)}
-                  className={`inline-flex items-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl text-xs sm:text-sm font-bold bg-gradient-to-r ${theme.buttonGradient} text-white shadow-md shadow-purple-600/25 hover:shadow-lg transition-all group/btn`}
+                  className={`inline-flex items-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl text-xs sm:text-sm font-bold bg-gradient-to-r ${theme.buttonGradient} text-white shadow-lg hover:shadow-xl transition-all group/btn`}
                 >
                   <Sparkles className="w-3.5 h-3.5 text-white/90" />
                   <span>
@@ -501,92 +493,200 @@ export default function CampaignBanner({
               {isPreview ? (
                 <button
                   type="button"
-                  className="inline-flex items-center gap-1.5 px-3.5 sm:px-4 py-2.5 sm:py-3 rounded-xl text-xs sm:text-sm font-bold bg-white/70 dark:bg-white/10 hover:bg-white dark:hover:bg-white/15 text-slate-800 dark:text-white border border-slate-300/80 dark:border-white/15 transition-all"
+                  className="inline-flex items-center gap-1.5 px-3.5 sm:px-4 py-2.5 sm:py-3 rounded-xl text-xs sm:text-sm font-bold bg-white/80 dark:bg-white/10 hover:bg-white dark:hover:bg-white/15 text-slate-800 dark:text-white border border-slate-300/80 dark:border-white/20 transition-all shadow-xs"
                 >
-                  <Layers className="w-3.5 h-3.5 text-sky-500" />
+                  <Layers className="w-3.5 h-3.5 text-blue-600 dark:text-cyan-400" />
                   <span>{isAr ? "استعراض كافة الباقات" : "Browse All Rates"}</span>
                 </button>
               ) : (
                 <Link
                   href={`/${lang}/pricing`}
-                  className="inline-flex items-center gap-1.5 px-3.5 sm:px-4 py-2.5 sm:py-3 rounded-xl text-xs sm:text-sm font-bold bg-white/70 dark:bg-white/10 hover:bg-white dark:hover:bg-white/15 text-slate-800 dark:text-white border border-slate-300/80 dark:border-white/15 transition-all"
+                  className="inline-flex items-center gap-1.5 px-3.5 sm:px-4 py-2.5 sm:py-3 rounded-xl text-xs sm:text-sm font-bold bg-white/80 dark:bg-white/10 hover:bg-white dark:hover:bg-white/15 text-slate-800 dark:text-white border border-slate-300/80 dark:border-white/20 transition-all shadow-xs"
                 >
-                  <Layers className="w-3.5 h-3.5 text-sky-500" />
+                  <Layers className="w-3.5 h-3.5 text-blue-600 dark:text-cyan-400" />
                   <span>{isAr ? "استعراض كافة الباقات" : "Browse All Rates"}</span>
                 </Link>
               )}
             </div>
           </div>
 
-          {/* 3D Visual Product Showcase Column (5 Cols on Desktop) */}
-          <div className="lg:col-span-5 flex justify-center items-center">
-            <div className="relative w-full max-w-[260px] sm:max-w-[300px] aspect-square flex items-center justify-center">
+          {/* Full-Bleed Product Image Showcase (5 Cols on Desktop - Image Fills Completely) */}
+          <div className="lg:col-span-5 flex items-center justify-center">
+            <div className="relative w-full h-[240px] sm:h-[280px] md:h-[320px] lg:h-full min-h-[240px] sm:min-h-[280px] lg:min-h-[340px] rounded-2xl sm:rounded-3xl overflow-hidden border border-slate-200/90 dark:border-white/15 shadow-md group/img bg-slate-900/5 dark:bg-[#071224]/80 flex flex-col justify-end">
               
-              {/* Product Floating 3D Graphic */}
-              <div className="relative w-44 h-44 sm:w-56 sm:h-56 animate-banner-float drop-shadow-[0_15px_30px_rgba(0,0,0,0.30)] dark:drop-shadow-[0_20px_40px_rgba(0,0,0,0.70)]">
-                {current.image ? (
+              {/* Blurred Ambient Fill Layer for Background Bleed */}
+              {current.image && (
+                <div className="absolute inset-0 scale-125 blur-2xl opacity-40 dark:opacity-30 pointer-events-none">
                   <Image
                     src={current.image}
-                    alt={current.titleEn || current.titleAr || "Offer"}
+                    alt="Background blur"
                     fill
-                    sizes="(max-width: 640px) 180px, 240px"
-                    className="object-contain"
-                    priority
+                    sizes="(max-width: 1024px) 100vw, 45vw"
+                    className="object-cover"
                   />
+                </div>
+              )}
+
+              {/* Main Full-Bleed Foreground Image */}
+              <div className="absolute inset-0 flex items-center justify-center p-2 sm:p-3">
+                {current.image ? (
+                  <div className="relative w-full h-full">
+                    <Image
+                      src={current.image}
+                      alt={current.titleEn || current.titleAr || "Offer"}
+                      fill
+                      sizes="(max-width: 1024px) 100vw, 45vw"
+                      className="object-contain drop-shadow-[0_15px_30px_rgba(0,0,0,0.35)] dark:drop-shadow-[0_20px_40px_rgba(0,0,0,0.85)] transition-transform duration-700 group-hover/img:scale-105"
+                      priority
+                    />
+                  </div>
                 ) : (
-                  <div className="w-full h-full rounded-2xl bg-gradient-to-br from-purple-500/20 to-sky-500/20 border border-white/20 flex flex-col items-center justify-center p-4 text-center">
-                    <Sparkles className="w-12 h-12 text-purple-400 mb-2" />
-                    <span className="text-xs font-bold text-slate-900 dark:text-white">
+                  <div className="w-full h-full rounded-2xl bg-gradient-to-br from-blue-500/10 to-cyan-500/10 dark:from-blue-500/20 dark:to-cyan-500/20 border border-slate-200/80 dark:border-white/20 flex flex-col items-center justify-center p-4 text-center">
+                    <Sparkles className="w-12 h-12 text-blue-600 dark:text-cyan-400 mb-2" />
+                    <span className="text-sm font-bold text-slate-900 dark:text-white">
                       {isAr ? current.titleAr : current.titleEn}
                     </span>
                   </div>
                 )}
               </div>
 
-              {/* Floating Verified Badge Pill */}
-              <div className="absolute -bottom-1.5 inset-x-2 sm:inset-x-4 p-2 rounded-xl bg-white/90 dark:bg-[#071120]/90 backdrop-blur-md border border-slate-200/90 dark:border-white/15 flex items-center justify-between shadow-lg text-[10px] sm:text-xs">
-                <span className="font-bold text-slate-800 dark:text-white truncate">
-                  {isAr ? current.titleAr : current.titleEn}
-                </span>
-                <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400 shrink-0 ms-2">
-                  AUTO 24/7
-                </span>
+              {/* Bottom Scrim & Status Pill */}
+              <div className="relative z-10 p-2.5 sm:p-3 bg-gradient-to-t from-slate-950/70 via-slate-950/30 to-transparent">
+                <div className="w-full p-2 sm:p-2.5 rounded-xl bg-white/90 dark:bg-[#071120]/90 backdrop-blur-md border border-slate-200/90 dark:border-white/15 flex items-center justify-between shadow-lg text-[11px] sm:text-xs">
+                  <span className="font-bold text-slate-800 dark:text-white truncate max-w-[150px] sm:max-w-[190px]">
+                    {isAr ? current.titleAr : current.titleEn}
+                  </span>
+                  <span className="inline-flex items-center gap-1 font-mono font-bold text-emerald-600 dark:text-emerald-400 shrink-0 ms-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    AUTO 24/7
+                  </span>
+                </div>
               </div>
             </div>
           </div>
 
         </div>
 
-        {/* 3. Interactive Thumb Tabs for Multi-Item Switcher */}
+        {/* 3. Executive Compact Navigation Deck (Light & Dark Compatible, Zero Clutter) */}
         {total > 1 && (
-          <div className="mt-6 pt-3.5 border-t border-slate-200/80 dark:border-white/10 flex items-center gap-1.5 sm:gap-2 overflow-x-auto scrollbar-none pb-0.5">
-            {items.map((item, idx) => {
-              const isActive = idx === activeIndex;
-              return (
-                <button
-                  key={idx}
-                  type="button"
-                  onClick={() => {
-                    setActiveIndex(idx);
-                    setProgress(0);
-                  }}
-                  className={`shrink-0 px-3 py-1.5 rounded-xl text-[11px] sm:text-xs font-bold transition-all flex items-center gap-1.5 border ${
-                    isActive
-                      ? "bg-slate-900 text-white dark:bg-white dark:text-slate-950 border-transparent shadow-sm"
-                      : "bg-white/60 dark:bg-white/5 text-slate-600 dark:text-slate-400 border-slate-200/80 dark:border-white/10 hover:text-slate-900 dark:hover:text-white hover:bg-white dark:hover:bg-white/10"
-                  }`}
-                >
-                  <span
-                    className={`w-1.5 h-1.5 rounded-full ${
-                      isActive ? "bg-emerald-400 animate-pulse" : "bg-slate-400 dark:bg-slate-600"
+          <div className="mt-5 pt-3.5 border-t border-slate-200/80 dark:border-white/10 flex flex-wrap items-center justify-between gap-3 text-xs">
+            {/* Left: Monospace Slide Counter & Active Title */}
+            <div className="flex items-center gap-2.5">
+              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-100/90 dark:bg-white/[0.08] border border-slate-200/90 dark:border-white/10 font-mono text-[11px] text-slate-800 dark:text-white font-bold">
+                <span className="text-blue-600 dark:text-cyan-400">{String(activeIndex + 1).padStart(2, "0")}</span>
+                <span className="text-slate-400 dark:text-slate-500">/</span>
+                <span className="text-slate-600 dark:text-slate-400">{String(total).padStart(2, "0")}</span>
+              </div>
+              <span className="hidden sm:inline-block text-[11px] text-slate-600 dark:text-slate-300 font-medium truncate max-w-[220px]">
+                {isAr ? current.titleAr || current.titleEn : current.titleEn || current.titleAr}
+              </span>
+            </div>
+
+            {/* Center: Dynamic Sliding Pagination Indicators */}
+            <div className="flex items-center gap-1.5">
+              {Array.from({ length: Math.min(total, 7) }).map((_, i) => {
+                const targetIdx = total <= 7 ? i : (activeIndex - 3 + i + total) % total;
+                const isActive = targetIdx === activeIndex;
+                return (
+                  <button
+                    key={i}
+                    type="button"
+                    onClick={() => {
+                      setActiveIndex(targetIdx);
+                      setProgress(0);
+                    }}
+                    aria-label={`Slide ${targetIdx + 1}`}
+                    className={`h-2 rounded-full transition-all duration-300 ${
+                      isActive
+                        ? "w-7 bg-blue-600 dark:bg-cyan-400 shadow-sm"
+                        : "w-2 bg-slate-300 dark:bg-white/20 hover:bg-slate-400 dark:hover:bg-white/40"
                     }`}
                   />
-                  <span className="truncate max-w-[120px] sm:max-w-[160px]">
-                    {isAr ? item.titleAr || item.titleEn : item.titleEn || item.titleAr}
-                  </span>
+                );
+              })}
+            </div>
+
+            {/* Right: Quick Jump Drawer Toggle + Glass Controls */}
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setShowDrawer(!showDrawer)}
+                className="px-2.5 py-1 rounded-lg bg-slate-100/90 hover:bg-slate-200/90 dark:bg-white/[0.08] dark:hover:bg-white/[0.14] border border-slate-200/90 dark:border-white/10 text-slate-700 dark:text-slate-200 text-[11px] font-medium transition-all flex items-center gap-1.5 shadow-xs"
+              >
+                <Grid className="w-3 h-3 text-blue-600 dark:text-cyan-400" />
+                <span>{isAr ? `كافة العروض (${total})` : `All Offers (${total})`}</span>
+              </button>
+
+              <div className="flex items-center gap-1 bg-slate-100/90 dark:bg-white/[0.08] p-0.5 rounded-lg border border-slate-200/90 dark:border-white/10 shadow-xs">
+                <button
+                  type="button"
+                  onClick={handlePrev}
+                  aria-label={isAr ? "السابق" : "Previous"}
+                  className="w-6 h-6 rounded flex items-center justify-center text-slate-700 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-white/10 transition-colors"
+                >
+                  <PrevIcon className="w-3.5 h-3.5" />
                 </button>
-              );
-            })}
+                <button
+                  type="button"
+                  onClick={() => setIsPaused(!isPaused)}
+                  aria-label={isPaused ? "Play" : "Pause"}
+                  className="w-6 h-6 rounded flex items-center justify-center text-slate-700 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-white/10 transition-colors"
+                >
+                  {isPaused ? <Play className="w-2.5 h-2.5 text-blue-600 dark:text-cyan-400" /> : <Pause className="w-2.5 h-2.5 text-slate-500 dark:text-slate-400" />}
+                </button>
+                <button
+                  type="button"
+                  onClick={handleNext}
+                  aria-label={isAr ? "التالي" : "Next"}
+                  className="w-6 h-6 rounded flex items-center justify-center text-slate-700 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-white/10 transition-colors"
+                >
+                  <NextIcon className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* 4. Instant Access Multi-Item Drawer Grid */}
+        {showDrawer && total > 1 && (
+          <div className="mt-3 p-3.5 rounded-2xl bg-white/95 dark:bg-[#040a16]/95 border border-slate-300/90 dark:border-cyan-500/30 backdrop-blur-xl shadow-2xl">
+            <div className="flex items-center justify-between mb-2.5 px-1 text-[11px] font-bold text-slate-800 dark:text-slate-300">
+              <span className="flex items-center gap-1.5">
+                <Sparkles className="w-3 h-3 text-blue-600 dark:text-cyan-400" />
+                <span>{isAr ? "اختر العرض المطلوب للانتقال الفوري:" : "Jump directly to campaign:"}</span>
+              </span>
+              <button
+                type="button"
+                onClick={() => setShowDrawer(false)}
+                className="w-5 h-5 rounded-md flex items-center justify-center text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-white/10 text-xs"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="max-h-48 overflow-y-auto grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-1.5 p-1 scrollbar-thin">
+              {items.map((it, idx) => {
+                const isSel = idx === activeIndex;
+                return (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => {
+                      setActiveIndex(idx);
+                      setProgress(0);
+                      setShowDrawer(false);
+                    }}
+                    className={`px-2.5 py-1.5 rounded-xl text-start text-[11px] font-medium truncate border transition-all flex items-center gap-1.5 ${
+                      isSel
+                        ? "bg-blue-600 text-white dark:bg-cyan-500 dark:text-slate-950 font-bold border-blue-600 dark:border-cyan-400 shadow-sm"
+                        : "bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200 dark:bg-white/[0.04] dark:text-slate-300 dark:border-white/10 dark:hover:bg-white/10 dark:hover:text-white"
+                    }`}
+                  >
+                    <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${isSel ? "bg-white dark:bg-slate-950" : "bg-blue-500 dark:bg-cyan-400"}`} />
+                    <span className="truncate">{isAr ? it.titleAr || it.titleEn : it.titleEn || it.titleAr}</span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
         )}
       </div>

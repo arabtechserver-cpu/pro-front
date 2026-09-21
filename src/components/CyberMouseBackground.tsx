@@ -54,10 +54,10 @@ export default function CyberMouseBackground() {
         dotRef.current.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0) translate(-50%, -50%) ${
           isHovering ? "scale(1.5)" : "scale(1)"
         }`;
-        dotRef.current.style.backgroundColor = isHovering ? "#0284c7" : "#2563eb";
+        dotRef.current.style.backgroundColor = isHovering ? "#0284c7" : "#1e40af";
         dotRef.current.style.boxShadow = isHovering
-          ? "0 0 16px #0284c7, 0 0 32px #2563eb"
-          : "0 0 12px #2563eb, 0 0 24px #0284c7";
+          ? "0 0 16px #0284c7, 0 0 32px #1e40af"
+          : "0 0 12px #1e40af, 0 0 24px #0284c7";
       }
 
       if (auraRef.current) {
@@ -112,10 +112,10 @@ export default function CyberMouseBackground() {
           ringRef.current.style.transform = `translate3d(${ringX}px, ${ringY}px, 0) translate(-50%, -50%) ${
             isHovering ? "scale(1.4)" : "scale(1)"
           }`;
-          ringRef.current.style.borderColor = isHovering ? "#2563eb" : "rgba(2, 132, 199, 0.85)";
+          ringRef.current.style.borderColor = isHovering ? "#1e40af" : "rgba(15, 23, 42, 0.85)";
           ringRef.current.style.boxShadow = isHovering
-            ? "0 0 24px rgba(37, 99, 235, 0.8), inset 0 0 12px rgba(2, 132, 199, 0.5)"
-            : "0 0 18px rgba(2, 132, 199, 0.75)";
+            ? "0 0 24px rgba(30, 58, 138, 0.8), inset 0 0 12px rgba(2, 132, 199, 0.5)"
+            : "0 0 18px rgba(15, 23, 42, 0.75)";
         }
 
         if (Math.abs(dx) > 0.2 || Math.abs(dy) > 0.2) {
@@ -145,12 +145,12 @@ export default function CyberMouseBackground() {
     <div className="pointer-events-none select-none">
       {/* 1. Hardware-Accelerated Cyber Mouse Follower (Desktop fine-pointer only) */}
       <div className="hidden md:block pointer-events-none fixed inset-0 z-[9999] overflow-hidden">
-        {/* Cursor Aura */}
+        {/* Cursor Aura - Deep Navy and Cyan, Zero Pink */}
         <div
           ref={auraRef}
           className="absolute w-[320px] h-[320px] rounded-full pointer-events-none transition-opacity duration-300 opacity-0 will-change-transform"
           style={{
-            background: "radial-gradient(circle, rgba(37, 99, 235, 0.25) 0%, rgba(124, 58, 237, 0.15) 40%, transparent 70%)",
+            background: "radial-gradient(circle, rgba(30, 58, 138, 0.25) 0%, rgba(15, 23, 42, 0.20) 40%, transparent 70%)",
             filter: "blur(28px)",
           }}
         />
@@ -158,171 +158,170 @@ export default function CyberMouseBackground() {
         {/* Trailing Ring */}
         <div
           ref={ringRef}
-          className="absolute w-10 h-10 rounded-full pointer-events-none border border-blue-500/90 dark:border-cyan-400/90 transition-opacity duration-300 opacity-0 flex items-center justify-center will-change-transform"
+          className="absolute w-10 h-10 rounded-full pointer-events-none border border-slate-900/80 dark:border-cyan-400/90 transition-opacity duration-300 opacity-0 flex items-center justify-center will-change-transform"
           style={{
-            boxShadow: "0 0 18px rgba(37, 99, 235, 0.75)",
+            boxShadow: "0 0 18px rgba(15, 23, 42, 0.75)",
           }}
         >
-          <div className="w-full h-full rounded-full border border-dashed border-blue-400/60 dark:border-cyan-300/60 animate-spin-slow pointer-events-none" />
+          <div className="w-full h-full rounded-full border border-dashed border-blue-900/60 dark:border-cyan-300/60 animate-spin-slow pointer-events-none" />
         </div>
 
         {/* Core Dot */}
         <div
           ref={dotRef}
-          className="absolute w-2.5 h-2.5 rounded-full pointer-events-none bg-blue-600 dark:bg-cyan-400 transition-opacity duration-300 opacity-0 will-change-transform"
+          className="absolute w-2.5 h-2.5 rounded-full pointer-events-none bg-slate-950 dark:bg-cyan-400 transition-opacity duration-300 opacity-0 will-change-transform"
           style={{
-            boxShadow: "0 0 12px #2563eb, 0 0 24px #0284c7",
+            boxShadow: "0 0 12px rgba(15, 23, 42, 0.9), 0 0 24px rgba(30, 58, 138, 0.7)",
           }}
         />
       </div>
 
       {/* 2. Full-Canvas Dual-Axis Cyber Laser & Stream Engine (Both Light & Dark Modes) */}
       <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-        {/* A. Animated Coordinate Cyber Grid (Slightly darker in light mode for crisp visibility) */}
+        {/* A. Animated Coordinate Cyber Grid (Dark slate in light mode for crisp definition) */}
         <div
-          className="absolute inset-0 opacity-55 dark:opacity-60 animate-cyber-grid pointer-events-none"
+          className="absolute inset-0 opacity-60 dark:opacity-55 animate-cyber-grid pointer-events-none"
           style={{
             backgroundImage: `
-              linear-gradient(to right, rgba(30, 64, 175, 0.10) 1px, transparent 1px),
-              linear-gradient(to bottom, rgba(30, 64, 175, 0.10) 1px, transparent 1px)
+              linear-gradient(to right, rgba(15, 23, 42, 0.18) 1.5px, transparent 1.5px),
+              linear-gradient(to bottom, rgba(15, 23, 42, 0.18) 1.5px, transparent 1.5px)
             `,
             backgroundSize: "60px 60px",
           }}
         />
 
-        {/* B. Ambient Aurora Glowing Light Pools (Rich & vibrant tones in Light Mode, Glowing in Dark Mode) */}
+        {/* B. Ambient Deep Atmospheric Lighting Pools (Dark Navy & Deep Slate in Light Mode - Zero Pink) */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden animate-cyber-color-cycle will-change-[filter]">
-          {/* Aurora Pool 1 - Top Left / Center (Sky Blue / Deep Royal) */}
+          {/* Aurora Pool 1 - Top Left / Center (Deep Dark Slate Navy) */}
           <div
-            className="absolute -top-[10%] left-[5%] w-[680px] h-[680px] rounded-full pointer-events-none animate-cyber-aura-1 opacity-60 dark:opacity-75"
+            className="absolute -top-[10%] left-[5%] w-[680px] h-[680px] rounded-full pointer-events-none animate-cyber-aura-1 opacity-70 dark:opacity-75"
             style={{
-              background: "radial-gradient(circle, rgba(2, 132, 199, 0.28) 0%, rgba(37, 99, 235, 0.16) 45%, transparent 70%)",
+              background: "radial-gradient(circle, rgba(15, 23, 42, 0.32) 0%, rgba(30, 58, 138, 0.24) 45%, transparent 70%)",
               filter: "blur(75px)",
             }}
           />
-          {/* Aurora Pool 2 - Center Right (Deep Violet / Purple) */}
+          {/* Aurora Pool 2 - Center Right (Dark Charcoal Sapphire - Zero Pink) */}
           <div
-            className="absolute top-[35%] -right-[5%] w-[720px] h-[720px] rounded-full pointer-events-none animate-cyber-aura-2 opacity-55 dark:opacity-70"
+            className="absolute top-[35%] -right-[5%] w-[720px] h-[720px] rounded-full pointer-events-none animate-cyber-aura-2 opacity-70 dark:opacity-70"
             style={{
-              background: "radial-gradient(circle, rgba(124, 58, 237, 0.26) 0%, rgba(147, 51, 234, 0.15) 45%, transparent 70%)",
+              background: "radial-gradient(circle, rgba(15, 23, 42, 0.36) 0%, rgba(30, 58, 138, 0.26) 45%, transparent 70%)",
               filter: "blur(85px)",
             }}
           />
-          {/* Aurora Pool 3 - Bottom Left (Deep Emerald / Teal) */}
+          {/* Aurora Pool 3 - Bottom Left (Deep Dark Teal Slate) */}
           <div
-            className="absolute -bottom-[10%] left-[18%] w-[620px] h-[620px] rounded-full pointer-events-none animate-cyber-aura-3 opacity-55 dark:opacity-65"
+            className="absolute -bottom-[10%] left-[18%] w-[620px] h-[620px] rounded-full pointer-events-none animate-cyber-aura-3 opacity-65 dark:opacity-65"
             style={{
-              background: "radial-gradient(circle, rgba(5, 150, 105, 0.24) 0%, rgba(2, 132, 199, 0.15) 45%, transparent 70%)",
+              background: "radial-gradient(circle, rgba(15, 23, 42, 0.30) 0%, rgba(13, 148, 136, 0.22) 45%, transparent 70%)",
               filter: "blur(75px)",
             }}
           />
         </div>
 
-        {/* C. 10 Vertical Laser Tracks & Streams (الطول) - Darker in Light Mode */}
+        {/* C. 10 Vertical Laser Tracks & Streams (الطول) - Dark, High-Contrast, Zero Pink */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden animate-cyber-color-cycle will-change-[filter]">
           {/* V-Track 1 (3%) */}
-          <div className="absolute left-[3%] top-0 bottom-0 w-[1.5px] dark:w-[1px] bg-gradient-to-b from-transparent via-blue-700/40 dark:via-cyan-400/30 to-transparent">
-            <div className="w-full h-60 bg-gradient-to-b from-transparent via-blue-600 to-blue-900 dark:via-cyan-400 dark:to-white shadow-[0_0_18px_rgba(29,78,216,0.85),0_0_30px_rgba(37,99,235,0.7)] dark:shadow-[0_0_22px_#00f0ff,0_0_40px_#38bdf8] animate-cyber-down-1 will-change-transform" />
+          <div className="absolute left-[3%] top-0 bottom-0 w-[2px] dark:w-[1px] bg-gradient-to-b from-transparent via-slate-900/60 dark:via-cyan-400/30 to-transparent">
+            <div className="w-full h-60 bg-gradient-to-b from-transparent via-blue-900 to-slate-950 dark:via-cyan-400 dark:to-white shadow-[0_0_18px_rgba(15,23,42,0.95),0_0_30px_rgba(30,58,138,0.85)] dark:shadow-[0_0_22px_#00f0ff,0_0_40px_#38bdf8] animate-cyber-down-1 will-change-transform" />
           </div>
 
-          {/* V-Track 2 (12%) */}
-          <div className="hidden sm:block absolute left-[12%] top-0 bottom-0 w-[1.5px] dark:w-[1px] bg-gradient-to-b from-transparent via-purple-700/40 dark:via-violet-400/30 to-transparent">
-            <div className="w-full h-64 bg-gradient-to-t from-transparent via-purple-600 to-purple-900 dark:via-purple-400 dark:to-white shadow-[0_0_18px_rgba(124,58,237,0.85),0_0_30px_rgba(147,51,234,0.7)] dark:shadow-[0_0_24px_#c084fc,0_0_42px_#a855f7] animate-cyber-up-1 will-change-transform" />
+          {/* V-Track 2 (12%) - Deep Dark Slate */}
+          <div className="hidden sm:block absolute left-[12%] top-0 bottom-0 w-[2px] dark:w-[1px] bg-gradient-to-b from-transparent via-slate-900/60 dark:via-sky-400/30 to-transparent">
+            <div className="w-full h-64 bg-gradient-to-t from-transparent via-blue-900 to-slate-950 dark:via-cyan-400 dark:to-white shadow-[0_0_18px_rgba(15,23,42,0.95),0_0_30px_rgba(30,58,138,0.85)] dark:shadow-[0_0_24px_#38bdf8,0_0_42px_#00f0ff] animate-cyber-up-1 will-change-transform" />
           </div>
 
           {/* V-Track 3 (22%) */}
-          <div className="absolute left-[22%] top-0 bottom-0 w-[1.5px] dark:w-[1px] bg-gradient-to-b from-transparent via-sky-700/40 dark:via-sky-400/30 to-transparent">
-            <div className="w-full h-60 bg-gradient-to-b from-transparent via-sky-600 to-blue-800 dark:via-sky-400 dark:to-white shadow-[0_0_18px_rgba(2,132,199,0.85),0_0_30px_rgba(56,189,248,0.7)] dark:shadow-[0_0_22px_#38bdf8,0_0_38px_#00f0ff] animate-cyber-down-2 will-change-transform" />
+          <div className="absolute left-[22%] top-0 bottom-0 w-[2px] dark:w-[1px] bg-gradient-to-b from-transparent via-slate-900/60 dark:via-sky-400/30 to-transparent">
+            <div className="w-full h-60 bg-gradient-to-b from-transparent via-blue-900 to-slate-950 dark:via-sky-400 dark:to-white shadow-[0_0_18px_rgba(15,23,42,0.95),0_0_30px_rgba(30,58,138,0.85)] dark:shadow-[0_0_22px_#38bdf8,0_0_38px_#00f0ff] animate-cyber-down-2 will-change-transform" />
           </div>
 
           {/* V-Track 4 (34%) */}
-          <div className="hidden md:block absolute left-[34%] top-0 bottom-0 w-[1.5px] dark:w-[1px] bg-gradient-to-b from-transparent via-emerald-700/40 dark:via-emerald-400/30 to-transparent">
-            <div className="w-full h-56 bg-gradient-to-t from-transparent via-emerald-600 to-teal-900 dark:via-emerald-400 dark:to-white shadow-[0_0_18px_rgba(5,150,105,0.85),0_0_30px_rgba(16,185,129,0.7)] dark:shadow-[0_0_20px_#34d399,0_0_36px_#2dd4bf] animate-cyber-up-2 will-change-transform" />
+          <div className="hidden md:block absolute left-[34%] top-0 bottom-0 w-[2px] dark:w-[1px] bg-gradient-to-b from-transparent via-slate-900/60 dark:via-emerald-400/30 to-transparent">
+            <div className="w-full h-56 bg-gradient-to-t from-transparent via-teal-900 to-slate-950 dark:via-emerald-400 dark:to-white shadow-[0_0_18px_rgba(15,23,42,0.95),0_0_30px_rgba(13,148,136,0.85)] dark:shadow-[0_0_20px_#34d399,0_0_36px_#2dd4bf] animate-cyber-up-2 will-change-transform" />
           </div>
 
           {/* V-Track 5 (45%) */}
-          <div className="absolute left-[45%] top-0 bottom-0 w-[1.5px] dark:w-[1px] bg-gradient-to-b from-transparent via-blue-700/40 dark:via-cyan-400/30 to-transparent">
-            <div className="w-full h-72 bg-gradient-to-b from-transparent via-blue-600 to-indigo-900 dark:via-cyan-300 dark:to-white shadow-[0_0_20px_rgba(37,99,235,0.9),0_0_34px_rgba(29,78,216,0.75)] dark:shadow-[0_0_26px_#00f0ff,0_0_46px_#a855f7] animate-cyber-down-3 will-change-transform" />
+          <div className="absolute left-[45%] top-0 bottom-0 w-[2px] dark:w-[1px] bg-gradient-to-b from-transparent via-slate-900/70 dark:via-cyan-400/30 to-transparent">
+            <div className="w-full h-72 bg-gradient-to-b from-transparent via-blue-950 to-black dark:via-cyan-300 dark:to-white shadow-[0_0_20px_rgba(15,23,42,1),0_0_34px_rgba(30,58,138,0.9)] dark:shadow-[0_0_26px_#00f0ff,0_0_46px_#38bdf8] animate-cyber-down-3 will-change-transform" />
           </div>
 
-          {/* V-Track 6 (55%) */}
-          <div className="hidden sm:block absolute left-[55%] top-0 bottom-0 w-[1.5px] dark:w-[1px] bg-gradient-to-b from-transparent via-purple-700/40 dark:via-violet-400/30 to-transparent">
-            <div className="w-full h-60 bg-gradient-to-t from-transparent via-violet-600 to-indigo-900 dark:via-violet-400 dark:to-white shadow-[0_0_18px_rgba(109,40,217,0.85),0_0_30px_rgba(124,58,237,0.7)] dark:shadow-[0_0_22px_#a855f7,0_0_40px_#38bdf8] animate-cyber-up-1 will-change-transform" />
+          {/* V-Track 6 (55%) - Deep Sapphire Slate */}
+          <div className="hidden sm:block absolute left-[55%] top-0 bottom-0 w-[2px] dark:w-[1px] bg-gradient-to-b from-transparent via-slate-900/70 dark:via-cyan-400/30 to-transparent">
+            <div className="w-full h-60 bg-gradient-to-t from-transparent via-blue-900 to-slate-950 dark:via-sky-400 dark:to-white shadow-[0_0_18px_rgba(15,23,42,0.95),0_0_30px_rgba(30,58,138,0.85)] dark:shadow-[0_0_22px_#38bdf8,0_0_40px_#00f0ff] animate-cyber-up-1 will-change-transform" />
           </div>
 
           {/* V-Track 7 (67%) */}
-          <div className="hidden md:block absolute left-[67%] top-0 bottom-0 w-[1.5px] dark:w-[1px] bg-gradient-to-b from-transparent via-sky-700/40 dark:via-sky-400/30 to-transparent">
-            <div className="w-full h-64 bg-gradient-to-b from-transparent via-blue-600 to-blue-900 dark:via-sky-400 dark:to-white shadow-[0_0_18px_rgba(29,78,216,0.85),0_0_30px_rgba(37,99,235,0.7)] dark:shadow-[0_0_24px_#38bdf8,0_0_42px_#00f0ff] animate-cyber-down-1 will-change-transform" />
+          <div className="hidden md:block absolute left-[67%] top-0 bottom-0 w-[2px] dark:w-[1px] bg-gradient-to-b from-transparent via-slate-900/60 dark:via-sky-400/30 to-transparent">
+            <div className="w-full h-64 bg-gradient-to-b from-transparent via-blue-900 to-slate-950 dark:via-sky-400 dark:to-white shadow-[0_0_18px_rgba(15,23,42,0.95),0_0_30px_rgba(30,58,138,0.85)] dark:shadow-[0_0_24px_#38bdf8,0_0_42px_#00f0ff] animate-cyber-down-1 will-change-transform" />
           </div>
 
-          {/* V-Track 8 (78%) */}
-          <div className="absolute left-[78%] top-0 bottom-0 w-[1.5px] dark:w-[1px] bg-gradient-to-b from-transparent via-indigo-700/40 dark:via-purple-400/30 to-transparent">
-            <div className="w-full h-64 bg-gradient-to-t from-transparent via-indigo-600 to-purple-900 dark:via-purple-400 dark:to-white shadow-[0_0_18px_rgba(67,56,202,0.85),0_0_30px_rgba(124,58,237,0.7)] dark:shadow-[0_0_24px_#c084fc,0_0_44px_#00f0ff] animate-cyber-up-2 will-change-transform" />
+          {/* V-Track 8 (78%) - Deep Dark Slate */}
+          <div className="absolute left-[78%] top-0 bottom-0 w-[2px] dark:w-[1px] bg-gradient-to-b from-transparent via-slate-900/60 dark:via-cyan-400/30 to-transparent">
+            <div className="w-full h-64 bg-gradient-to-t from-transparent via-blue-900 to-slate-950 dark:via-cyan-400 dark:to-white shadow-[0_0_18px_rgba(15,23,42,0.95),0_0_30px_rgba(30,58,138,0.85)] dark:shadow-[0_0_24px_#00f0ff,0_0_44px_#38bdf8] animate-cyber-up-2 will-change-transform" />
           </div>
 
           {/* V-Track 9 (88%) */}
-          <div className="hidden sm:block absolute left-[88%] top-0 bottom-0 w-[1.5px] dark:w-[1px] bg-gradient-to-b from-transparent via-cyan-700/40 dark:via-cyan-400/30 to-transparent">
-            <div className="w-full h-56 bg-gradient-to-b from-transparent via-cyan-600 to-blue-800 dark:via-cyan-400 dark:to-white shadow-[0_0_18px_rgba(2,132,199,0.85),0_0_30px_rgba(14,165,233,0.7)] dark:shadow-[0_0_20px_#00f0ff,0_0_36px_#38bdf8] animate-cyber-down-2 will-change-transform" />
+          <div className="hidden sm:block absolute left-[88%] top-0 bottom-0 w-[2px] dark:w-[1px] bg-gradient-to-b from-transparent via-slate-900/60 dark:via-cyan-400/30 to-transparent">
+            <div className="w-full h-56 bg-gradient-to-b from-transparent via-cyan-950 to-slate-950 dark:via-cyan-400 dark:to-white shadow-[0_0_18px_rgba(15,23,42,0.95),0_0_30px_rgba(14,116,144,0.85)] dark:shadow-[0_0_20px_#00f0ff,0_0_36px_#38bdf8] animate-cyber-down-2 will-change-transform" />
           </div>
 
           {/* V-Track 10 (97%) */}
-          <div className="absolute right-[3%] top-0 bottom-0 w-[1.5px] dark:w-[1px] bg-gradient-to-b from-transparent via-blue-700/40 dark:via-cyan-400/30 to-transparent">
-            <div className="w-full h-68 bg-gradient-to-b from-transparent via-blue-600 to-blue-900 dark:via-cyan-300 dark:to-white shadow-[0_0_18px_rgba(29,78,216,0.85),0_0_30px_rgba(37,99,235,0.7)] dark:shadow-[0_0_24px_#00f0ff,0_0_40px_#a855f7] animate-cyber-down-3 will-change-transform" />
+          <div className="absolute right-[3%] top-0 bottom-0 w-[2px] dark:w-[1px] bg-gradient-to-b from-transparent via-slate-900/70 dark:via-cyan-400/30 to-transparent">
+            <div className="w-full h-68 bg-gradient-to-b from-transparent via-blue-900 to-slate-950 dark:via-cyan-300 dark:to-white shadow-[0_0_18px_rgba(15,23,42,0.95),0_0_30px_rgba(30,58,138,0.85)] dark:shadow-[0_0_24px_#00f0ff,0_0_40px_#38bdf8] animate-cyber-down-3 will-change-transform" />
           </div>
         </div>
 
-        {/* D. 8 Horizontal Laser Tracks & Streams (العرض) - Darker in Light Mode */}
+        {/* D. 8 Horizontal Laser Tracks & Streams (العرض) - Dark, High-Contrast, Zero Pink */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden animate-cyber-color-cycle will-change-[filter]">
           {/* H-Track 1 (8%) */}
-          <div className="absolute top-[8%] left-0 right-0 h-[1.5px] dark:h-[1px] bg-gradient-to-r from-transparent via-blue-700/40 dark:via-cyan-400/30 to-transparent">
-            <div className="h-full w-64 bg-gradient-to-r from-transparent via-blue-600 to-blue-900 dark:via-cyan-400 dark:to-white shadow-[0_0_18px_rgba(29,78,216,0.85),0_0_30px_rgba(37,99,235,0.7)] dark:shadow-[0_0_22px_#00f0ff,0_0_38px_#38bdf8] animate-cyber-right-1 will-change-transform" />
+          <div className="absolute top-[8%] left-0 right-0 h-[2px] dark:h-[1px] bg-gradient-to-r from-transparent via-slate-900/60 dark:via-cyan-400/30 to-transparent">
+            <div className="h-full w-64 bg-gradient-to-r from-transparent via-blue-900 to-slate-950 dark:via-cyan-400 dark:to-white shadow-[0_0_18px_rgba(15,23,42,0.95),0_0_30px_rgba(30,58,138,0.85)] dark:shadow-[0_0_22px_#00f0ff,0_0_38px_#38bdf8] animate-cyber-right-1 will-change-transform" />
           </div>
 
           {/* H-Track 2 (20%) */}
-          <div className="hidden sm:block absolute top-[20%] left-0 right-0 h-[1.5px] dark:h-[1px] bg-gradient-to-r from-transparent via-purple-700/40 dark:via-purple-400/30 to-transparent">
-            <div className="h-full w-72 bg-gradient-to-l from-transparent via-purple-600 to-purple-900 dark:via-purple-400 dark:to-white shadow-[0_0_18px_rgba(124,58,237,0.85),0_0_30px_rgba(147,51,234,0.7)] dark:shadow-[0_0_24px_#c084fc,0_0_44px_#a855f7] animate-cyber-left-1 will-change-transform" />
+          <div className="hidden sm:block absolute top-[20%] left-0 right-0 h-[2px] dark:h-[1px] bg-gradient-to-r from-transparent via-slate-900/60 dark:via-cyan-400/30 to-transparent">
+            <div className="h-full w-72 bg-gradient-to-l from-transparent via-blue-900 to-slate-950 dark:via-cyan-400 dark:to-white shadow-[0_0_18px_rgba(15,23,42,0.95),0_0_30px_rgba(30,58,138,0.85)] dark:shadow-[0_0_24px_#00f0ff,0_0_44px_#38bdf8] animate-cyber-left-1 will-change-transform" />
           </div>
 
           {/* H-Track 3 (32%) */}
-          <div className="absolute top-[32%] left-0 right-0 h-[1.5px] dark:h-[1px] bg-gradient-to-r from-transparent via-sky-700/40 dark:via-sky-400/30 to-transparent">
-            <div className="h-full w-80 bg-gradient-to-r from-transparent via-sky-600 to-blue-900 dark:via-sky-300 dark:to-white shadow-[0_0_18px_rgba(2,132,199,0.85),0_0_30px_rgba(56,189,248,0.7)] dark:shadow-[0_0_26px_#38bdf8,0_0_46px_#00f0ff] animate-cyber-right-2 will-change-transform" />
+          <div className="absolute top-[32%] left-0 right-0 h-[2px] dark:h-[1px] bg-gradient-to-r from-transparent via-slate-900/60 dark:via-sky-400/30 to-transparent">
+            <div className="h-full w-80 bg-gradient-to-r from-transparent via-blue-900 to-slate-950 dark:via-sky-300 dark:to-white shadow-[0_0_18px_rgba(15,23,42,0.95),0_0_30px_rgba(3,105,161,0.85)] dark:shadow-[0_0_26px_#38bdf8,0_0_46px_#00f0ff] animate-cyber-right-2 will-change-transform" />
           </div>
 
           {/* H-Track 4 (44%) */}
-          <div className="hidden md:block absolute top-[44%] left-0 right-0 h-[1.5px] dark:h-[1px] bg-gradient-to-r from-transparent via-emerald-700/40 dark:via-emerald-400/30 to-transparent">
-            <div className="h-full w-64 bg-gradient-to-l from-transparent via-emerald-600 to-teal-900 dark:via-emerald-400 dark:to-white shadow-[0_0_18px_rgba(5,150,105,0.85),0_0_30px_rgba(16,185,129,0.7)] dark:shadow-[0_0_20px_#34d399,0_0_36px_#2dd4bf] animate-cyber-left-2 will-change-transform" />
+          <div className="hidden md:block absolute top-[44%] left-0 right-0 h-[2px] dark:h-[1px] bg-gradient-to-r from-transparent via-slate-900/60 dark:via-emerald-400/30 to-transparent">
+            <div className="h-full w-64 bg-gradient-to-l from-transparent via-teal-900 to-slate-950 dark:via-emerald-400 dark:to-white shadow-[0_0_18px_rgba(15,23,42,0.95),0_0_30px_rgba(13,148,136,0.85)] dark:shadow-[0_0_20px_#34d399,0_0_36px_#2dd4bf] animate-cyber-left-2 will-change-transform" />
           </div>
 
           {/* H-Track 5 (56%) */}
-          <div className="absolute top-[56%] left-0 right-0 h-[1.5px] dark:h-[1px] bg-gradient-to-r from-transparent via-blue-700/40 dark:via-cyan-400/30 to-transparent">
-            <div className="h-full w-72 bg-gradient-to-r from-transparent via-blue-600 to-indigo-900 dark:via-cyan-400 dark:to-white shadow-[0_0_18px_rgba(37,99,235,0.85),0_0_30px_rgba(29,78,216,0.7)] dark:shadow-[0_0_24px_#00f0ff,0_0_42px_#c084fc] animate-cyber-right-3 will-change-transform" />
+          <div className="absolute top-[56%] left-0 right-0 h-[2px] dark:h-[1px] bg-gradient-to-r from-transparent via-slate-900/70 dark:via-cyan-400/30 to-transparent">
+            <div className="h-full w-72 bg-gradient-to-r from-transparent via-blue-950 to-black dark:via-cyan-400 dark:to-white shadow-[0_0_18px_rgba(15,23,42,1),0_0_30px_rgba(30,58,138,0.9)] dark:shadow-[0_0_24px_#00f0ff,0_0_42px_#38bdf8] animate-cyber-right-3 will-change-transform" />
           </div>
 
           {/* H-Track 6 (68%) */}
-          <div className="hidden sm:block absolute top-[68%] left-0 right-0 h-[1.5px] dark:h-[1px] bg-gradient-to-r from-transparent via-violet-700/40 dark:via-violet-400/30 to-transparent">
-            <div className="h-full w-64 bg-gradient-to-l from-transparent via-violet-600 to-purple-900 dark:via-violet-400 dark:to-white shadow-[0_0_18px_rgba(109,40,217,0.85),0_0_30px_rgba(124,58,237,0.7)] dark:shadow-[0_0_22px_#a855f7,0_0_40px_#38bdf8] animate-cyber-left-1 will-change-transform" />
+          <div className="hidden sm:block absolute top-[68%] left-0 right-0 h-[2px] dark:h-[1px] bg-gradient-to-r from-transparent via-slate-900/60 dark:via-sky-400/30 to-transparent">
+            <div className="h-full w-64 bg-gradient-to-l from-transparent via-blue-900 to-slate-950 dark:via-sky-400 dark:to-white shadow-[0_0_18px_rgba(15,23,42,0.95),0_0_30px_rgba(30,58,138,0.85)] dark:shadow-[0_0_22px_#38bdf8,0_0_40px_#00f0ff] animate-cyber-left-1 will-change-transform" />
           </div>
 
           {/* H-Track 7 (80%) */}
-          <div className="absolute top-[80%] left-0 right-0 h-[1.5px] dark:h-[1px] bg-gradient-to-r from-transparent via-sky-700/40 dark:via-sky-400/30 to-transparent">
-            <div className="h-full w-80 bg-gradient-to-r from-transparent via-blue-600 to-blue-900 dark:via-sky-400 dark:to-white shadow-[0_0_18px_rgba(29,78,216,0.85),0_0_30px_rgba(37,99,235,0.7)] dark:shadow-[0_0_26px_#38bdf8,0_0_44px_#00f0ff] animate-cyber-right-2 will-change-transform" />
+          <div className="absolute top-[80%] left-0 right-0 h-[2px] dark:h-[1px] bg-gradient-to-r from-transparent via-slate-900/60 dark:via-sky-400/30 to-transparent">
+            <div className="h-full w-80 bg-gradient-to-r from-transparent via-blue-900 to-slate-950 dark:via-sky-400 dark:to-white shadow-[0_0_18px_rgba(15,23,42,0.95),0_0_30px_rgba(30,58,138,0.85)] dark:shadow-[0_0_26px_#38bdf8,0_0_44px_#00f0ff] animate-cyber-right-2 will-change-transform" />
           </div>
 
           {/* H-Track 8 (92%) */}
-          <div className="hidden sm:block absolute top-[92%] left-0 right-0 h-[1.5px] dark:h-[1px] bg-gradient-to-r from-transparent via-blue-700/40 dark:via-cyan-400/30 to-transparent">
-            <div className="h-full w-68 bg-gradient-to-l from-transparent via-blue-600 to-indigo-900 dark:via-cyan-300 dark:to-white shadow-[0_0_18px_rgba(37,99,235,0.85),0_0_30px_rgba(29,78,216,0.7)] dark:shadow-[0_0_22px_#00f0ff,0_0_38px_#34d399] animate-cyber-left-2 will-change-transform" />
+          <div className="hidden sm:block absolute top-[92%] left-0 right-0 h-[2px] dark:h-[1px] bg-gradient-to-r from-transparent via-slate-900/70 dark:via-cyan-400/30 to-transparent">
+            <div className="h-full w-68 bg-gradient-to-l from-transparent via-blue-900 to-slate-950 dark:via-cyan-300 dark:to-white shadow-[0_0_18px_rgba(15,23,42,0.95),0_0_30px_rgba(30,58,138,0.85)] dark:shadow-[0_0_22px_#00f0ff,0_0_38px_#34d399] animate-cyber-left-2 will-change-transform" />
           </div>
         </div>
 
-        {/* E. Overlay Surface Bleed Layer ("والالوان دي تخترق الخلفيات") */}
+        {/* E. Overlay Surface Bleed Layer - Deep Slate / Cyan Only */}
         <div
-          className="absolute inset-0 pointer-events-none overflow-hidden opacity-30 dark:opacity-50 mix-blend-multiply dark:mix-blend-screen animate-cyber-color-cycle will-change-[filter]"
+          className="absolute inset-0 pointer-events-none overflow-hidden opacity-35 dark:opacity-50 mix-blend-multiply dark:mix-blend-screen animate-cyber-color-cycle will-change-[filter]"
         >
-          {/* Luminous cross beams passing over content surfaces */}
-          <div className="absolute left-[28%] top-0 bottom-0 w-[2px] bg-gradient-to-b from-transparent via-blue-600 dark:via-cyan-300 to-transparent shadow-[0_0_24px_rgba(37,99,235,0.8)] dark:shadow-[0_0_28px_#00f0ff] animate-cyber-down-2 will-change-transform" />
-          <div className="absolute left-[72%] top-0 bottom-0 w-[2px] bg-gradient-to-b from-transparent via-purple-600 dark:via-purple-300 to-transparent shadow-[0_0_24px_rgba(147,51,234,0.8)] dark:shadow-[0_0_28px_#a855f7] animate-cyber-up-1 will-change-transform" />
-          <div className="absolute top-[36%] left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-sky-600 dark:via-sky-300 to-transparent shadow-[0_0_24px_rgba(2,132,199,0.8)] dark:shadow-[0_0_28px_#38bdf8] animate-cyber-right-1 will-change-transform" />
-          <div className="absolute top-[74%] left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-blue-600 dark:via-cyan-300 to-transparent shadow-[0_0_24px_rgba(37,99,235,0.8)] dark:shadow-[0_0_28px_#00f0ff] animate-cyber-left-2 will-change-transform" />
+          <div className="absolute left-[28%] top-0 bottom-0 w-[2.5px] bg-gradient-to-b from-transparent via-slate-950 dark:via-cyan-300 to-transparent shadow-[0_0_24px_rgba(15,23,42,1)] dark:shadow-[0_0_28px_#00f0ff] animate-cyber-down-2 will-change-transform" />
+          <div className="absolute left-[72%] top-0 bottom-0 w-[2.5px] bg-gradient-to-b from-transparent via-slate-950 dark:via-sky-300 to-transparent shadow-[0_0_24px_rgba(15,23,42,1)] dark:shadow-[0_0_28px_#38bdf8] animate-cyber-up-1 will-change-transform" />
+          <div className="absolute top-[36%] left-0 right-0 h-[2.5px] bg-gradient-to-r from-transparent via-slate-950 dark:via-sky-300 to-transparent shadow-[0_0_24px_rgba(15,23,42,1)] dark:shadow-[0_0_28px_#38bdf8] animate-cyber-right-1 will-change-transform" />
+          <div className="absolute top-[74%] left-0 right-0 h-[2.5px] bg-gradient-to-r from-transparent via-slate-950 dark:via-cyan-300 to-transparent shadow-[0_0_24px_rgba(15,23,42,1)] dark:shadow-[0_0_28px_#00f0ff] animate-cyber-left-2 will-change-transform" />
         </div>
       </div>
     </div>

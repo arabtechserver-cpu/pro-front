@@ -1581,9 +1581,9 @@ export default function AdminHomepageManager() {
                   </label>
                   <div className="flex flex-wrap items-center gap-2">
                     {[
-                      { key: "purple", label: "بنفسجي نيون (Purple)", dot: "bg-purple-500" },
+                      { key: "purple", label: "كحلي ملكي داكن (Royal Cobalt)", dot: "bg-blue-800" },
                       { key: "cyan", label: "سيان سايبر (Cyan)", dot: "bg-cyan-400" },
-                      { key: "blue", label: "أزرق ملكي (Royal Blue)", dot: "bg-blue-600" },
+                      { key: "blue", label: "أزرق كهربائي (Electric Blue)", dot: "bg-blue-600" },
                       { key: "emerald", label: "زمردي سريع (Emerald)", dot: "bg-emerald-500" },
                       { key: "amber", label: "ذهبي برونزي (Amber)", dot: "bg-amber-500" }
                     ].map((t) => (

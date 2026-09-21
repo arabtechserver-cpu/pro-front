@@ -714,13 +714,13 @@ html.dark body {
    ============================================================ */
 @keyframes cyberColorShift {
   0% {
-    filter: hue-rotate(0deg);
+    filter: brightness(1) contrast(1);
   }
   50% {
-    filter: hue-rotate(90deg);
+    filter: brightness(1.12) contrast(1.08);
   }
   100% {
-    filter: hue-rotate(0deg);
+    filter: brightness(1) contrast(1);
   }
 }
 
