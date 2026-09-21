@@ -171,11 +171,9 @@ body {
 /* Dark mode overrides */
 .dark body,
 html.dark body {
-  background-color: #0b0f17;
+  background-color: #060913;
   color: #f8fafc;
-  background-image:
-    radial-gradient(ellipse 80% 40% at 50% 0%, rgba(37, 99, 235, 0.07) 0%, transparent 60%),
-    radial-gradient(ellipse 60% 30% at 85% 50%, rgba(14, 165, 233, 0.04) 0%, transparent 50%);
+  background-image: none;
 }
 
 /* Global icon color */
@@ -455,12 +453,13 @@ html.dark body {
   /* Individual Card Lamp: Balanced Frosted Cyber Glass */
   .lamp-card,
   .card-spotlight,
-  .curved-cockpit {
+  .curved-cockpit,
+  .glass-card {
     position: relative;
-    background: #ffffff;
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(0, 0, 0, 0.08);
+    background: rgba(255, 255, 255, 0.78);
+    backdrop-filter: blur(14px) saturate(140%);
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
+    border: 1px solid rgba(226, 232, 240, 0.85);
     box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
     transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   }
@@ -472,29 +471,52 @@ html.dark body {
 
   .lamp-card:hover,
   .card-spotlight:hover,
-  .curved-cockpit:hover {
-    background: #ffffff;
-    border-color: rgba(37, 99, 235, 0.35) !important;
-    box-shadow: 0 12px 30px -4px rgba(0, 0, 0, 0.08);
+  .curved-cockpit:hover,
+  .glass-card:hover {
+    background: rgba(255, 255, 255, 0.90);
+    border-color: rgba(37, 99, 235, 0.45) !important;
+    box-shadow: 0 12px 30px -4px rgba(37, 99, 235, 0.12), 0 0 16px rgba(14, 165, 233, 0.15);
     transform: translateY(-2px);
+  }
+
+  html:not(.dark) [class*="rounded-2xl"][class*="bg-white"],
+  html:not(.dark) [class*="rounded-3xl"][class*="bg-white"] {
+    background-color: rgba(255, 255, 255, 0.82) !important;
+    backdrop-filter: blur(14px) saturate(140%) !important;
+    -webkit-backdrop-filter: blur(14px) saturate(140%) !important;
   }
 
   .dark .lamp-card,
   .dark .card-spotlight,
-  .dark .curved-cockpit {
-    background: rgba(11, 19, 37, 0.50);
-    backdrop-filter: blur(12px) saturate(140%);
-    -webkit-backdrop-filter: blur(12px) saturate(140%);
-    border: 1px solid rgba(255, 255, 255, 0.12);
+  .dark .curved-cockpit,
+  .dark .glass-card,
+  .dark .convex-card,
+  .dark [class*="bg-[#061224]"],
+  .dark [class*="bg-[#040a14]"],
+  .dark [class*="bg-[#091524]"],
+  .dark [class*="bg-[#111622]"],
+  .dark [class*="bg-[#1A1A2E]"],
+  .dark [class*="bg-[#0b1426]"],
+  .dark [class*="bg-[#0b1322]"],
+  .dark [class*="bg-[#0b1220]"] {
+    background-color: rgba(6, 18, 36, 0.72) !important;
+    backdrop-filter: blur(14px) saturate(150%) !important;
+    -webkit-backdrop-filter: blur(14px) saturate(150%) !important;
+    border: 1px solid rgba(56, 189, 248, 0.20) !important;
     box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.45), inset 0 1px 1px rgba(255, 255, 255, 0.08);
   }
 
   .dark .lamp-card:hover,
   .dark .card-spotlight:hover,
-  .dark .curved-cockpit:hover {
-    background: rgba(15, 26, 50, 0.72);
+  .dark .curved-cockpit:hover,
+  .dark .glass-card:hover,
+  .dark .convex-card:hover,
+  .dark [class*="bg-[#061224]"]:hover,
+  .dark [class*="bg-[#040a14]"]:hover,
+  .dark [class*="bg-[#111622]"]:hover {
+    background-color: rgba(10, 26, 52, 0.82) !important;
     border-color: rgba(96, 165, 250, 0.45) !important;
-    box-shadow: 0 16px 42px -4px rgba(0, 0, 0, 0.60), 0 0 24px rgba(59, 130, 246, 0.20), inset 0 1px 1px rgba(255, 255, 255, 0.15) !important;
+    box-shadow: 0 16px 42px -4px rgba(0, 0, 0, 0.60), 0 0 24px rgba(56, 189, 248, 0.20), inset 0 1px 1px rgba(255, 255, 255, 0.15) !important;
   }
 
   .lamp-card:hover::before,
@@ -687,12 +709,198 @@ html.dark body {
   animation: softPulse 2.5s ease-in-out infinite;
 }
 
+/* ============================================================
+   Dual-Axis Cyber Laser & Stream Engine (الطول والعرض)
+   ============================================================ */
+@keyframes cyberColorShift {
+  0% {
+    filter: hue-rotate(0deg);
+  }
+  50% {
+    filter: hue-rotate(90deg);
+  }
+  100% {
+    filter: hue-rotate(0deg);
+  }
+}
+
+@keyframes cyberAuraPulse {
+  0%, 100% {
+    opacity: 0.35;
+    transform: scale(1) translate3d(0, 0, 0);
+  }
+  50% {
+    opacity: 0.60;
+    transform: scale(1.15) translate3d(20px, -20px, 0);
+  }
+}
+
+@keyframes cyberAura1 {
+  0%, 100% {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 0.50;
+  }
+  50% {
+    transform: translate3d(40px, 30px, 0) scale(1.18);
+    opacity: 0.75;
+  }
+}
+
+@keyframes cyberAura2 {
+  0%, 100% {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 0.45;
+  }
+  50% {
+    transform: translate3d(-35px, -25px, 0) scale(1.15);
+    opacity: 0.70;
+  }
+}
+
+@keyframes cyberAura3 {
+  0%, 100% {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 0.40;
+  }
+  50% {
+    transform: translate3d(25px, -35px, 0) scale(1.20);
+    opacity: 0.65;
+  }
+}
+
+.animate-cyber-aura-1 {
+  animation: cyberAura1 14s ease-in-out infinite;
+}
+.animate-cyber-aura-2 {
+  animation: cyberAura2 18s ease-in-out infinite 3s;
+}
+.animate-cyber-aura-3 {
+  animation: cyberAura3 16s ease-in-out infinite 6s;
+}
+
+@keyframes cyberGridBreath {
+  0%, 100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 0.65;
+  }
+}
+
+@keyframes cyberStreamDown {
+  0% {
+    transform: translate3d(0, -140%, 0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.95;
+  }
+  90% {
+    opacity: 0.95;
+  }
+  100% {
+    transform: translate3d(0, 110vh, 0);
+    opacity: 0;
+  }
+}
+
+@keyframes cyberStreamUp {
+  0% {
+    transform: translate3d(0, 110vh, 0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.95;
+  }
+  90% {
+    opacity: 0.95;
+  }
+  100% {
+    transform: translate3d(0, -140%, 0);
+    opacity: 0;
+  }
+}
+
+@keyframes cyberStreamRight {
+  0% {
+    transform: translate3d(-140%, 0, 0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.95;
+  }
+  90% {
+    opacity: 0.95;
+  }
+  100% {
+    transform: translate3d(110vw, 0, 0);
+    opacity: 0;
+  }
+}
+
+@keyframes cyberStreamLeft {
+  0% {
+    transform: translate3d(110vw, 0, 0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.95;
+  }
+  90% {
+    opacity: 0.95;
+  }
+  100% {
+    transform: translate3d(-140%, 0, 0);
+    opacity: 0;
+  }
+}
+
+.animate-vertical-stream-1,
+.animate-cyber-down-1 {
+  animation: cyberStreamDown 7.5s cubic-bezier(0.25, 1, 0.5, 1) infinite;
+}
+.animate-vertical-stream-2,
+.animate-cyber-down-2 {
+  animation: cyberStreamDown 10s cubic-bezier(0.25, 1, 0.5, 1) infinite 2s;
+}
+.animate-vertical-stream-3,
+.animate-cyber-down-3 {
+  animation: cyberStreamDown 12s cubic-bezier(0.25, 1, 0.5, 1) infinite 4.5s;
+}
+.animate-vertical-stream-up,
+.animate-cyber-up-1 {
+  animation: cyberStreamUp 9s cubic-bezier(0.25, 1, 0.5, 1) infinite 1s;
+}
+.animate-cyber-up-2 {
+  animation: cyberStreamUp 13s cubic-bezier(0.25, 1, 0.5, 1) infinite 5s;
+}
+
+.animate-cyber-right-1 {
+  animation: cyberStreamRight 8.5s cubic-bezier(0.25, 1, 0.5, 1) infinite;
+}
+.animate-cyber-right-2 {
+  animation: cyberStreamRight 11s cubic-bezier(0.25, 1, 0.5, 1) infinite 3s;
+}
+.animate-cyber-right-3 {
+  animation: cyberStreamRight 14s cubic-bezier(0.25, 1, 0.5, 1) infinite 6s;
+}
+.animate-cyber-left-1 {
+  animation: cyberStreamLeft 9.5s cubic-bezier(0.25, 1, 0.5, 1) infinite 1.5s;
+}
+.animate-cyber-left-2 {
+  animation: cyberStreamLeft 12.5s cubic-bezier(0.25, 1, 0.5, 1) infinite 4.5s;
+}
+
+.animate-cyber-color-cycle {
+  animation: cyberColorShift 16s ease-in-out infinite;
+}
+
+.animate-cyber-grid {
+  animation: cyberGridBreath 8s ease-in-out infinite;
+}
+
 /* Neutralized animations (safe aliases preventing layout breaks) */
 .animate-laser-scan,
-.animate-vertical-stream-1,
-.animate-vertical-stream-2,
-.animate-vertical-stream-3,
-.animate-vertical-stream-up,
 .animate-holo-rings,
 .animate-horizon-sweep,
 .animate-thruster,
@@ -886,26 +1094,17 @@ html.dark body {
     animation: none !important;
   }
 
-  /* Eliminate expensive multi-pass Gaussian blur on mobile GPUs */
-  .backdrop-blur-sm,
-  .backdrop-blur,
-  .backdrop-blur-md,
-  .backdrop-blur-lg,
-  .backdrop-blur-xl,
-  .backdrop-blur-2xl,
-  .backdrop-blur-3xl,
-  [class*="backdrop-blur"] {
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-  }
-
-  /* Solidify dark cyber surfaces for pristine contrast only in dark mode */
+  /* Balanced mobile frosted glass allowing background beams to penetrate smoothly */
   .dark .lamp-card,
   .dark .glass-card,
+  .dark [class*="bg-[#061224]"],
+  .dark [class*="bg-[#040a14]"],
   .dark [class*="bg-[#0b1426]"],
   .dark [class*="bg-[#0b1322]"],
   .dark [class*="bg-[#0b1220]"] {
-    background-color: rgba(11, 20, 38, 0.94) !important;
+    background-color: rgba(6, 18, 36, 0.78) !important;
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
   }
 
   /* Lighten heavy GPU blur shadows on mobile */

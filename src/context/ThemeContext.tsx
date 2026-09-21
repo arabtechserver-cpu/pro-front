@@ -13,19 +13,22 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>("dark");
+  const [theme, setThemeState] = useState<Theme>("light");
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     try {
       const savedTheme = localStorage.getItem("app_theme") as Theme | null;
-      if (savedTheme === "light" || savedTheme === "dark") {
-        setThemeState(savedTheme);
-        document.documentElement.classList.toggle("dark", savedTheme === "dark");
-      } else {
-        // Default to dark mode if no saved preference
+      if (savedTheme === "dark") {
         setThemeState("dark");
         document.documentElement.classList.add("dark");
+      } else if (savedTheme === "light") {
+        setThemeState("light");
+        document.documentElement.classList.remove("dark");
+      } else {
+        // Default to light mode if no saved preference
+        setThemeState("light");
+        document.documentElement.classList.remove("dark");
       }
     } catch {
       // Fallback in case localStorage is restricted
@@ -47,7 +50,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   };
 
   const toggleTheme = () => {
-    setTheme(theme === "dark" ? "light" : "dark");
+    const nextTheme: Theme = theme === "dark" ? "light" : "dark";
+    setTheme(nextTheme);
   };
 
   return (
