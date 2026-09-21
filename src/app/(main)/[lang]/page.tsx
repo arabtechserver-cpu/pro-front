@@ -156,7 +156,7 @@ export default async function Home(props: { params: Promise<{ lang: Locale }> })
   };
 
   return (
-    <div className="homepage-static-content relative flex flex-col pb-12 sm:pb-20 overflow-x-clip bg-slate-50 text-slate-900 dark:bg-transparent dark:text-white">
+    <div className="homepage-static-content relative flex flex-col pb-12 sm:pb-20 overflow-x-clip bg-transparent text-slate-900 dark:text-white">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
