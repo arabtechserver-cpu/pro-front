@@ -2,7 +2,131 @@
 
 import { useState, useEffect } from "react";
 
-// Reusable Image Picker Component with direct device file upload
+// Preset icon suggestions for quick picking
+const PRESET_ICONS = [
+  { label: "Chimera", url: "/images/tools/tool_chimera.png" },
+  { label: "UnlockTool", url: "/images/tools/tool_unlocktool.png" },
+  { label: "Borneo", url: "/images/tools/tool_borneo.png" },
+  { label: "iRemoval", url: "/images/tools/tool_iremoval.png" },
+  { label: "DFT Pro", url: "/images/tools/tool_dft.png" },
+  { label: "MobileSea", url: "/images/tools/tool_mobilesea.png" },
+  { label: "AMT", url: "/images/tools/tool_amt.png" },
+  { label: "Phoenix", url: "/images/tools/tool_phoenix.png" },
+  { label: "Cheetah", url: "/images/tools/tool_cheetah.png" },
+  { label: "FKey", url: "/images/tools/tool_fkey.png" },
+  { label: "Samsung", url: "/images/promo_samsung.webp" },
+  { label: "Gift Box", url: "/images/promo_gift_box.png" }
+];
+
+// Default 3 Featured Packages matching the production homepage
+const DEFAULT_FEATURED_PACKAGES = [
+  {
+    id: "chimera",
+    nameAr: "Chimera Tool",
+    nameEn: "Chimera Tool",
+    subAr: "Activation / Credits",
+    subEn: "Activation / Credits",
+    badgeAr: "Best Seller",
+    badgeEn: "Best Seller",
+    isPopular: true,
+    startingPrice: "$106.59",
+    categoryAr: "Official",
+    categoryEn: "Official",
+    deliveryTimeAr: "فوري 24/7",
+    deliveryTimeEn: "Instant 24/7",
+    iconName: "build",
+    image: "/images/tools/tool_chimera.png",
+    url: "/pricing?section=Chimera%20Tool",
+    featuresAr: [
+      "تراخيص Chimera Basic و Samsung و All Brands Pro",
+      "فك شبكات وتصليح السيريال وإصلاح IMEI وتعديل الموديل",
+      "تفعيل رسمي مباشر على حساب المستخدم خلال دقيقة",
+      "تحديثات متواصلة لدعم أحدث إصدارات الأندرويد"
+    ],
+    featuresEn: [
+      "Chimera Basic, Samsung, and All Brands Pro licenses",
+      "Carrier unlock, serial repair, and network patching",
+      "Official 1-minute automated account activation",
+      "Continuous support for latest Android security patches"
+    ]
+  },
+  {
+    id: "amt",
+    nameAr: "Android Multi Tool",
+    nameEn: "Android Multi Tool",
+    subAr: "AMT Credits",
+    subEn: "AMT Credits",
+    badgeAr: "Popular",
+    badgeEn: "Popular",
+    isPopular: false,
+    startingPrice: "$0.92",
+    categoryAr: "Instant",
+    categoryEn: "Instant",
+    deliveryTimeAr: "فوري 24/7",
+    deliveryTimeEn: "Instant 24/7",
+    iconName: "bolt",
+    image: "/images/tools/tool_amt.png",
+    url: "/pricing?section=Android%20Multi%20Tool",
+    featuresAr: [
+      "دعم كامل لهواتف VIVO و XIAOMI و TECNO و INFINIX",
+      "عمليات FRP وتخطي حسابات وحذف الديمو (Demo Removal)",
+      "شحن فوري بالكريدت مباشرة إلى اسم المستخدم لحسابك",
+      "لا يحتاج إلى بوكس أو دونجل خارجي للعمل"
+    ],
+    featuresEn: [
+      "Full support for Vivo, Xiaomi, Tecno & Infinix",
+      "One-click FRP bypass, factory reset, and demo removal",
+      "Instant credit top-up directly to your username",
+      "No hardware box or dongle required to run"
+    ]
+  },
+  {
+    id: "xiaomi",
+    nameAr: "Xiaomi Remove Account",
+    nameEn: "Xiaomi Remove Account",
+    subAr: "",
+    subEn: "",
+    badgeAr: "Official",
+    badgeEn: "Official",
+    isPopular: false,
+    startingPrice: "$3.41",
+    categoryAr: "Fast Service",
+    categoryEn: "Fast Service",
+    deliveryTimeAr: "1 - 12 ساعة",
+    deliveryTimeEn: "1 - 12 Hours",
+    iconName: "smartphone",
+    image: "",
+    url: "/pricing?section=Xiaomi%20Remove%20Account",
+    featuresAr: [
+      "حذف دائم ونظيف من سيرفر شاومي الرسمي (Clean IMEI)",
+      "دعم الأجهزة من جميع دول العالم (Worldwide Support)",
+      "إمكانية إعادة ضبط المصنع والتحديث بعد الحذف بأمان",
+      "تنفيذ تلقائي عبر الـ API مع استرجاع الرصيد في حال الرفض"
+    ],
+    featuresEn: [
+      "Permanent clean removal from official Xiaomi servers",
+      "Worldwide device support across all regions",
+      "Safe factory reset and OTA updates after completion",
+      "Automated API execution with full refund protection"
+    ]
+  }
+];
+
+// Default 10 Supported Tools matching the production homepage
+const DEFAULT_SUPPORTED_TOOLS = [
+  { id: "chimera", name: "Chimera", url: "/pricing?search=Chimera", image: "/images/tools/tool_chimera.png" },
+  { id: "unlocktool", name: "UnlockTool", url: "/pricing?search=UnlockTool", image: "/images/tools/tool_unlocktool.png" },
+  { id: "borneo", name: "Borneo", url: "/pricing?search=Borneo", image: "/images/tools/tool_borneo.png" },
+  { id: "iremoval", name: "iRemoval Pro", url: "/pricing?search=iRemoval%20Pro", image: "/images/tools/tool_iremoval.png" },
+  { id: "dft", name: "DFT Pro", url: "/pricing?search=DFT%20Pro", image: "/images/tools/tool_dft.png" },
+  { id: "mobilesea", name: "MobileSea Tool", url: "/pricing?search=MobileSea%20Tool", image: "/images/tools/tool_mobilesea.png" },
+  { id: "amt", name: "AMT", url: "/pricing?search=AMT", image: "/images/tools/tool_amt.png" },
+  { id: "phoenix", name: "Phoenix", url: "/pricing?search=Phoenix", image: "/images/tools/tool_phoenix.png" },
+  { id: "cheetah", name: "Cheetah", url: "/pricing?search=Cheetah", image: "/images/tools/tool_cheetah.png" },
+  { id: "fkey", name: "FKey", url: "/pricing?search=FKey", image: "/images/tools/tool_fkey.png" }
+];
+
+// Reusable Image Picker Component with direct device file upload and auth header
 function ImagePickerInput({ 
   label, 
   value, 
@@ -13,6 +137,7 @@ function ImagePickerInput({
   onChange: (newUrl: string) => void;
 }) {
   const [uploading, setUploading] = useState(false);
+  const [showPresets, setShowPresets] = useState(false);
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -24,9 +149,14 @@ function ImagePickerInput({
       const reader = new FileReader();
       reader.onload = async () => {
         const base64 = reader.result as string;
+        const token = typeof window !== "undefined" ? (localStorage.getItem("admin_token") || localStorage.getItem("token")) : null;
+
         const res = await fetch("/api/upload", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: { 
+            "Content-Type": "application/json",
+            ...(token ? { "Authorization": `Bearer ${token}`, "x-admin-token": token } : {})
+          },
           body: JSON.stringify({ image: base64, filename: file.name })
         });
 
@@ -36,7 +166,8 @@ function ImagePickerInput({
             onChange(data.url);
           }
         } else {
-          alert("فشل رفع الصورة على السيرفر");
+          const errData = await res.json().catch(() => ({}));
+          alert(errData.error || "فشل رفع الصورة على السيرفر، يرجى التأكد من تسجيل الدخول.");
         }
         setUploading(false);
       };
@@ -49,35 +180,73 @@ function ImagePickerInput({
   };
 
   return (
-    <div className="flex flex-col gap-2 p-4 bg-surface-container-low rounded-2xl border border-outline-variant/30">
-      <label className="text-xs font-bold uppercase text-on-surface-variant flex items-center justify-between">
-        <span>{label}</span>
-        {value && <span className="text-[10px] text-primary font-mono">معاينة الصورة</span>}
-      </label>
+    <div className="flex flex-col gap-2 p-3.5 bg-surface-container-low rounded-2xl border border-outline-variant/30">
+      <div className="flex items-center justify-between">
+        <label className="text-xs font-bold uppercase text-on-surface-variant flex items-center gap-1.5">
+          <span className="material-symbols-outlined text-sm text-primary">image</span>
+          <span>{label}</span>
+        </label>
+        <button
+          type="button"
+          onClick={() => setShowPresets(!showPresets)}
+          className="text-[11px] text-primary hover:underline flex items-center gap-1"
+        >
+          <span className="material-symbols-outlined text-xs">auto_awesome</span>
+          <span>{showPresets ? "إخفاء الأيقونات الجاهزة" : "اختيار أيقونة جاهزة"}</span>
+        </button>
+      </div>
+
+      {/* Preset Icons Selection */}
+      {showPresets && (
+        <div className="p-2.5 bg-surface-container-lowest rounded-xl border border-outline-variant/20 flex flex-wrap gap-2 animate-in fade-in">
+          {PRESET_ICONS.map((preset) => (
+            <button
+              key={preset.label}
+              type="button"
+              onClick={() => {
+                onChange(preset.url);
+                setShowPresets(false);
+              }}
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-surface-container hover:bg-primary/20 hover:text-primary text-xs border border-outline-variant/20 transition-colors"
+            >
+              <img src={preset.url} alt={preset.label} className="w-4 h-4 object-contain rounded" />
+              <span>{preset.label}</span>
+            </button>
+          ))}
+        </div>
+      )}
 
       {/* Image Preview Box */}
       {value && (
-        <div className="relative aspect-video w-full max-h-[160px] rounded-xl overflow-hidden bg-black/40 border border-outline-variant/20 mb-2 group">
-          <img src={value} alt="Preview" className="w-full h-full object-cover" />
-          <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center p-2">
-            <span className="text-xs text-white font-mono break-all text-center">{value}</span>
+        <div className="relative w-full max-h-[140px] rounded-xl overflow-hidden bg-black/40 border border-outline-variant/20 flex items-center justify-center p-2 group">
+          <img src={value} alt="Preview" className="max-h-[120px] object-contain rounded-lg" />
+          <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+            <span className="text-[10px] text-white font-mono break-all px-3 text-center">{value}</span>
+            <button
+              type="button"
+              onClick={() => onChange("")}
+              className="bg-error/80 hover:bg-error text-white p-1.5 rounded-lg text-xs flex items-center"
+              title="إزالة الصورة"
+            >
+              <span className="material-symbols-outlined text-sm">delete</span>
+            </button>
           </div>
         </div>
       )}
 
       {/* Inputs: URL + Upload Button */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
         <input
           type="text"
           placeholder="رابط الصورة (URL) أو ارفع من جهازك..."
           value={value || ""}
           onChange={(e) => onChange(e.target.value)}
-          className="flex-1 bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-3 text-sm text-on-surface font-mono"
+          className="flex-1 bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-2.5 text-xs text-on-surface font-mono"
         />
 
-        <label className="btn-secondary py-3 px-4 rounded-xl text-xs font-bold cursor-pointer shrink-0 flex items-center justify-center gap-2 hover:border-primary">
-          <span className="material-symbols-outlined text-lg">{uploading ? "sync" : "upload_file"}</span>
-          <span>{uploading ? "جاري الرفع..." : "رفع من الجهاز"}</span>
+        <label className="btn-secondary py-2 px-3.5 rounded-xl text-xs font-bold cursor-pointer shrink-0 flex items-center justify-center gap-1.5 hover:border-primary">
+          <span className="material-symbols-outlined text-base">{uploading ? "sync" : "upload_file"}</span>
+          <span>{uploading ? "جاري الرفع..." : "رفع من جهازك"}</span>
           <input 
             type="file" 
             accept="image/*" 
@@ -95,11 +264,12 @@ export default function AdminHomepageManager() {
   const [config, setConfig] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [activeTab, setActiveTab] = useState<string>("hero");
+  // Default to the requested controls tab
+  const [activeTab, setActiveTab] = useState<string>("packages");
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
-  // Service picker states
-  const [siteGroups, setSiteGroups] = useState<Array<{ name: string; minPrice: number; count: number; time: string }>>([]);
+  // Service picker modal states
+  const [siteItems, setSiteItems] = useState<Array<{ name: string; minPrice: number; count: number; time: string; categoryName: string }>>([]);
   const [loadingServices, setLoadingServices] = useState(false);
   const [showPickerModal, setShowPickerModal] = useState(false);
   const [pickerSearch, setPickerSearch] = useState("");
@@ -111,8 +281,10 @@ export default function AdminHomepageManager() {
         const res = await fetch("/api/homepage");
         if (res.ok) {
           const data = await res.json();
+
+          // Normalization: Ensure campaigns is an array
           let campaignsArray = Array.isArray(data.campaigns) ? data.campaigns : [];
-          if (campaignsArray.length === 0 && data.campaigns && typeof data.campaigns === 'object') {
+          if (campaignsArray.length === 0 && data.campaigns && typeof data.campaigns === "object") {
             const c = data.campaigns;
             if (c.promo1Image || c.promo1TitleAr || c.promo1TitleEn) {
               campaignsArray.push({
@@ -126,34 +298,17 @@ export default function AdminHomepageManager() {
                 url: c.promo1Url || "/pricing"
               });
             }
-            if (c.promo2Image || c.promo2TitleAr || c.promo2TitleEn) {
-              campaignsArray.push({
-                tagEn: c.promo2TagEn || "Official Reseller",
-                tagAr: c.promo2TagAr || "ترخيص رسمي",
-                titleEn: c.promo2TitleEn || "Chimera Tool",
-                titleAr: c.promo2TitleAr || "أداة شيميراChimera",
-                descEn: c.promo2DescEn || "",
-                descAr: c.promo2DescAr || "",
-                image: c.promo2Image || "/images/promo_chimera.webp",
-                url: c.promo2Url || "/pricing"
-              });
-            }
           }
           data.campaigns = campaignsArray;
 
+          // Normalization: Ensure featuredPackages has at least default 3 cards
+          if (!Array.isArray(data.featuredPackages) || data.featuredPackages.length === 0) {
+            data.featuredPackages = DEFAULT_FEATURED_PACKAGES;
+          }
+
+          // Normalization: Ensure supportedTools has default 10 tools
           if (!Array.isArray(data.supportedTools) || data.supportedTools.length === 0) {
-            data.supportedTools = [
-              { id: "chimera", name: "Chimera", url: "/pricing?search=Chimera", image: "" },
-              { id: "unlocktool", name: "UnlockTool", url: "/pricing?search=UnlockTool", image: "" },
-              { id: "borneo", name: "Borneo", url: "/pricing?search=Borneo", image: "" },
-              { id: "iremoval", name: "iRemoval Pro", url: "/pricing?search=iRemoval%20Pro", image: "" },
-              { id: "dft", name: "DFT Pro", url: "/pricing?search=DFT%20Pro", image: "" },
-              { id: "mobilesea", name: "MobileSea Tool", url: "/pricing?search=MobileSea%20Tool", image: "" },
-              { id: "amt", name: "AMT", url: "/pricing?search=AMT", image: "" },
-              { id: "phoenix", name: "Phoenix", url: "/pricing?search=Phoenix", image: "" },
-              { id: "cheetah", name: "Cheetah", url: "/pricing?search=Cheetah", image: "" },
-              { id: "fkey", name: "FKey", url: "/pricing?search=FKey", image: "" }
-            ];
+            data.supportedTools = DEFAULT_SUPPORTED_TOOLS;
           }
 
           setConfig(data);
@@ -167,7 +322,7 @@ export default function AdminHomepageManager() {
     fetchConfig();
   }, []);
 
-  // Fetch site service groups for the package & tool picker
+  // Fetch site services and groups for the package & tool picker
   useEffect(() => {
     async function fetchSiteServices() {
       try {
@@ -175,22 +330,27 @@ export default function AdminHomepageManager() {
         const res = await fetch("/api/dhru/services?view=pricing");
         if (res.ok) {
           const categories = await res.json();
-          const groupMap = new Map<string, { name: string; minPrice: number; count: number; time: string }>();
+          const itemMap = new Map<string, { name: string; minPrice: number; count: number; time: string; categoryName: string }>();
 
           if (Array.isArray(categories)) {
             for (const cat of categories) {
-              const services = Array.isArray(cat.services) ? cat.services : [];
+              const services = Array.isArray(cat.dhruServices) 
+                ? cat.dhruServices 
+                : (Array.isArray(cat.services) ? cat.services : []);
+
               for (const s of services) {
-                const group = (s.groupName || "").trim();
+                const group = (s.groupName || s.name || "").trim();
                 if (!group) continue;
                 const credit = typeof s.credit === "number" ? s.credit : 0;
-                const existing = groupMap.get(group);
+                const existing = itemMap.get(group);
+
                 if (!existing) {
-                  groupMap.set(group, {
+                  itemMap.set(group, {
                     name: group,
                     minPrice: credit,
                     count: 1,
-                    time: s.time || ""
+                    time: s.time || "",
+                    categoryName: cat.name || ""
                   });
                 } else {
                   existing.count += 1;
@@ -205,8 +365,8 @@ export default function AdminHomepageManager() {
             }
           }
 
-          const sorted = Array.from(groupMap.values()).sort((a, b) => a.name.localeCompare(b.name));
-          setSiteGroups(sorted);
+          const sorted = Array.from(itemMap.values()).sort((a, b) => a.name.localeCompare(b.name));
+          setSiteItems(sorted);
         }
       } catch (err) {
         console.error("Failed to load site services for picker:", err);
@@ -230,7 +390,7 @@ export default function AdminHomepageManager() {
         body: JSON.stringify(config)
       });
       if (res.ok) {
-        setToastMessage("تم حفظ تعديلات الصفحة الرئيسية بنجاح!");
+        setToastMessage("تم حفظ وتطبيق تعديلات الصفحة الرئيسية بنجاح!");
         setTimeout(() => setToastMessage(null), 4000);
       } else {
         const errData = await res.json().catch(() => ({}));
@@ -254,40 +414,9 @@ export default function AdminHomepageManager() {
     }));
   };
 
-  const updateCampaignField = (index: number, field: string, value: any) => {
-    setConfig((prev: any) => {
-      const campaigns = Array.isArray(prev.campaigns) ? [...prev.campaigns] : [];
-      if (!campaigns[index]) return prev;
-      campaigns[index] = { ...campaigns[index], [field]: value };
-      return { ...prev, campaigns };
-    });
-  };
-
-  const addCampaign = () => {
-    setConfig((prev: any) => {
-      const campaigns = Array.isArray(prev.campaigns) ? [...prev.campaigns] : [];
-      campaigns.push({
-        tagEn: "New Offer",
-        tagAr: "عرض جديد",
-        titleEn: "Campaign Title",
-        titleAr: "عنوان الإعلان",
-        descEn: "Campaign Description",
-        descAr: "وصف الإعلان",
-        image: "",
-        url: "/pricing"
-      });
-      return { ...prev, campaigns };
-    });
-  };
-
-  const removeCampaign = (index: number) => {
-    setConfig((prev: any) => {
-      const campaigns = Array.isArray(prev.campaigns) ? [...prev.campaigns] : [];
-      campaigns.splice(index, 1);
-      return { ...prev, campaigns };
-    });
-  };
-
+  // -------------------------------------------------------------
+  // Package Management Handlers
+  // -------------------------------------------------------------
   const addPackage = () => {
     setConfig((prev: any) => {
       const pkgs = Array.isArray(prev.featuredPackages) ? [...prev.featuredPackages] : [];
@@ -297,79 +426,26 @@ export default function AdminHomepageManager() {
         nameEn: "New Package",
         subAr: "",
         subEn: "",
-        badgeAr: "الأكثر طلباً",
-        badgeEn: "Popular",
+        badgeAr: "متاح الآن",
+        badgeEn: "Available",
         isPopular: false,
-        startingPrice: "$0.00",
-        categoryAr: "رسمي",
+        startingPrice: "$1.00",
+        categoryAr: "سيرفر رسمي",
         categoryEn: "Official",
         deliveryTimeAr: "فوري 24/7",
         deliveryTimeEn: "Instant 24/7",
         iconName: "inventory_2",
         image: "",
         url: "/pricing",
-        featuresAr: [""],
-        featuresEn: [""]
+        featuresAr: ["تفعيل فوري تلقائي", "دعم كامل ومباشر"],
+        featuresEn: ["Instant automated delivery", "Full direct support"]
       });
       return { ...prev, featuredPackages: pkgs };
     });
   };
 
-  const selectServiceForPackage = (group: { name: string; minPrice: number; time: string }) => {
-    const formattedPrice = group.minPrice > 0 ? `$${group.minPrice.toFixed(2)}` : "$0.99";
-
-    setConfig((prev: any) => {
-      const pkgs = Array.isArray(prev.featuredPackages) ? [...prev.featuredPackages] : [];
-      if (pickerTargetIndex !== null && pkgs[pickerTargetIndex]) {
-        pkgs[pickerTargetIndex] = {
-          ...pkgs[pickerTargetIndex],
-          nameAr: group.name,
-          nameEn: group.name,
-          subAr: group.name,
-          subEn: group.name,
-          startingPrice: formattedPrice,
-          deliveryTimeAr: group.time || "فوري 24/7",
-          deliveryTimeEn: group.time || "Instant 24/7",
-          url: `/pricing?section=${encodeURIComponent(group.name)}`
-        };
-      } else {
-        pkgs.push({
-          id: `pkg_${Date.now()}`,
-          nameAr: group.name,
-          nameEn: group.name,
-          subAr: group.name,
-          subEn: group.name,
-          badgeAr: "الأكثر طلباً",
-          badgeEn: "Best Seller",
-          isPopular: false,
-          startingPrice: formattedPrice,
-          categoryAr: "سيرفر رسمي",
-          categoryEn: "Official Server",
-          deliveryTimeAr: group.time || "فوري 24/7",
-          deliveryTimeEn: group.time || "Instant 24/7",
-          iconName: "bolt",
-          image: "",
-          url: `/pricing?section=${encodeURIComponent(group.name)}`,
-          featuresAr: [
-            `خدمة ${group.name} الرسمية`,
-            "تنفيذ تلقائي وفوري عبر السيرفر",
-            "ضمان استرجاع الرصيد في حال عدم الإنجاز"
-          ],
-          featuresEn: [
-            `Official ${group.name} service`,
-            "Instant automated server execution",
-            "Full refund protection on rejection"
-          ]
-        });
-      }
-      return { ...prev, featuredPackages: pkgs };
-    });
-
-    setShowPickerModal(false);
-    setPickerTargetIndex(null);
-  };
-
   const removePackage = (index: number) => {
+    if (!confirm("هل أنت متأكد من حذف هذه الباقة؟")) return;
     setConfig((prev: any) => {
       const pkgs = Array.isArray(prev.featuredPackages) ? [...prev.featuredPackages] : [];
       pkgs.splice(index, 1);
@@ -386,78 +462,72 @@ export default function AdminHomepageManager() {
     });
   };
 
-  // Supported Tools Handlers
-  const addTool = () => {
+  const selectServiceForPackage = (item: { name: string; minPrice: number; time: string; categoryName: string }) => {
+    const formattedPrice = item.minPrice > 0 ? `$${item.minPrice.toFixed(2)}` : "$0.99";
+
+    // Auto-detect image from preset list if matching
+    const matchingPreset = PRESET_ICONS.find(p => item.name.toLowerCase().includes(p.label.toLowerCase()));
+    const autoImage = matchingPreset ? matchingPreset.url : "";
+
     setConfig((prev: any) => {
-      const tools = Array.isArray(prev.supportedTools) ? [...prev.supportedTools] : [];
-      tools.push({
-        id: `tool_${Date.now()}`,
-        name: "أداة جديدة",
-        url: "/pricing",
-        image: ""
-      });
-      return { ...prev, supportedTools: tools };
+      const pkgs = Array.isArray(prev.featuredPackages) ? [...prev.featuredPackages] : [];
+      if (pickerTargetIndex !== null && pkgs[pickerTargetIndex]) {
+        pkgs[pickerTargetIndex] = {
+          ...pkgs[pickerTargetIndex],
+          nameAr: item.name,
+          nameEn: item.name,
+          subAr: item.categoryName || item.name,
+          subEn: item.categoryName || item.name,
+          startingPrice: formattedPrice,
+          categoryAr: item.categoryName || "سيرفر رسمي",
+          categoryEn: item.categoryName || "Official Server",
+          deliveryTimeAr: item.time || "فوري 24/7",
+          deliveryTimeEn: item.time || "Instant 24/7",
+          image: pkgs[pickerTargetIndex].image || autoImage,
+          url: `/pricing?section=${encodeURIComponent(item.name)}`
+        };
+      } else {
+        pkgs.push({
+          id: `pkg_${Date.now()}`,
+          nameAr: item.name,
+          nameEn: item.name,
+          subAr: item.categoryName || item.name,
+          subEn: item.categoryName || item.name,
+          badgeAr: "الأكثر طلباً",
+          badgeEn: "Best Seller",
+          isPopular: false,
+          startingPrice: formattedPrice,
+          categoryAr: item.categoryName || "سيرفر رسمي",
+          categoryEn: item.categoryName || "Official Server",
+          deliveryTimeAr: item.time || "فوري 24/7",
+          deliveryTimeEn: item.time || "Instant 24/7",
+          iconName: "bolt",
+          image: autoImage,
+          url: `/pricing?section=${encodeURIComponent(item.name)}`,
+          featuresAr: [
+            `خدمة ${item.name} المعتمدة`,
+            "تنفيذ تلقائي وفوري عبر السيرفر",
+            "ضمان استرجاع الرصيد في حال عدم الإنجاز"
+          ],
+          featuresEn: [
+            `Official ${item.name} service`,
+            "Instant automated server execution",
+            "Full refund protection on rejection"
+          ]
+        });
+      }
+      return { ...prev, featuredPackages: pkgs };
     });
+
+    setShowPickerModal(false);
+    setPickerTargetIndex(null);
   };
 
-  const addToolFromGroup = (groupName: string) => {
-    setConfig((prev: any) => {
-      const tools = Array.isArray(prev.supportedTools) ? [...prev.supportedTools] : [];
-      tools.push({
-        id: `tool_${Date.now()}`,
-        name: groupName,
-        url: `/pricing?search=${encodeURIComponent(groupName)}`,
-        image: ""
-      });
-      return { ...prev, supportedTools: tools };
-    });
-  };
-
-  const removeTool = (index: number) => {
-    setConfig((prev: any) => {
-      const tools = Array.isArray(prev.supportedTools) ? [...prev.supportedTools] : [];
-      tools.splice(index, 1);
-      return { ...prev, supportedTools: tools };
-    });
-  };
-
-  const updateToolField = (index: number, field: string, value: any) => {
-    setConfig((prev: any) => {
-      const tools = Array.isArray(prev.supportedTools) ? [...prev.supportedTools] : [];
-      if (!tools[index]) return prev;
-      tools[index] = { ...tools[index], [field]: value };
-      return { ...prev, supportedTools: tools };
-    });
-  };
-
-  const moveTool = (index: number, direction: "up" | "down") => {
-    setConfig((prev: any) => {
-      const tools = Array.isArray(prev.supportedTools) ? [...prev.supportedTools] : [];
-      const targetIndex = direction === "up" ? index - 1 : index + 1;
-      if (targetIndex < 0 || targetIndex >= tools.length) return prev;
-      const temp = tools[index];
-      tools[index] = tools[targetIndex];
-      tools[targetIndex] = temp;
-      return { ...prev, supportedTools: tools };
-    });
-  };
-
-  const resetDefaultTools = () => {
-    if (!confirm("هل أنت متأكد من استعادة قائمة الـ 10 أدوات الافتراضية؟")) return;
+  const resetDefaultPackages = () => {
+    if (!confirm("هل أنت متأكد من استعادة الباقات الـ 3 الافتراضية (Chimera, AMT, Xiaomi)؟")) return;
     setConfig((prev: any) => ({
       ...prev,
-      supportedTools: [
-        { id: "chimera", name: "Chimera", url: "/pricing?search=Chimera", image: "" },
-        { id: "unlocktool", name: "UnlockTool", url: "/pricing?search=UnlockTool", image: "" },
-        { id: "borneo", name: "Borneo", url: "/pricing?search=Borneo", image: "" },
-        { id: "iremoval", name: "iRemoval Pro", url: "/pricing?search=iRemoval%20Pro", image: "" },
-        { id: "dft", name: "DFT Pro", url: "/pricing?search=DFT%20Pro", image: "" },
-        { id: "mobilesea", name: "MobileSea Tool", url: "/pricing?search=MobileSea%20Tool", image: "" },
-        { id: "amt", name: "AMT", url: "/pricing?search=AMT", image: "" },
-        { id: "phoenix", name: "Phoenix", url: "/pricing?search=Phoenix", image: "" },
-        { id: "cheetah", name: "Cheetah", url: "/pricing?search=Cheetah", image: "" },
-        { id: "fkey", name: "FKey", url: "/pricing?search=FKey", image: "" }
-      ]
+      featuredPackages: DEFAULT_FEATURED_PACKAGES
     }));
   };
 
@@ -494,6 +564,74 @@ export default function AdminHomepageManager() {
     });
   };
 
+  // -------------------------------------------------------------
+  // Supported Tools Handlers
+  // -------------------------------------------------------------
+  const addTool = () => {
+    setConfig((prev: any) => {
+      const tools = Array.isArray(prev.supportedTools) ? [...prev.supportedTools] : [];
+      tools.push({
+        id: `tool_${Date.now()}`,
+        name: "أداة جديدة",
+        url: "/pricing",
+        image: ""
+      });
+      return { ...prev, supportedTools: tools };
+    });
+  };
+
+  const addToolFromItem = (itemName: string) => {
+    const matchingPreset = PRESET_ICONS.find(p => itemName.toLowerCase().includes(p.label.toLowerCase()));
+    setConfig((prev: any) => {
+      const tools = Array.isArray(prev.supportedTools) ? [...prev.supportedTools] : [];
+      tools.push({
+        id: `tool_${Date.now()}`,
+        name: itemName,
+        url: `/pricing?search=${encodeURIComponent(itemName)}`,
+        image: matchingPreset ? matchingPreset.url : ""
+      });
+      return { ...prev, supportedTools: tools };
+    });
+  };
+
+  const removeTool = (index: number) => {
+    if (!confirm("هل أنت متأكد من حذف هذه الأداة من الشريط؟")) return;
+    setConfig((prev: any) => {
+      const tools = Array.isArray(prev.supportedTools) ? [...prev.supportedTools] : [];
+      tools.splice(index, 1);
+      return { ...prev, supportedTools: tools };
+    });
+  };
+
+  const updateToolField = (index: number, field: string, value: any) => {
+    setConfig((prev: any) => {
+      const tools = Array.isArray(prev.supportedTools) ? [...prev.supportedTools] : [];
+      if (!tools[index]) return prev;
+      tools[index] = { ...tools[index], [field]: value };
+      return { ...prev, supportedTools: tools };
+    });
+  };
+
+  const moveTool = (index: number, direction: "up" | "down") => {
+    setConfig((prev: any) => {
+      const tools = Array.isArray(prev.supportedTools) ? [...prev.supportedTools] : [];
+      const targetIndex = direction === "up" ? index - 1 : index + 1;
+      if (targetIndex < 0 || targetIndex >= tools.length) return prev;
+      const temp = tools[index];
+      tools[index] = tools[targetIndex];
+      tools[targetIndex] = temp;
+      return { ...prev, supportedTools: tools };
+    });
+  };
+
+  const resetDefaultTools = () => {
+    if (!confirm("هل أنت متأكد من استعادة قائمة الـ 10 أدوات الافتراضية بصورها الرسمية؟")) return;
+    setConfig((prev: any) => ({
+      ...prev,
+      supportedTools: DEFAULT_SUPPORTED_TOOLS
+    }));
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-[400px]">
@@ -519,765 +657,245 @@ export default function AdminHomepageManager() {
       {/* Page Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-outline-variant/20 pb-6">
         <div>
-          <h1 className="text-3xl font-display font-bold text-on-surface">إدارة صور ومحتوى الصفحة الرئيسية</h1>
-          <p className="text-on-surface-variant text-sm mt-1">التحكم المباشر في كافة النصوص، الأزرار، الصور، وروابط التوجيه، مع دعم الرفع المباشر للصور من جهازك.</p>
+          <h1 className="text-3xl font-display font-bold text-on-surface">إدارة وتخصيص الصفحة الرئيسية</h1>
+          <p className="text-on-surface-variant text-sm mt-1">
+            تحكم كامل وسهل في بطاقات الباقات المميزة، شريط الأدوات المدعومة، العروض، وكافة الصور مع إمكانية الرفع المباشر من جهازك.
+          </p>
         </div>
 
         <button
           onClick={handleSave}
           disabled={saving}
-          className="btn-primary flex items-center gap-2 shadow-lg disabled:opacity-50"
+          className="btn-primary flex items-center gap-2 shadow-lg disabled:opacity-50 px-6 py-3 text-sm font-bold rounded-xl shrink-0"
         >
           <span className="material-symbols-outlined text-lg">{saving ? "sync" : "save"}</span>
           <span>{saving ? "جاري الحفظ..." : "حفظ والتطبيق المباشر"}</span>
         </button>
       </div>
 
-      {/* Tabs */}
-      <div className="flex flex-wrap gap-2 border-b border-outline-variant/20 pb-2">
-        <button
-          onClick={() => setActiveTab("notice")}
-          className={`px-5 py-2.5 rounded-xl font-medium text-sm transition-all flex items-center gap-2 ${
-            activeTab === "notice" ? "bg-primary text-surface font-bold shadow-md" : "bg-surface-container text-on-surface-variant hover:bg-surface-container-high"
-          }`}
-        >
-          <span className="material-symbols-outlined text-lg">campaign</span>
-          1. الشريط الإعلاني العلوي (Notice Bar)
-        </button>
-
-        <button
-          onClick={() => setActiveTab("hero")}
-          className={`px-5 py-2.5 rounded-xl font-medium text-sm transition-all flex items-center gap-2 ${
-            activeTab === "hero" ? "bg-primary text-surface font-bold shadow-md" : "bg-surface-container text-on-surface-variant hover:bg-surface-container-high"
-          }`}
-        >
-          <span className="material-symbols-outlined text-lg">space_dashboard</span>
-          2. القسم الرئيسي والصورة الرئيسية (Hero Showcase)
-        </button>
-
-        <button
-          onClick={() => setActiveTab("sidebar")}
-          className={`px-5 py-2.5 rounded-xl font-medium text-sm transition-all flex items-center gap-2 ${
-            activeTab === "sidebar" ? "bg-primary text-surface font-bold shadow-md" : "bg-surface-container text-on-surface-variant hover:bg-surface-container-high"
-          }`}
-        >
-          <span className="material-symbols-outlined text-lg">view_sidebar</span>
-          3. العروض الجانبية وصورة البانر
-        </button>
-
-        <button
-          onClick={() => setActiveTab("lanes")}
-          className={`px-5 py-2.5 rounded-xl font-medium text-sm transition-all flex items-center gap-2 ${
-            activeTab === "lanes" ? "bg-primary text-surface font-bold shadow-md" : "bg-surface-container text-on-surface-variant hover:bg-surface-container-high"
-          }`}
-        >
-          <span className="material-symbols-outlined text-lg">grid_view</span>
-          4. كروت ورابط الأقسام الأربعة (Service Lanes)
-        </button>
-
-        <button
-          onClick={() => setActiveTab("ribbon")}
-          className={`px-5 py-2.5 rounded-xl font-medium text-sm transition-all flex items-center gap-2 ${
-            activeTab === "ribbon" ? "bg-primary text-surface font-bold shadow-md" : "bg-surface-container text-on-surface-variant hover:bg-surface-container-high"
-          }`}
-        >
-          <span className="material-symbols-outlined text-lg">verified</span>
-          5. شريط المميزات الثلاثي (Feature Ribbon)
-        </button>
-
-        <button
-          onClick={() => setActiveTab("campaigns")}
-          className={`px-5 py-2.5 rounded-xl font-medium text-sm transition-all flex items-center gap-2 ${
-            activeTab === "campaigns" ? "bg-primary text-surface font-bold shadow-md" : "bg-surface-container text-on-surface-variant hover:bg-surface-container-high"
-          }`}
-        >
-          <span className="material-symbols-outlined text-lg">local_fire_department</span>
-          6. بنرات وصور العروض الساخنة (Campaign Offers)
-        </button>
-
+      {/* Tabs Navigation */}
+      <div className="flex flex-wrap gap-2 border-b border-outline-variant/20 pb-3">
         <button
           onClick={() => setActiveTab("packages")}
-          className={`px-5 py-2.5 rounded-xl font-medium text-sm transition-all flex items-center gap-2 ${
-            activeTab === "packages" ? "bg-primary text-surface font-bold shadow-md" : "bg-surface-container text-on-surface-variant hover:bg-surface-container-high"
+          className={`px-4 py-2.5 rounded-xl font-bold text-sm transition-all flex items-center gap-2 border ${
+            activeTab === "packages" 
+              ? "bg-primary text-surface border-primary shadow-md" 
+              : "bg-surface-container text-on-surface hover:bg-surface-container-high border-outline-variant/30"
           }`}
         >
           <span className="material-symbols-outlined text-lg">package_2</span>
-          7. بطاقات الباقات المميزة (Featured Packages)
+          1. بطاقات الباقات المميزة (Featured Packages)
         </button>
 
         <button
           onClick={() => setActiveTab("tools")}
-          className={`px-5 py-2.5 rounded-xl font-medium text-sm transition-all flex items-center gap-2 ${
-            activeTab === "tools" ? "bg-primary text-surface font-bold shadow-md" : "bg-surface-container text-on-surface-variant hover:bg-surface-container-high"
+          className={`px-4 py-2.5 rounded-xl font-bold text-sm transition-all flex items-center gap-2 border ${
+            activeTab === "tools" 
+              ? "bg-primary text-surface border-primary shadow-md" 
+              : "bg-surface-container text-on-surface hover:bg-surface-container-high border-outline-variant/30"
           }`}
         >
           <span className="material-symbols-outlined text-lg">construction</span>
-          8. أبرز الأدوات المدعومة (Supported Tools Bar)
+          2. أبرز الأدوات المدعومة (Supported Tools Bar)
+        </button>
+
+        <button
+          onClick={() => setActiveTab("campaigns")}
+          className={`px-4 py-2.5 rounded-xl font-medium text-sm transition-all flex items-center gap-2 ${
+            activeTab === "campaigns" ? "bg-primary text-surface font-bold shadow-md" : "bg-surface-container text-on-surface-variant hover:bg-surface-container-high"
+          }`}
+        >
+          <span className="material-symbols-outlined text-lg">local_fire_department</span>
+          3. بنرات وعروض الترويج (Campaign Offers)
+        </button>
+
+        <button
+          onClick={() => setActiveTab("hero")}
+          className={`px-4 py-2.5 rounded-xl font-medium text-sm transition-all flex items-center gap-2 ${
+            activeTab === "hero" ? "bg-primary text-surface font-bold shadow-md" : "bg-surface-container text-on-surface-variant hover:bg-surface-container-high"
+          }`}
+        >
+          <span className="material-symbols-outlined text-lg">space_dashboard</span>
+          4. الواجهة والصورة الرئيسية (Hero Showcase)
+        </button>
+
+        <button
+          onClick={() => setActiveTab("lanes")}
+          className={`px-4 py-2.5 rounded-xl font-medium text-sm transition-all flex items-center gap-2 ${
+            activeTab === "lanes" ? "bg-primary text-surface font-bold shadow-md" : "bg-surface-container text-on-surface-variant hover:bg-surface-container-high"
+          }`}
+        >
+          <span className="material-symbols-outlined text-lg">grid_view</span>
+          5. كروت الأقسام الأربعة (Service Lanes)
+        </button>
+
+        <button
+          onClick={() => setActiveTab("notice")}
+          className={`px-4 py-2.5 rounded-xl font-medium text-sm transition-all flex items-center gap-2 ${
+            activeTab === "notice" ? "bg-primary text-surface font-bold shadow-md" : "bg-surface-container text-on-surface-variant hover:bg-surface-container-high"
+          }`}
+        >
+          <span className="material-symbols-outlined text-lg">campaign</span>
+          6. شريط الإشعارات العلوي (Notice Bar)
+        </button>
+
+        <button
+          onClick={() => setActiveTab("ribbon")}
+          className={`px-4 py-2.5 rounded-xl font-medium text-sm transition-all flex items-center gap-2 ${
+            activeTab === "ribbon" ? "bg-primary text-surface font-bold shadow-md" : "bg-surface-container text-on-surface-variant hover:bg-surface-container-high"
+          }`}
+        >
+          <span className="material-symbols-outlined text-lg">verified</span>
+          7. شريط المميزات (Feature Ribbon)
         </button>
       </div>
 
-      {/* --- TAB 1: NOTICE BAR --- */}
-      {activeTab === "notice" && (
-        <div className="glass-card rounded-3xl p-6 md:p-8 border border-outline-variant/30 flex flex-col gap-6">
-          <div className="border-b border-outline-variant/20 pb-3">
-            <h2 className="text-xl font-bold text-primary flex items-center gap-2">
-              <span className="material-symbols-outlined">campaign</span>
-              1. الشريط الإعلاني العلوي المتنقل (Notice Bar / Marquee)
-            </h2>
-            <p className="text-xs text-on-surface-variant mt-1">يتحكم في شريط الإشعارات المتنقل الظاهر أعلى الواجهة الرئيسية.</p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="flex flex-col gap-2">
-              <label className="text-xs font-bold uppercase text-on-surface-variant">الإعلان الأول (بالعربية)</label>
-              <input
-                type="text"
-                value={config.noticeBar?.text1Ar || ""}
-                onChange={(e) => updateSectionField("noticeBar", "text1Ar", e.target.value)}
-                className="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-3 text-on-surface"
-              />
-            </div>
-            <div className="flex flex-col gap-2">
-              <label className="text-xs font-bold uppercase text-on-surface-variant">الإعلان الأول (بالإنجليزية)</label>
-              <input
-                type="text"
-                value={config.noticeBar?.text1En || ""}
-                onChange={(e) => updateSectionField("noticeBar", "text1En", e.target.value)}
-                className="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-3 text-on-surface"
-              />
-            </div>
-
-            <div className="flex flex-col gap-2">
-              <label className="text-xs font-bold uppercase text-on-surface-variant">الإعلان الثاني (بالعربية)</label>
-              <input
-                type="text"
-                value={config.noticeBar?.text2Ar || ""}
-                onChange={(e) => updateSectionField("noticeBar", "text2Ar", e.target.value)}
-                className="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-3 text-on-surface"
-              />
-            </div>
-            <div className="flex flex-col gap-2">
-              <label className="text-xs font-bold uppercase text-on-surface-variant">الإعلان الثاني (بالإنجليزية)</label>
-              <input
-                type="text"
-                value={config.noticeBar?.text2En || ""}
-                onChange={(e) => updateSectionField("noticeBar", "text2En", e.target.value)}
-                className="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-3 text-on-surface"
-              />
-            </div>
-
-            <div className="flex flex-col gap-2">
-              <label className="text-xs font-bold uppercase text-on-surface-variant">رقم واتساب الدعم الظاهر</label>
-              <input
-                type="text"
-                value={config.noticeBar?.whatsapp || ""}
-                onChange={(e) => updateSectionField("noticeBar", "whatsapp", e.target.value)}
-                className="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-3 text-on-surface"
-              />
-            </div>
-
-            <div className="flex flex-col gap-2">
-              <label className="text-xs font-bold uppercase text-on-surface-variant">معرف تيليجرام الدعم الظاهر</label>
-              <input
-                type="text"
-                value={config.noticeBar?.telegram || ""}
-                onChange={(e) => updateSectionField("noticeBar", "telegram", e.target.value)}
-                className="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-3 text-on-surface"
-              />
-            </div>
-
-            <div className="flex flex-col gap-2 md:col-span-2">
-              <label className="text-xs font-bold uppercase text-on-surface-variant">البريد الإلكتروني للدعم</label>
-              <input
-                type="text"
-                value={config.noticeBar?.email || ""}
-                onChange={(e) => updateSectionField("noticeBar", "email", e.target.value)}
-                className="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-3 text-on-surface"
-              />
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* --- TAB 2: HERO SECTION --- */}
-      {activeTab === "hero" && (
-        <div className="glass-card rounded-3xl p-6 md:p-8 border border-outline-variant/30 flex flex-col gap-6">
-          <div className="border-b border-outline-variant/20 pb-3">
-            <h2 className="text-xl font-bold text-primary flex items-center gap-2">
-              <span className="material-symbols-outlined">space_dashboard</span>
-              2. واجهة العرض الرئيسية والصورة (Hero Showcase & Image)
-            </h2>
-            <p className="text-xs text-on-surface-variant mt-1">التحكم في العناوين والوصف والأزرار ورابط الصورة الرئيسية للواجهة.</p>
-          </div>
-
-          {/* Hero Image Picker with Device Upload */}
-          <ImagePickerInput
-            label="الصورة الخلفية لكارت الواجهة الرئيسية (Hero Background Image)"
-            value={config.heroSection?.heroImage || ""}
-            onChange={(newUrl) => updateSectionField("heroSection", "heroImage", newUrl)}
-          />
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="flex flex-col gap-2">
-              <label className="text-xs font-bold uppercase text-on-surface-variant">شارة البوابة الحية (Live Tag - بالعربية)</label>
-              <input
-                type="text"
-                value={config.heroSection?.liveTagAr || ""}
-                onChange={(e) => updateSectionField("heroSection", "liveTagAr", e.target.value)}
-                className="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-3 text-on-surface"
-              />
-            </div>
-            <div className="flex flex-col gap-2">
-              <label className="text-xs font-bold uppercase text-on-surface-variant">شارة البوابة الحية (Live Tag - بالإنجليزية)</label>
-              <input
-                type="text"
-                value={config.heroSection?.liveTagEn || ""}
-                onChange={(e) => updateSectionField("heroSection", "liveTagEn", e.target.value)}
-                className="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-3 text-on-surface"
-              />
-            </div>
-
-            <div className="flex flex-col gap-2">
-              <label className="text-xs font-bold uppercase text-on-surface-variant">العنوان الرئيسي السطر الأول (بالعربية)</label>
-              <input
-                type="text"
-                value={config.heroSection?.title1Ar || ""}
-                onChange={(e) => updateSectionField("heroSection", "title1Ar", e.target.value)}
-                className="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-3 text-on-surface font-bold"
-              />
-            </div>
-            <div className="flex flex-col gap-2">
-              <label className="text-xs font-bold uppercase text-on-surface-variant">العنوان الرئيسي السطر الأول (بالإنجليزية)</label>
-              <input
-                type="text"
-                value={config.heroSection?.title1En || ""}
-                onChange={(e) => updateSectionField("heroSection", "title1En", e.target.value)}
-                className="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-3 text-on-surface font-bold"
-              />
-            </div>
-
-            <div className="flex flex-col gap-2">
-              <label className="text-xs font-bold uppercase text-on-surface-variant">العنوان الرئيسي السطر الثاني (بالعربية - ملون)</label>
-              <input
-                type="text"
-                value={config.heroSection?.title2Ar || ""}
-                onChange={(e) => updateSectionField("heroSection", "title2Ar", e.target.value)}
-                className="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-3 text-primary font-bold"
-              />
-            </div>
-            <div className="flex flex-col gap-2">
-              <label className="text-xs font-bold uppercase text-on-surface-variant">العنوان الرئيسي السطر الثاني (بالإنجليزية - ملون)</label>
-              <input
-                type="text"
-                value={config.heroSection?.title2En || ""}
-                onChange={(e) => updateSectionField("heroSection", "title2En", e.target.value)}
-                className="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-3 text-primary font-bold"
-              />
-            </div>
-
-            <div className="flex flex-col gap-2 md:col-span-2">
-              <label className="text-xs font-bold uppercase text-on-surface-variant">الوصف التوضيحي للواجهة (بالعربية)</label>
-              <textarea
-                rows={2}
-                value={config.heroSection?.leadAr || ""}
-                onChange={(e) => updateSectionField("heroSection", "leadAr", e.target.value)}
-                className="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-3 text-on-surface"
-              />
-            </div>
-
-            {/* BUTTON 1 CONFIG */}
-            <div className="p-4 bg-surface-container-low rounded-2xl border border-primary/30 flex flex-col gap-3">
-              <h3 className="font-bold text-primary text-sm flex items-center gap-2">
-                <span className="material-symbols-outlined text-lg">link</span> الزر الأول (Browse Button)
-              </h3>
-              <div className="flex flex-col gap-1">
-                <label className="text-[10px] text-on-surface-variant uppercase font-bold">النص (بالعربية)</label>
-                <input
-                  type="text"
-                  value={config.heroSection?.btnBrowseAr || ""}
-                  onChange={(e) => updateSectionField("heroSection", "btnBrowseAr", e.target.value)}
-                  className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-2.5 text-sm"
-                />
-              </div>
-              <div className="flex flex-col gap-1">
-                <label className="text-[10px] text-primary uppercase font-bold flex items-center gap-1">
-                  <span className="material-symbols-outlined text-xs">link</span> رابط التوجيه (URL Link)
-                </label>
-                <input
-                  type="text"
-                  placeholder="مثال: /pricing"
-                  value={config.heroSection?.btnBrowseUrl || "/pricing"}
-                  onChange={(e) => updateSectionField("heroSection", "btnBrowseUrl", e.target.value)}
-                  className="bg-surface-container-lowest border border-primary/40 rounded-xl p-2.5 text-sm font-mono text-primary"
-                />
-              </div>
-            </div>
-
-            {/* BUTTON 2 CONFIG */}
-            <div className="p-4 bg-surface-container-low rounded-2xl border border-secondary/30 flex flex-col gap-3">
-              <h3 className="font-bold text-secondary text-sm flex items-center gap-2">
-                <span className="material-symbols-outlined text-lg">link</span> الزر الثاني (Join Button)
-              </h3>
-              <div className="flex flex-col gap-1">
-                <label className="text-[10px] text-on-surface-variant uppercase font-bold">النص (بالعربية)</label>
-                <input
-                  type="text"
-                  value={config.heroSection?.btnJoinAr || ""}
-                  onChange={(e) => updateSectionField("heroSection", "btnJoinAr", e.target.value)}
-                  className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-2.5 text-sm"
-                />
-              </div>
-              <div className="flex flex-col gap-1">
-                <label className="text-[10px] text-secondary uppercase font-bold flex items-center gap-1">
-                  <span className="material-symbols-outlined text-xs">link</span> رابط التوجيه (URL Link)
-                </label>
-                <input
-                  type="text"
-                  placeholder="مثال: /register"
-                  value={config.heroSection?.btnJoinUrl || "/register"}
-                  onChange={(e) => updateSectionField("heroSection", "btnJoinUrl", e.target.value)}
-                  className="bg-surface-container-lowest border border-secondary/40 rounded-xl p-2.5 text-sm font-mono text-secondary"
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* --- TAB 3: SIDEBAR PROMOS --- */}
-      {activeTab === "sidebar" && (
-        <div className="glass-card rounded-3xl p-6 md:p-8 border border-outline-variant/30 flex flex-col gap-6">
-          <div className="border-b border-outline-variant/20 pb-3">
-            <h2 className="text-xl font-bold text-primary flex items-center gap-2">
-              <span className="material-symbols-outlined">view_sidebar</span>
-              3. العروض الجانبية وصورة البانر (Sidebar Banner & Image Upload)
-            </h2>
-          </div>
-
-          {/* Featured Sidebar Image Picker */}
-          <ImagePickerInput
-            label="صورة البانر الجانبي المميز (Featured Sidebar Banner Image)"
-            value={config.sidebarPromos?.featuredImage || ""}
-            onChange={(newUrl) => updateSectionField("sidebarPromos", "featuredImage", newUrl)}
-          />
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="flex flex-col gap-2">
-              <label className="text-xs font-bold uppercase text-on-surface-variant">عنوان العرض الجانبي المميز (بالعربية)</label>
-              <input
-                type="text"
-                value={config.sidebarPromos?.featuredTitleAr || ""}
-                onChange={(e) => updateSectionField("sidebarPromos", "featuredTitleAr", e.target.value)}
-                className="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-3 text-on-surface font-bold"
-              />
-            </div>
-            <div className="flex flex-col gap-2">
-              <label className="text-xs font-bold uppercase text-on-surface-variant">رابط توجيه العرض الجانبي المميز (URL Link)</label>
-              <input
-                type="text"
-                placeholder="مثال: /pricing"
-                value={config.sidebarPromos?.featuredUrl || "/pricing"}
-                onChange={(e) => updateSectionField("sidebarPromos", "featuredUrl", e.target.value)}
-                className="w-full bg-surface-container-lowest border border-primary/40 rounded-xl p-3 text-primary font-mono"
-              />
-            </div>
-
-            <div className="flex flex-col gap-2">
-              <label className="text-xs font-bold uppercase text-on-surface-variant">عنوان زر الواتساب (بالعربية)</label>
-              <input
-                type="text"
-                value={config.sidebarPromos?.supportTitleAr || ""}
-                onChange={(e) => updateSectionField("sidebarPromos", "supportTitleAr", e.target.value)}
-                className="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-3 text-on-surface"
-              />
-            </div>
-            <div className="flex flex-col gap-2">
-              <label className="text-xs font-bold uppercase text-on-surface-variant">رابط الواتساب (WhatsApp Direct Link)</label>
-              <input
-                type="text"
-                value={config.sidebarPromos?.whatsappUrl || ""}
-                onChange={(e) => updateSectionField("sidebarPromos", "whatsappUrl", e.target.value)}
-                className="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-3 text-on-surface font-mono"
-              />
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* --- TAB 4: SERVICE LANES --- */}
-      {activeTab === "lanes" && (
-        <div className="glass-card rounded-3xl p-6 md:p-8 border border-outline-variant/30 flex flex-col gap-6">
-          <div className="border-b border-outline-variant/20 pb-3">
-            <h2 className="text-xl font-bold text-primary flex items-center gap-2">
-              <span className="material-symbols-outlined">grid_view</span>
-              4. كروت ورابط الأقسام الأربعة (Service Lanes & Section Links)
-            </h2>
-            <p className="text-xs text-on-surface-variant mt-1">تحديد عناوين، أوصاف، ورابط التوجيه المباشر لكل قسم من الأقسام الأربعة.</p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Card 1: IMEI */}
-            <div className="p-4 bg-surface-container-low rounded-2xl border border-outline-variant/20 flex flex-col gap-3">
-              <h3 className="font-bold text-primary text-sm flex items-center gap-2">
-                <span className="material-symbols-outlined text-lg">fingerprint</span> كارت 1: خدمات الـ IMEI
-              </h3>
-              <input
-                type="text"
-                placeholder="عنوان الكارت (بالعربية)"
-                value={config.serviceLanes?.imeiTitleAr || ""}
-                onChange={(e) => updateSectionField("serviceLanes", "imeiTitleAr", e.target.value)}
-                className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-2.5 text-sm"
-              />
-              <input
-                type="text"
-                placeholder="وصف الكارت (بالعربية)"
-                value={config.serviceLanes?.imeiDescAr || ""}
-                onChange={(e) => updateSectionField("serviceLanes", "imeiDescAr", e.target.value)}
-                className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-2.5 text-sm text-on-surface-variant"
-              />
-              <div className="flex flex-col gap-1 mt-1">
-                <label className="text-[10px] text-primary uppercase font-bold">رابط التوجيه (Section Link)</label>
-                <input
-                  type="text"
-                  placeholder="/pricing?cat=imei"
-                  value={config.serviceLanes?.imeiUrl || "/pricing?cat=imei"}
-                  onChange={(e) => updateSectionField("serviceLanes", "imeiUrl", e.target.value)}
-                  className="bg-surface-container-lowest border border-primary/40 rounded-xl p-2 text-xs font-mono text-primary"
-                />
-              </div>
-            </div>
-
-            {/* Card 2: Server */}
-            <div className="p-4 bg-surface-container-low rounded-2xl border border-outline-variant/20 flex flex-col gap-3">
-              <h3 className="font-bold text-secondary text-sm flex items-center gap-2">
-                <span className="material-symbols-outlined text-lg">dns</span> كارت 2: خدمات السيرفرات Server
-              </h3>
-              <input
-                type="text"
-                placeholder="عنوان الكارت (بالعربية)"
-                value={config.serviceLanes?.serverTitleAr || ""}
-                onChange={(e) => updateSectionField("serviceLanes", "serverTitleAr", e.target.value)}
-                className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-2.5 text-sm"
-              />
-              <input
-                type="text"
-                placeholder="وصف الكارت (بالعربية)"
-                value={config.serviceLanes?.serverDescAr || ""}
-                onChange={(e) => updateSectionField("serviceLanes", "serverDescAr", e.target.value)}
-                className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-2.5 text-sm text-on-surface-variant"
-              />
-              <div className="flex flex-col gap-1 mt-1">
-                <label className="text-[10px] text-secondary uppercase font-bold">رابط التوجيه (Section Link)</label>
-                <input
-                  type="text"
-                  placeholder="/pricing?cat=server"
-                  value={config.serviceLanes?.serverUrl || "/pricing?cat=server"}
-                  onChange={(e) => updateSectionField("serviceLanes", "serverUrl", e.target.value)}
-                  className="bg-surface-container-lowest border border-secondary/40 rounded-xl p-2 text-xs font-mono text-secondary"
-                />
-              </div>
-            </div>
-
-            {/* Card 3: Remote */}
-            <div className="p-4 bg-surface-container-low rounded-2xl border border-outline-variant/20 flex flex-col gap-3">
-              <h3 className="font-bold text-tertiary text-sm flex items-center gap-2">
-                <span className="material-symbols-outlined text-lg">settings_remote</span> كارت 3: خدمات التحكم عن بعد Remote
-              </h3>
-              <input
-                type="text"
-                placeholder="عنوان الكارت (بالعربية)"
-                value={config.serviceLanes?.remoteTitleAr || ""}
-                onChange={(e) => updateSectionField("serviceLanes", "remoteTitleAr", e.target.value)}
-                className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-2.5 text-sm"
-              />
-              <input
-                type="text"
-                placeholder="وصف الكارت (بالعربية)"
-                value={config.serviceLanes?.remoteDescAr || ""}
-                onChange={(e) => updateSectionField("serviceLanes", "remoteDescAr", e.target.value)}
-                className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-2.5 text-sm text-on-surface-variant"
-              />
-              <div className="flex flex-col gap-1 mt-1">
-                <label className="text-[10px] text-tertiary uppercase font-bold">رابط التوجيه (Section Link)</label>
-                <input
-                  type="text"
-                  placeholder="/pricing?cat=remote"
-                  value={config.serviceLanes?.remoteUrl || "/pricing?cat=remote"}
-                  onChange={(e) => updateSectionField("serviceLanes", "remoteUrl", e.target.value)}
-                  className="bg-surface-container-lowest border border-tertiary/40 rounded-xl p-2 text-xs font-mono text-tertiary"
-                />
-              </div>
-            </div>
-
-            {/* Card 4: Store */}
-            <div className="p-4 bg-surface-container-low rounded-2xl border border-outline-variant/20 flex flex-col gap-3">
-              <h3 className="font-bold text-on-surface text-sm flex items-center gap-2">
-                <span className="material-symbols-outlined text-lg">shopping_bag</span> كارت 4: أدوات المتجر Tools & Store
-              </h3>
-              <input
-                type="text"
-                placeholder="عنوان الكارت (بالعربية)"
-                value={config.serviceLanes?.storeTitleAr || ""}
-                onChange={(e) => updateSectionField("serviceLanes", "storeTitleAr", e.target.value)}
-                className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-2.5 text-sm"
-              />
-              <input
-                type="text"
-                placeholder="وصف الكارت (بالعربية)"
-                value={config.serviceLanes?.storeDescAr || ""}
-                onChange={(e) => updateSectionField("serviceLanes", "storeDescAr", e.target.value)}
-                className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-2.5 text-sm text-on-surface-variant"
-              />
-              <div className="flex flex-col gap-1 mt-1">
-                <label className="text-[10px] text-on-surface uppercase font-bold">رابط التوجيه (Section Link)</label>
-                <input
-                  type="text"
-                  placeholder="/pricing?cat=store"
-                  value={config.serviceLanes?.storeUrl || "/pricing?cat=store"}
-                  onChange={(e) => updateSectionField("serviceLanes", "storeUrl", e.target.value)}
-                  className="bg-surface-container-lowest border border-outline-variant/40 rounded-xl p-2 text-xs font-mono text-on-surface"
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* --- TAB 5: FEATURE RIBBON --- */}
-      {activeTab === "ribbon" && (
-        <div className="glass-card rounded-3xl p-6 md:p-8 border border-outline-variant/30 flex flex-col gap-6">
-          <div className="border-b border-outline-variant/20 pb-3">
-            <h2 className="text-xl font-bold text-primary flex items-center gap-2">
-              <span className="material-symbols-outlined">verified</span>
-              5. شريط المميزات الثلاثية (Feature Ribbon)
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="p-4 bg-surface-container-low rounded-2xl border border-outline-variant/20 flex flex-col gap-3">
-              <h3 className="font-bold text-primary text-sm">ميزة 1: موزع رسمي</h3>
-              <input
-                type="text"
-                value={config.featureRibbon?.feat1TitleAr || ""}
-                onChange={(e) => updateSectionField("featureRibbon", "feat1TitleAr", e.target.value)}
-                className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-2.5 text-sm"
-              />
-              <textarea
-                rows={2}
-                value={config.featureRibbon?.feat1DescAr || ""}
-                onChange={(e) => updateSectionField("featureRibbon", "feat1DescAr", e.target.value)}
-                className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-2.5 text-xs text-on-surface-variant"
-              />
-            </div>
-
-            <div className="p-4 bg-surface-container-low rounded-2xl border border-outline-variant/20 flex flex-col gap-3">
-              <h3 className="font-bold text-secondary text-sm">ميزة 2: مدفوعات آمنة</h3>
-              <input
-                type="text"
-                value={config.featureRibbon?.feat2TitleAr || ""}
-                onChange={(e) => updateSectionField("featureRibbon", "feat2TitleAr", e.target.value)}
-                className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-2.5 text-sm"
-              />
-              <textarea
-                rows={2}
-                value={config.featureRibbon?.feat2DescAr || ""}
-                onChange={(e) => updateSectionField("featureRibbon", "feat2DescAr", e.target.value)}
-                className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-2.5 text-xs text-on-surface-variant"
-              />
-            </div>
-
-            <div className="p-4 bg-surface-container-low rounded-2xl border border-outline-variant/20 flex flex-col gap-3">
-              <h3 className="font-bold text-tertiary text-sm">ميزة 3: دعم ذو أولوية</h3>
-              <input
-                type="text"
-                value={config.featureRibbon?.feat3TitleAr || ""}
-                onChange={(e) => updateSectionField("featureRibbon", "feat3TitleAr", e.target.value)}
-                className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-2.5 text-sm"
-              />
-              <textarea
-                rows={2}
-                value={config.featureRibbon?.feat3DescAr || ""}
-                onChange={(e) => updateSectionField("featureRibbon", "feat3DescAr", e.target.value)}
-                className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-2.5 text-xs text-on-surface-variant"
-              />
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* --- TAB 6: CAMPAIGN OFFERS --- */}
-      {activeTab === "campaigns" && (
-        <div className="glass-card rounded-3xl p-6 md:p-8 border border-outline-variant/30 flex flex-col gap-6">
-          <div className="border-b border-outline-variant/20 pb-3 flex justify-between items-center">
-            <div>
-              <h2 className="text-xl font-bold text-primary flex items-center gap-2">
-                <span className="material-symbols-outlined">local_fire_department</span>
-                6. العروض الديناميكية (Campaign Slider)
-              </h2>
-              <p className="text-xs text-on-surface-variant mt-1">يمكنك إضافة عدد غير محدود من العروض وسيتم عرضها في شريط متحرك (Slider) بالصفحة الرئيسية.</p>
-            </div>
-            <button onClick={addCampaign} className="btn-primary text-sm px-4 py-2 flex items-center gap-2 rounded-xl">
-              <span className="material-symbols-outlined text-sm">add</span> إضافة إعلان جديد
-            </button>
-          </div>
-
-          <div className="grid grid-cols-1 gap-6">
-            {Array.isArray(config.campaigns) && config.campaigns.map((camp: any, idx: number) => (
-              <div key={idx} className="p-5 bg-surface-container-low rounded-2xl border border-outline-variant/20 flex flex-col gap-4 relative">
-                <div className="flex justify-between items-center mb-2">
-                  <h3 className="font-bold text-primary text-lg flex items-center gap-2">
-                    <span className="bg-primary/20 px-2 py-0.5 rounded text-xs">#{idx + 1}</span> {camp.titleAr || "إعلان جديد"}
-                  </h3>
-                  <button onClick={() => removeCampaign(idx)} className="text-error hover:bg-error/10 p-2 rounded-full transition-colors flex items-center justify-center">
-                    <span className="material-symbols-outlined">delete</span>
-                  </button>
-                </div>
-
-                <ImagePickerInput
-                  label={`صورة الإعلان رقم ${idx + 1}`}
-                  value={camp.image || ""}
-                  onChange={(newUrl) => updateCampaignField(idx, "image", newUrl)}
-                />
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="flex flex-col gap-1">
-                    <label className="text-[10px] text-on-surface-variant uppercase font-bold">الشارة العلوي (Tag - بالعربية)</label>
-                    <input
-                      type="text"
-                      value={camp.tagAr || ""}
-                      onChange={(e) => updateCampaignField(idx, "tagAr", e.target.value)}
-                      className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-2 text-sm"
-                    />
-                  </div>
-                  <div className="flex flex-col gap-1">
-                    <label className="text-[10px] text-on-surface-variant uppercase font-bold">الشارة العلوي (Tag - بالإنجليزية)</label>
-                    <input
-                      type="text"
-                      value={camp.tagEn || ""}
-                      onChange={(e) => updateCampaignField(idx, "tagEn", e.target.value)}
-                      className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-2 text-sm"
-                    />
-                  </div>
-
-                  <div className="flex flex-col gap-1">
-                    <label className="text-[10px] text-on-surface-variant uppercase font-bold">العنوان (Title - بالعربية)</label>
-                    <input
-                      type="text"
-                      value={camp.titleAr || ""}
-                      onChange={(e) => updateCampaignField(idx, "titleAr", e.target.value)}
-                      className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-2 text-sm font-bold"
-                    />
-                  </div>
-                  <div className="flex flex-col gap-1">
-                    <label className="text-[10px] text-on-surface-variant uppercase font-bold">العنوان (Title - بالإنجليزية)</label>
-                    <input
-                      type="text"
-                      value={camp.titleEn || ""}
-                      onChange={(e) => updateCampaignField(idx, "titleEn", e.target.value)}
-                      className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-2 text-sm font-bold"
-                    />
-                  </div>
-
-                  <div className="flex flex-col gap-1">
-                    <label className="text-[10px] text-on-surface-variant uppercase font-bold">الوصف (Desc - بالعربية)</label>
-                    <input
-                      type="text"
-                      value={camp.descAr || ""}
-                      onChange={(e) => updateCampaignField(idx, "descAr", e.target.value)}
-                      className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-2 text-xs text-on-surface-variant"
-                    />
-                  </div>
-                  <div className="flex flex-col gap-1">
-                    <label className="text-[10px] text-on-surface-variant uppercase font-bold">الوصف (Desc - بالإنجليزية)</label>
-                    <input
-                      type="text"
-                      value={camp.descEn || ""}
-                      onChange={(e) => updateCampaignField(idx, "descEn", e.target.value)}
-                      className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-2 text-xs text-on-surface-variant"
-                    />
-                  </div>
-
-                  <div className="flex flex-col gap-1 md:col-span-2">
-                    <label className="text-[10px] text-primary uppercase font-bold">رابط توجيه العرض (URL)</label>
-                    <input
-                      type="text"
-                      placeholder="/pricing"
-                      value={camp.url || "/pricing"}
-                      onChange={(e) => updateCampaignField(idx, "url", e.target.value)}
-                      className="bg-surface-container-lowest border border-primary/40 rounded-xl p-2 text-xs font-mono text-primary"
-                    />
-                  </div>
-                </div>
-              </div>
-            ))}
-            {(!config.campaigns || config.campaigns.length === 0) && (
-              <div className="text-center p-8 border border-dashed border-outline-variant/50 rounded-2xl text-on-surface-variant">
-                لا توجد إعلانات حالياً. اضغط على "إضافة إعلان جديد" للبدء.
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* --- TAB 7: FEATURED PACKAGES --- */}
+      {/* ============================================================= */}
+      {/* TAB 1: FEATURED PACKAGES (الكروت الثلاثة)                      */}
+      {/* ============================================================= */}
       {activeTab === "packages" && (
-        <div className="glass-card rounded-3xl p-6 md:p-8 border border-outline-variant/30 flex flex-col gap-6">
-          <div className="border-b border-outline-variant/20 pb-3 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="glass-card rounded-3xl p-6 md:p-8 border border-outline-variant/30 flex flex-col gap-8">
+          <div className="border-b border-outline-variant/20 pb-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
               <h2 className="text-xl font-bold text-primary flex items-center gap-2">
                 <span className="material-symbols-outlined">package_2</span>
-                7. بطاقات الباقات المميزة في الصفحة الرئيسية
+                بطاقات الباقات الأكثر طلباً (Featured Packages)
               </h2>
               <p className="text-xs text-on-surface-variant mt-1">
-                تحكم كامل في بطاقات قسم &quot;الباقات الأكثر طلباً&quot; — إضافة وتعديل وحذف، مع رفع صورة مخصصة لكل باقة، أو اختيار باقة مباشرة من خدمات وسيرفرات الموقع.
+                تحكم كامل في الكروت المعروضة على الواجهة (مثل Chimera و AMT و Xiaomi). يمكنك اختيار الباقة مباشرة من خدمات الموقع ورفع صورة مخصصة لها.
               </p>
             </div>
+
             <div className="flex items-center gap-2 flex-wrap">
               <button
+                type="button"
                 onClick={() => {
                   setPickerTargetIndex(null);
                   setShowPickerModal(true);
                 }}
-                className="btn-primary text-sm px-4 py-2.5 flex items-center gap-2 rounded-xl shrink-0 shadow-md"
+                className="btn-primary text-xs px-4 py-2.5 flex items-center gap-1.5 rounded-xl shrink-0 shadow-md font-bold"
               >
                 <span className="material-symbols-outlined text-sm">hub</span>
                 اختيار باقة من خدمات الموقع
               </button>
               <button
+                type="button"
                 onClick={addPackage}
-                className="btn-secondary text-sm px-4 py-2.5 flex items-center gap-2 rounded-xl shrink-0"
+                className="btn-secondary text-xs px-3.5 py-2.5 flex items-center gap-1.5 rounded-xl shrink-0"
               >
                 <span className="material-symbols-outlined text-sm">add</span>
                 إضافة باقة يدوية
               </button>
+              <button
+                type="button"
+                onClick={resetDefaultPackages}
+                className="text-xs px-3 py-2 rounded-xl bg-surface-container-high hover:bg-surface-container-highest text-on-surface-variant border border-outline-variant/30 flex items-center gap-1"
+                title="استعادة الباقات الـ 3 الافتراضية"
+              >
+                <span className="material-symbols-outlined text-xs">restart_alt</span>
+                استعادة الافتراضي
+              </button>
             </div>
           </div>
 
-          <div className="flex flex-col gap-8">
+          {/* Live Visual Preview of Cards */}
+          <div className="p-4 sm:p-6 bg-surface-container-lowest/80 rounded-2xl border border-primary/20 flex flex-col gap-3">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold text-primary flex items-center gap-1.5">
+                <span className="material-symbols-outlined text-sm">visibility</span>
+                معاينة حية لشكل الكروت بالواجهة الرئيسية:
+              </span>
+              <span className="text-[10px] text-on-surface-variant font-mono">
+                عدد الباقات: {config.featuredPackages?.length || 0}
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4 mt-1">
+              {Array.isArray(config.featuredPackages) && config.featuredPackages.map((pkg: any, idx: number) => (
+                <div 
+                  key={pkg.id || idx}
+                  className="p-3.5 sm:p-4 rounded-2xl bg-surface-container border border-outline-variant/30 flex flex-col justify-between shadow-xs"
+                >
+                  <div className="flex items-start gap-3">
+                    {/* Logo preview */}
+                    <div className="w-12 h-12 rounded-xl bg-surface-container-high border border-outline-variant/30 flex items-center justify-center shrink-0 overflow-hidden">
+                      {pkg.image ? (
+                        <img src={pkg.image} alt={pkg.nameAr} className="w-full h-full object-contain p-1" />
+                      ) : (
+                        <span className="material-symbols-outlined text-primary text-xl">
+                          {pkg.iconName || "inventory_2"}
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="min-w-0 flex-1">
+                      <h4 className="font-bold text-on-surface text-sm truncate">{pkg.nameAr || "اسم الباقة"}</h4>
+                      <span className="text-[10px] text-on-surface-variant block truncate">{pkg.subAr || pkg.nameEn || "وصف فرعي"}</span>
+                      <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
+                        {pkg.badgeAr && (
+                          <span className="px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20 text-[9px] font-bold">
+                            {pkg.badgeAr}
+                          </span>
+                        )}
+                        {pkg.categoryAr && (
+                          <span className="px-1.5 py-0.5 rounded bg-primary/10 text-primary border border-primary/20 text-[9px]">
+                            {pkg.categoryAr}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="pt-3 mt-3 border-t border-outline-variant/20 flex items-center justify-between">
+                    <div>
+                      <span className="text-base font-black text-primary font-mono">{pkg.startingPrice || "$0.00"}</span>
+                      <span className="text-[9px] text-on-surface-variant block">يبدأ من</span>
+                    </div>
+                    <span className="px-3 py-1 rounded-lg bg-emerald-500/20 text-emerald-400 font-bold text-xs">
+                      اطلب الآن
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Cards Editor List */}
+          <div className="flex flex-col gap-6">
             {Array.isArray(config.featuredPackages) && config.featuredPackages.map((pkg: any, idx: number) => (
-              <div key={pkg.id || idx} className="p-5 bg-surface-container-low rounded-2xl border border-outline-variant/20 flex flex-col gap-5 relative">
-                {/* Card Header */}
-                <div className="flex justify-between items-center">
-                  <h3 className="font-bold text-primary text-lg flex items-center gap-2">
-                    <span className="bg-primary/20 px-2 py-0.5 rounded text-xs">#{idx + 1}</span>
-                    {pkg.nameAr || "باقة جديدة"}
+              <div 
+                key={pkg.id || idx} 
+                className="p-5 bg-surface-container-low rounded-2xl border border-outline-variant/30 flex flex-col gap-5 relative shadow-xs"
+              >
+                {/* Header */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-outline-variant/20 pb-3">
+                  <div className="flex items-center gap-2">
+                    <span className="bg-primary/20 text-primary font-bold px-2.5 py-0.5 rounded-lg text-xs font-mono">
+                      باقة #{idx + 1}
+                    </span>
+                    <h3 className="font-bold text-on-surface text-base">
+                      {pkg.nameAr || "باقة جديدة"}
+                    </h3>
                     {pkg.isPopular && (
-                      <span className="text-xs bg-amber-500/20 text-amber-300 border border-amber-400/30 px-2 py-0.5 rounded-full font-bold">الأكثر طلباً</span>
+                      <span className="text-xs bg-amber-500/20 text-amber-300 border border-amber-400/30 px-2 py-0.5 rounded-full font-bold">
+                        الأكثر طلباً
+                      </span>
                     )}
-                  </h3>
+                  </div>
+
                   <div className="flex items-center gap-2 flex-wrap">
                     <button
+                      type="button"
                       onClick={() => {
                         setPickerTargetIndex(idx);
                         setShowPickerModal(true);
                       }}
-                      className="text-xs bg-surface-container-high hover:bg-surface-container-highest text-primary px-3 py-1.5 rounded-xl border border-primary/30 flex items-center gap-1.5 transition-all"
-                      title="تعبئة بيانات هذه الباقة من خدمة بالموقع"
+                      className="text-xs bg-primary/10 hover:bg-primary/20 text-primary px-3 py-1.5 rounded-xl border border-primary/30 flex items-center gap-1.5 transition-all font-bold"
                     >
-                      <span className="material-symbols-outlined text-sm">sync_alt</span>
+                      <span className="material-symbols-outlined text-sm">hub</span>
                       ربط بخدمة من الموقع
                     </button>
-                    <label className="flex items-center gap-1.5 cursor-pointer text-xs font-bold text-on-surface-variant">
+                    <label className="flex items-center gap-1.5 cursor-pointer text-xs font-bold text-on-surface-variant px-2 py-1 bg-surface-container rounded-lg">
                       <input
                         type="checkbox"
                         checked={Boolean(pkg.isPopular)}
@@ -1287,17 +905,19 @@ export default function AdminHomepageManager() {
                       الأكثر طلباً
                     </label>
                     <button
+                      type="button"
                       onClick={() => removePackage(idx)}
-                      className="text-error hover:bg-error/10 p-2 rounded-full transition-colors flex items-center justify-center"
+                      className="text-error hover:bg-error/10 p-1.5 rounded-lg transition-colors"
+                      title="حذف الباقة"
                     >
-                      <span className="material-symbols-outlined">delete</span>
+                      <span className="material-symbols-outlined text-sm">delete</span>
                     </button>
                   </div>
                 </div>
 
-                {/* Package Image */}
+                {/* Package Image Picker */}
                 <ImagePickerInput
-                  label={`صورة الباقة رقم ${idx + 1} (اختياري - تظهر أعلى البطاقة)`}
+                  label={`صورة أو شعار الباقة #${idx + 1} (يمكنك الرفع من جهازك)`}
                   value={pkg.image || ""}
                   onChange={(newUrl) => updatePackageField(idx, "image", newUrl)}
                 />
@@ -1310,7 +930,8 @@ export default function AdminHomepageManager() {
                       type="text"
                       value={pkg.nameAr || ""}
                       onChange={(e) => updatePackageField(idx, "nameAr", e.target.value)}
-                      className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-2.5 text-sm font-bold"
+                      className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-2.5 text-sm font-bold text-on-surface"
+                      placeholder="مثال: Chimera Tool"
                     />
                   </div>
                   <div className="flex flex-col gap-1">
@@ -1319,7 +940,8 @@ export default function AdminHomepageManager() {
                       type="text"
                       value={pkg.nameEn || ""}
                       onChange={(e) => updatePackageField(idx, "nameEn", e.target.value)}
-                      className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-2.5 text-sm font-bold"
+                      className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-2.5 text-sm font-bold text-on-surface"
+                      placeholder="e.g. Chimera Tool"
                     />
                   </div>
 
@@ -1330,6 +952,7 @@ export default function AdminHomepageManager() {
                       value={pkg.subAr || ""}
                       onChange={(e) => updatePackageField(idx, "subAr", e.target.value)}
                       className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-2.5 text-xs text-on-surface-variant"
+                      placeholder="مثال: Activation / Credits"
                     />
                   </div>
                   <div className="flex flex-col gap-1">
@@ -1339,6 +962,7 @@ export default function AdminHomepageManager() {
                       value={pkg.subEn || ""}
                       onChange={(e) => updatePackageField(idx, "subEn", e.target.value)}
                       className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-2.5 text-xs text-on-surface-variant"
+                      placeholder="e.g. Activation / Credits"
                     />
                   </div>
 
@@ -1346,41 +970,41 @@ export default function AdminHomepageManager() {
                     <label className="text-[10px] text-amber-400 uppercase font-bold">الشارة / البادج (بالعربية)</label>
                     <input
                       type="text"
-                      placeholder="مثال: سيرفر رسمي مباشر"
+                      placeholder="مثال: Best Seller أو الأكثر طلباً"
                       value={pkg.badgeAr || ""}
                       onChange={(e) => updatePackageField(idx, "badgeAr", e.target.value)}
-                      className="bg-surface-container-lowest border border-amber-400/30 rounded-xl p-2.5 text-xs text-amber-300"
+                      className="bg-surface-container-lowest border border-amber-400/30 rounded-xl p-2.5 text-xs text-amber-300 font-bold"
                     />
                   </div>
                   <div className="flex flex-col gap-1">
                     <label className="text-[10px] text-amber-400 uppercase font-bold">الشارة / البادج (بالإنجليزية)</label>
                     <input
                       type="text"
-                      placeholder="e.g. Direct Server"
+                      placeholder="e.g. Best Seller"
                       value={pkg.badgeEn || ""}
                       onChange={(e) => updatePackageField(idx, "badgeEn", e.target.value)}
-                      className="bg-surface-container-lowest border border-amber-400/30 rounded-xl p-2.5 text-xs text-amber-300"
+                      className="bg-surface-container-lowest border border-amber-400/30 rounded-xl p-2.5 text-xs text-amber-300 font-bold"
                     />
                   </div>
 
                   <div className="flex flex-col gap-1">
-                    <label className="text-[10px] text-emerald-400 uppercase font-bold">السعر (مثال: $3.41)</label>
+                    <label className="text-[10px] text-emerald-400 uppercase font-bold">السعر المبدئي (مثال: $106.59)</label>
                     <input
                       type="text"
-                      placeholder="$0.00"
+                      placeholder="$106.59"
                       value={pkg.startingPrice || ""}
                       onChange={(e) => updatePackageField(idx, "startingPrice", e.target.value)}
                       className="bg-surface-container-lowest border border-emerald-400/30 rounded-xl p-2.5 text-sm font-mono text-emerald-400 font-bold"
                     />
                   </div>
                   <div className="flex flex-col gap-1">
-                    <label className="text-[10px] text-on-surface-variant uppercase font-bold">اسم الأيقونة (iconName)</label>
+                    <label className="text-[10px] text-primary uppercase font-bold">رابط التوجيه (URL)</label>
                     <input
                       type="text"
-                      placeholder="smartphone / bolt / build"
-                      value={pkg.iconName || ""}
-                      onChange={(e) => updatePackageField(idx, "iconName", e.target.value)}
-                      className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-2.5 text-xs font-mono"
+                      placeholder="/pricing?section=Chimera%20Tool"
+                      value={pkg.url || "/pricing"}
+                      onChange={(e) => updatePackageField(idx, "url", e.target.value)}
+                      className="bg-surface-container-lowest border border-primary/40 rounded-xl p-2.5 text-xs font-mono text-primary"
                     />
                   </div>
 
@@ -1390,7 +1014,8 @@ export default function AdminHomepageManager() {
                       type="text"
                       value={pkg.categoryAr || ""}
                       onChange={(e) => updatePackageField(idx, "categoryAr", e.target.value)}
-                      className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-2.5 text-xs"
+                      className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-2.5 text-xs text-on-surface"
+                      placeholder="مثال: Official أو سيرفر معتمد"
                     />
                   </div>
                   <div className="flex flex-col gap-1">
@@ -1399,7 +1024,8 @@ export default function AdminHomepageManager() {
                       type="text"
                       value={pkg.categoryEn || ""}
                       onChange={(e) => updatePackageField(idx, "categoryEn", e.target.value)}
-                      className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-2.5 text-xs"
+                      className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-2.5 text-xs text-on-surface"
+                      placeholder="e.g. Official Server"
                     />
                   </div>
 
@@ -1409,7 +1035,8 @@ export default function AdminHomepageManager() {
                       type="text"
                       value={pkg.deliveryTimeAr || ""}
                       onChange={(e) => updatePackageField(idx, "deliveryTimeAr", e.target.value)}
-                      className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-2.5 text-xs"
+                      className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-2.5 text-xs text-on-surface"
+                      placeholder="مثال: فوري 24/7 أو 1 - 12 ساعة"
                     />
                   </div>
                   <div className="flex flex-col gap-1">
@@ -1418,31 +1045,21 @@ export default function AdminHomepageManager() {
                       type="text"
                       value={pkg.deliveryTimeEn || ""}
                       onChange={(e) => updatePackageField(idx, "deliveryTimeEn", e.target.value)}
-                      className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-2.5 text-xs"
-                    />
-                  </div>
-
-                  <div className="flex flex-col gap-1 md:col-span-2">
-                    <label className="text-[10px] text-primary uppercase font-bold">رابط الباقة (URL)</label>
-                    <input
-                      type="text"
-                      placeholder="/pricing?section=..."
-                      value={pkg.url || "/pricing"}
-                      onChange={(e) => updatePackageField(idx, "url", e.target.value)}
-                      className="bg-surface-container-lowest border border-primary/40 rounded-xl p-2.5 text-xs font-mono text-primary"
+                      className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-2.5 text-xs text-on-surface"
+                      placeholder="e.g. Instant 24/7"
                     />
                   </div>
                 </div>
 
-                {/* Features */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {/* Arabic Features */}
-                  <div className="flex flex-col gap-3">
+                {/* Features (المميزات) */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-3 border-t border-outline-variant/15">
+                  <div className="flex flex-col gap-2">
                     <div className="flex justify-between items-center">
                       <label className="text-xs font-bold text-on-surface-variant uppercase">المميزات (بالعربية)</label>
                       <button
+                        type="button"
                         onClick={() => addPackageFeature(idx, "featuresAr")}
-                        className="text-[10px] text-primary hover:underline flex items-center gap-1"
+                        className="text-[11px] text-primary hover:underline flex items-center gap-1 font-bold"
                       >
                         <span className="material-symbols-outlined text-xs">add</span> إضافة ميزة
                       </button>
@@ -1453,12 +1070,13 @@ export default function AdminHomepageManager() {
                           type="text"
                           value={feat}
                           onChange={(e) => updatePackageFeature(idx, "featuresAr", fIdx, e.target.value)}
-                          className="flex-1 bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-2 text-xs"
+                          className="flex-1 bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-2 text-xs text-on-surface"
                           placeholder={`الميزة ${fIdx + 1}`}
                         />
                         <button
+                          type="button"
                           onClick={() => removePackageFeature(idx, "featuresAr", fIdx)}
-                          className="text-error p-1 hover:bg-error/10 rounded-full transition-colors"
+                          className="text-error p-1 hover:bg-error/10 rounded-lg transition-colors"
                         >
                           <span className="material-symbols-outlined text-sm">close</span>
                         </button>
@@ -1466,13 +1084,13 @@ export default function AdminHomepageManager() {
                     ))}
                   </div>
 
-                  {/* English Features */}
-                  <div className="flex flex-col gap-3">
+                  <div className="flex flex-col gap-2">
                     <div className="flex justify-between items-center">
-                      <label className="text-xs font-bold text-on-surface-variant uppercase">المميزات (بالإنجليزية)</label>
+                      <label className="text-xs font-bold text-on-surface-variant uppercase">Features (English)</label>
                       <button
+                        type="button"
                         onClick={() => addPackageFeature(idx, "featuresEn")}
-                        className="text-[10px] text-primary hover:underline flex items-center gap-1"
+                        className="text-[11px] text-primary hover:underline flex items-center gap-1 font-bold"
                       >
                         <span className="material-symbols-outlined text-xs">add</span> Add feature
                       </button>
@@ -1483,12 +1101,13 @@ export default function AdminHomepageManager() {
                           type="text"
                           value={feat}
                           onChange={(e) => updatePackageFeature(idx, "featuresEn", fIdx, e.target.value)}
-                          className="flex-1 bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-2 text-xs"
+                          className="flex-1 bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-2 text-xs text-on-surface"
                           placeholder={`Feature ${fIdx + 1}`}
                         />
                         <button
+                          type="button"
                           onClick={() => removePackageFeature(idx, "featuresEn", fIdx)}
-                          className="text-error p-1 hover:bg-error/10 rounded-full transition-colors"
+                          className="text-error p-1 hover:bg-error/10 rounded-lg transition-colors"
                         >
                           <span className="material-symbols-outlined text-sm">close</span>
                         </button>
@@ -1498,82 +1117,119 @@ export default function AdminHomepageManager() {
                 </div>
               </div>
             ))}
-
-            {(!config.featuredPackages || config.featuredPackages.length === 0) && (
-              <div className="text-center p-10 border border-dashed border-outline-variant/50 rounded-2xl text-on-surface-variant">
-                <span className="material-symbols-outlined text-4xl mb-2 block">package_2</span>
-                لا توجد باقات مميزة حالياً. اضغط على &quot;إضافة باقة جديدة&quot; للبدء.
-              </div>
-            )}
           </div>
         </div>
       )}
 
-      {/* --- TAB 8: SUPPORTED TOOLS BAR --- */}
+      {/* ============================================================= */}
+      {/* TAB 2: SUPPORTED TOOLS BAR (شريط الأدوات المدعومة)            */}
+      {/* ============================================================= */}
       {activeTab === "tools" && (
-        <div className="glass-card rounded-3xl p-6 md:p-8 border border-outline-variant/30 flex flex-col gap-6">
-          <div className="border-b border-outline-variant/20 pb-3 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="glass-card rounded-3xl p-6 md:p-8 border border-outline-variant/30 flex flex-col gap-8">
+          <div className="border-b border-outline-variant/20 pb-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
               <h2 className="text-xl font-bold text-primary flex items-center gap-2">
                 <span className="material-symbols-outlined">construction</span>
-                8. أبرز الأدوات المدعومة (Supported Tools Bar)
+                أبرز الأدوات المدعومة (Supported Tools Bar)
               </h2>
               <p className="text-xs text-on-surface-variant mt-1">
-                التحكم في شريط الأدوات العشرة (أو أي عدد تحدده) الظاهر في الواجهة الرئيسية. يمكنك رفع شعار/أيقونة مخصصة لكل أداة وتعديل اسمها ورابط البحث.
+                التحكم في شريط الأدوات الظاهر أعلى الصفحة (Chimera, UnlockTool, Borneo, iRemoval, DFT, MobileSea, AMT...). يمكنك رفع صورة لكل أداة وتعديل رابطها أو إضافة أدوات جديدة.
               </p>
             </div>
 
             <div className="flex items-center gap-2 flex-wrap">
               <button
+                type="button"
                 onClick={addTool}
-                className="btn-primary text-sm px-4 py-2.5 flex items-center gap-2 rounded-xl shrink-0 shadow-md"
+                className="btn-primary text-xs px-4 py-2.5 flex items-center gap-1.5 rounded-xl shrink-0 shadow-md font-bold"
               >
                 <span className="material-symbols-outlined text-sm">add</span> إضافة أداة جديدة
               </button>
               <button
+                type="button"
                 onClick={resetDefaultTools}
-                className="btn-secondary text-sm px-4 py-2.5 flex items-center gap-2 rounded-xl shrink-0"
+                className="btn-secondary text-xs px-3.5 py-2.5 flex items-center gap-1.5 rounded-xl shrink-0"
               >
                 <span className="material-symbols-outlined text-sm">restart_alt</span> استعادة الأدوات الافتراضية
               </button>
             </div>
           </div>
 
+          {/* Live Visual Preview of Supported Tools */}
+          <div className="p-4 sm:p-6 bg-surface-container-lowest/80 rounded-2xl border border-primary/20 flex flex-col gap-3">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold text-primary flex items-center gap-1.5">
+                <span className="material-symbols-outlined text-sm">visibility</span>
+                معاينة حية لشريط الأدوات بالواجهة الرئيسية:
+              </span>
+              <span className="text-[10px] text-on-surface-variant font-mono">
+                العدد: {config.supportedTools?.length || 0} أدوات
+              </span>
+            </div>
+
+            <div className="grid grid-cols-5 lg:grid-cols-10 gap-2 sm:gap-3 mt-1">
+              {Array.isArray(config.supportedTools) && config.supportedTools.map((tool: any, idx: number) => (
+                <div
+                  key={tool.id || idx}
+                  className="p-2 sm:p-2.5 rounded-xl bg-surface-container border border-outline-variant/30 flex flex-col items-center justify-center text-center shadow-xs"
+                >
+                  <div className="w-8 h-8 rounded-lg bg-surface-container-high border border-outline-variant/20 flex items-center justify-center overflow-hidden mb-1">
+                    {tool.image ? (
+                      <img src={tool.image} alt={tool.name} className="w-full h-full object-contain p-0.5" />
+                    ) : (
+                      <span className="material-symbols-outlined text-xs text-primary">build</span>
+                    )}
+                  </div>
+                  <span className="text-[10px] sm:text-xs font-bold text-on-surface truncate w-full">
+                    {tool.name || "أداة"}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+
           {/* Quick-add from site service groups */}
-          {siteGroups.length > 0 && (
-            <div className="p-4 bg-surface-container-low rounded-2xl border border-outline-variant/20">
-              <span className="text-xs font-bold text-on-surface block mb-2">إضافة سريعة من أدوات ومجموعات الموقع:</span>
-              <div className="flex flex-wrap gap-2 max-h-28 overflow-y-auto pr-1">
-                {siteGroups.slice(0, 20).map((grp) => (
+          {siteItems.length > 0 && (
+            <div className="p-4 bg-surface-container-low rounded-2xl border border-outline-variant/30 flex flex-col gap-2">
+              <span className="text-xs font-bold text-on-surface flex items-center gap-1.5">
+                <span className="material-symbols-outlined text-sm text-primary">add_circle</span>
+                إضافة سريعة من مجموعات وأدوات الموقع المسجلة:
+              </span>
+              <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto pr-1">
+                {siteItems.slice(0, 30).map((item) => (
                   <button
-                    key={grp.name}
-                    onClick={() => addToolFromGroup(grp.name)}
-                    className="text-xs px-3 py-1.5 rounded-lg bg-surface-container-high hover:bg-primary/20 hover:text-primary transition-colors border border-outline-variant/20 flex items-center gap-1"
+                    key={item.name}
+                    type="button"
+                    onClick={() => addToolFromItem(item.name)}
+                    className="text-xs px-2.5 py-1.5 rounded-lg bg-surface-container hover:bg-primary/20 hover:text-primary transition-colors border border-outline-variant/20 flex items-center gap-1"
                   >
                     <span className="material-symbols-outlined text-xs">add</span>
-                    <span className="truncate max-w-[150px]">{grp.name}</span>
+                    <span className="truncate max-w-[150px]">{item.name}</span>
                   </button>
                 ))}
               </div>
             </div>
           )}
 
-          {/* Tools Grid / List */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          {/* Tools List Editor */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {Array.isArray(config.supportedTools) && config.supportedTools.map((tool: any, tIdx: number) => (
               <div
                 key={tool.id || tIdx}
-                className="p-5 bg-surface-container-low rounded-2xl border border-outline-variant/20 flex flex-col gap-4 relative"
+                className="p-4 bg-surface-container-low rounded-2xl border border-outline-variant/30 flex flex-col gap-3 relative shadow-xs"
               >
                 {/* Header */}
                 <div className="flex justify-between items-center">
-                  <span className="font-bold text-primary text-sm flex items-center gap-2">
-                    <span className="bg-primary/20 px-2 py-0.5 rounded text-xs">#{tIdx + 1}</span>
+                  <span className="font-bold text-on-surface text-sm flex items-center gap-2">
+                    <span className="bg-primary/20 text-primary font-mono px-2 py-0.5 rounded text-xs">
+                      #{tIdx + 1}
+                    </span>
                     {tool.name || "أداة جديدة"}
                   </span>
 
                   <div className="flex items-center gap-1">
                     <button
+                      type="button"
                       onClick={() => moveTool(tIdx, "up")}
                       disabled={tIdx === 0}
                       className="p-1.5 rounded-lg hover:bg-surface-container-high disabled:opacity-30 transition-colors"
@@ -1582,6 +1238,7 @@ export default function AdminHomepageManager() {
                       <span className="material-symbols-outlined text-sm">arrow_upward</span>
                     </button>
                     <button
+                      type="button"
                       onClick={() => moveTool(tIdx, "down")}
                       disabled={tIdx === config.supportedTools.length - 1}
                       className="p-1.5 rounded-lg hover:bg-surface-container-high disabled:opacity-30 transition-colors"
@@ -1590,6 +1247,7 @@ export default function AdminHomepageManager() {
                       <span className="material-symbols-outlined text-sm">arrow_downward</span>
                     </button>
                     <button
+                      type="button"
                       onClick={() => removeTool(tIdx)}
                       className="text-error hover:bg-error/10 p-1.5 rounded-lg transition-colors"
                       title="حذف الأداة"
@@ -1601,7 +1259,7 @@ export default function AdminHomepageManager() {
 
                 {/* Tool Image Picker */}
                 <ImagePickerInput
-                  label="شعار أو أيقونة الأداة (اختياري - يظهر بالواجهة)"
+                  label="أيقونة الأداة (رفع من جهازك أو اختيار أيقونة)"
                   value={tool.image || ""}
                   onChange={(newUrl) => updateToolField(tIdx, "image", newUrl)}
                 />
@@ -1615,7 +1273,7 @@ export default function AdminHomepageManager() {
                       value={tool.name || ""}
                       onChange={(e) => updateToolField(tIdx, "name", e.target.value)}
                       placeholder="مثال: Chimera"
-                      className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-2.5 text-sm font-bold"
+                      className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-2 text-xs font-bold text-on-surface"
                     />
                   </div>
                   <div className="flex flex-col gap-1">
@@ -1625,24 +1283,381 @@ export default function AdminHomepageManager() {
                       value={tool.url || ""}
                       onChange={(e) => updateToolField(tIdx, "url", e.target.value)}
                       placeholder={`/pricing?search=${encodeURIComponent(tool.name || "")}`}
-                      className="bg-surface-container-lowest border border-primary/30 rounded-xl p-2.5 text-xs font-mono text-primary"
+                      className="bg-surface-container-lowest border border-primary/40 rounded-xl p-2 text-xs font-mono text-primary"
                     />
                   </div>
                 </div>
               </div>
             ))}
-
-            {(!config.supportedTools || config.supportedTools.length === 0) && (
-              <div className="col-span-full text-center p-10 border border-dashed border-outline-variant/50 rounded-2xl text-on-surface-variant">
-                <span className="material-symbols-outlined text-4xl mb-2 block">construction</span>
-                لا توجد أدوات مدعومة حالياً. اضغط على &quot;استعادة الأدوات الافتراضية&quot; أو &quot;إضافة أداة جديدة&quot;.
-              </div>
-            )}
           </div>
         </div>
       )}
 
-      {/* Service Picker Modal */}
+      {/* ============================================================= */}
+      {/* TAB 3: CAMPAIGN OFFERS (العروض وبنرات الترويج)                 */}
+      {/* ============================================================= */}
+      {activeTab === "campaigns" && (
+        <div className="glass-card rounded-3xl p-6 md:p-8 border border-outline-variant/30 flex flex-col gap-6">
+          <div className="border-b border-outline-variant/20 pb-3 flex justify-between items-center">
+            <div>
+              <h2 className="text-xl font-bold text-primary flex items-center gap-2">
+                <span className="material-symbols-outlined">local_fire_department</span>
+                3. بنرات وعروض الترويج الساخنة (Campaign Offers)
+              </h2>
+              <p className="text-xs text-on-surface-variant mt-1">
+                إدارة البنرات الإعلانية الترويجية (مثل بنر سامسونج وبنر شيميرا).
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                setConfig((prev: any) => {
+                  const campaigns = Array.isArray(prev.campaigns) ? [...prev.campaigns] : [];
+                  campaigns.push({
+                    tagEn: "Special Offer",
+                    tagAr: "عرض مميز",
+                    titleEn: "Service Title",
+                    titleAr: "عنوان الخدمة",
+                    descEn: "100% Guaranteed",
+                    descAr: "ضمان كامل وتنفيذ فوري",
+                    image: "/images/promo_samsung.webp",
+                    url: "/pricing"
+                  });
+                  return { ...prev, campaigns };
+                });
+              }}
+              className="btn-primary text-xs px-3.5 py-2 rounded-xl flex items-center gap-1.5"
+            >
+              <span className="material-symbols-outlined text-sm">add</span> إضافة إعلان جديد
+            </button>
+          </div>
+
+          <div className="flex flex-col gap-6">
+            {Array.isArray(config.campaigns) && config.campaigns.map((camp: any, idx: number) => (
+              <div key={idx} className="p-5 bg-surface-container-low rounded-2xl border border-outline-variant/30 flex flex-col gap-4 relative">
+                <div className="flex justify-between items-center border-b border-outline-variant/20 pb-2">
+                  <span className="font-bold text-primary text-sm">إعلان #{idx + 1}</span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setConfig((prev: any) => {
+                        const campaigns = [...prev.campaigns];
+                        campaigns.splice(idx, 1);
+                        return { ...prev, campaigns };
+                      });
+                    }}
+                    className="text-error hover:bg-error/10 p-1.5 rounded-lg transition-colors"
+                  >
+                    <span className="material-symbols-outlined text-sm">delete</span>
+                  </button>
+                </div>
+
+                <ImagePickerInput
+                  label={`صورة الإعلان رقم ${idx + 1}`}
+                  value={camp.image || ""}
+                  onChange={(newUrl) => {
+                    setConfig((prev: any) => {
+                      const campaigns = [...prev.campaigns];
+                      campaigns[idx] = { ...campaigns[idx], image: newUrl };
+                      return { ...prev, campaigns };
+                    });
+                  }}
+                />
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div className="flex flex-col gap-1">
+                    <label className="text-[10px] text-on-surface-variant uppercase font-bold">العنوان (بالعربية)</label>
+                    <input
+                      type="text"
+                      value={camp.titleAr || ""}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setConfig((prev: any) => {
+                          const campaigns = [...prev.campaigns];
+                          campaigns[idx] = { ...campaigns[idx], titleAr: val };
+                          return { ...prev, campaigns };
+                        });
+                      }}
+                      className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-2 text-xs"
+                    />
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <label className="text-[10px] text-on-surface-variant uppercase font-bold">العنوان (بالإنجليزية)</label>
+                    <input
+                      type="text"
+                      value={camp.titleEn || ""}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setConfig((prev: any) => {
+                          const campaigns = [...prev.campaigns];
+                          campaigns[idx] = { ...campaigns[idx], titleEn: val };
+                          return { ...prev, campaigns };
+                        });
+                      }}
+                      className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-2 text-xs"
+                    />
+                  </div>
+                  <div className="flex flex-col gap-1 md:col-span-2">
+                    <label className="text-[10px] text-primary uppercase font-bold">رابط التوجيه (URL)</label>
+                    <input
+                      type="text"
+                      value={camp.url || "/pricing"}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setConfig((prev: any) => {
+                          const campaigns = [...prev.campaigns];
+                          campaigns[idx] = { ...campaigns[idx], url: val };
+                          return { ...prev, campaigns };
+                        });
+                      }}
+                      className="bg-surface-container-lowest border border-primary/40 rounded-xl p-2 text-xs font-mono text-primary"
+                    />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* ============================================================= */}
+      {/* TAB 4: HERO SHOWCASE (القسم الرئيسي)                           */}
+      {/* ============================================================= */}
+      {activeTab === "hero" && (
+        <div className="glass-card rounded-3xl p-6 md:p-8 border border-outline-variant/30 flex flex-col gap-6">
+          <div className="border-b border-outline-variant/20 pb-3">
+            <h2 className="text-xl font-bold text-primary flex items-center gap-2">
+              <span className="material-symbols-outlined">space_dashboard</span>
+              4. الواجهة والصورة الرئيسية (Hero Showcase)
+            </h2>
+            <p className="text-xs text-on-surface-variant mt-1">تعديل نصوص وأزرار والصورة التوضيحية لقسم الـ Hero.</p>
+          </div>
+
+          <ImagePickerInput
+            label="صورة الموكاب الرئيسية للهاتف (Hero Device Mockup)"
+            value={config.heroSection?.heroImage || ""}
+            onChange={(newUrl) => updateSectionField("heroSection", "heroImage", newUrl)}
+          />
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="flex flex-col gap-1">
+              <label className="text-[10px] text-on-surface-variant uppercase font-bold">العنوان الأول (بالعربية)</label>
+              <input
+                type="text"
+                value={config.heroSection?.title1Ar || ""}
+                onChange={(e) => updateSectionField("heroSection", "title1Ar", e.target.value)}
+                className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-2.5 text-sm"
+              />
+            </div>
+            <div className="flex flex-col gap-1">
+              <label className="text-[10px] text-on-surface-variant uppercase font-bold">العنوان الأول (بالإنجليزية)</label>
+              <input
+                type="text"
+                value={config.heroSection?.title1En || ""}
+                onChange={(e) => updateSectionField("heroSection", "title1En", e.target.value)}
+                className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-2.5 text-sm"
+              />
+            </div>
+            <div className="flex flex-col gap-1">
+              <label className="text-[10px] text-on-surface-variant uppercase font-bold">العنوان الملون الثاني (بالعربية)</label>
+              <input
+                type="text"
+                value={config.heroSection?.title2Ar || ""}
+                onChange={(e) => updateSectionField("heroSection", "title2Ar", e.target.value)}
+                className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-2.5 text-sm"
+              />
+            </div>
+            <div className="flex flex-col gap-1">
+              <label className="text-[10px] text-on-surface-variant uppercase font-bold">العنوان الملون الثاني (بالإنجليزية)</label>
+              <input
+                type="text"
+                value={config.heroSection?.title2En || ""}
+                onChange={(e) => updateSectionField("heroSection", "title2En", e.target.value)}
+                className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-2.5 text-sm"
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ============================================================= */}
+      {/* TAB 5: SERVICE LANES (كروت الأقسام الأربعة)                   */}
+      {/* ============================================================= */}
+      {activeTab === "lanes" && (
+        <div className="glass-card rounded-3xl p-6 md:p-8 border border-outline-variant/30 flex flex-col gap-6">
+          <div className="border-b border-outline-variant/20 pb-3">
+            <h2 className="text-xl font-bold text-primary flex items-center gap-2">
+              <span className="material-symbols-outlined">grid_view</span>
+              5. كروت بوابات الخدمات الأربعة (Service Lanes)
+            </h2>
+            <p className="text-xs text-on-surface-variant mt-1">تعديل عناوين ووصف وروابط الأقسام الأربعة (IMEI، سيرفر، تحكم عن بعد، المتجر).</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* IMEI */}
+            <div className="p-4 bg-surface-container-low rounded-2xl border border-outline-variant/30 flex flex-col gap-3">
+              <span className="font-bold text-primary text-sm">قسم خدمات IMEI</span>
+              <input
+                type="text"
+                placeholder="العنوان بالعربية"
+                value={config.serviceLanes?.imeiTitleAr || ""}
+                onChange={(e) => updateSectionField("serviceLanes", "imeiTitleAr", e.target.value)}
+                className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-2 text-xs font-bold"
+              />
+              <input
+                type="text"
+                placeholder="الوصف بالعربية"
+                value={config.serviceLanes?.imeiDescAr || ""}
+                onChange={(e) => updateSectionField("serviceLanes", "imeiDescAr", e.target.value)}
+                className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-2 text-xs"
+              />
+            </div>
+
+            {/* Server */}
+            <div className="p-4 bg-surface-container-low rounded-2xl border border-outline-variant/30 flex flex-col gap-3">
+              <span className="font-bold text-primary text-sm">قسم خدمات السيرفرات والأرصدة</span>
+              <input
+                type="text"
+                placeholder="العنوان بالعربية"
+                value={config.serviceLanes?.serverTitleAr || ""}
+                onChange={(e) => updateSectionField("serviceLanes", "serverTitleAr", e.target.value)}
+                className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-2 text-xs font-bold"
+              />
+              <input
+                type="text"
+                placeholder="الوصف بالعربية"
+                value={config.serviceLanes?.serverDescAr || ""}
+                onChange={(e) => updateSectionField("serviceLanes", "serverDescAr", e.target.value)}
+                className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-2 text-xs"
+              />
+            </div>
+
+            {/* Remote */}
+            <div className="p-4 bg-surface-container-low rounded-2xl border border-outline-variant/30 flex flex-col gap-3">
+              <span className="font-bold text-primary text-sm">قسم خدمات التحكم عن بعد</span>
+              <input
+                type="text"
+                placeholder="العنوان بالعربية"
+                value={config.serviceLanes?.remoteTitleAr || ""}
+                onChange={(e) => updateSectionField("serviceLanes", "remoteTitleAr", e.target.value)}
+                className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-2 text-xs font-bold"
+              />
+              <input
+                type="text"
+                placeholder="الوصف بالعربية"
+                value={config.serviceLanes?.remoteDescAr || ""}
+                onChange={(e) => updateSectionField("serviceLanes", "remoteDescAr", e.target.value)}
+                className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-2 text-xs"
+              />
+            </div>
+
+            {/* Store */}
+            <div className="p-4 bg-surface-container-low rounded-2xl border border-outline-variant/30 flex flex-col gap-3">
+              <span className="font-bold text-primary text-sm">قسم الأدوات والمتجر</span>
+              <input
+                type="text"
+                placeholder="العنوان بالعربية"
+                value={config.serviceLanes?.storeTitleAr || ""}
+                onChange={(e) => updateSectionField("serviceLanes", "storeTitleAr", e.target.value)}
+                className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-2 text-xs font-bold"
+              />
+              <input
+                type="text"
+                placeholder="الوصف بالعربية"
+                value={config.serviceLanes?.storeDescAr || ""}
+                onChange={(e) => updateSectionField("serviceLanes", "storeDescAr", e.target.value)}
+                className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-2 text-xs"
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ============================================================= */}
+      {/* TAB 6: NOTICE BAR                                             */}
+      {/* ============================================================= */}
+      {activeTab === "notice" && (
+        <div className="glass-card rounded-3xl p-6 md:p-8 border border-outline-variant/30 flex flex-col gap-6">
+          <div className="border-b border-outline-variant/20 pb-3">
+            <h2 className="text-xl font-bold text-primary flex items-center gap-2">
+              <span className="material-symbols-outlined">campaign</span>
+              6. شريط الإشعارات العلوي (Notice Bar)
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="flex flex-col gap-1">
+              <label className="text-[10px] text-on-surface-variant uppercase font-bold">الإعلان الأول (بالعربية)</label>
+              <input
+                type="text"
+                value={config.noticeBar?.text1Ar || ""}
+                onChange={(e) => updateSectionField("noticeBar", "text1Ar", e.target.value)}
+                className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-2.5 text-xs text-on-surface"
+              />
+            </div>
+            <div className="flex flex-col gap-1">
+              <label className="text-[10px] text-on-surface-variant uppercase font-bold">الإعلان الثاني (بالعربية)</label>
+              <input
+                type="text"
+                value={config.noticeBar?.text2Ar || ""}
+                onChange={(e) => updateSectionField("noticeBar", "text2Ar", e.target.value)}
+                className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-2.5 text-xs text-on-surface"
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ============================================================= */}
+      {/* TAB 7: FEATURE RIBBON                                         */}
+      {/* ============================================================= */}
+      {activeTab === "ribbon" && (
+        <div className="glass-card rounded-3xl p-6 md:p-8 border border-outline-variant/30 flex flex-col gap-6">
+          <div className="border-b border-outline-variant/20 pb-3">
+            <h2 className="text-xl font-bold text-primary flex items-center gap-2">
+              <span className="material-symbols-outlined">verified</span>
+              7. شريط المميزات الثلاثي (Feature Ribbon)
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="p-4 bg-surface-container-low rounded-2xl border border-outline-variant/30 flex flex-col gap-2">
+              <span className="font-bold text-primary text-xs">الميزة الأولى</span>
+              <input
+                type="text"
+                value={config.featureRibbon?.feat1TitleAr || ""}
+                onChange={(e) => updateSectionField("featureRibbon", "feat1TitleAr", e.target.value)}
+                className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-2 text-xs"
+                placeholder="العنوان"
+              />
+            </div>
+            <div className="p-4 bg-surface-container-low rounded-2xl border border-outline-variant/30 flex flex-col gap-2">
+              <span className="font-bold text-primary text-xs">الميزة الثانية</span>
+              <input
+                type="text"
+                value={config.featureRibbon?.feat2TitleAr || ""}
+                onChange={(e) => updateSectionField("featureRibbon", "feat2TitleAr", e.target.value)}
+                className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-2 text-xs"
+                placeholder="العنوان"
+              />
+            </div>
+            <div className="p-4 bg-surface-container-low rounded-2xl border border-outline-variant/30 flex flex-col gap-2">
+              <span className="font-bold text-primary text-xs">الميزة الثالثة</span>
+              <input
+                type="text"
+                value={config.featureRibbon?.feat3TitleAr || ""}
+                onChange={(e) => updateSectionField("featureRibbon", "feat3TitleAr", e.target.value)}
+                className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-2 text-xs"
+                placeholder="العنوان"
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ============================================================= */}
+      {/* SERVICE PICKER MODAL                                          */}
+      {/* ============================================================= */}
       {showPickerModal && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-surface-container rounded-3xl border border-outline-variant/30 max-w-2xl w-full max-h-[85vh] flex flex-col shadow-2xl overflow-hidden">
@@ -1656,10 +1671,11 @@ export default function AdminHomepageManager() {
                     : "اختيار باقة من خدمات وسيرفرات الموقع"}
                 </h3>
                 <p className="text-xs text-on-surface-variant mt-1">
-                  اختر من بين باقات وأدوات الموقع المسجلة لديك ليتم تعبئة الاسم والسعر والرابط تلقائياً.
+                  اختر من بين مجموعات وخدمات الموقع المسجلة لديك ليتم تعبئة الاسم والسعر والرابط تلقائياً.
                 </p>
               </div>
               <button
+                type="button"
                 onClick={() => {
                   setShowPickerModal(false);
                   setPickerTargetIndex(null);
@@ -1694,31 +1710,37 @@ export default function AdminHomepageManager() {
                 </div>
               ) : (
                 <>
-                  {siteGroups
-                    .filter((g) =>
-                      !pickerSearch || g.name.toLowerCase().includes(pickerSearch.toLowerCase())
+                  {siteItems
+                    .filter((item) =>
+                      !pickerSearch || item.name.toLowerCase().includes(pickerSearch.toLowerCase())
                     )
-                    .map((group) => (
+                    .map((item) => (
                       <div
-                        key={group.name}
+                        key={item.name}
                         className="pt-2.5 first:pt-0 flex items-center justify-between gap-4 hover:bg-surface-container-high/40 p-3 rounded-2xl transition-colors"
                       >
                         <div className="min-w-0 flex-1">
-                          <h4 className="font-bold text-on-surface text-sm truncate">{group.name}</h4>
+                          <h4 className="font-bold text-on-surface text-sm truncate">{item.name}</h4>
                           <div className="flex items-center gap-3 mt-1 text-xs text-on-surface-variant flex-wrap">
-                            <span>{group.count} خدمات فرعية</span>
-                            {group.minPrice > 0 && (
-                              <span className="text-emerald-400 font-mono font-bold">
-                                يبدأ من ${group.minPrice.toFixed(2)}
+                            {item.categoryName && (
+                              <span className="bg-surface-container-high px-2 py-0.5 rounded text-[11px] text-primary">
+                                {item.categoryName}
                               </span>
                             )}
-                            {group.time && <span>التسليم: {group.time}</span>}
+                            <span>{item.count} خدمات فرعية</span>
+                            {item.minPrice > 0 && (
+                              <span className="text-emerald-400 font-mono font-bold">
+                                يبدأ من ${item.minPrice.toFixed(2)}
+                              </span>
+                            )}
+                            {item.time && <span>التسليم: {item.time}</span>}
                           </div>
                         </div>
 
                         <button
-                          onClick={() => selectServiceForPackage(group)}
-                          className="btn-primary text-xs px-4 py-2 rounded-xl flex items-center gap-1.5 shrink-0"
+                          type="button"
+                          onClick={() => selectServiceForPackage(item)}
+                          className="btn-primary text-xs px-4 py-2 rounded-xl flex items-center gap-1.5 shrink-0 font-bold shadow-xs"
                         >
                           <span className="material-symbols-outlined text-sm">check</span>
                           تحديد هذه الباقة
@@ -1726,8 +1748,8 @@ export default function AdminHomepageManager() {
                       </div>
                     ))}
 
-                  {siteGroups.filter((g) =>
-                    !pickerSearch || g.name.toLowerCase().includes(pickerSearch.toLowerCase())
+                  {siteItems.filter((item) =>
+                    !pickerSearch || item.name.toLowerCase().includes(pickerSearch.toLowerCase())
                   ).length === 0 && (
                     <div className="text-center py-12 text-on-surface-variant text-sm">
                       لا توجد خدمات مطابقة لبحثك.
@@ -1739,8 +1761,9 @@ export default function AdminHomepageManager() {
 
             {/* Modal Footer */}
             <div className="p-4 border-t border-outline-variant/20 bg-surface-container-low flex justify-between items-center text-xs text-on-surface-variant">
-              <span>إجمالي المجموعات والخدمات المتاحة: {siteGroups.length}</span>
+              <span>إجمالي المجموعات والخدمات المتاحة: {siteItems.length}</span>
               <button
+                type="button"
                 onClick={() => {
                   setShowPickerModal(false);
                   setPickerTargetIndex(null);
