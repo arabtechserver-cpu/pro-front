@@ -17,6 +17,8 @@ interface OrderItem {
   status: "completed" | "processing" | "pending" | "rejected" | "cancelled" | string;
   reply?: string;
   apiOrderId?: string | null;
+  refundedAt?: string | null;
+  refundRefNo?: string | null;
   createdAt: string;
   updatedAt?: string;
   serviceDhruId?: string | null;
@@ -91,6 +93,12 @@ export default function OrdersClient() {
   const [refundModalOrder, setRefundModalOrder] = useState<{ order: OrderItem; isProviderCancel: boolean } | null>(null);
   const [refundReason, setRefundReason] = useState("");
   const [isRefunding, setIsRefunding] = useState(false);
+  const [isVerifyingProviderInModal, setIsVerifyingProviderInModal] = useState(false);
+  const [providerModalStatus, setProviderModalStatus] = useState<{
+    isRejected?: boolean;
+    isCompleted?: boolean;
+    message: string;
+  } | null>(null);
 
   const [dispatchingOrderId, setDispatchingOrderId] = useState<string | null>(null);
   const [checkingOrderId, setCheckingOrderId] = useState<string | null>(null);
@@ -300,18 +308,19 @@ export default function OrdersClient() {
       });
       const data = await res.json();
       if (res.ok && data.success) {
-        showToast(data.message || "تم إلغاء الطلب واسترجاع الرصيد للعميل بنجاح!");
+        showToast(data.message || "تم استرجاع الرصيد للعميل بنجاح!");
         setRefundModalOrder(null);
         setRefundReason("");
+        setProviderModalStatus(null);
         await fetchOrders();
         if (selectedOrder && selectedOrder.id === order.id) {
           setSelectedOrder(data.order);
         }
       } else {
-        showToast(data.error || "فشل إلغاء الطلب", "error");
+        showToast(data.error || "فشل استرجاع الرصيد", "error");
       }
     } catch {
-      showToast("تعذر الاتصال بالسيرفر لإتمام الإلغاء", "error");
+      showToast("تعذر الاتصال بالسيرفر لإتمام الاسترجاع", "error");
     } finally {
       setIsRefunding(false);
     }
@@ -340,6 +349,54 @@ export default function OrdersClient() {
       showToast("تعذر الاتصال بسيرفر المزود", "error");
     } finally {
       setCheckingOrderId(null);
+    }
+  };
+
+  // Verify provider status specifically within refund modal
+  const handleVerifyProviderInModal = async () => {
+    if (!refundModalOrder?.order.id) return;
+    setIsVerifyingProviderInModal(true);
+    setProviderModalStatus(null);
+    try {
+      const res = await fetch("/api/orders/check-status", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ orderId: refundModalOrder.order.id })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        const rawStatus = String(data.statusData?.STATUS ?? data.statusData?.status ?? "").trim();
+        const isRejected = rawStatus === "3" || String(data.message).includes("مرفوض") || String(data.message).includes("ملغي");
+        const isCompleted = rawStatus === "4" || String(data.message).includes("مكتمل") || String(data.message).includes("نجاح");
+
+        setProviderModalStatus({
+          isRejected,
+          isCompleted,
+          message: data.message || `تم التحقق: حالة المزود الحالية (${rawStatus})`
+        });
+        showToast(data.message || "تم الاستعلام من المزود بنجاح");
+        if (data.order) {
+          setRefundModalOrder(prev => prev ? { ...prev, order: data.order } : null);
+          setOrders(prev => prev.map(o => o.id === data.order.id ? data.order : o));
+          if (selectedOrder && selectedOrder.id === data.order.id) {
+            setSelectedOrder(data.order);
+          }
+        }
+      } else {
+        setProviderModalStatus({
+          isRejected: false,
+          message: data.error || "تعذر الاستعلام من سيرفر المزود"
+        });
+        showToast(data.error || "فشل الاستعلام من المزود", "error");
+      }
+    } catch {
+      setProviderModalStatus({
+        isRejected: false,
+        message: "تعذر الاتصال بسيرفر المزود"
+      });
+      showToast("تعذر الاتصال بسيرفر المزود", "error");
+    } finally {
+      setIsVerifyingProviderInModal(false);
     }
   };
 
@@ -738,10 +795,17 @@ export default function OrdersClient() {
                           </span>
                         )}
                         {order.status !== "completed" && order.status !== "processing" && order.status !== "pending" && (
-                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-red-500/15 border border-red-500/30 text-red-400 font-bold text-[11px]">
-                            <span className="w-1.5 h-1.5 rounded-full bg-red-400"></span>
-                            ملغي ومسترجع
-                          </span>
+                          order.refundedAt ? (
+                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 font-bold text-[11px]" title={`تم الاسترجاع برقم مرجع: ${order.refundRefNo || ''}`}>
+                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                              ملغي ومسترجع
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-rose-500/15 border border-rose-500/30 text-rose-400 font-bold text-[11px]" title="الطلب مرفوض ولكن الرصيد لم يُسترجع للمحفظة بعد">
+                              <span className="w-1.5 h-1.5 rounded-full bg-rose-400"></span>
+                              مرفوض (غير مسترجع)
+                            </span>
+                          )
                         )}
                       </td>
 
@@ -789,12 +853,12 @@ export default function OrdersClient() {
                           )}
 
                           {/* Check Status from Provider if apiOrderId exists */}
-                          {order.apiOrderId && order.status === "processing" && (
+                          {order.apiOrderId && (
                             <button
                               onClick={() => handleCheckStatus(order)}
                               disabled={isChecking}
                               className="p-1.5 rounded-xl bg-surface-container-high hover:bg-surface-container-highest text-primary border border-outline-variant/30 transition-all disabled:opacity-50"
-                              title="فحص تحديث الحالة من المزود"
+                              title="فحص تحديث الحالة مباشرة من المزود"
                             >
                               <span className={`material-symbols-outlined text-xs ${isChecking ? "animate-spin" : ""}`}>
                                 refresh
@@ -802,8 +866,8 @@ export default function OrdersClient() {
                             </button>
                           )}
 
-                          {/* Cancel & Refund Order */}
-                          {order.status !== "rejected" && order.status !== "cancelled" && (
+                          {/* Manual Refund - Present across all cases as requested */}
+                          {!order.refundedAt ? (
                             <button
                               onClick={() => {
                                 setRefundModalOrder({
@@ -811,12 +875,22 @@ export default function OrdersClient() {
                                   isProviderCancel: Boolean(order.apiOrderId && order.status === "processing")
                                 });
                                 setRefundReason("");
+                                setProviderModalStatus(null);
                               }}
-                              className="p-1.5 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 transition-all"
-                              title={order.apiOrderId ? "إلغاء من المزود واسترجاع الرصيد" : "إلغاء الطلب واسترجاع الرصيد"}
+                              className="px-2.5 py-1.5 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 text-rose-400 border border-rose-500/30 transition-all flex items-center gap-1 text-[11px] font-bold"
+                              title="استرجاع يدوي للمبلغ إلى محفظة العميل"
                             >
                               <span className="material-symbols-outlined text-xs">undo</span>
+                              <span>استرجاع يدوي</span>
                             </button>
+                          ) : (
+                            <span
+                              className="px-2 py-1 rounded-xl bg-emerald-500/10 text-emerald-400/80 border border-emerald-500/20 text-[11px] font-bold flex items-center gap-1"
+                              title={`تم استرجاع الرصيد سابقاً (${order.refundRefNo || ''})`}
+                            >
+                              <span className="material-symbols-outlined text-xs">check_circle</span>
+                              <span>مسترجع</span>
+                            </span>
                           )}
 
                           {/* View Full Details & Timeline */}
@@ -952,14 +1026,17 @@ export default function OrdersClient() {
                 </div>
                 <div>
                   <h3 className="font-bold text-base text-on-surface">
-                    {refundModalOrder.isProviderCancel ? "إلغاء الطلب من المزود واسترجاع الرصيد" : "إلغاء الطلب واسترجاع الرصيد"}
+                    استرجاع يدوي للمبلغ إلى محفظة العميل
                   </h3>
-                  <p className="text-xs text-red-400">طلب #{refundModalOrder.order.id.slice(-6)} • استرجاع ${(refundModalOrder.order.price || 0).toFixed(2)} USD</p>
+                  <p className="text-xs text-red-400">طلب #{refundModalOrder.order.id.slice(-6)} • {refundModalOrder.order.serviceName}</p>
                 </div>
               </div>
 
               <button
-                onClick={() => setRefundModalOrder(null)}
+                onClick={() => {
+                  setRefundModalOrder(null);
+                  setProviderModalStatus(null);
+                }}
                 className="w-8 h-8 rounded-full bg-surface-variant flex items-center justify-center text-on-surface-variant hover:text-on-surface"
               >
                 ✕
@@ -967,17 +1044,69 @@ export default function OrdersClient() {
             </div>
 
             <div className="space-y-4 text-xs">
-              <div className="p-3.5 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-300 leading-relaxed">
-                سيتم إلغاء الطلب وإرجاع كامل المبلغ (${(refundModalOrder.order.price || 0).toFixed(2)} USD) إلى محفظة العميل ({refundModalOrder.order.user?.fullName}) وتوثيق حركة استرجاع مالية تلقائياً.
+              {/* Customer & Order Summary Card */}
+              <div className="p-3.5 rounded-2xl bg-surface-container-lowest border border-outline-variant/20 space-y-2">
+                <div className="flex justify-between items-center">
+                  <span className="text-on-surface-variant font-medium">العميل:</span>
+                  <span className="text-on-surface font-bold">{refundModalOrder.order.user?.fullName || refundModalOrder.order.user?.username || "عميل"} ({refundModalOrder.order.user?.email})</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-on-surface-variant font-medium">رصيد العميل الحالي:</span>
+                  <span className="font-mono text-emerald-400 font-bold dir-ltr">${(refundModalOrder.order.user?.balance ?? 0).toFixed(2)} USD</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-on-surface-variant font-medium">المبلغ المراد استرجاعه:</span>
+                  <span className="font-mono text-rose-400 font-bold text-sm dir-ltr">+${(refundModalOrder.order.price || 0).toFixed(2)} USD</span>
+                </div>
+                {refundModalOrder.order.targetInput && (
+                  <div className="flex justify-between items-center pt-1 border-t border-outline-variant/10">
+                    <span className="text-on-surface-variant font-medium">البيانات / IMEI:</span>
+                    <span className="font-mono text-primary font-bold dir-ltr">{refundModalOrder.order.targetInput}</span>
+                  </div>
+                )}
               </div>
+
+              {/* Provider Live Verification Section */}
+              {refundModalOrder.order.apiOrderId && (
+                <div className="p-3.5 rounded-2xl bg-surface-container-lowest border border-primary/25 space-y-2.5">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-1.5 font-bold text-on-surface">
+                      <span className="material-symbols-outlined text-sm text-primary">verified</span>
+                      <span>التحقق من المزود (مرجع: #{refundModalOrder.order.apiOrderId})</span>
+                    </div>
+                    <button
+                      type="button"
+                      disabled={isVerifyingProviderInModal}
+                      onClick={handleVerifyProviderInModal}
+                      className="px-2.5 py-1 rounded-lg bg-primary/15 hover:bg-primary/25 text-primary text-[11px] font-bold flex items-center gap-1 transition-all disabled:opacity-50"
+                    >
+                      <span className={`material-symbols-outlined text-xs ${isVerifyingProviderInModal ? "animate-spin" : ""}`}>
+                        refresh
+                      </span>
+                      <span>فحص الحالة الآن</span>
+                    </button>
+                  </div>
+                  {providerModalStatus && (
+                    <div className={`p-2.5 rounded-xl text-[11px] font-mono leading-relaxed border ${
+                      providerModalStatus.isRejected
+                        ? "bg-rose-500/10 border-rose-500/30 text-rose-300 font-bold"
+                        : providerModalStatus.isCompleted
+                          ? "bg-violet-500/10 border-violet-500/30 text-violet-300 font-bold"
+                          : "bg-blue-500/10 border-blue-500/30 text-blue-300"
+                    }`}>
+                      {providerModalStatus.message}
+                    </div>
+                  )}
+                </div>
+              )}
 
               <div>
                 <label className="block font-bold text-on-surface mb-1.5">
-                  سبب الإلغاء (يظهر للعميل في التقرير):
+                  سبب الاسترجاع (يظهر في تقرير العميل وسجل العمليات):
                 </label>
                 <input
                   type="text"
-                  placeholder="مثال: رقم IMEI غير صحيح أو الخدمة غير متوفرة حالياً"
+                  placeholder="مثال: رفض الطلب من المزود، تعويض العميل، أو إلغاء بناء على طلب الإدارة"
                   value={refundReason}
                   onChange={(e) => setRefundReason(e.target.value)}
                   className="w-full px-4 py-3 bg-surface-container-lowest border border-outline-variant/40 rounded-xl focus:border-red-500 outline-none text-xs text-on-surface transition-all"
@@ -995,13 +1124,16 @@ export default function OrdersClient() {
                 {isRefunding ? (
                   <span className="material-symbols-outlined animate-spin text-sm">refresh</span>
                 ) : (
-                  <span className="material-symbols-outlined text-sm">undo</span>
+                  <span className="material-symbols-outlined text-sm">account_balance_wallet</span>
                 )}
-                <span>تأكيد الإلغاء واسترجاع الرصيد</span>
+                <span>تأكيد استرجاع ${(refundModalOrder.order.price || 0).toFixed(2)} USD للمحفظة</span>
               </button>
               <button
                 type="button"
-                onClick={() => setRefundModalOrder(null)}
+                onClick={() => {
+                  setRefundModalOrder(null);
+                  setProviderModalStatus(null);
+                }}
                 className="px-5 bg-surface-variant text-on-surface-variant hover:text-on-surface py-3 rounded-xl font-bold text-xs"
               >
                 تراجع
@@ -1426,17 +1558,24 @@ export default function OrdersClient() {
                       إكمال يدوياً وإرسال كود
                     </button>
                   )}
-                  {selectedOrder.status !== "rejected" && selectedOrder.status !== "cancelled" && (
+                  {!selectedOrder.refundedAt ? (
                     <button
                       type="button"
                       onClick={() => {
-                        setRefundModalOrder({ order: selectedOrder, isProviderCancel: Boolean(selectedOrder.apiOrderId) });
+                        setRefundModalOrder({ order: selectedOrder, isProviderCancel: Boolean(selectedOrder.apiOrderId && selectedOrder.status === "processing") });
                         setRefundReason("");
+                        setProviderModalStatus(null);
                       }}
-                      className="px-3.5 py-2 rounded-xl bg-red-50 text-red-600 border border-red-300 font-bold text-xs hover:bg-red-100 transition-all"
+                      className="px-4 py-2 rounded-xl bg-rose-50 text-rose-600 border border-rose-300 font-bold text-xs hover:bg-rose-100 transition-all flex items-center gap-1.5"
                     >
-                      إلغاء واسترجاع
+                      <span className="material-symbols-outlined text-xs">undo</span>
+                      <span>استرجاع يدوي للمحفظة</span>
                     </button>
+                  ) : (
+                    <div className="px-3.5 py-2 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-300 font-bold text-xs flex items-center gap-1.5">
+                      <span className="material-symbols-outlined text-xs">check_circle</span>
+                      <span>مسترجع مسبقاً ({selectedOrder.refundRefNo || 'مكتمل'})</span>
+                    </div>
                   )}
                 </div>
 

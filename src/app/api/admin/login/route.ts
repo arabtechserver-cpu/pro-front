@@ -29,10 +29,6 @@ export async function POST(request: NextRequest) {
     const forwardHeaders: Record<string, string> = { "Content-Type": "application/json" };
     const xff = request.headers.get("x-forwarded-for");
     if (xff) forwardHeaders["x-forwarded-for"] = xff;
-    const xRealIp = request.headers.get("x-real-ip");
-    if (xRealIp) forwardHeaders["x-real-ip"] = xRealIp;
-    const cfIp = request.headers.get("cf-connecting-ip");
-    if (cfIp) forwardHeaders["cf-connecting-ip"] = cfIp;
     const userAgent = request.headers.get("user-agent");
     if (userAgent) forwardHeaders["user-agent"] = userAgent;
 
