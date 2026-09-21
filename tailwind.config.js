@@ -9,23 +9,23 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        /* Enterprise Slate & Obsidian dark background palette */
-        "surface-container-lowest": "#06090e",
-        "surface-container-low":    "#0b0f17",
-        "surface-container":        "#111622",
-        "surface-container-high":   "#182032",
-        "surface-container-highest":"#1e293b",
-        "surface-dim":              "#080c14",
-        "surface":                  "#0b0f17",
-        "surface-bright":           "#1e293b",
-        "surface-variant":          "#161d2d",
+        /* Adaptive surface & background palette */
+        "surface-container-lowest": "rgb(var(--surface-container-lowest) / <alpha-value>)",
+        "surface-container-low":    "rgb(var(--surface-container-low) / <alpha-value>)",
+        "surface-container":        "rgb(var(--surface-container) / <alpha-value>)",
+        "surface-container-high":   "rgb(var(--surface-container-high) / <alpha-value>)",
+        "surface-container-highest":"rgb(var(--surface-container-highest) / <alpha-value>)",
+        "surface-dim":              "rgb(var(--surface-dim) / <alpha-value>)",
+        "surface":                  "rgb(var(--surface) / <alpha-value>)",
+        "surface-bright":           "rgb(var(--surface-bright) / <alpha-value>)",
+        "surface-variant":          "rgb(var(--surface-variant) / <alpha-value>)",
         "surface-tint":             "#2563eb",
-        "background":               "#0b0f17",
-        "on-background":            "#f8fafc",
-        "on-surface":               "#f8fafc",
-        "on-surface-variant":       "#cbd5e1",
-        "inverse-surface":          "#f8fafc",
-        "inverse-on-surface":       "#0b0f17",
+        "background":               "rgb(var(--background) / <alpha-value>)",
+        "on-background":            "rgb(var(--on-background) / <alpha-value>)",
+        "on-surface":               "rgb(var(--on-surface) / <alpha-value>)",
+        "on-surface-variant":       "rgb(var(--on-surface-variant) / <alpha-value>)",
+        "inverse-surface":          "rgb(var(--inverse-surface) / <alpha-value>)",
+        "inverse-on-surface":       "rgb(var(--inverse-on-surface) / <alpha-value>)",
 
         /* Primary: Royal Tech Blue */
         "primary":                  "#2563eb",
@@ -59,8 +59,8 @@ module.exports = {
         "on-tertiary-fixed-variant":"#047857",
 
         /* Outlines */
-        "outline":                  "#334155",
-        "outline-variant":          "#1e293b",
+        "outline":                  "rgb(var(--outline) / <alpha-value>)",
+        "outline-variant":          "rgb(var(--outline-variant) / <alpha-value>)",
 
         /* Error */
         "error":                    "#ef4444",
@@ -84,13 +84,14 @@ module.exports = {
         "gutter":            "16px"
       },
       fontFamily: {
+        "sans":               ["var(--font-cairo)", "Cairo", "sans-serif"],
         "price-display":      ["JetBrains Mono", "monospace"],
-        "display-lg":         ["Plus Jakarta Sans", "sans-serif"],
-        "headline-md":        ["Plus Jakarta Sans", "sans-serif"],
-        "body-lg":            ["Inter", "sans-serif"],
-        "body-md":            ["Inter", "sans-serif"],
+        "display-lg":         ["var(--font-cairo)", "Cairo", "Plus Jakarta Sans", "sans-serif"],
+        "headline-md":        ["var(--font-cairo)", "Cairo", "Plus Jakarta Sans", "sans-serif"],
+        "body-lg":            ["var(--font-cairo)", "Cairo", "Inter", "sans-serif"],
+        "body-md":            ["var(--font-cairo)", "Cairo", "Inter", "sans-serif"],
         "label-sm":           ["JetBrains Mono", "monospace"],
-        "display-lg-mobile":  ["Plus Jakarta Sans", "sans-serif"]
+        "display-lg-mobile":  ["var(--font-cairo)", "Cairo", "Plus Jakarta Sans", "sans-serif"]
       }
     },
   },

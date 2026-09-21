@@ -5,12 +5,7 @@ import AOS from "aos";
 
 export default function AosInit() {
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      if ("scrollRestoration" in window.history) {
-        window.history.scrollRestoration = "manual";
-      }
-      window.scrollTo(0, 0);
-    }
+
 
     // Disable on mobile so touch momentum scroll has zero layout shifts or animation overhead
     const initTimer = setTimeout(() => {

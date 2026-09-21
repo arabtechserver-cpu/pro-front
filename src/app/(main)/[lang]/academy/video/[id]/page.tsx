@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
@@ -54,34 +54,34 @@ export default async function VideoPage(props: { params: Promise<{ lang: string;
   const description = isAr ? video.descriptionAr : video.descriptionEn;
 
   return (
-    <div className="min-h-screen bg-[#0F0F1A] text-white pt-24 pb-20 font-sans" dir={isAr ? 'rtl' : 'ltr'}>
+    <div className="min-h-screen bg-slate-50 text-slate-900 dark:bg-[#0F0F1A] dark:text-white pt-24 pb-20 font-sans" dir={isAr ? 'rtl' : 'ltr'}>
       <div className="container mx-auto px-4 max-w-7xl">
         
         {/* Top Breadcrumb Navigation */}
-        <div className="mb-6 flex flex-wrap items-center justify-between gap-3 text-xs md:text-sm text-gray-400">
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-3 text-xs md:text-sm text-slate-500 dark:text-gray-400">
           <div className="flex items-center gap-2 flex-wrap">
-            <Link href={`/${params.lang}/academy`} className="hover:text-indigo-400 transition-colors flex items-center gap-1">
+            <Link href={`/${params.lang}/academy`} className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors flex items-center gap-1">
               <span className="material-symbols-outlined text-sm">school</span>
               <span>{isAr ? 'الأكاديمية' : 'Academy'}</span>
             </Link>
             
             {series && (
               <>
-                <span className="material-symbols-outlined text-xs rtl:rotate-180 text-gray-600">chevron_right</span>
-                <Link href={`/${params.lang}/academy/series/${series.id}`} className="hover:text-indigo-400 transition-colors font-semibold">
+                <span className="material-symbols-outlined text-xs rtl:rotate-180 text-slate-400 dark:text-gray-600">chevron_right</span>
+                <Link href={`/${params.lang}/academy/series/${series.id}`} className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors font-semibold">
                   {isAr ? series.titleAr : series.titleEn}
                 </Link>
               </>
             )}
 
-            <span className="material-symbols-outlined text-xs rtl:rotate-180 text-gray-600">chevron_right</span>
-            <span className="text-gray-200 font-bold truncate max-w-xs sm:max-w-md">{title}</span>
+            <span className="material-symbols-outlined text-xs rtl:rotate-180 text-slate-400 dark:text-gray-600">chevron_right</span>
+            <span className="text-slate-800 dark:text-gray-200 font-bold truncate max-w-xs sm:max-w-md">{title}</span>
           </div>
 
           {series && (
             <Link
               href={`/${params.lang}/academy/series/${series.id}`}
-              className="bg-[#1A1A2E] hover:bg-[#22223D] text-indigo-400 hover:text-white px-3 py-1.5 rounded-xl border border-gray-800 text-xs font-bold transition-colors flex items-center gap-1"
+              className="bg-white dark:bg-[#1A1A2E] hover:bg-slate-100 dark:hover:bg-[#22223D] text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-white px-3 py-1.5 rounded-xl border border-slate-200 dark:border-gray-800 text-xs font-bold transition-colors flex items-center gap-1 shadow-sm"
             >
               <span className="material-symbols-outlined text-sm">arrow_back</span>
               <span>{isAr ? 'العودة لصفحة الكورس' : 'Back to Course'}</span>
@@ -96,7 +96,7 @@ export default async function VideoPage(props: { params: Promise<{ lang: string;
           <div className={playlist.length > 0 ? 'lg:col-span-8 space-y-6' : 'lg:col-span-12 space-y-6'}>
             
             {/* Player Container */}
-            <div className="bg-[#1A1A2E] rounded-3xl overflow-hidden shadow-2xl border border-gray-800">
+            <div className="bg-white dark:bg-[#1A1A2E] rounded-3xl overflow-hidden shadow-2xl border border-slate-200 dark:border-gray-800">
               {hasAccess ? (
                 <div className="aspect-video relative w-full bg-black">
                   <iframe 
@@ -108,14 +108,14 @@ export default async function VideoPage(props: { params: Promise<{ lang: string;
                   />
                 </div>
               ) : (
-                <div className="aspect-video relative w-full bg-gray-900 flex flex-col items-center justify-center p-8 text-center border-b border-gray-800">
+                <div className="aspect-video relative w-full bg-slate-900 flex flex-col items-center justify-center p-8 text-center border-b border-slate-800">
                   <div className="w-20 h-20 bg-amber-500/20 text-amber-400 rounded-full flex items-center justify-center mb-6">
                     <span className="material-symbols-outlined text-4xl">lock</span>
                   </div>
                   <h2 className="text-2xl font-bold mb-3 text-white">
                     {isAr ? 'هذا الدرس حصري للمشتركين في الكورس' : 'This lesson is exclusive to course subscribers'}
                   </h2>
-                  <p className="text-gray-400 max-w-md mb-6 text-sm leading-relaxed">
+                  <p className="text-gray-300 max-w-md mb-6 text-sm leading-relaxed">
                     {isAr 
                       ? 'اشترك في الكورس الآن لفتح جميع الدروس ومتابعة الشرح العملي بالكامل.' 
                       : 'Enroll in this course now to unlock all lessons and follow the complete hands-on tutorial.'}
@@ -130,7 +130,7 @@ export default async function VideoPage(props: { params: Promise<{ lang: string;
                       </Link>
                       <Link
                         href={`/${params.lang}/academy/series/${series.id}`}
-                        className="bg-[#151525] hover:bg-[#22223D] text-white px-6 py-3 rounded-2xl text-sm font-bold border border-gray-800 transition-colors"
+                        className="bg-slate-800 hover:bg-slate-700 text-white px-6 py-3 rounded-2xl text-sm font-bold border border-slate-700 transition-colors"
                       >
                         {isAr ? 'عرض منهج الكورس' : 'View Course Curriculum'}
                       </Link>

@@ -9,6 +9,7 @@ import { Locale, i18n } from "@/i18n/config";
 import ClientWidgets from "@/components/ClientWidgets";
 import ArabCountriesMarquee from "@/components/ArabCountriesMarquee";
 import ArabSolidarityModal from "@/components/ArabSolidarityModal";
+import { ThemeProvider } from "@/context/ThemeContext";
 
 const cairo = Cairo({
   subsets: ["arabic", "latin"],
@@ -267,8 +268,13 @@ export default async function RootLayout(
   };
 
   return (
-    <html lang={lang} dir={dir} className="dark" style={{ backgroundColor: "#0b0f17", colorScheme: "dark" }}>
+    <html lang={lang} dir={dir} className="dark" suppressHydrationWarning>
       <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem('app_theme');if(t==='light'){document.documentElement.classList.remove('dark')}else{document.documentElement.classList.add('dark')}}catch(e){}})();`
+          }}
+        />
         <meta name="google-site-verification" content="N34n3oI-P5elZmLFHgFqp_BK93EijixhnIHEj_2oGnI" />
         <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -306,23 +312,23 @@ export default async function RootLayout(
         />
       </head>
       <body
-        className={`${cairo.variable} ${inter.variable} ${jakarta.variable} ${jetbrains.variable} bg-[#0b0f17] text-slate-100 subpixel-antialiased min-h-screen flex flex-col relative`}
-        style={{ backgroundColor: "#0b0f17", colorScheme: "dark" }}
+        className={`${cairo.variable} ${inter.variable} ${jakarta.variable} ${jetbrains.variable} font-sans bg-[#f8fafc] text-slate-900 dark:bg-[#0b0f17] dark:text-slate-100 subpixel-antialiased min-h-screen flex flex-col relative`}
       >
-        {/* Client Enhancement Widgets (Lazy loaded, non-blocking) */}
-        <ClientWidgets lang={lang} />
+        <ThemeProvider>
+          {/* Client Enhancement Widgets (Lazy loaded, non-blocking) */}
+          <ClientWidgets lang={lang} />
 
-        {/* Full Arab Solidarity Announcement Modal */}
-        <ArabSolidarityModal lang={lang} />
+          {/* Full Arab Solidarity Announcement Modal */}
+          <ArabSolidarityModal lang={lang} />
 
-        <Navbar lang={lang} dict={dict.nav} />
-        
-        <main className="flex-grow w-full pt-16 sm:pt-20 pb-12 overflow-x-clip bg-transparent">
-          <ArabCountriesMarquee lang={lang} />
-          {children}
-        </main>
+          <Navbar lang={lang} dict={dict.nav} />
+          
+          <main className="flex-grow w-full pt-16 sm:pt-20 pb-12 overflow-x-clip bg-transparent">
+            {children}
+          </main>
 
-        <Footer lang={lang} dict={dict.footer} />
+          <Footer lang={lang} dict={dict.footer} />
+        </ThemeProvider>
       </body>
     </html>
   );

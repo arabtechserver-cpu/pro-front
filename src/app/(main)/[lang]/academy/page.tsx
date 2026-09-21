@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import Link from 'next/link';
 import { Locale } from '@/i18n/config';
 
@@ -67,7 +67,7 @@ export default async function AcademyPage(props: { params: Promise<{ lang: Local
   ]);
 
   return (
-    <div className="min-h-screen bg-[#0F0F1A] text-white py-16 font-sans" dir={isAr ? 'rtl' : 'ltr'}>
+    <div className="min-h-screen bg-slate-50 text-slate-900 dark:bg-[#0F0F1A] dark:text-white py-16 font-sans" dir={isAr ? 'rtl' : 'ltr'}>
       <div className="container mx-auto px-4 max-w-7xl space-y-16">
         
         {/* Header Hero Section */}
@@ -79,10 +79,10 @@ export default async function AcademyPage(props: { params: Promise<{ lang: Local
             <span>{isAr ? 'أكاديمية الشروحات والكورسات التعليمية' : 'Academy & Video Tutorials'}</span>
           </div>
 
-          <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white mb-5 leading-tight">
+          <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-slate-900 dark:text-white mb-5 leading-tight">
             {isAr ? 'أكاديمية التعلم والكورسات' : 'Learning Academy & Courses'}
           </h1>
-          <p className="text-base sm:text-lg text-gray-300 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-base sm:text-lg text-slate-600 dark:text-gray-300 max-w-2xl mx-auto leading-relaxed">
             {isAr 
               ? 'تصفح الكورسات والفيديوهات التعليمية لتطوير مهاراتك في السوفت وير والبرمجة وفك الحمايات.' 
               : 'Browse our courses and tutorials to develop your software and repair skills.'}
@@ -92,20 +92,20 @@ export default async function AcademyPage(props: { params: Promise<{ lang: Local
         {/* ================= SECTION 1: COURSES & SERIES ================= */}
         {seriesList.length > 0 && (
           <section className="space-y-8">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-gray-800">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200 dark:border-gray-800">
               <div>
-                <h2 className="text-2xl sm:text-3xl font-extrabold text-white flex items-center gap-3">
-                  <span className="w-10 h-10 rounded-2xl bg-indigo-500/20 text-indigo-400 flex items-center justify-center">
+                <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white flex items-center gap-3">
+                  <span className="w-10 h-10 rounded-2xl bg-indigo-500/20 text-indigo-500 dark:text-indigo-400 flex items-center justify-center">
                     <span className="material-symbols-outlined text-2xl">video_library</span>
                   </span>
                   <span>{isAr ? 'الكورسات والسلاسل المتاحة' : 'Available Courses & Series'}</span>
                 </h2>
-                <p className="text-xs sm:text-sm text-gray-400 mt-1">
+                <p className="text-xs sm:text-sm text-slate-500 dark:text-gray-400 mt-1">
                   {isAr ? 'دورات متكاملة مرتبة حسب المراحل التعليمية مع تطبيقات عملية.' : 'Full comprehensive courses organized step-by-step with hands-on practice.'}
                 </p>
               </div>
 
-              <span className="text-xs font-bold text-gray-400 bg-[#1A1A2E] px-4 py-2 rounded-xl border border-gray-800 self-start sm:self-auto">
+              <span className="text-xs font-bold text-slate-600 dark:text-gray-400 bg-white dark:bg-[#1A1A2E] px-4 py-2 rounded-xl border border-slate-200 dark:border-gray-800 shadow-sm self-start sm:self-auto">
                 {seriesList.length} {isAr ? 'كورسات متوفرة' : 'Courses Available'}
               </span>
             </div>
@@ -123,9 +123,9 @@ export default async function AcademyPage(props: { params: Promise<{ lang: Local
                     key={series.id}
                     className="group"
                   >
-                    <div className="bg-[#1A1A2E] rounded-3xl overflow-hidden border border-gray-800/80 hover:border-indigo-500/50 transition-all duration-300 hover:shadow-2xl hover:shadow-indigo-500/20 h-full flex flex-col hover:-translate-y-1.5">
+                    <div className="bg-white dark:bg-[#1A1A2E] rounded-3xl overflow-hidden border border-slate-200 dark:border-gray-800/80 hover:border-indigo-500/50 transition-all duration-300 shadow-md hover:shadow-2xl hover:shadow-indigo-500/20 h-full flex flex-col hover:-translate-y-1.5">
                       {/* Poster Container */}
-                      <div className="relative aspect-video bg-black/60 overflow-hidden border-b border-gray-800/60">
+                      <div className="relative aspect-video bg-black/60 overflow-hidden border-b border-slate-100 dark:border-gray-800/60">
                         {series.thumbnail ? (
                           <img
                             src={series.thumbnail}
@@ -155,22 +155,22 @@ export default async function AcademyPage(props: { params: Promise<{ lang: Local
                       {/* Card Content */}
                       <div className="p-6 flex flex-col flex-1 justify-between space-y-4">
                         <div>
-                          <h3 className="text-xl font-bold mb-2 text-white group-hover:text-indigo-400 transition-colors line-clamp-1">
+                          <h3 className="text-xl font-bold mb-2 text-slate-900 dark:text-white group-hover:text-indigo-500 dark:group-hover:text-indigo-400 transition-colors line-clamp-1">
                             {title}
                           </h3>
-                          <p className="text-gray-400 text-xs sm:text-sm line-clamp-2 leading-relaxed">
+                          <p className="text-slate-600 dark:text-gray-400 text-xs sm:text-sm line-clamp-2 leading-relaxed">
                             {desc || (isAr ? 'شاهد تفاصيل هذا الكورس ومنهج الدروس المتاحة.' : 'View course details and complete curriculum.')}
                           </p>
                         </div>
 
                         {/* Footer Meta & Action */}
-                        <div className="pt-4 border-t border-gray-800/80 flex items-center justify-between">
-                          <span className="text-xs text-gray-500 flex items-center gap-1">
-                            <span className="material-symbols-outlined text-sm text-violet-400">check_circle</span>
+                        <div className="pt-4 border-t border-slate-100 dark:border-gray-800/80 flex items-center justify-between">
+                          <span className="text-xs text-slate-500 dark:text-gray-500 flex items-center gap-1">
+                            <span className="material-symbols-outlined text-sm text-violet-500 dark:text-violet-400">check_circle</span>
                             {freeCount > 0 ? (isAr ? `${freeCount} دروس مجانية` : `${freeCount} Free Previews`) : (isAr ? 'كورس شامل' : 'Full Course')}
                           </span>
 
-                          <span className="text-indigo-400 font-bold text-xs group-hover:translate-x-[-4px] transition-transform flex items-center gap-1">
+                          <span className="text-indigo-600 dark:text-indigo-400 font-bold text-xs group-hover:translate-x-[-4px] transition-transform flex items-center gap-1">
                             <span>{isAr ? 'عرض الكورس' : 'View Course'}</span>
                             <span className="material-symbols-outlined text-xs rtl:rotate-180">arrow_forward</span>
                           </span>
@@ -186,28 +186,28 @@ export default async function AcademyPage(props: { params: Promise<{ lang: Local
 
         {/* ================= SECTION 2: ALL TUTORIALS & LESSONS ================= */}
         <section className="space-y-8">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-gray-800">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200 dark:border-gray-800">
             <div>
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-white flex items-center gap-3">
-                <span className="w-10 h-10 rounded-2xl bg-purple-500/20 text-purple-400 flex items-center justify-center">
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white flex items-center gap-3">
+                <span className="w-10 h-10 rounded-2xl bg-purple-500/20 text-purple-500 dark:text-purple-400 flex items-center justify-center">
                   <span className="material-symbols-outlined text-2xl">play_lesson</span>
                 </span>
                 <span>{isAr ? 'جميع الدروس والشروحات' : 'All Tutorials & Lessons'}</span>
               </h2>
-              <p className="text-xs sm:text-sm text-gray-400 mt-1">
+              <p className="text-xs sm:text-sm text-slate-500 dark:text-gray-400 mt-1">
                 {isAr ? 'فيديوهات وشروحات عملية لمختلف الأدوات والخدمات.' : 'Practical videos and tutorials for all services and tools.'}
               </p>
             </div>
 
-            <span className="text-xs font-bold text-gray-400 bg-[#1A1A2E] px-4 py-2 rounded-xl border border-gray-800 self-start sm:self-auto">
+            <span className="text-xs font-bold text-slate-600 dark:text-gray-400 bg-white dark:bg-[#1A1A2E] px-4 py-2 rounded-xl border border-slate-200 dark:border-gray-800 shadow-sm self-start sm:self-auto">
               {allVideos.length} {isAr ? 'فيديوهات' : 'Videos'}
             </span>
           </div>
 
           {allVideos.length === 0 ? (
-            <div className="bg-[#1A1A2E] border border-gray-800 rounded-3xl p-16 text-center text-gray-400 space-y-3">
-              <span className="material-symbols-outlined text-5xl text-gray-600">smart_display</span>
-              <p className="font-bold text-base text-white">{isAr ? 'لا توجد شروحات أو كورسات منشورة حالياً.' : 'No tutorials available yet.'}</p>
+            <div className="bg-white dark:bg-[#1A1A2E] border border-slate-200 dark:border-gray-800 rounded-3xl p-16 text-center text-slate-600 dark:text-gray-400 shadow-sm space-y-3">
+              <span className="material-symbols-outlined text-5xl text-slate-400 dark:text-gray-600">smart_display</span>
+              <p className="font-bold text-base text-slate-900 dark:text-white">{isAr ? 'لا توجد شروحات أو كورسات منشورة حالياً.' : 'No tutorials available yet.'}</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -221,9 +221,9 @@ export default async function AcademyPage(props: { params: Promise<{ lang: Local
                     key={video.id}
                     className="group"
                   >
-                    <div className="bg-[#1A1A2E] rounded-3xl overflow-hidden border border-gray-800/80 hover:border-purple-500/50 transition-all duration-300 hover:shadow-2xl hover:shadow-purple-500/20 h-full flex flex-col hover:-translate-y-1.5">
+                    <div className="bg-white dark:bg-[#1A1A2E] rounded-3xl overflow-hidden border border-slate-200 dark:border-gray-800/80 hover:border-purple-500/50 transition-all duration-300 shadow-md hover:shadow-2xl hover:shadow-purple-500/20 h-full flex flex-col hover:-translate-y-1.5">
                       {/* Video Thumbnail */}
-                      <div className="relative aspect-video bg-black/60 overflow-hidden border-b border-gray-800/60">
+                      <div className="relative aspect-video bg-black/60 overflow-hidden border-b border-slate-100 dark:border-gray-800/60">
                         {video.thumbnail ? (
                           <img
                             src={video.thumbnail}
@@ -260,22 +260,22 @@ export default async function AcademyPage(props: { params: Promise<{ lang: Local
                       {/* Content */}
                       <div className="p-6 flex flex-col flex-1 justify-between space-y-4">
                         <div>
-                          <h3 className="text-lg font-bold mb-2 text-white group-hover:text-purple-400 transition-colors line-clamp-1">
+                          <h3 className="text-lg font-bold mb-2 text-slate-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors line-clamp-1">
                             {videoTitle}
                           </h3>
                           {videoDesc && (
-                            <p className="text-gray-400 text-xs line-clamp-2 leading-relaxed">
+                            <p className="text-slate-600 dark:text-gray-400 text-xs line-clamp-2 leading-relaxed">
                               {videoDesc}
                             </p>
                           )}
                         </div>
 
-                        <div className="pt-3 border-t border-gray-800/80 flex items-center justify-between text-xs text-gray-500">
+                        <div className="pt-3 border-t border-slate-100 dark:border-gray-800/80 flex items-center justify-between text-xs text-slate-500 dark:text-gray-500">
                           <span className="flex items-center gap-1">
                             <span className="material-symbols-outlined text-sm">schedule</span>
                             {new Date(video.createdAt).toLocaleDateString(isAr ? 'ar-EG' : 'en-US')}
                           </span>
-                          <span className="text-purple-400 font-bold group-hover:underline flex items-center gap-1">
+                          <span className="text-purple-600 dark:text-purple-400 font-bold group-hover:underline flex items-center gap-1">
                             <span>{isAr ? 'مشاهدة الفيديو' : 'Watch Video'}</span>
                             <span className="material-symbols-outlined text-xs rtl:rotate-180">play_arrow</span>
                           </span>

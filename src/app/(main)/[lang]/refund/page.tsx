@@ -1,4 +1,4 @@
-﻿import { Locale } from "@/i18n/config";
+import { Locale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/get-dictionary";
 import Link from "next/link";
 
@@ -64,7 +64,7 @@ export default async function RefundPolicyPage(props: PageProps) {
       <div className="space-y-6">
         <div className="glass-card rounded-3xl p-6 sm:p-8 border border-outline-variant/20 space-y-3">
           <div className="flex items-center gap-3 text-primary font-bold text-base">
-            <span className="text-xl">1️⃣</span>
+            <span className="w-7 h-7 rounded-lg bg-primary/15 text-primary flex items-center justify-center text-xs font-mono">1</span>
             <h2>{lang === "ar" ? "طبيعة المنتجات الرقمية" : "1. Nature of Digital Products"}</h2>
           </div>
           <p className="text-on-surface-variant text-sm leading-relaxed">
@@ -76,7 +76,7 @@ export default async function RefundPolicyPage(props: PageProps) {
 
         <div className="glass-card rounded-3xl p-6 sm:p-8 border border-violet-500/20 bg-violet-500/5 space-y-3">
           <div className="flex items-center gap-3 text-violet-400 font-bold text-base">
-            <span className="text-xl">2️⃣</span>
+            <span className="w-7 h-7 rounded-lg bg-violet-500/15 text-violet-400 flex items-center justify-center text-xs font-mono">2</span>
             <h2>{lang === "ar" ? "حالات استرجاع الرصيد المؤكدة (100%)" : "2. Guaranteed 100% Refund Cases"}</h2>
           </div>
           <ul className="space-y-2 text-sm text-on-surface list-disc list-inside">
@@ -91,7 +91,7 @@ export default async function RefundPolicyPage(props: PageProps) {
 
         <div className="glass-card rounded-3xl p-6 sm:p-8 border border-red-500/20 bg-red-500/5 space-y-3">
           <div className="flex items-center gap-3 text-red-400 font-bold text-base">
-            <span className="text-xl">3️⃣</span>
+            <span className="w-7 h-7 rounded-lg bg-red-500/15 text-red-400 flex items-center justify-center text-xs font-mono">3</span>
             <h2>{lang === "ar" ? "حالات لا يشملها الاسترجاع" : "3. Non-Refundable Situations"}</h2>
           </div>
           <ul className="space-y-2 text-sm text-on-surface-variant list-disc list-inside">
@@ -104,7 +104,7 @@ export default async function RefundPolicyPage(props: PageProps) {
 
         <div className="glass-card rounded-3xl p-6 sm:p-8 border border-outline-variant/20 space-y-3">
           <div className="flex items-center gap-3 text-primary font-bold text-base">
-            <span className="text-xl">4️⃣</span>
+            <span className="w-7 h-7 rounded-lg bg-primary/15 text-primary flex items-center justify-center text-xs font-mono">4</span>
             <h2>{lang === "ar" ? "آلية استرداد الرصيد والمحفظة" : "4. Refund Disbursement"}</h2>
           </div>
           <p className="text-on-surface-variant text-sm leading-relaxed">

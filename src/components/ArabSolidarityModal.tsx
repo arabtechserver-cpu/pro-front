@@ -113,6 +113,9 @@ const COUNTRIES_LIST: CountrySolidarityData[] = [
   }
 ];
 
+const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
+const SESSION_SEEN_KEY = "arab_solidarity_modal_session_seen";
+
 export default function ArabSolidarityModal({ lang = "ar" }: ArabSolidarityModalProps) {
   const isAr = lang === "ar";
   const [isOpen, setIsOpen] = useState(false);
@@ -121,6 +124,14 @@ export default function ArabSolidarityModal({ lang = "ar" }: ArabSolidarityModal
   useEffect(() => {
     setMounted(true);
     try {
+      if (typeof window === "undefined") return;
+
+      // Don't repeatedly show on reload in the same tab session
+      const sessionSeen = sessionStorage.getItem(SESSION_SEEN_KEY);
+      if (sessionSeen) {
+        return;
+      }
+
       const rawUntil = localStorage.getItem(STORAGE_KEY);
       if (rawUntil) {
         const untilTime = parseInt(rawUntil, 10);
@@ -128,20 +139,25 @@ export default function ArabSolidarityModal({ lang = "ar" }: ArabSolidarityModal
           return;
         }
       }
+
+      // Mark session seen immediately so refreshes never pop it up unexpectedly
+      sessionStorage.setItem(SESSION_SEEN_KEY, "1");
+
       const timer = setTimeout(() => {
         setIsOpen(true);
-      }, 400);
+      }, 800);
       return () => clearTimeout(timer);
     } catch {
-      setIsOpen(true);
+      // Safe fallback
     }
   }, []);
 
   const handleDismiss = useCallback(() => {
     setIsOpen(false);
     try {
-      const expiry = Date.now() + ONE_HOUR_MS;
+      const expiry = Date.now() + THIRTY_DAYS_MS;
       localStorage.setItem(STORAGE_KEY, expiry.toString());
+      sessionStorage.setItem(SESSION_SEEN_KEY, "1");
     } catch {
       // Ignore storage errors
     }

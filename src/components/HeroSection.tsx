@@ -2,18 +2,18 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { 
-  ShieldCheck, 
-  ArrowLeft, 
-  ArrowRight, 
-  Zap, 
-  Layers, 
-  Activity, 
-  CheckCircle2, 
-  Cpu, 
-  Smartphone, 
-  LockOpen, 
-  Clock 
+  Cloud,
+  Lock,
+  Flame,
+  ShoppingCart,
+  ShieldCheck,
+  Headphones,
+  UserPlus,
+  Wrench,
+  PhoneCall,
+  Phone
 } from "lucide-react";
 
 interface HeroSectionProps {
@@ -33,7 +33,6 @@ interface HeroSectionProps {
 export default function HeroSection({ lang, config }: HeroSectionProps) {
   const isAr = lang === "ar";
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [activeNodePing, setActiveNodePing] = useState(9);
 
   useEffect(() => {
     try {
@@ -42,210 +41,169 @@ export default function HeroSection({ lang, config }: HeroSectionProps) {
         setIsLoggedIn(true);
       }
     } catch {}
-
-    const interval = setInterval(() => {
-      setActiveNodePing(Math.floor(7 + Math.random() * 5));
-    }, 4000);
-
-    return () => clearInterval(interval);
   }, []);
 
-  const ArrowIcon = isAr ? ArrowLeft : ArrowRight;
-
   return (
-    <section className="relative w-full bg-[#090e17]/80 border-b border-white/10 backdrop-blur-xl shadow-2xl overflow-hidden p-5 sm:px-8 lg:px-12 py-8 lg:py-12 mb-8 sm:mb-12">
+    <section className="relative w-full overflow-hidden pt-2 sm:pt-6 pb-6 sm:pb-10 mb-8 sm:mb-12">
+      {/* Background Ambience & Cyber Grid */}
       <div 
-        className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_-10%,rgba(37,99,235,0.18),transparent_70%)] pointer-events-none" 
-        aria-hidden="true" 
-      />
-      <div 
-        className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none" 
+        className="absolute inset-0 bg-[radial-gradient(ellipse_75%_55%_at_50%_0%,rgba(0,229,255,0.08),transparent_70%)] pointer-events-none" 
         aria-hidden="true" 
       />
 
-      <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center cyber-container">
-        <div className="lg:col-span-7 flex flex-col gap-4 sm:gap-6 text-start">
-          <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-sky-500/10 border border-sky-400/30 text-sky-300 text-xs sm:text-sm font-semibold w-fit shadow-sm">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
-            </span>
-            <span>
-              {config?.liveTag || (isAr ? "السيرفر الرسمي المعتمد لخدمات السوفت وير والأجهزة 24/7" : "Official Authorized GSM & Software Server 24/7")}
-            </span>
-          </div>
+      <div className="relative z-10 cyber-container">
+        {/* User-Uploaded Custom Hero Banner with Interactive Action Hotspots */}
+        <div className="relative w-full rounded-2xl sm:rounded-3xl overflow-hidden border border-slate-200 dark:border-cyan-500/30 shadow-md dark:shadow-2xl dark:shadow-cyan-950/40 group mb-6 sm:mb-8 bg-slate-100 dark:bg-[#040a14]">
+          <div className="relative w-full aspect-[2/1] sm:aspect-[1024/377] select-none">
+            <Image
+              src="/images/hero_banner_custom.png"
+              alt="Arab Tech Pro Server - كل ما تحتاجه لإدارة أعمال الـ GSM في مكان واحد"
+              fill
+              priority
+              className="w-full h-full object-cover object-left sm:object-contain sm:object-center"
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 95vw, 1400px"
+            />
 
-          <div className="space-y-2">
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-white tracking-tight leading-[1.18]">
-              <span>{config?.title1 || (isAr ? "عرب تك برو سيرفر" : "Arab Tech Pro Server")}</span>
-              <span className="block mt-2 text-transparent bg-clip-text bg-gradient-to-r from-sky-400 via-blue-400 to-indigo-300">
-                {config?.title2 || (isAr ? "إدارة وتفعيل شامل لكافة الهواتف والأجهزة الذكية" : "Comprehensive Mobile Unlocking & Server Ecosystem")}
-              </span>
-            </h1>
-          </div>
-
-          <p className="text-sm sm:text-base text-slate-300 leading-relaxed max-w-2xl font-normal">
-            {config?.lead || (isAr
-              ? "منصة عرب تك برو سيرفر هي بوابتك المعتمدة لفك شفرات الشبكات، تخطي حسابات آيكلود وFRP، وتفعيل جميع أدوات ودونجل السوفت وير فورياً وبأفضل أسعار الجملة المعتمدة للموزعين والمحلات."
-              : "Arab Tech Pro Server is your certified gateway for official network unlocking, iCloud & FRP bypass, and instant tool activations at exclusive wholesale rates for repair shops and resellers worldwide.")}
-          </p>
-
-          <div className="flex flex-wrap items-center gap-3 sm:gap-4 pt-1">
+            {/* Clickable Action Hotspots mapped precisely to buttons in the banner (Desktop only for mouse precision) */}
+            {/* 1. Primary CTA: إبدأ الآن */}
             <Link
               href={config?.btnJoinUrl || (isLoggedIn ? `/${lang}/pricing` : `/${lang}/register`)}
-              className="btn-royal px-6 sm:px-8 py-3.5 sm:py-4 rounded-xl font-bold text-sm sm:text-base shadow-xl shadow-blue-950/40 hover:shadow-blue-600/30 transition-all flex items-center gap-2.5 group"
-            >
-              <span>
-                {config?.btnJoin || (isAr ? (isLoggedIn ? "طلب فك وتفعيل فوري" : "ابدأ الفك والتفعيل الآن") : (isLoggedIn ? "Order Unlock Now" : "Start Unlocking Now"))}
-              </span>
-              <ArrowIcon className="w-4 h-4 transition-transform group-hover:-translate-x-1 rtl:group-hover:-translate-x-1 ltr:group-hover:translate-x-1" />
-            </Link>
+              className="hidden sm:block absolute left-[8.2%] top-[63.6%] w-[12.8%] h-[11.2%] rounded-xl z-20 cursor-pointer hover:ring-2 hover:ring-emerald-400/90 transition-all"
+              title={isAr ? "إبدأ الآن" : "Start Now"}
+            />
 
+            {/* 2. Secondary CTA: عرض الخدمات */}
             <Link
               href={config?.btnBrowseUrl || `/${lang}/pricing`}
-              className="px-6 sm:px-7 py-3.5 sm:py-4 rounded-xl font-bold text-sm sm:text-base text-slate-200 bg-white/5 hover:bg-white/10 border border-white/15 hover:border-sky-400/40 transition-all flex items-center gap-2"
+              className="hidden sm:block absolute left-[22.2%] top-[63.6%] w-[13.0%] h-[11.2%] rounded-xl z-20 cursor-pointer hover:ring-2 hover:ring-cyan-400/90 transition-all"
+              title={isAr ? "عرض الخدمات" : "View Services"}
+            />
+          </div>
+        </div>
+
+        {/* Mobile-Only: 1. Hero Stats Strip */}
+        <div className="sm:hidden w-full rounded-2xl bg-white dark:bg-[#061224] border border-slate-200 dark:border-cyan-500/20 p-2.5 mb-3 flex items-center justify-around shadow-sm text-center">
+          <div className="flex items-center gap-1.5">
+            <ShoppingCart className="w-3.5 h-3.5 text-sky-500" />
+            <span className="text-xs font-black text-slate-900 dark:text-white font-mono">500K+</span>
+            <span className="text-[10px] text-slate-500 dark:text-slate-400 font-bold">{isAr ? "طلب" : "Orders"}</span>
+          </div>
+          <div className="h-4 w-[1px] bg-slate-200 dark:bg-white/10" />
+          <div className="flex items-center gap-1.5">
+            <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
+            <span className="text-xs font-black text-slate-900 dark:text-white font-mono">99.8%</span>
+            <span className="text-[10px] text-slate-500 dark:text-slate-400 font-bold">{isAr ? "نجاح" : "Success"}</span>
+          </div>
+          <div className="h-4 w-[1px] bg-slate-200 dark:bg-white/10" />
+          <div className="flex items-center gap-1.5">
+            <Headphones className="w-3.5 h-3.5 text-cyan-500" />
+            <span className="text-xs font-black text-slate-900 dark:text-white font-mono">24/7</span>
+            <span className="text-[10px] text-slate-500 dark:text-slate-400 font-bold">{isAr ? "دعم" : "Support"}</span>
+          </div>
+        </div>
+
+        {/* Mobile-Only: 2. Dual Big Action Buttons */}
+        <div className="sm:hidden grid grid-cols-2 gap-2.5 mb-3">
+          <Link
+            href={config?.btnJoinUrl || (isLoggedIn ? `/${lang}/pricing` : `/${lang}/register`)}
+            className="w-full py-2.5 px-3 rounded-xl bg-[#00d084] hover:bg-[#00b975] text-[#052216] font-black text-xs flex items-center justify-center gap-1.5 shadow-sm active:scale-98 transition-all"
+          >
+            <UserPlus className="w-3.5 h-3.5 text-[#052216]" />
+            <span>{config?.btnJoin || (isAr ? "أنشئ حساب الآن" : "Create Account Now")}</span>
+          </Link>
+          <Link
+            href={config?.btnBrowseUrl || `/${lang}/pricing`}
+            className="w-full py-2.5 px-3 rounded-xl bg-white dark:bg-[#061224] border border-sky-400 dark:border-cyan-500/50 text-sky-600 dark:text-cyan-300 font-black text-xs flex items-center justify-center gap-1.5 shadow-sm active:scale-98 transition-all"
+          >
+            <Wrench className="w-3.5 h-3.5 text-sky-500 dark:text-cyan-400" />
+            <span>{config?.btnBrowse || (isAr ? "استعرض الخدمات" : "Browse Services")}</span>
+          </Link>
+        </div>
+
+        {/* Mobile-Only: 3. Amber Notice Alert Banner */}
+        <Link
+          href={`/${lang}/pricing`}
+          className="sm:hidden w-full rounded-2xl bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-700/30 p-2.5 mb-5 flex items-center justify-between gap-2.5 shadow-sm hover:border-amber-400 transition-all"
+        >
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className="w-8 h-8 rounded-full bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
+              <PhoneCall className="w-4 h-4" />
+            </div>
+            <div className="min-w-0 text-start">
+              <div className="text-xs font-black text-slate-900 dark:text-white leading-tight">
+                {isAr ? "خدمات جديدة متاحة الآن" : "New Services Available Now"}
+              </div>
+              <div className="text-[10px] text-amber-700 dark:text-amber-300/80 font-medium truncate">
+                {isAr ? "اكتشف أحدث الأدوات والخدمات" : "Discover the latest tools & services"}
+              </div>
+            </div>
+          </div>
+          <div className="w-8 h-8 rounded-full bg-amber-100/60 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
+            <Phone className="w-4 h-4" />
+          </div>
+        </Link>
+
+        {/* Quick Tools & Live API Bar (Desktop / Tablet) */}
+        <div className="hidden sm:flex w-full rounded-2xl bg-white/90 dark:bg-[#061122]/90 border border-slate-200 dark:border-cyan-500/20 p-2.5 sm:p-4 backdrop-blur-xl flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 sm:gap-4 shadow-sm dark:shadow-2xl">
+          {/* Quick Tools Buttons with smooth horizontal scroll on mobile */}
+          <div className="flex items-center gap-2 sm:gap-3 overflow-x-auto scrollbar-none py-0.5">
+            <Link 
+              href={`/${lang}/pricing?search=UnlockTool`} 
+              className="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-[#0b1b33] border border-slate-200 dark:border-white/10 hover:border-orange-500/50 text-[11px] sm:text-xs font-semibold text-slate-800 dark:text-slate-200 flex items-center gap-1.5 hover:bg-slate-200 dark:hover:bg-[#102445] transition-all shrink-0"
             >
-              <Layers className="w-4 h-4 text-sky-400" />
-              <span>{config?.btnBrowse || (isAr ? "عرض قائمة الأسعار والخدمات" : "Browse Price Catalog")}</span>
+              <span className="w-4.5 h-4.5 rounded-full bg-orange-600 text-white flex items-center justify-center text-[9px] font-bold shrink-0">
+                <Lock className="w-2.5 h-2.5" />
+              </span>
+              <span>UnlockTool</span>
+            </Link>
+
+            <Link 
+              href={`/${lang}/pricing?search=Chimera`} 
+              className="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-[#0b1b33] border border-slate-200 dark:border-white/10 hover:border-amber-500/50 text-[11px] sm:text-xs font-semibold text-slate-800 dark:text-slate-200 flex items-center gap-1.5 hover:bg-slate-200 dark:hover:bg-[#102445] transition-all shrink-0"
+            >
+              <Flame className="w-3.5 h-3.5 text-amber-500 dark:text-amber-400 shrink-0" />
+              <span>Chimera Tool</span>
+            </Link>
+
+            <Link 
+              href={`/${lang}/pricing?search=iCloud`} 
+              className="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-[#0b1b33] border border-slate-200 dark:border-white/10 hover:border-sky-500/50 text-[11px] sm:text-xs font-semibold text-slate-800 dark:text-slate-200 flex items-center gap-1.5 hover:bg-slate-200 dark:hover:bg-[#102445] transition-all shrink-0"
+            >
+              <Cloud className="w-3.5 h-3.5 text-sky-500 dark:text-sky-400 shrink-0" />
+              <span>iCloud Bypass</span>
+            </Link>
+
+            <Link 
+              href={`/${lang}/pricing?search=Borneo`} 
+              className="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-[#0b1b33] border border-slate-200 dark:border-white/10 hover:border-red-500/50 text-[11px] sm:text-xs font-semibold text-slate-800 dark:text-slate-200 flex items-center gap-1.5 hover:bg-slate-200 dark:hover:bg-[#102445] transition-all shrink-0"
+            >
+              <span className="w-4.5 h-4.5 rounded bg-red-600 text-white font-black text-[10px] flex items-center justify-center shrink-0">
+                B
+              </span>
+              <span>Borneo Schematics</span>
             </Link>
           </div>
 
-          <div className="rounded-2xl p-4 grid grid-cols-2 sm:grid-cols-4 gap-3 text-center border border-white/10 bg-[#0d1424]/60 backdrop-blur-md mt-2">
-            <div className="space-y-1">
-              <span className="text-xl sm:text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-cyan-300 font-mono">
-                +100K
-              </span>
-              <p className="text-xs text-slate-300 font-medium">{isAr ? "طلب منجز" : "Orders Completed"}</p>
+          {/* Right Side: LIVE API & Header Description */}
+          <div className="flex items-center justify-between sm:justify-end gap-3 shrink-0 pt-1 sm:pt-0 border-t sm:border-t-0 border-slate-100 dark:border-white/5">
+            <div className="flex items-center gap-2 px-2.5 py-1 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-xs font-bold shadow-sm">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 dark:bg-emerald-400 animate-pulse" />
+              <div className="leading-tight">
+                <div className="font-mono text-[10px] sm:text-[11px] text-slate-900 dark:text-white font-bold">LIVE API</div>
+                <div className="text-[8px] sm:text-[9px] text-emerald-600 dark:text-emerald-300 font-normal">
+                  {isAr ? "جميع السيرفرات تعمل الآن" : "All servers active"}
+                </div>
+              </div>
             </div>
-            <div className="space-y-1 border-s sm:border-x border-white/10">
-              <span className="text-xl sm:text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-300 font-mono">
-                99.9%
-              </span>
-              <p className="text-xs text-slate-300 font-medium">{isAr ? "نسبة النجاح" : "Success Rate"}</p>
-            </div>
-            <div className="space-y-1 border-t sm:border-t-0 border-white/10 pt-2 sm:pt-0">
-              <span className="text-xl sm:text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-yellow-300 font-mono">
-                +1500
-              </span>
-              <p className="text-xs text-slate-300 font-medium">{isAr ? "طراز مدعوم" : "Models Supported"}</p>
-            </div>
-            <div className="space-y-1 border-t sm:border-t-0 border-s border-white/10 pt-2 sm:pt-0">
-              <span className="text-xl sm:text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-indigo-300 font-mono">
-                24/7
-              </span>
-              <p className="text-xs text-slate-300 font-medium">{isAr ? "تشغيل دائم" : "Live Uptime"}</p>
+
+            <div className="text-end">
+              <div className="text-[11px] sm:text-xs font-bold text-slate-800 dark:text-white leading-tight">
+                {isAr ? "خدمات سريعة ومباشرة" : "Direct Fast Services"}
+              </div>
             </div>
           </div>
         </div>
 
-        <div className="lg:col-span-5 w-full">
-          <div className="relative w-full rounded-2xl sm:rounded-3xl bg-[#0c1322]/85 backdrop-blur-xl border border-sky-400/25 shadow-2xl p-4 sm:p-6 flex flex-col gap-4">
-            <div className="flex items-center justify-between pb-3 border-b border-white/10">
-              <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-rose-500/80 inline-block" />
-                <span className="w-2.5 h-2.5 rounded-full bg-amber-500/80 inline-block" />
-                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/80 inline-block" />
-                <span className="text-xs font-mono text-slate-300 font-bold ms-1.5 tracking-wide">
-                  ATP-NODE // 01-PRO
-                </span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 text-[11px] font-bold">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                  <span>ONLINE</span>
-                </div>
-                <span className="text-xs text-sky-400 font-mono font-semibold">{activeNodePing}ms</span>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-3 gap-2 py-2 px-3 rounded-xl bg-[#080d17]/80 border border-white/10 text-center">
-              <div>
-                <span className="block text-[10px] text-slate-400 uppercase tracking-wider">{isAr ? "تسليم فوري" : "Instant"}</span>
-                <span className="text-xs font-bold text-sky-400 font-mono">1-5 Mins</span>
-              </div>
-              <div className="border-x border-white/10">
-                <span className="block text-[10px] text-slate-400 uppercase tracking-wider">{isAr ? "الضمان" : "Guarantee"}</span>
-                <span className="text-xs font-bold text-emerald-400 font-mono">100% REFUND</span>
-              </div>
-              <div>
-                <span className="block text-[10px] text-slate-400 uppercase tracking-wider">{isAr ? "الخدمات" : "Services"}</span>
-                <span className="text-xs font-bold text-amber-300 font-mono">+500 LIVE</span>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-2.5">
-              <Link 
-                href={`/${lang}/pricing`}
-                className="p-3 rounded-xl bg-[#10192b]/60 hover:bg-[#15223a] border border-white/10 hover:border-sky-400/40 transition-all group flex items-center gap-2.5"
-              >
-                <div className="w-8 h-8 rounded-lg bg-sky-500/15 text-sky-400 border border-sky-400/30 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                  <Zap className="w-4 h-4" />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <h2 className="text-xs font-bold text-white truncate group-hover:text-sky-300 transition-colors">
-                    UnlockTool
-                  </h2>
-                  <span className="text-[10px] text-slate-400 truncate block">{isAr ? "تفعيل سنوي آلي" : "1 Year License"}</span>
-                </div>
-              </Link>
-
-              <Link 
-                href={`/${lang}/pricing`}
-                className="p-3 rounded-xl bg-[#10192b]/60 hover:bg-[#15223a] border border-white/10 hover:border-amber-400/40 transition-all group flex items-center gap-2.5"
-              >
-                <div className="w-8 h-8 rounded-lg bg-amber-500/15 text-amber-400 border border-amber-400/30 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                  <Cpu className="w-4 h-4" />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <h2 className="text-xs font-bold text-white truncate group-hover:text-amber-300 transition-colors">
-                    Chimera Tool
-                  </h2>
-                  <span className="text-[10px] text-slate-400 truncate block">{isAr ? "أرصدة رسمية فورية" : "Official Server Credits"}</span>
-                </div>
-              </Link>
-
-              <Link 
-                href={`/${lang}/pricing`}
-                className="p-3 rounded-xl bg-[#10192b]/60 hover:bg-[#15223a] border border-white/10 hover:border-indigo-400/40 transition-all group flex items-center gap-2.5"
-              >
-                <div className="w-8 h-8 rounded-lg bg-indigo-500/15 text-indigo-400 border border-indigo-400/30 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                  <Smartphone className="w-4 h-4" />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <h2 className="text-xs font-bold text-white truncate group-hover:text-indigo-300 transition-colors">
-                    iCloud Bypass
-                  </h2>
-                  <span className="text-[10px] text-slate-400 truncate block">{isAr ? "مكالمات وشبكة كاملة" : "Full Signal Bypass"}</span>
-                </div>
-              </Link>
-
-              <Link 
-                href={`/${lang}/pricing`}
-                className="p-3 rounded-xl bg-[#10192b]/60 hover:bg-[#15223a] border border-white/10 hover:border-emerald-400/40 transition-all group flex items-center gap-2.5"
-              >
-                <div className="w-8 h-8 rounded-lg bg-emerald-500/15 text-emerald-400 border border-emerald-400/30 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                  <LockOpen className="w-4 h-4" />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <h2 className="text-xs font-bold text-white truncate group-hover:text-emerald-300 transition-colors">
-                    Borneo Schematics
-                  </h2>
-                  <span className="text-[10px] text-slate-400 truncate block">{isAr ? "مخططات وهاردوير" : "Hardware Schematics"}</span>
-                </div>
-              </Link>
-            </div>
-
-            <div className="pt-2 border-t border-white/10 flex items-center justify-between text-xs text-slate-400">
-              <div className="flex items-center gap-2 truncate">
-                <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span className="text-slate-300 text-xs truncate">
-                  {isAr ? "تحديث وتفعيل تلقائي متواصل عبر Dhru Fusion & API" : "Automated API & Dhru Fusion Sync Active"}
-                </span>
-              </div>
-              <span className="font-mono text-sky-400 font-bold shrink-0 ms-2">LIVE API</span>
-            </div>
-          </div>
-        </div>
       </div>
     </section>
   );

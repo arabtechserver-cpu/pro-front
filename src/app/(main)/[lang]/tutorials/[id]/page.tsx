@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Locale } from '@/i18n/config';
@@ -66,33 +66,33 @@ export default async function TutorialDetailsPage(
   const description = isAr ? video.descriptionAr : video.descriptionEn;
 
   return (
-    <div className="min-h-screen bg-[#0F0F1A] text-white pt-24 pb-20 font-sans" dir={isAr ? 'rtl' : 'ltr'}>
+    <div className="min-h-screen bg-slate-50 text-slate-900 dark:bg-[#0F0F1A] dark:text-white pt-24 pb-20 font-sans" dir={isAr ? 'rtl' : 'ltr'}>
       <div className="container mx-auto px-4 max-w-7xl">
         
         {/* Top Breadcrumb Navigation */}
-        <div className="mb-6 flex flex-wrap items-center justify-between gap-3 text-xs md:text-sm text-gray-400">
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-3 text-xs md:text-sm text-slate-500 dark:text-gray-400">
           <div className="flex items-center gap-2 flex-wrap">
-            <Link href={`/${params.lang}/tutorials`} className="hover:text-indigo-400 transition-colors flex items-center gap-1">
+            <Link href={`/${params.lang}/tutorials`} className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors flex items-center gap-1">
               <span className="material-symbols-outlined text-sm">school</span>
               <span>{isAr ? 'فيديوهات الشرح والكورسات' : 'Tutorials & Courses'}</span>
             </Link>
             
             {series && (
               <>
-                <span className="material-symbols-outlined text-xs rtl:rotate-180 text-gray-600">chevron_right</span>
-                <Link href={`/${params.lang}/academy/series/${series.id}`} className="hover:text-indigo-400 transition-colors font-semibold">
+                <span className="material-symbols-outlined text-xs rtl:rotate-180 text-slate-400 dark:text-gray-600">chevron_right</span>
+                <Link href={`/${params.lang}/academy/series/${series.id}`} className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors font-semibold">
                   {isAr ? series.titleAr : series.titleEn}
                 </Link>
               </>
             )}
 
-            <span className="material-symbols-outlined text-xs rtl:rotate-180 text-gray-600">chevron_right</span>
-            <span className="text-gray-200 font-bold truncate max-w-xs sm:max-w-md">{title}</span>
+            <span className="material-symbols-outlined text-xs rtl:rotate-180 text-slate-400 dark:text-gray-600">chevron_right</span>
+            <span className="text-slate-800 dark:text-gray-200 font-bold truncate max-w-xs sm:max-w-md">{title}</span>
           </div>
 
           <Link
             href={`/${params.lang}/tutorials`}
-            className="bg-[#1A1A2E] hover:bg-[#22223D] text-indigo-400 hover:text-white px-3 py-1.5 rounded-xl border border-gray-800 text-xs font-bold transition-colors flex items-center gap-1"
+            className="bg-white dark:bg-[#1A1A2E] hover:bg-slate-100 dark:hover:bg-[#22223D] text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-white px-3 py-1.5 rounded-xl border border-slate-200 dark:border-gray-800 text-xs font-bold transition-colors flex items-center gap-1 shadow-sm"
           >
             <span className="material-symbols-outlined text-sm">arrow_back</span>
             <span>{isAr ? 'العودة لجميع الشروحات' : 'Back to Tutorials'}</span>
@@ -106,7 +106,7 @@ export default async function TutorialDetailsPage(
           <div className={playlist.length > 0 ? 'lg:col-span-8 space-y-6' : 'lg:col-span-12 space-y-6'}>
             
             {/* Player Container */}
-            <div className="bg-[#1A1A2E] rounded-3xl overflow-hidden shadow-2xl border border-gray-800">
+            <div className="bg-white dark:bg-[#1A1A2E] rounded-3xl overflow-hidden shadow-2xl border border-slate-200 dark:border-gray-800">
               {hasAccess ? (
                 <div className="aspect-video relative w-full bg-black">
                   <iframe 
@@ -118,14 +118,14 @@ export default async function TutorialDetailsPage(
                   />
                 </div>
               ) : (
-                <div className="aspect-video relative w-full bg-gray-900 flex flex-col items-center justify-center p-8 text-center border-b border-gray-800">
+                <div className="aspect-video relative w-full bg-slate-900 flex flex-col items-center justify-center p-8 text-center border-b border-slate-800">
                   <div className="w-20 h-20 bg-amber-500/20 text-amber-400 rounded-full flex items-center justify-center mb-6">
                     <span className="material-symbols-outlined text-4xl">lock</span>
                   </div>
                   <h2 className="text-2xl font-bold mb-3 text-white">
                     {isAr ? 'هذا الدرس حصري للمشتركين في الكورس' : 'This lesson is exclusive to course subscribers'}
                   </h2>
-                  <p className="text-gray-400 max-w-md mb-6 text-sm leading-relaxed">
+                  <p className="text-gray-300 max-w-md mb-6 text-sm leading-relaxed">
                     {isAr 
                       ? 'اشترك في الكورس الآن لفتح جميع الدروس ومتابعة الشرح العملي بالكامل.' 
                       : 'Enroll in this course now to unlock all lessons and follow the complete hands-on tutorial.'}
@@ -140,7 +140,7 @@ export default async function TutorialDetailsPage(
                       </Link>
                       <Link
                         href={`/${params.lang}/academy/series/${series.id}`}
-                        className="bg-[#151525] hover:bg-[#22223D] text-white px-6 py-3 rounded-2xl text-sm font-bold border border-gray-800 transition-colors"
+                        className="bg-slate-800 hover:bg-slate-700 text-white px-6 py-3 rounded-2xl text-sm font-bold border border-slate-700 transition-colors"
                       >
                         {isAr ? 'عرض منهج الكورس' : 'View Course Curriculum'}
                       </Link>
@@ -152,11 +152,11 @@ export default async function TutorialDetailsPage(
 
             {/* Navigation Buttons: Previous / Next Lesson */}
             {playlist.length > 1 && (
-              <div className="flex items-center justify-between gap-4 p-4 bg-[#1A1A2E] rounded-2xl border border-gray-800">
+              <div className="flex items-center justify-between gap-4 p-4 bg-white dark:bg-[#1A1A2E] rounded-2xl border border-slate-200 dark:border-gray-800 shadow-sm">
                 {prevLesson ? (
                   <Link
                     href={`/${params.lang}/tutorials/${prevLesson.id}`}
-                    className="flex items-center gap-2 text-xs font-bold text-gray-300 hover:text-indigo-400 transition-colors bg-[#151525] px-4 py-2 rounded-xl border border-gray-800"
+                    className="flex items-center gap-2 text-xs font-bold text-slate-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors bg-slate-100 dark:bg-[#151525] px-4 py-2 rounded-xl border border-slate-200 dark:border-gray-800"
                   >
                     <span className="material-symbols-outlined text-sm rtl:rotate-180">arrow_back</span>
                     <span>{isAr ? 'الدرس السابق' : 'Previous Lesson'}</span>
@@ -172,7 +172,7 @@ export default async function TutorialDetailsPage(
                 {nextLesson ? (
                   <Link
                     href={`/${params.lang}/tutorials/${nextLesson.id}`}
-                    className="flex items-center gap-2 text-xs font-bold text-gray-300 hover:text-indigo-400 transition-colors bg-[#151525] px-4 py-2 rounded-xl border border-gray-800"
+                    className="flex items-center gap-2 text-xs font-bold text-slate-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors bg-slate-100 dark:bg-[#151525] px-4 py-2 rounded-xl border border-slate-200 dark:border-gray-800"
                   >
                     <span>{isAr ? 'الدرس التالي' : 'Next Lesson'}</span>
                     <span className="material-symbols-outlined text-sm rtl:rotate-180">arrow_forward</span>
@@ -184,25 +184,25 @@ export default async function TutorialDetailsPage(
             )}
 
             {/* Video Details & Content Description */}
-            <div className="bg-[#1A1A2E] p-6 sm:p-8 rounded-3xl border border-gray-800 space-y-6">
-              <div className="flex flex-wrap items-start justify-between gap-4 pb-5 border-b border-gray-800">
+            <div className="bg-white dark:bg-[#1A1A2E] p-6 sm:p-8 rounded-3xl border border-slate-200 dark:border-gray-800 space-y-6 shadow-sm">
+              <div className="flex flex-wrap items-start justify-between gap-4 pb-5 border-b border-slate-100 dark:border-gray-800">
                 <div className="space-y-2">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold ${video.isFreePreview ? 'bg-violet-500/15 text-violet-400 border border-violet-500/30' : 'bg-amber-500/15 text-amber-400 border border-amber-500/30'}`}>
+                    <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold ${video.isFreePreview ? 'bg-violet-500/15 text-violet-600 dark:text-violet-400 border border-violet-500/30' : 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30'}`}>
                       {video.isFreePreview ? (isAr ? 'معاينة مجانية' : 'Free Preview') : (isAr ? 'كورس مدفوع' : 'Paid')}
                     </span>
                     {video.category && (
-                      <span className="bg-indigo-500/15 text-indigo-400 border border-indigo-500/30 px-2.5 py-0.5 rounded-full text-xs font-bold">
+                      <span className="bg-indigo-500/15 text-indigo-600 dark:text-indigo-400 border border-indigo-500/30 px-2.5 py-0.5 rounded-full text-xs font-bold">
                         {video.category}
                       </span>
                     )}
                   </div>
-                  <h1 className="text-2xl sm:text-3xl font-extrabold text-white">
+                  <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">
                     {title}
                   </h1>
                 </div>
 
-                <span className="text-xs text-gray-400 flex items-center gap-1.5 bg-[#151525] px-3 py-1.5 rounded-xl border border-gray-800">
+                <span className="text-xs text-slate-500 dark:text-gray-400 flex items-center gap-1.5 bg-slate-100 dark:bg-[#151525] px-3 py-1.5 rounded-xl border border-slate-200 dark:border-gray-800">
                   <span className="material-symbols-outlined text-sm">schedule</span>
                   {new Date(video.createdAt).toLocaleDateString(isAr ? 'ar-EG' : 'en-US')}
                 </span>
@@ -210,11 +210,11 @@ export default async function TutorialDetailsPage(
 
               {/* Lesson Text / Content */}
               <div>
-                <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-3 flex items-center gap-2">
-                  <span className="material-symbols-outlined text-indigo-400 text-base">description</span>
+                <h3 className="text-sm font-bold text-slate-500 dark:text-gray-400 uppercase tracking-wider mb-3 flex items-center gap-2">
+                  <span className="material-symbols-outlined text-indigo-600 dark:text-indigo-400 text-base">description</span>
                   <span>{isAr ? 'تفاصيل ومحتوى هذا الدرس:' : 'Lesson Content & Notes:'}</span>
                 </h3>
-                <div className="text-gray-300 text-sm sm:text-base leading-relaxed whitespace-pre-line bg-[#151525]/60 p-5 rounded-2xl border border-gray-800/80">
+                <div className="text-slate-700 dark:text-gray-300 text-sm sm:text-base leading-relaxed whitespace-pre-line bg-slate-50 dark:bg-[#151525]/60 p-5 rounded-2xl border border-slate-200 dark:border-gray-800/80">
                   {description || (isAr ? 'لا يوجد نص أو محتوى إضافي مضاف لهذا الدرس.' : 'No additional text provided for this lesson.')}
                 </div>
               </div>
@@ -224,20 +224,20 @@ export default async function TutorialDetailsPage(
           {/* Playlist Sidebar (4 cols on lg) */}
           {playlist.length > 0 && (
             <div className="lg:col-span-4 space-y-4">
-              <div className="bg-[#1A1A2E] border border-gray-800 rounded-3xl p-5 shadow-xl sticky top-28">
+              <div className="bg-white dark:bg-[#1A1A2E] border border-slate-200 dark:border-gray-800 rounded-3xl p-5 shadow-xl sticky top-28">
                 {/* Playlist Header */}
-                <div className="pb-4 mb-4 border-b border-gray-800">
+                <div className="pb-4 mb-4 border-b border-slate-100 dark:border-gray-800">
                   <div className="flex items-center justify-between gap-2 mb-1">
-                    <span className="text-xs font-bold text-indigo-400 uppercase tracking-wider flex items-center gap-1.5">
+                    <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider flex items-center gap-1.5">
                       <span className="material-symbols-outlined text-base">playlist_play</span>
                       <span>{isAr ? 'قائمة دروس الكورس' : 'Course Playlist'}</span>
                     </span>
-                    <span className="text-xs text-gray-500 font-bold">
+                    <span className="text-xs text-slate-500 dark:text-gray-500 font-bold">
                       {playlist.length} {isAr ? 'دروس' : 'lessons'}
                     </span>
                   </div>
                   {series && (
-                    <h3 className="font-bold text-sm text-white line-clamp-1">
+                    <h3 className="font-bold text-sm text-slate-900 dark:text-white line-clamp-1">
                       {isAr ? series.titleAr : series.titleEn}
                     </h3>
                   )}
@@ -256,8 +256,8 @@ export default async function TutorialDetailsPage(
                         href={`/${params.lang}/tutorials/${item.id}`}
                         className={`p-3 rounded-2xl border transition-all flex items-center gap-3 group ${
                           isCurrent
-                            ? 'bg-indigo-600/20 border-indigo-500 text-white shadow-md'
-                            : 'bg-[#151525] border-gray-800/80 hover:border-gray-700 text-gray-300 hover:text-white'
+                            ? 'bg-indigo-600/20 border-indigo-500 text-indigo-700 dark:text-white shadow-md'
+                            : 'bg-slate-50 dark:bg-[#151525] border-slate-200 dark:border-gray-800/80 hover:border-slate-300 dark:hover:border-gray-700 text-slate-700 dark:text-gray-300 hover:text-slate-900 dark:hover:text-white'
                         }`}
                       >
                         {/* Number / Status Icon */}
@@ -265,8 +265,8 @@ export default async function TutorialDetailsPage(
                           isCurrent
                             ? 'bg-indigo-600 text-white'
                             : itemFree
-                              ? 'bg-[#1E1E35] text-violet-400'
-                              : 'bg-[#1E1E35] text-amber-400'
+                              ? 'bg-slate-200 dark:bg-[#1E1E35] text-violet-600 dark:text-violet-400'
+                              : 'bg-slate-200 dark:bg-[#1E1E35] text-amber-600 dark:text-amber-400'
                         }`}>
                           {isCurrent ? (
                             <span className="material-symbols-outlined text-sm animate-pulse">play_arrow</span>
@@ -280,11 +280,11 @@ export default async function TutorialDetailsPage(
                           <h4 className="text-xs font-bold line-clamp-1">
                             {itemTitle}
                           </h4>
-                          <span className="text-[10px] text-gray-500 flex items-center gap-1 mt-0.5">
+                          <span className="text-[10px] text-slate-500 dark:text-gray-500 flex items-center gap-1 mt-0.5">
                             {itemFree ? (
-                              <span className="text-violet-400 font-semibold">{isAr ? 'معاينة مجانية' : 'Free Preview'}</span>
+                              <span className="text-violet-600 dark:text-violet-400 font-semibold">{isAr ? 'معاينة مجانية' : 'Free Preview'}</span>
                             ) : (
-                              <span className="text-amber-400 font-semibold">{isAr ? 'مقفل' : 'Locked'}</span>
+                              <span className="text-amber-600 dark:text-amber-400 font-semibold">{isAr ? 'مقفل' : 'Locked'}</span>
                             )}
                           </span>
                         </div>

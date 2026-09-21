@@ -1,43 +1,43 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
-import Link from "next/link";
 import { getDictionary } from "@/i18n/get-dictionary";
 import { Locale, i18n } from "@/i18n/config";
-import HeroScrollVideoBackground from "@/components/HeroScrollVideoBackground";
 import HeroSection from "@/components/HeroSection";
 import ServiceLanes from "@/components/ServiceLanes";
-import ToolMarquee from "@/components/ToolMarquee";
+import SupportedToolsBar from "@/components/SupportedToolsBar";
 import CapabilitiesGrid from "@/components/CapabilitiesGrid";
 import PackagesSlider from "@/components/PackagesSlider";
-import CampaignSlider from "@/components/CampaignSlider";
+import CampaignBanner from "@/components/CampaignBanner";
 import WorkflowTrustSection from "@/components/WorkflowTrustSection";
-import FaqSection from "@/components/FaqSection";
-import SupportCtaSection from "@/components/SupportCtaSection";
-import NewsletterSection from "@/components/NewsletterSection";
-import { Sparkles, Zap, ShieldCheck, Wrench, Lock, Tag, MessageCircle, Send, Mail } from "lucide-react";
+import BottomActionCards from "@/components/BottomActionCards";
+import { Zap, ShieldCheck, Wrench, Lock, Tag, MessageCircle, Send, Mail } from "lucide-react";
+
+import localHomepageConfig from "@/data/homepage_config.json";
 
 async function getHomepageConfig() {
   const candidates = [...new Set([
     process.env.INTERNAL_API_URL,
-    "http://pro-b-i0r2xu:5000",
-    "http://backend:5000",
+    "http://127.0.0.1:5000",
     "http://localhost:5000",
     process.env.NEXT_PUBLIC_API_URL,
-    "https://arabtechproserver.tech"
   ].filter(Boolean) as string[])];
 
   try {
-    return await Promise.any(candidates.map(async (baseUrl) => {
+    const res = await Promise.any(candidates.map(async (baseUrl) => {
       const cleanBase = baseUrl.replace(/\/$/, "");
-      const res = await fetch(`${cleanBase}/api/homepage`, {
-        next: { revalidate: 60 },
-        signal: AbortSignal.timeout(900)
+      const r = await fetch(`${cleanBase}/api/homepage`, {
+        next: { revalidate: 30 },
+        signal: AbortSignal.timeout(1500)
       });
-      if (!res.ok) throw new Error(`Homepage API returned ${res.status}`);
-      return res.json();
+      if (!r.ok) throw new Error(`Homepage API returned ${r.status}`);
+      return r.json();
     }));
+    if (res && res.heroSection) {
+      return res;
+    }
+    return localHomepageConfig;
   } catch {
-    return null;
+    return localHomepageConfig;
   }
 }
 
@@ -155,67 +155,8 @@ export default async function Home(props: { params: Promise<{ lang: Locale }> })
     storeUrl: formatUrl(hp?.serviceLanes?.storeUrl, "/pricing?cat=store"),
   };
 
-  let campaigns: any[] = [];
-  if (Array.isArray(hp?.campaigns) && hp.campaigns.length > 0) {
-    campaigns = hp.campaigns;
-  } else if (hp?.campaigns && typeof hp.campaigns === 'object') {
-    const c = hp.campaigns;
-    if (c.promo1Image || c.promo1TitleAr || c.promo1TitleEn) {
-      campaigns.push({
-        tagEn: c.promo1TagEn || "Hot Offer",
-        tagAr: c.promo1TagAr || "عرض خاص",
-        titleEn: c.promo1TitleEn || "Samsung FRP Remove",
-        titleAr: c.promo1TitleAr || "حذف حساب جوجل لسامسونج",
-        descEn: c.promo1DescEn || "",
-        descAr: c.promo1DescAr || "",
-        image: c.promo1Image || "/images/promo_samsung.webp",
-        url: c.promo1Url || "/pricing"
-      });
-    }
-    if (c.promo2Image || c.promo2TitleAr || c.promo2TitleEn) {
-      campaigns.push({
-        tagEn: c.promo2TagEn || "Official Reseller",
-        tagAr: c.promo2TagAr || "ترخيص رسمي",
-        titleEn: c.promo2TitleEn || "Chimera Tool",
-        titleAr: c.promo2TitleAr || "أداة شيميرا (Chimera)",
-        descEn: c.promo2DescEn || "",
-        descAr: c.promo2DescAr || "",
-        image: c.promo2Image || "/images/promo_chimera.webp",
-        url: c.promo2Url || "/pricing"
-      });
-    }
-  }
-
-  if (campaigns.length === 0) {
-    campaigns = [
-      {
-        tagEn: "Hot Offer",
-        tagAr: "عرض خاص",
-        titleEn: "Samsung FRP Remove",
-        titleAr: "حذف حساب جوجل لسامسونج",
-        descEn: "Instant via IMEI. Support all models.",
-        descAr: "فك فوري لجميع موديلات سامسونج.",
-        image: "/images/promo_samsung.webp",
-        url: "/pricing"
-      },
-      {
-        tagEn: "Official Reseller",
-        tagAr: "ترخيص رسمي",
-        titleEn: "Chimera Tool",
-        titleAr: "أداة شيميرا (Chimera)",
-        descEn: "Activations and credits available instantly.",
-        descAr: "تراخيص وأرصدة سريعة ومتاحة فوراً.",
-        image: "/images/promo_chimera.webp",
-        url: "/pricing"
-      }
-    ];
-  }
-
   return (
-    <div className="homepage-static-content relative flex flex-col pb-12 sm:pb-20 overflow-x-clip">
-      {/* 1. Hardware-Accelerated Video / Motion Layer (Zero-lag scroll decoupling) */}
-      <HeroScrollVideoBackground lang={params.lang} />
-
+    <div className="homepage-static-content relative flex flex-col pb-12 sm:pb-20 overflow-x-clip bg-slate-50 text-slate-900 dark:bg-[#070b14] dark:text-white">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -233,94 +174,7 @@ export default async function Home(props: { params: Promise<{ lang: Locale }> })
         }}
       />
 
-      {/* 2. Real-time Live Notice Marquee */}
-      <div className="w-full bg-[#0a0f18]/60 backdrop-blur-md border-b border-[#141d2e]/60 relative z-20 overflow-hidden shadow-sm">
-        <div className="w-full flex whitespace-nowrap overflow-hidden py-2 sm:py-2.5" dir="ltr">
-          <div className="flex w-max animate-marquee hover:[animation-play-state:paused] cursor-pointer select-none text-xs sm:text-sm font-medium text-slate-300">
-            <div className="flex shrink-0 items-center gap-6 sm:gap-8 px-4">
-              <span className="flex items-center gap-2 bg-sky-500/10 text-sky-300 px-3 py-1 rounded-full border border-sky-400/30 font-bold shrink-0">
-                <Zap className="w-3.5 h-3.5 text-amber-400" />
-                <span>{notice1 || (isAr ? "تسليم فوري وتلقائي لمعظم خدمات الـ IMEI والسيرفر على مدار 24/7" : "Instant 24/7 automated delivery for IMEI & server services")}</span>
-              </span>
-
-              <span className="flex items-center gap-2 shrink-0">
-                <ShieldCheck className="w-4 h-4 text-emerald-400" />
-                <span>{notice2 || (isAr ? "دفع آمن 100% + شحن فوري للمحفظة مع ضمان استرجاع الرصيد" : "100% Secure checkout + instant wallet funding & refund protection")}</span>
-              </span>
-
-              <span className="flex items-center gap-2 text-white shrink-0">
-                <Wrench className="w-4 h-4 text-sky-400" />
-                <span>{isAr ? "تفعيل فوري لأقوى أدوات وبوكسات السوفت وير (UnlockTool, Chimera, Borneo, AMT)" : "Instant activation for top tools (UnlockTool, Chimera, Borneo, AMT)"}</span>
-              </span>
-
-              <span className="flex items-center gap-2 shrink-0">
-                <Lock className="w-4 h-4 text-indigo-400" />
-                <span>{isAr ? "فك شفرات رسمي وتخطي iCloud & FRP لجميع الشبكات والموديلات" : "Official factory unlock & iCloud / FRP bypass worldwide"}</span>
-              </span>
-
-              <span className="flex items-center gap-2 text-violet-400 font-semibold shrink-0">
-                <Tag className="w-4 h-4" />
-                <span>{isAr ? "أسعار جملة وتخفيضات خاصة لأصحاب المحلات والوكلاء" : "Exclusive wholesale pricing for resellers & repair shops"}</span>
-              </span>
-
-              <a href={`https://wa.me/${whatsappNum.replace(/[^0-9]/g, '')}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 bg-[#25D366]/15 text-[#25D366] px-3 py-1 rounded-full border border-[#25D366]/30 hover:bg-[#25D366]/25 transition-all font-bold shrink-0">
-                <MessageCircle className="w-3.5 h-3.5 text-[#25D366]" />
-                <span>WhatsApp: {whatsappNum}</span>
-              </a>
-              <a href={telegramUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 bg-[#0088cc]/15 text-[#0088cc] px-3 py-1 rounded-full border border-[#0088cc]/30 hover:bg-[#0088cc]/25 transition-all font-bold shrink-0">
-                <Send className="w-3.5 h-3.5 text-[#0088cc]" />
-                <span>Telegram: {telegramUser}</span>
-              </a>
-              <a href={`mailto:${emailAddr}`} className="flex items-center gap-2 hover:text-sky-300 transition-colors shrink-0">
-                <Mail className="w-3.5 h-3.5 text-sky-400" />
-                <span>{emailAddr}</span>
-              </a>
-            </div>
-
-            <div className="flex shrink-0 items-center gap-6 sm:gap-8 px-4" aria-hidden="true">
-              <span className="flex items-center gap-2 bg-sky-500/10 text-sky-300 px-3 py-1 rounded-full border border-sky-400/30 font-bold shrink-0">
-                <Zap className="w-3.5 h-3.5 text-amber-400" />
-                <span>{notice1 || (isAr ? "تسليم فوري وتلقائي لمعظم خدمات الـ IMEI والسيرفر على مدار 24/7" : "Instant 24/7 automated delivery for IMEI & server services")}</span>
-              </span>
-
-              <span className="flex items-center gap-2 shrink-0">
-                <ShieldCheck className="w-4 h-4 text-emerald-400" />
-                <span>{notice2 || (isAr ? "دفع آمن 100% + شحن فوري للمحفظة مع ضمان استرجاع الرصيد" : "100% Secure checkout + instant wallet funding & refund protection")}</span>
-              </span>
-
-              <span className="flex items-center gap-2 text-white shrink-0">
-                <Wrench className="w-4 h-4 text-sky-400" />
-                <span>{isAr ? "تفعيل فوري لأقوى أدوات وبوكسات السوفت وير (UnlockTool, Chimera, Borneo, AMT)" : "Instant activation for top tools (UnlockTool, Chimera, Borneo, AMT)"}</span>
-              </span>
-
-              <span className="flex items-center gap-2 shrink-0">
-                <Lock className="w-4 h-4 text-indigo-400" />
-                <span>{isAr ? "فك شفرات رسمي وتخطي iCloud & FRP لجميع الشبكات والموديلات" : "Official factory unlock & iCloud / FRP bypass worldwide"}</span>
-              </span>
-
-              <span className="flex items-center gap-2 text-violet-400 font-semibold shrink-0">
-                <Tag className="w-4 h-4" />
-                <span>{isAr ? "أسعار جملة وتخفيضات خاصة لأصحاب المحلات والوكلاء" : "Exclusive wholesale pricing for resellers & repair shops"}</span>
-              </span>
-
-              <a href={`https://wa.me/${whatsappNum.replace(/[^0-9]/g, '')}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 bg-[#25D366]/15 text-[#25D366] px-3 py-1 rounded-full border border-[#25D366]/30 hover:bg-[#25D366]/25 transition-all font-bold shrink-0">
-                <MessageCircle className="w-3.5 h-3.5 text-[#25D366]" />
-                <span>WhatsApp: {whatsappNum}</span>
-              </a>
-              <a href={telegramUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 bg-[#0088cc]/15 text-[#0088cc] px-3 py-1 rounded-full border border-[#0088cc]/30 hover:bg-[#0088cc]/25 transition-all font-bold shrink-0">
-                <Send className="w-3.5 h-3.5 text-[#0088cc]" />
-                <span>Telegram: {telegramUser}</span>
-              </a>
-              <a href={`mailto:${emailAddr}`} className="flex items-center gap-2 hover:text-sky-300 transition-colors shrink-0">
-                <Mail className="w-3.5 h-3.5 text-sky-400" />
-                <span>{emailAddr}</span>
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Unified High-Performance Hero Cockpit */}
+      {/* 1. Unified High-Performance Hero Cockpit (Matching Mockup) */}
       <HeroSection lang={params.lang} config={heroConfig} />
 
       {/* 3. Main Responsive Content Container */}
@@ -328,53 +182,27 @@ export default async function Home(props: { params: Promise<{ lang: Locale }> })
         {/* 4 Primary Operational Service Portals */}
         <ServiceLanes lang={params.lang} config={serviceConfig} />
 
-        {/* Continuous Tool Marquee */}
-        <ToolMarquee tools={hp?.toolMarquee} lang={params.lang} />
+        {/* 10 Supported Tools Bar (Box 2 in User's Drawing) */}
+        <SupportedToolsBar lang={params.lang} tools={hp?.supportedTools} />
 
-        {/* 6 Capabilities Architecture Grid */}
+        {/* 6 Capabilities Architecture Grid (Why Choose Us) */}
         <CapabilitiesGrid lang={params.lang} />
 
-        {/* Top In-Demand Server Packages */}
-        <PackagesSlider lang={params.lang} />
+        {/* Top In-Demand Server Packages (Red Outline 1 in User's Drawing) */}
+        <PackagesSlider lang={params.lang} packages={hp?.featuredPackages} />
 
-        {/* Verified Reseller Campaigns */}
-        <section className="w-full relative">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-6 sm:mb-8 gap-4">
-            <div>
-              <div className="inline-flex items-center gap-2 bg-blue-500/10 border border-blue-500/20 px-3.5 py-1.5 rounded-full text-xs font-semibold text-sky-400 mb-2.5 shadow-sm">
-                <Sparkles className="w-3.5 h-3.5 text-sky-400" />
-                <span>{isAr ? "عروض وحملات الموزعين الرسمية" : "Official Reseller Campaigns"}</span>
-              </div>
-              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-white tracking-tight">
-                {isAr ? "أحدث تفعيلات الأدوات، فك الشفرات، والخصومات" : "Fresh Activations, Unlocks, and Tool Offers"}
-              </h2>
-            </div>
-          </div>
+        {/* Verified Reseller Campaigns & Samsung FRP Banner */}
+        <CampaignBanner lang={params.lang} />
 
-          <div className="w-full">
-            {campaigns.length > 0 ? (
-              <CampaignSlider campaigns={campaigns} lang={params.lang} />
-            ) : (
-              <div className="bg-[#141d30] rounded-2xl sm:rounded-3xl p-8 border border-white/15 text-center text-slate-300 shadow-xl">
-                {isAr ? "لا توجد عروض حالية." : "No active campaigns at the moment."}
-              </div>
-            )}
-          </div>
-        </section>
-
-        {/* 3-Step Instant Fulfillment & Platform Trust */}
+        {/* 3-Step Instant Fulfillment & Platform Trust + Stats + Brands */}
         <WorkflowTrustSection lang={params.lang} />
 
-        {/* 24/7 VIP Support CTA */}
-        <SupportCtaSection
+        {/* Dual Bottom Action Cards (Newsletter + Support Contacts) */}
+        <BottomActionCards
           lang={params.lang}
           whatsappNum={whatsappNum}
           telegramUrl={telegramUrl}
-          emailAddr={emailAddr}
         />
-
-        {/* Interactive Newsletter Section */}
-        <NewsletterSection lang={params.lang} />
       </div>
     </div>
   );

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { Locale } from "@/i18n/config";
+import ThemeToggle from "@/components/ThemeToggle";
 
 interface NavbarProps {
   lang: Locale;
@@ -217,7 +218,7 @@ export default function Navbar({ lang, dict }: NavbarProps) {
       <header 
         className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${
           isScrolled 
-            ? "bg-surface/85 backdrop-blur-xl border-b border-outline-variant/30 shadow-[0_4px_30px_rgba(0,0,0,0.3)] py-1" 
+            ? "bg-white/90 dark:bg-surface/85 backdrop-blur-xl border-b border-slate-200 dark:border-outline-variant/30 shadow-sm dark:shadow-[0_4px_30px_rgba(0,0,0,0.3)] py-1" 
             : "bg-transparent py-2"
         }`}
       >
@@ -273,13 +274,13 @@ export default function Navbar({ lang, dict }: NavbarProps) {
             </Link>
 
             {/* Desktop Navigation Links */}
-            <nav className="hidden lg:flex items-center gap-1.5 bg-surface-container-low/90 p-1.5 rounded-full border border-white/10 backdrop-blur-xl shadow-lg">
+            <nav className="hidden lg:flex items-center gap-1.5 bg-white/85 dark:bg-surface-container-low/90 p-1.5 rounded-full border border-slate-200 dark:border-white/10 backdrop-blur-xl shadow-sm dark:shadow-lg">
               <Link 
                 href={`/${lang}`} 
                 className={`px-4 py-2 rounded-full text-sm font-semibold transition-all duration-200 ${
                   isActive("/") 
                     ? "bg-primary text-white font-bold shadow-md shadow-blue-950/40" 
-                    : "text-slate-300 hover:text-white hover:bg-white/5"
+                    : "text-slate-700 dark:text-slate-300 hover:text-primary dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5"
                 }`}
               >
                 {dict.home}
@@ -292,23 +293,23 @@ export default function Navbar({ lang, dict }: NavbarProps) {
                   className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-semibold transition-all duration-200 ${
                     isActive("/pricing") 
                       ? "bg-primary text-white font-bold shadow-md shadow-blue-950/40" 
-                      : "text-slate-300 hover:text-white hover:bg-white/5"
+                      : "text-slate-700 dark:text-slate-300 hover:text-primary dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5"
                   }`}
                 >
                   <span>{dict.resellerPricing}</span>
                   <span className="material-symbols-outlined text-base transition-transform duration-300 group-hover:rotate-180">expand_more</span>
                 </button>
 
-                <div className="absolute top-full start-0 mt-2 w-56 glass-card rounded-2xl border border-white/10 shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top scale-95 group-hover:scale-100 overflow-hidden backdrop-blur-xl bg-surface-container-lowest/95 p-1.5 z-50">
-                  <Link href={`/${lang}/pricing`} className="flex items-center gap-2.5 px-4 py-3 rounded-xl text-xs font-bold text-slate-200 hover:bg-primary/20 hover:text-white transition-all">
+                <div className="absolute top-full start-0 mt-2 w-56 glass-card rounded-2xl border border-slate-200 dark:border-white/10 shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top scale-95 group-hover:scale-100 overflow-hidden backdrop-blur-xl bg-white/95 dark:bg-surface-container-lowest/95 p-1.5 z-50">
+                  <Link href={`/${lang}/pricing`} className="flex items-center gap-2.5 px-4 py-3 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-primary/10 dark:hover:bg-primary/20 hover:text-primary dark:hover:text-white transition-all">
                     <span className="material-symbols-outlined text-primary text-base">phonelink_setup</span>
                     {dict.imeiService}
                   </Link>
-                  <Link href={`/${lang}/pricing`} className="flex items-center gap-2.5 px-4 py-3 rounded-xl text-xs font-bold text-slate-200 hover:bg-primary/20 hover:text-white transition-all">
+                  <Link href={`/${lang}/pricing`} className="flex items-center gap-2.5 px-4 py-3 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-primary/10 dark:hover:bg-primary/20 hover:text-primary dark:hover:text-white transition-all">
                     <span className="material-symbols-outlined text-secondary text-base">dns</span>
                     {dict.serverService}
                   </Link>
-                  <Link href={`/${lang}/pricing`} className="flex items-center gap-2.5 px-4 py-3 rounded-xl text-xs font-bold text-slate-200 hover:bg-primary/20 hover:text-white transition-all">
+                  <Link href={`/${lang}/pricing`} className="flex items-center gap-2.5 px-4 py-3 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-primary/10 dark:hover:bg-primary/20 hover:text-primary dark:hover:text-white transition-all">
                     <span className="material-symbols-outlined text-tertiary text-base">cast</span>
                     {dict.remoteService}
                   </Link>
@@ -321,7 +322,7 @@ export default function Navbar({ lang, dict }: NavbarProps) {
                 className={`px-4 py-2 rounded-full text-sm font-semibold transition-all duration-200 flex items-center gap-1.5 ${
                   isActive("/orders") 
                     ? "bg-primary text-white font-bold shadow-md shadow-blue-950/40" 
-                    : "text-slate-300 hover:text-white hover:bg-white/5"
+                    : "text-slate-700 dark:text-slate-300 hover:text-primary dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5"
                 }`}
               >
                 <span className="material-symbols-outlined text-base">receipt_long</span>
@@ -334,7 +335,7 @@ export default function Navbar({ lang, dict }: NavbarProps) {
                 className={`px-4 py-2 rounded-full text-sm font-semibold transition-all duration-200 flex items-center gap-1.5 ${
                   isActive("/wallet") 
                     ? "bg-primary text-white font-bold shadow-md shadow-blue-950/40" 
-                    : "text-slate-300 hover:text-white hover:bg-white/5"
+                    : "text-slate-700 dark:text-slate-300 hover:text-primary dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5"
                 }`}
               >
                 <span className="material-symbols-outlined text-base">account_balance_wallet</span>
@@ -346,7 +347,7 @@ export default function Navbar({ lang, dict }: NavbarProps) {
                 className={`px-4 py-2 rounded-full text-sm font-semibold transition-all duration-200 ${
                   isActive("/blog") 
                     ? "bg-primary text-white font-bold shadow-md shadow-blue-950/40" 
-                    : "text-slate-300 hover:text-white hover:bg-white/5"
+                    : "text-slate-700 dark:text-slate-300 hover:text-primary dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5"
                 }`}
               >
                 {dict.blog}
@@ -357,7 +358,7 @@ export default function Navbar({ lang, dict }: NavbarProps) {
                 className={`px-4 py-2 rounded-full text-sm font-semibold transition-all duration-200 ${
                   isActive("/tutorials") 
                     ? "bg-primary text-white font-bold shadow-md shadow-blue-950/40" 
-                    : "text-slate-300 hover:text-white hover:bg-white/5"
+                    : "text-slate-700 dark:text-slate-300 hover:text-primary dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5"
                 }`}
               >
                 {dict.tutorials}
@@ -368,7 +369,7 @@ export default function Navbar({ lang, dict }: NavbarProps) {
                 className={`px-4 py-2 rounded-full text-sm font-semibold transition-all duration-200 ${
                   isActive("/contact") 
                     ? "bg-primary text-white font-bold shadow-md shadow-blue-950/40" 
-                    : "text-slate-300 hover:text-white hover:bg-white/5"
+                    : "text-slate-700 dark:text-slate-300 hover:text-primary dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5"
                 }`}
               >
                 {dict.contactUs}
@@ -376,18 +377,21 @@ export default function Navbar({ lang, dict }: NavbarProps) {
             </nav>
 
             {/* Right Action Buttons */}
-            <div className="hidden lg:flex items-center gap-3">
+            <div className="hidden lg:flex items-center gap-2.5">
 
-            {/* Language Switcher Pill */}
-            <Link 
-              href={switchLanguage()} 
-              aria-label={lang === "ar" ? "Switch language to English" : "التبديل إلى اللغة العربية"}
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-full border border-white/10 bg-surface-container-low/80 text-slate-200 hover:text-white hover:border-primary/50 hover:bg-primary/20 transition-all duration-200 group text-xs font-bold"
-              title={lang === "ar" ? "Switch to English" : "التبديل للعربية"}
-            >
-              <span className="material-symbols-outlined text-sm text-primary group-hover:rotate-45 transition-transform duration-300">language</span>
-              <span>{lang === "ar" ? "EN" : "AR"}</span>
-            </Link>
+              {/* Theme Toggle Button */}
+              <ThemeToggle lang={lang} />
+
+              {/* Language Switcher Pill */}
+              <Link 
+                href={switchLanguage()} 
+                aria-label={lang === "ar" ? "Switch language to English" : "التبديل إلى اللغة العربية"}
+                className="flex items-center gap-1.5 px-3.5 py-2 rounded-full border border-slate-300 dark:border-white/10 bg-white/85 dark:bg-surface-container-low/80 text-slate-700 dark:text-slate-200 hover:text-primary dark:hover:text-white hover:border-primary/50 hover:bg-slate-100 dark:hover:bg-primary/20 transition-all duration-200 group text-xs font-bold shadow-sm"
+                title={lang === "ar" ? "Switch to English" : "التبديل للعربية"}
+              >
+                <span className="material-symbols-outlined text-sm text-primary group-hover:rotate-45 transition-transform duration-300">language</span>
+                <span>{lang === "ar" ? "EN" : "AR"}</span>
+              </Link>
 
             {/* LOGGED IN USER PROFILE DROPDOWN OR LOGIN BUTTON */}
             {userSession ? (
@@ -548,11 +552,13 @@ export default function Navbar({ lang, dict }: NavbarProps) {
           </div>
 
           {/* Mobile Menu Controls */}
-          <div className="lg:hidden flex items-center gap-2.5">
+          <div className="lg:hidden flex items-center gap-2">
+            <ThemeToggle lang={lang} />
+
             <Link 
               href={switchLanguage()} 
               aria-label={lang === "ar" ? "Switch language to English" : "التبديل إلى اللغة العربية"}
-              className="flex items-center gap-1 px-3 py-1.5 rounded-full border border-white/10 bg-surface-container-low text-slate-200 hover:text-white transition-colors text-xs font-bold"
+              className="flex items-center gap-1 px-3 py-1.5 rounded-full border border-slate-300 dark:border-white/10 bg-white/90 dark:bg-surface-container-low text-slate-700 dark:text-slate-200 hover:text-primary dark:hover:text-white transition-colors text-xs font-bold shadow-sm"
             >
               <span className="material-symbols-outlined text-xs text-primary">language</span>
               <span>{lang === "ar" ? "EN" : "AR"}</span>
@@ -560,7 +566,7 @@ export default function Navbar({ lang, dict }: NavbarProps) {
 
             <button 
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-surface-container-high/90 border border-white/10 text-white hover:text-primary hover:bg-primary/20 transition-all active:scale-95 flex items-center justify-center shrink-0 shadow-sm"
+              className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-white/90 dark:bg-surface-container-high/90 border border-slate-300 dark:border-white/10 text-slate-800 dark:text-white hover:text-primary hover:bg-primary/10 dark:hover:bg-primary/20 transition-all active:scale-95 flex items-center justify-center shrink-0 shadow-sm"
               aria-label={mobileMenuOpen ? (lang === "ar" ? "إغلاق القائمة" : "Close menu") : (lang === "ar" ? "فتح القائمة" : "Open menu")}
             >
               <span className="material-symbols-outlined text-xl sm:text-2xl block transition-transform duration-300">
@@ -575,7 +581,7 @@ export default function Navbar({ lang, dict }: NavbarProps) {
 
     {/* Mobile Side Drawer Backdrop */}
     <div 
-      className={`fixed inset-0 bg-black/75 backdrop-blur-sm z-50 transition-opacity duration-300 lg:hidden ${
+      className={`fixed inset-0 bg-black/60 dark:bg-black/75 backdrop-blur-sm z-50 transition-opacity duration-300 lg:hidden ${
         mobileMenuOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
       }`}
       onClick={() => setMobileMenuOpen(false)}
@@ -588,7 +594,7 @@ export default function Navbar({ lang, dict }: NavbarProps) {
       role="dialog"
       aria-modal="true"
       aria-label={lang === "ar" ? "القائمة الجانبية" : "Side Navigation Menu"}
-      className={`fixed top-0 bottom-0 z-50 w-[85%] max-w-[340px] sm:max-w-[380px] bg-[#0c121e] border-e sm:border-s border-white/10 shadow-2xl flex flex-col transition-transform duration-300 ease-out lg:hidden ${
+      className={`fixed top-0 bottom-0 z-50 w-[85%] max-w-[340px] sm:max-w-[380px] bg-white dark:bg-[#0c121e] border-e sm:border-s border-slate-200 dark:border-white/10 shadow-2xl flex flex-col transition-transform duration-300 ease-out lg:hidden ${
         lang === "ar" ? "right-0" : "left-0"
       } ${
         mobileMenuOpen 
@@ -597,41 +603,41 @@ export default function Navbar({ lang, dict }: NavbarProps) {
       }`}
     >
       {/* 1. Header Bar */}
-      <div className="bg-[#101827] px-4 py-3.5 border-b border-white/10 flex items-center justify-between text-white shrink-0">
+      <div className="bg-slate-100 dark:bg-[#101827] px-4 py-3.5 border-b border-slate-200 dark:border-white/10 flex items-center justify-between text-slate-900 dark:text-white shrink-0">
         <div className="flex items-center gap-2.5 min-w-0">
           <button
             onClick={() => setMobileMenuOpen(false)}
-            className="w-8 h-8 rounded-lg text-slate-300 hover:text-white hover:bg-white/10 transition-colors flex items-center justify-center shrink-0 border border-white/5"
+            className="w-8 h-8 rounded-lg text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-white/10 transition-colors flex items-center justify-center shrink-0 border border-slate-300 dark:border-white/5"
             aria-label={lang === "ar" ? "إغلاق القائمة" : "Close menu"}
           >
             <i className={`fas ${lang === "ar" ? "fa-arrow-right" : "fa-arrow-left"} text-sm`}></i>
           </button>
-          <span className="font-black text-xs sm:text-sm tracking-wide text-white truncate font-mono">
+          <span className="font-black text-xs sm:text-sm tracking-wide text-slate-900 dark:text-white truncate font-mono">
             {lang === "ar" ? "عرب تك برو سيرفر" : "ARAB TECH PRO SERVER"}
           </span>
         </div>
-        <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-bold">
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+        <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 dark:bg-emerald-400 animate-pulse"></span>
           <span>ONLINE</span>
         </div>
       </div>
 
       {/* 2. Top Action Buttons (تسجيل / تسجيل الدخول) */}
       {userSession ? (
-        <div className="p-3.5 bg-[#0f1624] border-b border-white/10 shrink-0">
+        <div className="p-3.5 bg-slate-50 dark:bg-[#0f1624] border-b border-slate-200 dark:border-white/10 shrink-0">
           <div className="flex items-center justify-between gap-3 mb-2.5">
             <div className="flex items-center gap-2.5 min-w-0">
               <div className="w-9 h-9 rounded-full bg-blue-600 text-white font-black flex items-center justify-center text-sm shrink-0 shadow-md">
                 {userSession.fullName ? userSession.fullName.charAt(0) : "U"}
               </div>
               <div className="min-w-0">
-                <p className="font-bold text-xs text-white truncate">{userSession.fullName}</p>
-                <p className="text-[11px] text-blue-400 font-mono dir-ltr font-semibold">{formatBalance(userSession.balance)}</p>
+                <p className="font-bold text-xs text-slate-900 dark:text-white truncate">{userSession.fullName}</p>
+                <p className="text-[11px] text-blue-600 dark:text-blue-400 font-mono dir-ltr font-semibold">{formatBalance(userSession.balance)}</p>
               </div>
             </div>
             <button
               onClick={handleLogout}
-              className="px-2.5 py-1 rounded-lg bg-red-500/15 text-red-400 hover:bg-red-500/25 font-bold text-xs transition-colors shrink-0"
+              className="px-2.5 py-1 rounded-lg bg-red-500/10 dark:bg-red-500/15 text-red-600 dark:text-red-400 hover:bg-red-500/20 dark:hover:bg-red-500/25 font-bold text-xs transition-colors shrink-0"
             >
               {lang === "ar" ? "خروج" : "Logout"}
             </button>
@@ -640,36 +646,36 @@ export default function Navbar({ lang, dict }: NavbarProps) {
             <Link
               href={`/${lang}/profile`}
               onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center justify-center gap-1 py-2 px-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-xs font-semibold text-slate-200 transition-colors"
+              className="flex items-center justify-center gap-1 py-2 px-1.5 rounded-lg bg-white dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 border border-slate-200 dark:border-transparent text-xs font-semibold text-slate-700 dark:text-slate-200 transition-colors shadow-xs"
             >
-              <span className="material-symbols-outlined text-sm text-blue-400">account_circle</span>
+              <span className="material-symbols-outlined text-sm text-blue-600 dark:text-blue-400">account_circle</span>
               <span>{lang === "ar" ? "حسابي" : "Profile"}</span>
             </Link>
             <Link
               href={`/${lang}/orders`}
               onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center justify-center gap-1 py-2 px-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-xs font-semibold text-slate-200 transition-colors"
+              className="flex items-center justify-center gap-1 py-2 px-1.5 rounded-lg bg-white dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 border border-slate-200 dark:border-transparent text-xs font-semibold text-slate-700 dark:text-slate-200 transition-colors shadow-xs"
             >
-              <span className="material-symbols-outlined text-sm text-emerald-400">receipt_long</span>
+              <span className="material-symbols-outlined text-sm text-emerald-600 dark:text-emerald-400">receipt_long</span>
               <span>{lang === "ar" ? "طلباتي" : "Orders"}</span>
             </Link>
             <Link
               href={`/${lang}/wallet`}
               onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center justify-center gap-1 py-2 px-1.5 rounded-lg bg-blue-500/15 hover:bg-blue-500/25 border border-blue-500/20 text-xs font-bold text-blue-300 transition-colors"
+              className="flex items-center justify-center gap-1 py-2 px-1.5 rounded-lg bg-blue-50 dark:bg-blue-500/15 hover:bg-blue-100 dark:hover:bg-blue-500/25 border border-blue-200 dark:border-blue-500/20 text-xs font-bold text-blue-700 dark:text-blue-300 transition-colors shadow-xs"
             >
-              <span className="material-symbols-outlined text-sm text-blue-400">account_balance_wallet</span>
+              <span className="material-symbols-outlined text-sm text-blue-600 dark:text-blue-400">account_balance_wallet</span>
               <span>{lang === "ar" ? "المحفظة" : "Wallet"}</span>
             </Link>
           </div>
         </div>
       ) : (
-        <div className="p-3.5 bg-[#0f1624] border-b border-white/10 shrink-0">
+        <div className="p-3.5 bg-slate-50 dark:bg-[#0f1624] border-b border-slate-200 dark:border-white/10 shrink-0">
           <div className="grid grid-cols-2 gap-2.5">
             <Link
               href={`/${lang}/login`}
               onClick={() => setMobileMenuOpen(false)}
-              className="py-2.5 px-3 rounded-xl bg-[#182235] hover:bg-[#202d45] border border-white/10 text-white font-bold text-xs sm:text-sm text-center transition-all shadow-sm"
+              className="py-2.5 px-3 rounded-xl bg-white hover:bg-slate-100 dark:bg-[#182235] dark:hover:bg-[#202d45] border border-slate-200 dark:border-white/10 text-slate-800 dark:text-white font-bold text-xs sm:text-sm text-center transition-all shadow-xs"
             >
               {lang === "ar" ? "تسجيل الدخول" : "Sign In"}
             </Link>
@@ -685,22 +691,22 @@ export default function Navbar({ lang, dict }: NavbarProps) {
       )}
 
       {/* 3. Navigation List - Exact Partitioning */}
-      <div className="flex-1 overflow-y-auto overscroll-contain divide-y divide-white/[0.06]">
+      <div className="flex-1 overflow-y-auto overscroll-contain divide-y divide-slate-100 dark:divide-white/[0.06]">
         {/* أسعار إعادة البيع */}
         <Link
           href={`/${lang}/pricing`}
           onClick={() => setMobileMenuOpen(false)}
-          className="flex items-center justify-between px-4 py-3 text-slate-100 hover:text-white hover:bg-white/[0.04] transition-colors group"
+          className="flex items-center justify-between px-4 py-3 text-slate-800 dark:text-slate-100 hover:bg-slate-50 dark:hover:bg-white/[0.04] transition-colors group"
         >
           <div className="flex items-center gap-3 min-w-0">
-            <div className="w-7 h-7 rounded-lg bg-blue-500/15 border border-blue-500/30 flex items-center justify-center text-blue-400 shrink-0">
+            <div className="w-7 h-7 rounded-lg bg-blue-500/10 dark:bg-blue-500/15 border border-blue-500/20 dark:border-blue-500/30 flex items-center justify-center text-blue-600 dark:text-blue-400 shrink-0">
               <span className="material-symbols-outlined text-base">payments</span>
             </div>
-            <span className="font-bold text-xs sm:text-sm text-white group-hover:text-blue-400 transition-colors truncate">
+            <span className="font-bold text-xs sm:text-sm text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors truncate">
               {lang === "ar" ? "أسعار إعادة البيع" : "Reseller Pricing"}
             </span>
           </div>
-          <span className="text-[10px] px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20 font-semibold shrink-0">
+          <span className="text-[10px] px-2 py-0.5 rounded bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 font-semibold shrink-0">
             {lang === "ar" ? "VIP" : "PRO"}
           </span>
         </Link>
@@ -709,51 +715,51 @@ export default function Navbar({ lang, dict }: NavbarProps) {
         <Link
           href={`/${lang}/pricing?category=imei`}
           onClick={() => setMobileMenuOpen(false)}
-          className="flex items-center justify-between px-4 py-3 text-slate-200 hover:text-white hover:bg-white/[0.04] transition-colors group"
+          className="flex items-center justify-between px-4 py-3 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/[0.04] transition-colors group"
         >
           <div className="flex items-center gap-3 min-w-0">
-            <div className="w-7 h-7 rounded-lg bg-cyan-500/15 border border-cyan-500/30 flex items-center justify-center text-cyan-400 shrink-0">
+            <div className="w-7 h-7 rounded-lg bg-cyan-500/10 dark:bg-cyan-500/15 border border-cyan-500/20 dark:border-cyan-500/30 flex items-center justify-center text-cyan-600 dark:text-cyan-400 shrink-0">
               <span className="material-symbols-outlined text-base">phonelink_lock</span>
             </div>
-            <span className="font-semibold text-xs sm:text-sm text-slate-200 group-hover:text-cyan-400 transition-colors truncate">
+            <span className="font-semibold text-xs sm:text-sm text-slate-800 dark:text-slate-200 group-hover:text-cyan-600 dark:group-hover:text-cyan-400 transition-colors truncate">
               {lang === "ar" ? "خدمة IMEI / iCloud / فتح القفل" : "IMEI / iCloud / Unlock Services"}
             </span>
           </div>
-          <i className={`fas ${lang === "ar" ? "fa-chevron-left" : "fa-chevron-right"} text-xs text-slate-500 group-hover:text-cyan-400 group-hover:-translate-x-0.5 rtl:group-hover:-translate-x-0.5 ltr:group-hover:translate-x-0.5 transition-all shrink-0 ms-2`}></i>
+          <i className={`fas ${lang === "ar" ? "fa-chevron-left" : "fa-chevron-right"} text-xs text-slate-400 dark:text-slate-500 group-hover:text-cyan-600 dark:group-hover:text-cyan-400 group-hover:-translate-x-0.5 rtl:group-hover:-translate-x-0.5 ltr:group-hover:translate-x-0.5 transition-all shrink-0 ms-2`}></i>
         </Link>
 
         {/* خدمة الخادم / التفعيل / الرصيد / بطاقة الهدايا */}
         <Link
           href={`/${lang}/pricing?category=server`}
           onClick={() => setMobileMenuOpen(false)}
-          className="flex items-center justify-between px-4 py-3 text-slate-200 hover:text-white hover:bg-white/[0.04] transition-colors group"
+          className="flex items-center justify-between px-4 py-3 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/[0.04] transition-colors group"
         >
           <div className="flex items-center gap-3 min-w-0">
-            <div className="w-7 h-7 rounded-lg bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shrink-0">
+            <div className="w-7 h-7 rounded-lg bg-emerald-500/10 dark:bg-emerald-500/15 border border-emerald-500/20 dark:border-emerald-500/30 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shrink-0">
               <span className="material-symbols-outlined text-base">dns</span>
             </div>
-            <span className="font-semibold text-xs sm:text-sm text-slate-200 group-hover:text-emerald-400 transition-colors truncate">
+            <span className="font-semibold text-xs sm:text-sm text-slate-800 dark:text-slate-200 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors truncate">
               {lang === "ar" ? "خدمة الخادم / التفعيل / الرصيد" : "Server / Activation / Credits"}
             </span>
           </div>
-          <i className={`fas ${lang === "ar" ? "fa-chevron-left" : "fa-chevron-right"} text-xs text-slate-500 group-hover:text-emerald-400 group-hover:-translate-x-0.5 rtl:group-hover:-translate-x-0.5 ltr:group-hover:translate-x-0.5 transition-all shrink-0 ms-2`}></i>
+          <i className={`fas ${lang === "ar" ? "fa-chevron-left" : "fa-chevron-right"} text-xs text-slate-400 dark:text-slate-500 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 group-hover:-translate-x-0.5 rtl:group-hover:-translate-x-0.5 ltr:group-hover:translate-x-0.5 transition-all shrink-0 ms-2`}></i>
         </Link>
 
         {/* خدمة عن بُعد / FRP / وسائل التواصل الاجتماعي */}
         <Link
           href={`/${lang}/pricing?category=remote`}
           onClick={() => setMobileMenuOpen(false)}
-          className="flex items-center justify-between px-4 py-3 text-slate-200 hover:text-white hover:bg-white/[0.04] transition-colors group"
+          className="flex items-center justify-between px-4 py-3 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/[0.04] transition-colors group"
         >
           <div className="flex items-center gap-3 min-w-0">
-            <div className="w-7 h-7 rounded-lg bg-purple-500/15 border border-purple-500/30 flex items-center justify-center text-purple-400 shrink-0">
+            <div className="w-7 h-7 rounded-lg bg-purple-500/10 dark:bg-purple-500/15 border border-purple-500/20 dark:border-purple-500/30 flex items-center justify-center text-purple-600 dark:text-purple-400 shrink-0">
               <span className="material-symbols-outlined text-base">cast</span>
             </div>
-            <span className="font-semibold text-xs sm:text-sm text-slate-200 group-hover:text-purple-400 transition-colors truncate">
+            <span className="font-semibold text-xs sm:text-sm text-slate-800 dark:text-slate-200 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors truncate">
               {lang === "ar" ? "خدمة عن بُعد / FRP / الصيانة" : "Remote Support & FRP Services"}
             </span>
           </div>
-          <i className={`fas ${lang === "ar" ? "fa-chevron-left" : "fa-chevron-right"} text-xs text-slate-500 group-hover:text-purple-400 group-hover:-translate-x-0.5 rtl:group-hover:-translate-x-0.5 ltr:group-hover:translate-x-0.5 transition-all shrink-0 ms-2`}></i>
+          <i className={`fas ${lang === "ar" ? "fa-chevron-left" : "fa-chevron-right"} text-xs text-slate-400 dark:text-slate-500 group-hover:text-purple-600 dark:group-hover:text-purple-400 group-hover:-translate-x-0.5 rtl:group-hover:-translate-x-0.5 ltr:group-hover:translate-x-0.5 transition-all shrink-0 ms-2`}></i>
         </Link>
 
         {/* قناة التلجرام */}
@@ -762,22 +768,22 @@ export default function Navbar({ lang, dict }: NavbarProps) {
           target="_blank"
           rel="noopener noreferrer"
           onClick={() => setMobileMenuOpen(false)}
-          className="flex items-center justify-between px-4 py-3 text-slate-200 hover:text-white hover:bg-white/[0.04] transition-colors group"
+          className="flex items-center justify-between px-4 py-3 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/[0.04] transition-colors group"
         >
           <div className="flex items-center gap-3 min-w-0">
-            <div className="w-7 h-7 rounded-lg bg-sky-500/15 border border-sky-500/30 flex items-center justify-center text-sky-400 shrink-0">
+            <div className="w-7 h-7 rounded-lg bg-sky-500/10 dark:bg-sky-500/15 border border-sky-500/20 dark:border-sky-500/30 flex items-center justify-center text-sky-600 dark:text-sky-400 shrink-0">
               <i className="fab fa-telegram-plane text-xs"></i>
             </div>
-            <span className="font-semibold text-xs sm:text-sm text-slate-200 group-hover:text-sky-400 transition-colors truncate">
+            <span className="font-semibold text-xs sm:text-sm text-slate-800 dark:text-slate-200 group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors truncate">
               {lang === "ar" ? "قناة التلجرام الرسمية" : "Official Telegram Channel"}
             </span>
           </div>
-          <i className={`fas ${lang === "ar" ? "fa-chevron-left" : "fa-chevron-right"} text-xs text-slate-500 group-hover:text-sky-400 group-hover:-translate-x-0.5 rtl:group-hover:-translate-x-0.5 ltr:group-hover:translate-x-0.5 transition-all shrink-0 ms-2`}></i>
+          <i className={`fas ${lang === "ar" ? "fa-chevron-left" : "fa-chevron-right"} text-xs text-slate-400 dark:text-slate-500 group-hover:text-sky-600 dark:group-hover:text-sky-400 group-hover:-translate-x-0.5 rtl:group-hover:-translate-x-0.5 ltr:group-hover:translate-x-0.5 transition-all shrink-0 ms-2`}></i>
         </a>
 
         {/* Quick Site Links */}
-        <div className="pt-3 pb-1.5 px-4 bg-white/[0.02]">
-          <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">
+        <div className="pt-3 pb-1.5 px-4 bg-slate-100/70 dark:bg-white/[0.02]">
+          <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
             {lang === "ar" ? "أقسام الموقع" : "Platform Sections"}
           </span>
         </div>
@@ -785,108 +791,108 @@ export default function Navbar({ lang, dict }: NavbarProps) {
         <Link
           href={`/${lang}`}
           onClick={() => setMobileMenuOpen(false)}
-          className="flex items-center justify-between px-4 py-2.5 text-slate-300 hover:text-white hover:bg-white/[0.03] transition-colors text-xs sm:text-sm group"
+          className="flex items-center justify-between px-4 py-2.5 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-white/[0.03] transition-colors text-xs sm:text-sm group"
         >
           <span className="flex items-center gap-2.5">
-            <span className="material-symbols-outlined text-base text-blue-400">home</span>
-            <span>{dict.home}</span>
+            <span className="material-symbols-outlined text-base text-blue-600 dark:text-blue-400">home</span>
+            <span className="font-medium text-slate-800 dark:text-slate-200 group-hover:text-slate-900 dark:group-hover:text-white">{dict.home}</span>
           </span>
-          <i className={`fas ${lang === "ar" ? "fa-chevron-left" : "fa-chevron-right"} text-[10px] text-slate-500`}></i>
+          <i className={`fas ${lang === "ar" ? "fa-chevron-left" : "fa-chevron-right"} text-[10px] text-slate-400 dark:text-slate-500`}></i>
         </Link>
 
         <Link
           href={`/${lang}/orders`}
           onClick={() => setMobileMenuOpen(false)}
-          className="flex items-center justify-between px-4 py-2.5 text-slate-300 hover:text-white hover:bg-white/[0.03] transition-colors text-xs sm:text-sm group"
+          className="flex items-center justify-between px-4 py-2.5 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-white/[0.03] transition-colors text-xs sm:text-sm group"
         >
           <span className="flex items-center gap-2.5">
-            <span className="material-symbols-outlined text-base text-emerald-400">receipt_long</span>
-            <span>{lang === "ar" ? "الطلبات والعمليات" : "My Orders"}</span>
+            <span className="material-symbols-outlined text-base text-emerald-600 dark:text-emerald-400">receipt_long</span>
+            <span className="font-medium text-slate-800 dark:text-slate-200 group-hover:text-slate-900 dark:group-hover:text-white">{lang === "ar" ? "الطلبات والعمليات" : "My Orders"}</span>
           </span>
-          <i className={`fas ${lang === "ar" ? "fa-chevron-left" : "fa-chevron-right"} text-[10px] text-slate-500`}></i>
+          <i className={`fas ${lang === "ar" ? "fa-chevron-left" : "fa-chevron-right"} text-[10px] text-slate-400 dark:text-slate-500`}></i>
         </Link>
 
         <Link
           href={`/${lang}/wallet`}
           onClick={() => setMobileMenuOpen(false)}
-          className="flex items-center justify-between px-4 py-2.5 text-slate-300 hover:text-white hover:bg-white/[0.03] transition-colors text-xs sm:text-sm group"
+          className="flex items-center justify-between px-4 py-2.5 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-white/[0.03] transition-colors text-xs sm:text-sm group"
         >
           <span className="flex items-center gap-2.5">
-            <span className="material-symbols-outlined text-base text-amber-400">account_balance_wallet</span>
-            <span>{lang === "ar" ? "المحفظة والشحن" : "My Wallet"}</span>
+            <span className="material-symbols-outlined text-base text-amber-600 dark:text-amber-400">account_balance_wallet</span>
+            <span className="font-medium text-slate-800 dark:text-slate-200 group-hover:text-slate-900 dark:group-hover:text-white">{lang === "ar" ? "المحفظة والشحن" : "My Wallet"}</span>
           </span>
-          <i className={`fas ${lang === "ar" ? "fa-chevron-left" : "fa-chevron-right"} text-[10px] text-slate-500`}></i>
+          <i className={`fas ${lang === "ar" ? "fa-chevron-left" : "fa-chevron-right"} text-[10px] text-slate-400 dark:text-slate-500`}></i>
         </Link>
 
         <Link
           href={`/${lang}/api-developer`}
           onClick={() => setMobileMenuOpen(false)}
-          className="flex items-center justify-between px-4 py-2.5 text-slate-300 hover:text-white hover:bg-white/[0.03] transition-colors text-xs sm:text-sm group"
+          className="flex items-center justify-between px-4 py-2.5 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-white/[0.03] transition-colors text-xs sm:text-sm group"
         >
           <span className="flex items-center gap-2.5">
-            <span className="material-symbols-outlined text-base text-purple-400">api</span>
-            <span>{lang === "ar" ? "ربط الـ API" : "API Developer"}</span>
+            <span className="material-symbols-outlined text-base text-purple-600 dark:text-purple-400">api</span>
+            <span className="font-medium text-slate-800 dark:text-slate-200 group-hover:text-slate-900 dark:group-hover:text-white">{lang === "ar" ? "ربط الـ API" : "API Developer"}</span>
           </span>
-          <i className={`fas ${lang === "ar" ? "fa-chevron-left" : "fa-chevron-right"} text-[10px] text-slate-500`}></i>
+          <i className={`fas ${lang === "ar" ? "fa-chevron-left" : "fa-chevron-right"} text-[10px] text-slate-400 dark:text-slate-500`}></i>
         </Link>
 
         <Link
           href={`/${lang}/blog`}
           onClick={() => setMobileMenuOpen(false)}
-          className="flex items-center justify-between px-4 py-2.5 text-slate-300 hover:text-white hover:bg-white/[0.03] transition-colors text-xs sm:text-sm group"
+          className="flex items-center justify-between px-4 py-2.5 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-white/[0.03] transition-colors text-xs sm:text-sm group"
         >
           <span className="flex items-center gap-2.5">
-            <span className="material-symbols-outlined text-base text-sky-400">article</span>
-            <span>{dict.blog}</span>
+            <span className="material-symbols-outlined text-base text-sky-600 dark:text-sky-400">article</span>
+            <span className="font-medium text-slate-800 dark:text-slate-200 group-hover:text-slate-900 dark:group-hover:text-white">{dict.blog}</span>
           </span>
-          <i className={`fas ${lang === "ar" ? "fa-chevron-left" : "fa-chevron-right"} text-[10px] text-slate-500`}></i>
+          <i className={`fas ${lang === "ar" ? "fa-chevron-left" : "fa-chevron-right"} text-[10px] text-slate-400 dark:text-slate-500`}></i>
         </Link>
 
         <Link
           href={`/${lang}/tutorials`}
           onClick={() => setMobileMenuOpen(false)}
-          className="flex items-center justify-between px-4 py-2.5 text-slate-300 hover:text-white hover:bg-white/[0.03] transition-colors text-xs sm:text-sm group"
+          className="flex items-center justify-between px-4 py-2.5 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-white/[0.03] transition-colors text-xs sm:text-sm group"
         >
           <span className="flex items-center gap-2.5">
-            <span className="material-symbols-outlined text-base text-indigo-400">play_circle</span>
-            <span>{dict.tutorials}</span>
+            <span className="material-symbols-outlined text-base text-indigo-600 dark:text-indigo-400">play_circle</span>
+            <span className="font-medium text-slate-800 dark:text-slate-200 group-hover:text-slate-900 dark:group-hover:text-white">{dict.tutorials}</span>
           </span>
-          <i className={`fas ${lang === "ar" ? "fa-chevron-left" : "fa-chevron-right"} text-[10px] text-slate-500`}></i>
+          <i className={`fas ${lang === "ar" ? "fa-chevron-left" : "fa-chevron-right"} text-[10px] text-slate-400 dark:text-slate-500`}></i>
         </Link>
 
         <Link
           href={`/${lang}/contact`}
           onClick={() => setMobileMenuOpen(false)}
-          className="flex items-center justify-between px-4 py-2.5 text-slate-300 hover:text-white hover:bg-white/[0.03] transition-colors text-xs sm:text-sm group"
+          className="flex items-center justify-between px-4 py-2.5 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-white/[0.03] transition-colors text-xs sm:text-sm group"
         >
           <span className="flex items-center gap-2.5">
-            <span className="material-symbols-outlined text-base text-cyan-400">mail</span>
-            <span>{dict.contactUs}</span>
+            <span className="material-symbols-outlined text-base text-cyan-600 dark:text-cyan-400">mail</span>
+            <span className="font-medium text-slate-800 dark:text-slate-200 group-hover:text-slate-900 dark:group-hover:text-white">{dict.contactUs}</span>
           </span>
-          <i className={`fas ${lang === "ar" ? "fa-chevron-left" : "fa-chevron-right"} text-[10px] text-slate-500`}></i>
+          <i className={`fas ${lang === "ar" ? "fa-chevron-left" : "fa-chevron-right"} text-[10px] text-slate-400 dark:text-slate-500`}></i>
         </Link>
       </div>
 
       {/* 4. Drawer Footer Controls */}
-      <div className="p-3 bg-[#090d15] border-t border-white/10 shrink-0 flex items-center justify-between gap-3">
+      <div className="p-3.5 bg-slate-100 dark:bg-[#090d15] border-t border-slate-200 dark:border-white/10 shrink-0 flex items-center justify-between gap-3">
         <Link 
           href={switchLanguage()} 
           onClick={() => setMobileMenuOpen(false)}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-white/10 bg-white/5 text-slate-200 hover:text-white hover:bg-white/10 transition-colors text-xs font-bold"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-300 dark:border-white/10 bg-white dark:bg-white/5 text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-white/10 transition-colors text-xs font-bold shadow-xs"
         >
-          <span className="material-symbols-outlined text-sm text-blue-400">language</span>
+          <span className="material-symbols-outlined text-sm text-blue-600 dark:text-blue-400">language</span>
           <span>{lang === "ar" ? "English" : "العربية"}</span>
         </Link>
 
-        <div className="flex items-center gap-1.5 text-xs text-slate-300">
+        <div className="flex items-center gap-1.5 text-xs text-slate-600 dark:text-slate-300">
           <span className="text-slate-500">{lang === "ar" ? "العملة:" : "Currency:"}</span>
           <select
             value={selectedCurrencyCode}
             onChange={(e) => handleCurrencyChange(e.target.value)}
-            className="bg-surface-container-high border border-white/10 rounded-lg py-1 px-2 text-xs text-white focus:outline-none focus:border-blue-500 cursor-pointer"
+            className="bg-white dark:bg-[#121929] border border-slate-300 dark:border-white/10 rounded-lg py-1 px-2 text-xs text-slate-800 dark:text-white focus:outline-none focus:border-blue-500 cursor-pointer shadow-xs"
           >
             {CURRENCIES.map((c) => (
-              <option key={c.code} value={c.code} className="bg-[#121929] text-white">
+              <option key={c.code} value={c.code} className="bg-white dark:bg-[#121929] text-slate-800 dark:text-white">
                 {c.code} ({lang === "ar" ? c.symbolAr : c.symbolEn})
               </option>
             ))}

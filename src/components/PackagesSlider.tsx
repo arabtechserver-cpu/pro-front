@@ -1,257 +1,270 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import Link from "next/link";
-import { 
-  Check, 
-  ArrowLeft, 
-  ArrowRight, 
-  ChevronLeft, 
-  ChevronRight, 
-  Sparkles, 
-  Clock, 
-  ShieldCheck, 
-  Zap,
-  Wrench,
-  Smartphone,
-  Layers
+import {
+  ShoppingCart,
+  LayoutGrid,
+  Star,
+  CheckCircle2,
+  Zap
 } from "lucide-react";
 
-interface PackagesSliderProps {
-  lang: string;
-}
-
-interface PricingPackage {
+interface FeaturedPackage {
   id: string;
   nameAr: string;
   nameEn: string;
-  subAr: string;
-  subEn: string;
+  subAr?: string;
+  subEn?: string;
   badgeAr?: string;
   badgeEn?: string;
   isPopular?: boolean;
   startingPrice: string;
-  categoryAr: string;
-  categoryEn: string;
-  deliveryTimeAr: string;
-  deliveryTimeEn: string;
-  icon: typeof Wrench;
+  categoryAr?: string;
+  categoryEn?: string;
+  deliveryTimeAr?: string;
+  deliveryTimeEn?: string;
+  iconName?: string;
+  image?: string;
   url: string;
-  featuresAr: string[];
-  featuresEn: string[];
 }
 
-export default function PackagesSlider({ lang }: PackagesSliderProps) {
+interface PackagesSliderProps {
+  lang: string;
+  packages?: FeaturedPackage[];
+}
+
+const DEFAULT_PACKAGES: FeaturedPackage[] = [
+  {
+    id: "chimera",
+    nameAr: "Chimera Tool",
+    nameEn: "Chimera Tool",
+    subAr: "Activation / Credits",
+    subEn: "Activation / Credits",
+    badgeAr: "Best Seller",
+    badgeEn: "Best Seller",
+    isPopular: true,
+    startingPrice: "$106.59",
+    categoryAr: "Official",
+    categoryEn: "Official",
+    url: "/pricing?section=Chimera%20Tool"
+  },
+  {
+    id: "amt",
+    nameAr: "Android Multi Tool",
+    nameEn: "Android Multi Tool",
+    subAr: "AMT Credits",
+    subEn: "AMT Credits",
+    badgeAr: "Popular",
+    badgeEn: "Popular",
+    isPopular: false,
+    startingPrice: "$0.92",
+    categoryAr: "Instant",
+    categoryEn: "Instant",
+    url: "/pricing?section=Android%20Multi%20Tool"
+  },
+  {
+    id: "xiaomi",
+    nameAr: "Xiaomi Remove Account",
+    nameEn: "Xiaomi Remove Account",
+    subAr: "",
+    subEn: "",
+    badgeAr: "Official",
+    badgeEn: "Official",
+    isPopular: false,
+    startingPrice: "$3.41",
+    categoryAr: "Fast Service",
+    categoryEn: "Fast Service",
+    url: "/pricing?section=Xiaomi%20Remove%20Account"
+  }
+];
+
+function renderToolLogo(pkg: FeaturedPackage) {
+  if (pkg.image) {
+    return (
+      <img
+        src={pkg.image}
+        alt={pkg.nameAr || pkg.nameEn}
+        className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl object-cover border border-slate-200 dark:border-white/10 shrink-0 shadow-sm"
+      />
+    );
+  }
+
+  const key = `${pkg.id} ${pkg.nameAr} ${pkg.nameEn}`.toLowerCase();
+  if (key.includes("xiaomi") || key.includes("شاومي")) {
+    return (
+      <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-[#ff6900] flex items-center justify-center text-white font-black text-xl sm:text-2xl shadow-sm shrink-0 select-none">
+        mi
+      </div>
+    );
+  }
+
+  if (key.includes("amt") || key.includes("android multi tool")) {
+    return (
+      <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-slate-100 dark:bg-[#091524] border border-red-300 dark:border-red-500/30 flex items-center justify-center text-red-500 font-black text-sm sm:text-base shadow-sm shrink-0 select-none tracking-tight">
+        AMT
+      </div>
+    );
+  }
+
+  if (key.includes("chimera") || key.includes("شيميرا")) {
+    return (
+      <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-black border border-amber-500/40 flex items-center justify-center text-amber-400 shadow-sm shrink-0 select-none">
+        <svg viewBox="0 0 24 24" className="w-7 h-7 fill-current" aria-hidden="true">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z" />
+        </svg>
+      </div>
+    );
+  }
+
+  const initials = (pkg.nameEn || pkg.nameAr || "PRO").slice(0, 3).toUpperCase();
+  return (
+    <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-cyan-950/60 border border-cyan-500/30 flex items-center justify-center text-cyan-400 font-black text-xs sm:text-sm shadow-sm shrink-0 select-none">
+      {initials}
+    </div>
+  );
+}
+
+export default function PackagesSlider({ lang, packages }: PackagesSliderProps) {
   const isAr = lang === "ar";
-  const ArrowIcon = isAr ? ArrowLeft : ArrowRight;
-  const PrevIcon = isAr ? ChevronRight : ChevronLeft;
-  const NextIcon = isAr ? ChevronLeft : ChevronRight;
+  const displayPackages =
+    Array.isArray(packages) && packages.length > 0 ? packages : DEFAULT_PACKAGES;
 
-  const packages: PricingPackage[] = [
-    {
-      id: "xiaomi",
-      nameAr: "باقة حذف وتخطي حسابات شاومي الرسمية",
-      nameEn: "Xiaomi Mi Account Removal Service",
-      subAr: "Xiaomi Remove Account - Direct Source Services",
-      subEn: "Xiaomi Remove Account - Direct Source Services",
-      badgeAr: "سيرفر رسمي مباشر",
-      badgeEn: "Direct Server",
-      startingPrice: "$3.41",
-      categoryAr: "سيرفرات الـ IMEI الرسمية",
-      categoryEn: "Official IMEI Server",
-      deliveryTimeAr: "1 - 12 ساعة",
-      deliveryTimeEn: "1 - 12 Hours",
-      icon: Smartphone,
-      url: `/${lang}/pricing?section=Xiaomi%20Remove%20Account`,
-      featuresAr: [
-        "حذف دائم ونظيف من سيرفر شاومي الرسمي (Clean IMEI)",
-        "دعم الأجهزة من جميع دول العالم (Worldwide Support)",
-        "إمكانية إعادة ضبط المصنع والتحديث بعد الحذف بأمان",
-        "تنفيذ تلقائي عبر الـ API مع استرجاع الرصيد في حال الرفض"
-      ],
-      featuresEn: [
-        "Permanent clean removal from official Xiaomi servers",
-        "Worldwide device support across all regions",
-        "Safe factory reset and OTA updates after completion",
-        "Automated API execution with full refund protection"
-      ]
-    },
-    {
-      id: "amt",
-      nameAr: "باقة رصيد أداة أندرويد ملتي تول (AMT)",
-      nameEn: "Android Multi Tool (AMT) Credits",
-      subAr: "Android Multi Tool - Official Server Credits",
-      subEn: "Android Multi Tool - Official Server Credits",
-      badgeAr: "سعر يبدأ من أقل من $1",
-      badgeEn: "Starting under $1",
-      startingPrice: "$0.92",
-      categoryAr: "أرصدة أدوات السيرفر",
-      categoryEn: "Server Tool Credits",
-      deliveryTimeAr: "تسليم فوري 24/7",
-      deliveryTimeEn: "Instant 24/7",
-      icon: Zap,
-      url: `/${lang}/pricing?section=Android%20Multi%20Tool`,
-      featuresAr: [
-        "دعم كامل لهواتف VIVO و XIAOMI و TECNO و INFINIX",
-        "عمليات FRP وتخطي حسابات وحذف الديمو (Demo Removal)",
-        "شحن فوري بالكريدت مباشرة إلى اسم المستخدم لحسابك",
-        "لا يحتاج إلى بوكس أو دونجل خارجي للعمل"
-      ],
-      featuresEn: [
-        "Full support for Vivo, Xiaomi, Tecno & Infinix",
-        "One-click FRP bypass, factory reset, and demo removal",
-        "Instant credit top-up directly to your username",
-        "No hardware box or dongle required to run"
-      ]
-    },
-    {
-      id: "chimera",
-      nameAr: "باقة تفعيل وسيرفر أداة شيميرا (Chimera)",
-      nameEn: "Chimera Tool Pro & Samsung Activations",
-      subAr: "Chimera Tool - Direct Source Services",
-      subEn: "Chimera Tool - Direct Source Services",
-      badgeAr: "الأكثر طلباً للمحترفين",
-      badgeEn: "Most In-Demand",
-      isPopular: true,
-      startingPrice: "$106.59",
-      categoryAr: "أدوات السوفت وير الاحترافية",
-      categoryEn: "Pro Software Tools",
-      deliveryTimeAr: "تفعيل فوري تلقائي 24/7",
-      deliveryTimeEn: "Instant 24/7 Activation",
-      icon: Wrench,
-      url: `/${lang}/pricing?section=Chimera%20Tool`,
-      featuresAr: [
-        "تراخيص Chimera Basic و Samsung و All Brands Pro",
-        "فك شبكات وتصليح السيريال وإصلاح IMEI وتعديل الموديل",
-        "تفعيل رسمي مباشر على حساب المستخدم خلال دقيقة",
-        "تحديثات متواصلة لدعم أحدث إصدارات الأندرويد"
-      ],
-      featuresEn: [
-        "Chimera Basic, Samsung, and All Brands Pro licenses",
-        "Carrier unlock, serial repair, and network patching",
-        "Official 1-minute automated account activation",
-        "Continuous support for latest Android security patches"
-      ]
-    }
-  ];
+  const langPrefix = `/${lang}`;
 
-  const [activeIndex, setActiveIndex] = useState(0);
-
-  const handlePrev = () => {
-    setActiveIndex((prev) => (prev === 0 ? packages.length - 1 : prev - 1));
-  };
-
-  const handleNext = () => {
-    setActiveIndex((prev) => (prev === packages.length - 1 ? 0 : prev + 1));
+  const resolveUrl = (url: string) => {
+    if (!url) return `${langPrefix}/pricing`;
+    if (url.startsWith("http://") || url.startsWith("https://")) return url;
+    if (url.startsWith("/")) return `${langPrefix}${url}`;
+    return `${langPrefix}/${url}`;
   };
 
   return (
-    <section className="w-full mb-10 sm:mb-14">
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-6 sm:mb-8 gap-4">
-        <div>
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-xs font-bold text-sky-400 uppercase tracking-wider mb-2">
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>{isAr ? "الباقات والتفعيلات الأكثر طلباً" : "TOP FEATURED PACKAGES"}</span>
-          </div>
-          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-white tracking-tight leading-tight">
-            <span>{isAr ? "تصفح باقات وتراخيص " : "Explore In-Demand "}</span>
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-blue-400">
-              {isAr ? "السيرفر المعتمدة" : "Verified Server Packages"}
-            </span>
+    <section className="w-full mb-8 sm:mb-12">
+      {/* Header Matching Mockup */}
+      <div className="text-center mb-4 sm:mb-6">
+        <div className="inline-flex items-center gap-2 mb-1">
+          <span className="h-[2px] w-5 sm:w-6 bg-cyan-500 dark:bg-cyan-400" />
+          <h2 className="text-base sm:text-2xl font-black text-slate-900 dark:text-white">
+            {isAr ? "البيانات والتفعيلات الأكثر طلباً" : "Top In-Demand Packages"}
           </h2>
-          <p className="text-xs sm:text-sm text-slate-300 mt-2 max-w-xl">
-            {isAr
-              ? "باقات مختارة ومحدثة مباشرة مع تسليم مؤتمت فورياً وأسعار جملة مخفضة لأصحاب المحلات والوكلاء."
-              : "Hand-picked pro packages with automated instant API delivery and wholesale pricing for repair shops."}
-          </p>
+          <span className="h-[2px] w-5 sm:w-6 bg-cyan-500 dark:bg-cyan-400" />
         </div>
+        <p className="text-[11px] sm:text-sm text-slate-600 dark:text-slate-400 mb-3">
+          {isAr
+            ? "اختر من بين أبرز الخدمات طلباً الآن"
+            : "Choose from our top-selling services now"}
+        </p>
 
-        <div className="flex items-center gap-2">
+        {/* View All Packages Pill Button */}
+        <div className="flex justify-center">
           <Link
-            href={`/${lang}/pricing`}
-            className="text-xs font-bold text-sky-400 hover:text-white px-3 py-2 rounded-xl bg-white/5 border border-white/10 hover:border-sky-400/40 transition-all flex items-center gap-1.5"
+            href={resolveUrl("/pricing")}
+            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-slate-100 dark:bg-[#08182b] border border-slate-300 dark:border-cyan-500/40 hover:border-cyan-400 text-[11px] sm:text-xs font-bold text-slate-700 dark:text-cyan-300 hover:text-primary dark:hover:text-white transition-all shadow-sm"
           >
-            <span>{isAr ? "كافة الباقات (500+)" : "All Packages (500+)"}</span>
-            <ArrowIcon className="w-3.5 h-3.5" />
+            <LayoutGrid className="w-3.5 h-3.5 text-cyan-600 dark:text-cyan-400" />
+            <span>{isAr ? "عرض جميع الباقات" : "View All Packages"}</span>
           </Link>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {packages.map((pkg) => {
-          const Icon = pkg.icon;
+      {/* Cards: Stacked vertically on mobile, 3 columns on desktop */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-5">
+        {displayPackages.map((pkg) => {
+          const isChimera = pkg.id.includes("chimera") || pkg.nameEn.toLowerCase().includes("chimera");
+          const isAmt = pkg.id.includes("amt") || pkg.nameEn.toLowerCase().includes("android");
+          const isXiaomi = pkg.id.includes("xiaomi") || pkg.nameEn.toLowerCase().includes("xiaomi");
+
           return (
             <div
               key={pkg.id}
-              className={`relative rounded-2xl sm:rounded-3xl p-6 sm:p-7 bg-[#090f1a]/80 backdrop-blur-xl border transition-all duration-300 flex flex-col justify-between shadow-xl group hover:-translate-y-1 ${
-                pkg.isPopular 
-                  ? "border-sky-400/40 hover:border-sky-400/70 shadow-sky-950/30" 
-                  : "border-white/10 hover:border-white/25"
-              }`}
+              className="p-3.5 sm:p-5 rounded-2xl bg-white dark:bg-[#061224] border border-slate-200 dark:border-cyan-500/25 hover:border-cyan-400 dark:hover:border-cyan-400 shadow-sm dark:shadow-xl transition-all flex flex-col justify-between group min-h-[145px] sm:min-h-[165px]"
             >
-              {pkg.badgeAr && (
-                <div className="absolute -top-3 start-6 z-20 px-3 py-0.5 rounded-full bg-gradient-to-r from-amber-500/20 to-amber-600/20 border border-amber-400/40 text-[11px] font-bold text-amber-300 shadow-sm flex items-center gap-1.5">
-                  <Sparkles className="w-3 h-3 text-amber-400" />
-                  <span>{isAr ? pkg.badgeAr : pkg.badgeEn}</span>
-                </div>
-              )}
+              {/* Top Row: Logo on Right + Info */}
+              <div className="flex items-start gap-3 sm:gap-4">
+                {renderToolLogo(pkg)}
 
-              <div>
-                <div className="flex items-center justify-between gap-3 mb-4">
-                  <span className="text-xs font-semibold text-sky-400 bg-sky-500/10 px-3 py-1 rounded-full border border-sky-500/20 flex items-center gap-1.5">
-                    <Icon className="w-3.5 h-3.5" />
-                    <span>{isAr ? pkg.categoryAr : pkg.categoryEn}</span>
-                  </span>
-
-                  <span className="text-[11px] text-slate-400 flex items-center gap-1">
-                    <Clock className="w-3 h-3 text-slate-400" />
-                    <span>{isAr ? pkg.deliveryTimeAr : pkg.deliveryTimeEn}</span>
-                  </span>
-                </div>
-
-                <div className="flex items-start justify-between gap-3 mb-3">
-                  <div>
-                    <h3 className="text-lg sm:text-xl font-bold text-white group-hover:text-sky-300 transition-colors leading-tight">
-                      {isAr ? pkg.nameAr : pkg.nameEn}
-                    </h3>
-                    <span className="text-xs text-slate-400 block mt-1 line-clamp-1 font-mono">
+                <div className="min-w-0 flex-1">
+                  <h3 className="text-xs sm:text-base font-black text-slate-900 dark:text-white group-hover:text-cyan-600 dark:group-hover:text-cyan-300 transition-colors truncate leading-tight">
+                    {isAr ? pkg.nameAr : pkg.nameEn}
+                  </h3>
+                  {pkg.subAr && (
+                    <span className="text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 block truncate mt-0.5 font-medium">
                       {isAr ? pkg.subAr : pkg.subEn}
                     </span>
-                  </div>
-                  <div className="text-end shrink-0">
-                    <span className="text-[10px] text-slate-400 block uppercase font-medium">{isAr ? "يبدأ من" : "From"}</span>
-                    <span className="text-2xl font-black text-emerald-400 font-mono tracking-tight">
-                      {pkg.startingPrice}
-                    </span>
+                  )}
+
+                  {/* Badges strictly matching mockup */}
+                  <div className="flex flex-wrap items-center gap-1 sm:gap-1.5 mt-1.5">
+                    {isChimera ? (
+                      <>
+                        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-emerald-50 dark:bg-[#0a2c1f] border border-emerald-200 dark:border-emerald-500/30 text-[9px] sm:text-[10px] font-bold text-emerald-700 dark:text-emerald-400">
+                          <Star className="w-2.5 h-2.5 text-emerald-500 fill-emerald-500" />
+                          <span>{isAr ? "Best Seller" : "Best Seller"}</span>
+                        </span>
+                        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-sky-50 dark:bg-[#092238] border border-sky-200 dark:border-cyan-500/30 text-[9px] sm:text-[10px] font-semibold text-sky-700 dark:text-cyan-300">
+                          <CheckCircle2 className="w-2.5 h-2.5 text-sky-600 dark:text-cyan-400" />
+                          <span>{isAr ? "Official" : "Official"}</span>
+                        </span>
+                      </>
+                    ) : isAmt ? (
+                      <>
+                        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-amber-50 dark:bg-[#2c1d0a] border border-amber-200 dark:border-amber-500/30 text-[9px] sm:text-[10px] font-bold text-amber-700 dark:text-amber-400">
+                          <Star className="w-2.5 h-2.5 text-amber-500 fill-amber-500" />
+                          <span>{isAr ? "Popular" : "Popular"}</span>
+                        </span>
+                        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-sky-50 dark:bg-[#092238] border border-sky-200 dark:border-cyan-500/30 text-[9px] sm:text-[10px] font-semibold text-sky-700 dark:text-cyan-300">
+                          <Zap className="w-2.5 h-2.5 text-sky-600 dark:text-cyan-400" />
+                          <span>{isAr ? "Instant" : "Instant"}</span>
+                        </span>
+                      </>
+                    ) : isXiaomi ? (
+                      <>
+                        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-emerald-50 dark:bg-[#0a2c1f] border border-emerald-200 dark:border-emerald-500/30 text-[9px] sm:text-[10px] font-bold text-emerald-700 dark:text-emerald-400">
+                          <CheckCircle2 className="w-2.5 h-2.5 text-emerald-500" />
+                          <span>{isAr ? "Official" : "Official"}</span>
+                        </span>
+                        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-sky-50 dark:bg-[#092238] border border-sky-200 dark:border-cyan-500/30 text-[9px] sm:text-[10px] font-semibold text-sky-700 dark:text-cyan-300">
+                          <Zap className="w-2.5 h-2.5 text-sky-600 dark:text-cyan-400" />
+                          <span>{isAr ? "Fast Service" : "Fast Service"}</span>
+                        </span>
+                      </>
+                    ) : (
+                      <>
+                        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-sky-50 dark:bg-[#092238] border border-sky-200 dark:border-cyan-500/30 text-[9px] sm:text-[10px] font-semibold text-sky-700 dark:text-cyan-300">
+                          <CheckCircle2 className="w-2.5 h-2.5 text-sky-600 dark:text-cyan-400" />
+                          <span>{pkg.categoryAr || (isAr ? "Official" : "Official")}</span>
+                        </span>
+                        {pkg.badgeAr && (
+                          <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-emerald-50 dark:bg-[#0a2c1f] border border-emerald-200 dark:border-emerald-500/30 text-[9px] sm:text-[10px] font-bold text-emerald-700 dark:text-emerald-400">
+                            <Star className="w-2.5 h-2.5 text-emerald-500 fill-emerald-500" />
+                            <span>{pkg.badgeAr}</span>
+                          </span>
+                        )}
+                      </>
+                    )}
                   </div>
                 </div>
-
-                <div className="w-full h-px bg-white/10 my-4" />
-
-                <ul className="space-y-2.5 mb-6">
-                  {(isAr ? pkg.featuresAr : pkg.featuresEn).map((feat, fIdx) => (
-                    <li key={fIdx} className="flex items-start gap-2.5 text-xs sm:text-sm text-slate-300">
-                      <div className="w-4 h-4 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 flex items-center justify-center shrink-0 mt-0.5">
-                        <Check className="w-2.5 h-2.5 stroke-[3]" />
-                      </div>
-                      <span className="line-clamp-2 leading-relaxed">{feat}</span>
-                    </li>
-                  ))}
-                </ul>
               </div>
 
-              <div className="space-y-2 pt-2">
+              {/* Bottom Row: Price on Right + Green Button on Left */}
+              <div className="pt-2.5 sm:pt-3 mt-2.5 sm:mt-3 border-t border-slate-100 dark:border-white/5 flex items-center justify-between gap-2.5 sm:gap-3">
+                <div className="text-start">
+                  <span className="text-base sm:text-xl font-black text-sky-600 dark:text-[#00e5ff] font-mono tracking-tight block leading-tight">
+                    {pkg.startingPrice}
+                  </span>
+                  <span className="text-[9px] sm:text-[10px] text-slate-500 dark:text-slate-400 block font-medium">
+                    {isAr ? "يبدأ من" : "Starts at"}
+                  </span>
+                </div>
+
                 <Link
-                  href={pkg.url}
-                  className="btn-royal w-full py-3 px-5 font-bold text-xs sm:text-sm text-center flex items-center justify-center gap-2 group shadow-md shadow-blue-950/40"
+                  href={resolveUrl(pkg.url)}
+                  className="px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-xl bg-[#00d084] hover:bg-[#00b975] text-[#052216] font-black text-xs sm:text-sm shadow-sm transition-all flex items-center gap-1.5 shrink-0"
                 >
-                  <span>{isAr ? "اطلب الآن وابدأ التفعيل" : "Order & Activate Now"}</span>
-                  <ArrowIcon className="w-3.5 h-3.5 transition-transform group-hover:-translate-x-1 rtl:group-hover:-translate-x-1 ltr:group-hover:translate-x-1" />
+                  <ShoppingCart className="w-3.5 h-3.5 text-[#052216]" />
+                  <span>{isAr ? "اطلب الآن" : "Order Now"}</span>
                 </Link>
-                <p className="text-center text-[10px] text-slate-400 flex items-center justify-center gap-1.5">
-                  <ShieldCheck className="w-3 h-3 text-emerald-400" />
-                  <span>{isAr ? "تنفيذ مؤتمت عبر الـ API مع استرجاع الرصيد عند الفشل" : "Automated API with instant refund guarantee"}</span>
-                </p>
               </div>
             </div>
           );

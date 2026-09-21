@@ -1,251 +1,264 @@
 "use client";
 
 import React from "react";
-import Link from "next/link";
 import { 
-  Sparkles, 
-  Layers, 
+  User, 
+  Wallet, 
+  CheckCircle2, 
+  ChevronLeft, 
+  ChevronRight,
+  ShoppingCart, 
   ShieldCheck, 
   Zap, 
-  CheckCircle2, 
-  ArrowLeft, 
-  ArrowRight, 
-  Clock, 
-  Cpu, 
-  Wallet, 
-  RefreshCw, 
-  Headphones,
-  Check
+  RotateCcw, 
+  Users 
 } from "lucide-react";
-import { Locale } from "@/i18n/config";
 
 interface WorkflowTrustSectionProps {
-  lang: Locale;
+  lang: string;
 }
 
 export default function WorkflowTrustSection({ lang }: WorkflowTrustSectionProps) {
   const isAr = lang === "ar";
-  const ArrowIcon = isAr ? ArrowLeft : ArrowRight;
+  const FlowChevron = isAr ? ChevronLeft : ChevronRight;
 
   const steps = [
     {
-      step: "01",
-      icon: Layers,
-      accentColor: "sky",
-      badgeAr: "الخطوة الأولى",
-      badgeEn: "Step One",
-      titleAr: "تحديد الخدمة أو نوع الأداة",
-      titleEn: "Select Service or Tool",
-      descAr: "تصفح أكثر من 1500 خدمة وسيرفر، تشمل فك شفرات IMEI، حذف حسابات FRP/iCloud، وتفعيل البوكسات والأدوات.",
-      descEn: "Browse 1500+ services including IMEI unlock, FRP/iCloud bypass, and software tool activations.",
-      tagsAr: ["فحص تلقائي للتوافق", "تحديثات يومية للأدوات", "أسعار الجملة المعتمدة"],
-      tagsEn: ["Auto Model Check", "Daily Tool Updates", "Wholesale Rates"]
+      step: 1,
+      titleAr: "تحديد الخدمة",
+      titleEn: "Select Service",
+      descAr: "اختر الخدمة التي تحتاجها",
+      descEn: "Choose the service you need",
+      icon: User,
+      iconColor: "text-cyan-400",
+      glowBg: "bg-cyan-500/10 border-cyan-500/30 text-cyan-400 shadow-[0_0_15px_rgba(0,229,255,0.25)]"
     },
     {
-      step: "02",
+      step: 2,
+      titleAr: "شحن المحفظة",
+      titleEn: "Fund Wallet",
+      descAr: "وادفع عبر وسائل الدفع المتاحة",
+      descEn: "Pay via available payment methods",
       icon: Wallet,
-      accentColor: "emerald",
-      badgeAr: "الخطوة الثانية",
-      badgeEn: "Step Two",
-      titleAr: "شحن المحفظة والدفع الآمن",
-      titleEn: "Secure Funding & Checkout",
-      descAr: "شحن فوري وتلقائي للمحفظة عبر وسائل دفع مرنة، مع تشفير مصرفي كامل وضمان مالي 100% لاسترجاع الرصيد.",
-      descEn: "Instant automated wallet funding via multi-gateways with 256-bit encryption and full refund protection.",
-      tagsAr: ["شحن فوري 24/7", "تشفير بيانات عالي", "ضمان استرجاع تلقائي"],
-      tagsEn: ["Instant 24/7 Credit", "256-bit Security", "Auto-Refund Guarantee"]
+      iconColor: "text-cyan-400",
+      glowBg: "bg-cyan-500/10 border-cyan-500/30 text-cyan-400 shadow-[0_0_15px_rgba(0,229,255,0.25)]"
     },
     {
-      step: "03",
-      icon: Zap,
-      accentColor: "amber",
-      badgeAr: "الخطوة الثالثة",
-      badgeEn: "Step Three",
-      titleAr: "تنفيذ فوري واستلام التفعيل",
-      titleEn: "Instant API Fulfillment",
-      descAr: "معالجة آلية مباشرة عبر سيرفرات المصانع الرسمية خلال دقائق، مع إشعار بالبريد وتحديث فوري لحالة طلبك.",
-      descEn: "Direct automated server processing in minutes, with instant notifications and live order tracking.",
-      tagsAr: ["متوسط 1 - 5 دقائق", "ربط Direct API", "إشعار فوري بحالة الطلب"],
-      tagsEn: ["Avg 1 - 5 Mins", "Direct API Sync", "Live Status Updates"]
+      step: 3,
+      titleAr: "تنفيذ فوري",
+      titleEn: "Instant Execution",
+      descAr: "واستلام التفعيل",
+      descEn: "And receive activation",
+      icon: CheckCircle2,
+      iconColor: "text-emerald-400",
+      glowBg: "bg-emerald-500/10 border-emerald-500/30 text-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.25)]"
     }
   ];
 
-  const trustMetrics = [
+  const trustStats = [
     {
-      value: "500K+",
-      labelAr: "أجهزة وتفعيلات ناجحة",
-      labelEn: "Successful Unlocks",
-      subAr: "نسبة إتمام 99.8%",
-      subEn: "99.8% Success Rate",
-      icon: CheckCircle2,
-      color: "text-emerald-400"
+      value: "+500K",
+      labelAr: "طلب منجز",
+      labelEn: "Orders Completed",
+      icon: ShoppingCart,
+      color: "text-cyan-500 dark:text-cyan-400"
+    },
+    {
+      value: "24/7",
+      labelAr: "دعم VIP",
+      labelEn: "VIP Support",
+      icon: Users,
+      color: "text-blue-500 dark:text-blue-400"
+    },
+    {
+      value: "99.8%",
+      labelAr: "نسبة نجاح",
+      labelEn: "Success Rate",
+      icon: ShieldCheck,
+      color: "text-emerald-500 dark:text-emerald-400"
     },
     {
       value: "1 - 5 Mins",
-      labelAr: "متوسط سرعة الإنجاز",
-      labelEn: "Avg Delivery Time",
-      subAr: "معالجة آلية بدون تدخل بشري",
-      subEn: "Direct Automated Processing",
-      icon: Clock,
-      color: "text-amber-400"
-    },
-    {
-      value: "100% REFUND",
-      labelAr: "الضمان المالي الكامل",
-      labelEn: "Financial Protection",
-      subAr: "استرجاع فوري للطلبات المرفوضة",
-      subEn: "Instant Return on Rejection",
-      icon: ShieldCheck,
-      color: "text-sky-400"
-    },
-    {
-      value: "24/7 VIP",
-      labelAr: "سيرفرات ودعم متواصل",
-      labelEn: "Live Uptime & Support",
-      subAr: "تيليجرام، واتساب، وتذاكر فنية",
-      subEn: "Telegram, WhatsApp & Tickets",
-      icon: Headphones,
-      color: "text-cyan-400"
+      labelAr: "متوسط وقت التنفيذ",
+      labelEn: "Avg Execution Time",
+      icon: Zap,
+      color: "text-cyan-500 dark:text-cyan-400"
     }
   ];
 
-  const supportedPlatforms = [
-    "Apple", "Samsung", "Xiaomi", "Huawei", "OnePlus", "Oppo", "Vivo",
-    "Qualcomm", "MediaTek MTK", "Unisoc", "UnlockTool", "Chimera", "Borneo", "Pandora"
-  ];
-
   return (
-    <section className="w-full relative">
-      {/* Background Ambience & Glow */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-3/4 max-w-4xl h-64 bg-blue-600/10 rounded-full blur-3xl pointer-events-none" />
-
-      {/* Main Container Card */}
-      <div className="relative rounded-2xl sm:rounded-3xl p-6 sm:p-8 lg:p-10 bg-[#090f1a]/85 backdrop-blur-xl border border-white/10 shadow-2xl overflow-hidden">
-        {/* Top Glow Accent Strip */}
-        <div className="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-transparent via-cyan-400 to-transparent opacity-75 shadow-[0_0_16px_rgba(34,211,238,0.7)]" />
-
-        {/* Section Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-8 sm:pb-10 border-b border-white/10">
-          <div className="space-y-3">
-            <div className="inline-flex items-center gap-2 bg-blue-500/10 border border-blue-500/25 px-3.5 py-1.5 rounded-full text-xs font-semibold text-sky-400 shadow-sm">
-              <Sparkles className="w-3.5 h-3.5 text-sky-400" />
-              <span>{isAr ? "منظومة مؤتمتة وسريعة • مسار التفعيل الفوري" : "Automated Pipeline • Fast-Track Execution"}</span>
-            </div>
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-white tracking-tight">
-              {isAr ? "كيف تعمل المنصة؟ من الاختيار إلى التفعيل في 3 خطوات" : "How It Works: 3 Quick Steps from Selection to Activation"}
+    <div className="w-full space-y-8 sm:space-y-12 mb-8 sm:mb-12">
+      {/* 1. How It Works Section */}
+      <section className="w-full">
+        {/* Centered Header matching Mockup */}
+        <div className="text-center mb-4 sm:mb-6">
+          <div className="inline-flex items-center gap-2 mb-1">
+            <span className="h-[2px] w-5 sm:w-6 bg-cyan-500 dark:bg-cyan-400" />
+            <h2 className="text-base sm:text-2xl font-black text-slate-900 dark:text-white">
+              {isAr ? "كيف تعمل المنصة؟" : "How The Platform Works?"}
             </h2>
-            <p className="text-xs sm:text-sm text-slate-300 max-w-2xl leading-relaxed">
-              {isAr
-                ? "ارتباط سحابي مباشر مع خوادم المصانع الرسمية وشبكات الموزعين العالمية لمعالجة طلباتك آلياً دون أي تأخير."
-                : "Direct cloud integration with factory unlock servers and official tool networks to execute your requests automatically."}
-            </p>
+            <span className="h-[2px] w-5 sm:w-6 bg-cyan-500 dark:bg-cyan-400" />
           </div>
-
-          <div className="shrink-0 flex items-center gap-3">
-            <Link
-              href={`/${lang}/pricing`}
-              className="btn-royal py-2.5 px-5 text-xs sm:text-sm font-bold flex items-center gap-2 shadow-lg shadow-blue-950/40 group"
-            >
-              <span>{isAr ? "ابدأ طلبك الآن" : "Start Your Order"}</span>
-              <ArrowIcon className="w-3.5 h-3.5 transition-transform group-hover:-translate-x-1 rtl:group-hover:-translate-x-1 ltr:group-hover:translate-x-1" />
-            </Link>
-          </div>
+          <p className="text-[11px] sm:text-sm text-slate-600 dark:text-slate-400">
+            {isAr ? "بخطوات بسيطة وسريعة" : "In simple and fast steps"}
+          </p>
         </div>
 
-        {/* 3 Step Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-8 sm:pt-10">
-          {steps.map((item, index) => {
-            const IconComponent = item.icon;
+        {/* 3 Steps in Flow Grid with Icon on Right and Number on Left matching Mockup */}
+        <div className="flex flex-col md:flex-row items-center justify-between gap-2.5 sm:gap-4">
+          {steps.map((item, idx) => {
+            const Icon = item.icon;
+            const isLast = idx === steps.length - 1;
             return (
-              <div
-                key={index}
-                className="relative rounded-2xl p-5 sm:p-6 bg-[#0c1322] border border-white/10 hover:border-sky-400/40 transition-all duration-300 flex flex-col justify-between group/step hover:shadow-xl hover:shadow-blue-950/30"
-              >
-                {/* Step Watermark Number */}
-                <div className="absolute top-3 end-4 text-4xl sm:text-5xl font-black font-mono text-white/[0.04] pointer-events-none select-none group-hover/step:text-sky-400/10 transition-colors">
-                  {item.step}
-                </div>
-
-                <div>
-                  {/* Step Badge & Icon */}
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="w-11 h-11 rounded-xl bg-blue-500/10 border border-blue-500/25 flex items-center justify-center text-sky-400 group-hover/step:scale-110 group-hover/step:border-sky-400/50 transition-all shadow-inner">
-                      <IconComponent className="w-5 h-5" />
+              <React.Fragment key={item.step}>
+                <div className="flex-1 w-full p-3.5 sm:p-5 rounded-2xl bg-white dark:bg-[#061224] border border-slate-200 dark:border-cyan-500/25 hover:border-cyan-400 dark:hover:border-cyan-400 shadow-sm flex items-center justify-between gap-3 transition-all group">
+                  {/* Right (in RTL): Circular Soft Icon Container */}
+                  <div className="flex items-center gap-3">
+                    <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full ${isLast ? "bg-emerald-50 dark:bg-emerald-950/50 text-emerald-500" : "bg-cyan-50 dark:bg-cyan-950/50 text-cyan-500"} flex items-center justify-center shrink-0 border border-slate-100 dark:border-white/5`}>
+                      <Icon className="w-5 h-5 sm:w-6 sm:h-6" />
                     </div>
-                    <span className="text-[11px] font-mono font-bold px-2.5 py-1 rounded-full bg-white/[0.05] border border-white/10 text-slate-300">
-                      {isAr ? item.badgeAr : item.badgeEn}
-                    </span>
+                    <div className="text-start">
+                      <h3 className="text-xs sm:text-base font-black text-slate-900 dark:text-white group-hover:text-cyan-600 dark:group-hover:text-cyan-300 transition-colors leading-tight">
+                        {isAr ? item.titleAr : item.titleEn}
+                      </h3>
+                      <p className="text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 font-medium">
+                        {isAr ? item.descAr : item.descEn}
+                      </p>
+                    </div>
                   </div>
 
-                  {/* Title & Desc */}
-                  <h3 className="text-base sm:text-lg font-bold text-white mb-2 group-hover/step:text-sky-300 transition-colors">
-                    {isAr ? item.titleAr : item.titleEn}
-                  </h3>
-                  <p className="text-xs text-slate-300 leading-relaxed mb-4">
-                    {isAr ? item.descAr : item.descEn}
-                  </p>
-                </div>
-
-                {/* Feature Tags */}
-                <div className="pt-3 border-t border-white/10 space-y-1.5">
-                  {(isAr ? item.tagsAr : item.tagsEn).map((tag, tagIdx) => (
-                    <div key={tagIdx} className="flex items-center gap-2 text-[11px] text-slate-300">
-                      <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                      <span>{tag}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* 4 Micro Trust & Performance Stats Strip */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 pt-6 sm:pt-8 mt-6 sm:mt-8 border-t border-white/10">
-          {trustMetrics.map((stat, idx) => {
-            const StatIcon = stat.icon;
-            return (
-              <div
-                key={idx}
-                className="p-4 rounded-xl bg-[#0b1220] border border-white/10 flex flex-col justify-between"
-              >
-                <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-[10px] sm:text-xs text-slate-400 font-medium truncate">
-                    {isAr ? stat.labelAr : stat.labelEn}
+                  {/* Left (in RTL): Bold Step Number */}
+                  <span className="text-base sm:text-xl font-black text-slate-800 dark:text-slate-200 font-mono shrink-0">
+                    {item.step}
                   </span>
-                  <StatIcon className={`w-4 h-4 ${stat.color} shrink-0`} />
                 </div>
-                <div>
-                  <div className={`text-base sm:text-xl font-black font-mono tracking-tight ${stat.color}`}>
-                    {stat.value}
+
+                {idx < steps.length - 1 && (
+                  <div className="hidden md:flex items-center justify-center text-cyan-400/50 px-1 shrink-0">
+                    <FlowChevron className="w-5 h-5" />
                   </div>
-                  <div className="text-[10px] text-slate-400 mt-0.5 truncate">
-                    {isAr ? stat.subAr : stat.subEn}
-                  </div>
+                )}
+              </React.Fragment>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* 2. Customer Trust Stats - 2x2 Grid on Mobile matching Mockup */}
+      <section className="w-full">
+        <div className="text-center mb-4 sm:mb-6">
+          <div className="inline-flex items-center gap-2 mb-1">
+            <span className="h-[2px] w-5 sm:w-6 bg-cyan-500 dark:bg-cyan-400" />
+            <h2 className="text-base sm:text-2xl font-black text-slate-900 dark:text-white">
+              {isAr ? "أرقام تحدث عنها عملاؤنا" : "Numbers Our Clients Speak Of"}
+            </h2>
+            <span className="h-[2px] w-5 sm:w-6 bg-cyan-500 dark:bg-cyan-400" />
+          </div>
+          <p className="text-[11px] sm:text-sm text-slate-600 dark:text-slate-400">
+            {isAr ? "ثقة متزايدة كل يوم" : "Growing trust every day"}
+          </p>
+        </div>
+
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
+          {trustStats.map((st, i) => {
+            const Icon = st.icon;
+            return (
+              <div 
+                key={i} 
+                className="flex flex-col items-center justify-center text-center p-3 sm:p-4 rounded-2xl bg-white dark:bg-[#061224] border border-slate-200 dark:border-cyan-500/20 shadow-sm"
+              >
+                <div className="flex items-center gap-1.5 mb-1">
+                  <Icon className={`w-4 h-4 sm:w-5 sm:h-5 ${st.color} shrink-0`} />
+                  <span className="text-sm sm:text-lg font-black text-slate-900 dark:text-white font-mono tracking-tight">
+                    {st.value}
+                  </span>
                 </div>
+                <span className="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400 font-medium">
+                  {isAr ? st.labelAr : st.labelEn}
+                </span>
               </div>
             );
           })}
         </div>
+      </section>
 
-        {/* Brand & Tool Ecosystem Ticker */}
-        <div className="mt-6 pt-5 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
-          <div className="flex items-center gap-2 text-slate-400 text-[11px] font-medium shrink-0">
-            <Cpu className="w-3.5 h-3.5 text-sky-400" />
-            <span>{isAr ? "دعم وتوافق معتمد لأشهر الأنظمة والمعالجات:" : "Certified Ecosystem Compatibility:"}</span>
+      {/* 3. Supported Brands - 4 Columns Grid matching Mockup */}
+      <section className="w-full">
+        <div className="text-center mb-4 sm:mb-6">
+          <div className="inline-flex items-center gap-2 mb-1">
+            <span className="h-[2px] w-5 sm:w-6 bg-cyan-500 dark:bg-cyan-400" />
+            <h2 className="text-base sm:text-2xl font-black text-slate-900 dark:text-white">
+              {isAr ? "الماركات المدعومة" : "Supported Brands"}
+            </h2>
+            <span className="h-[2px] w-5 sm:w-6 bg-cyan-500 dark:bg-cyan-400" />
+          </div>
+          <p className="text-[11px] sm:text-sm text-slate-600 dark:text-slate-400">
+            {isAr ? "ندعم جميع الماركات الرئيسية" : "Supporting all major brands"}
+          </p>
+        </div>
+
+        {/* 8 Brands in 4 columns (2 rows of 4) */}
+        <div className="grid grid-cols-4 gap-2 sm:gap-3">
+          {/* Row 1 */}
+          {/* Samsung */}
+          <div className="p-2.5 sm:p-3 rounded-xl bg-white dark:bg-[#061224] border border-slate-200 dark:border-cyan-500/20 shadow-sm flex items-center justify-center text-center">
+            <span className="text-[11px] sm:text-xs font-black text-slate-800 dark:text-slate-200 tracking-wider font-sans">
+              SAMSUNG
+            </span>
           </div>
 
-          <div className="flex flex-wrap items-center justify-center sm:justify-end gap-1.5 max-w-2xl">
-            {supportedPlatforms.map((name, i) => (
-              <span
-                key={i}
-                className="px-2 py-0.5 rounded-md bg-[#0e1628] border border-white/10 text-[10px] font-mono text-slate-300"
-              >
-                {name}
-              </span>
-            ))}
+          {/* Xiaomi */}
+          <div className="p-2.5 sm:p-3 rounded-xl bg-white dark:bg-[#061224] border border-slate-200 dark:border-cyan-500/20 shadow-sm flex items-center justify-center text-center">
+            <div className="w-5 h-5 rounded bg-[#ff6900] flex items-center justify-center text-white font-black text-[10px]">
+              mi
+            </div>
+          </div>
+
+          {/* Huawei */}
+          <div className="p-2.5 sm:p-3 rounded-xl bg-white dark:bg-[#061224] border border-slate-200 dark:border-cyan-500/20 shadow-sm flex items-center justify-center gap-1 text-center">
+            <svg className="w-3.5 h-3.5 fill-red-500 shrink-0" viewBox="0 0 24 24">
+              <path d="M12 2c1 2 2 4 2 6s-1 4-2 4-2-2-2-4 1-4 2-6zm5 3c1.5 1.5 2.5 3.5 2.5 5.5s-1.5 3.5-3 3.5-2.5-1.5-2.5-3.5c0-1.5 1-3.5 3-5.5zm-10 0c2 2 3 4 3 5.5 0 2-1 3.5-2.5 3.5s-3-1.5-3-3.5 1-4 2.5-5.5z" />
+            </svg>
+            <span className="text-[10px] sm:text-[11px] font-bold text-slate-800 dark:text-slate-200">HUAWEI</span>
+          </div>
+
+          {/* Qualcomm */}
+          <div className="p-2.5 sm:p-3 rounded-xl bg-white dark:bg-[#061224] border border-slate-200 dark:border-cyan-500/20 shadow-sm flex items-center justify-center text-center">
+            <span className="text-[11px] sm:text-xs font-bold text-blue-600 dark:text-blue-400 tracking-wider">
+              Qualcomm
+            </span>
+          </div>
+
+          {/* Row 2 */}
+          {/* MediaTek */}
+          <div className="p-2.5 sm:p-3 rounded-xl bg-white dark:bg-[#061224] border border-slate-200 dark:border-cyan-500/20 shadow-sm flex items-center justify-center text-center">
+            <span className="text-[10px] sm:text-xs font-black text-amber-600 dark:text-amber-400 tracking-wider">
+              MEDIATEK
+            </span>
+          </div>
+
+          {/* Unisoc */}
+          <div className="p-2.5 sm:p-3 rounded-xl bg-white dark:bg-[#061224] border border-slate-200 dark:border-cyan-500/20 shadow-sm flex items-center justify-center text-center">
+            <span className="text-[10px] sm:text-xs font-bold text-purple-600 dark:text-purple-400 tracking-wider">
+              UNISOC
+            </span>
+          </div>
+
+          {/* Oppo */}
+          <div className="p-2.5 sm:p-3 rounded-xl bg-white dark:bg-[#061224] border border-slate-200 dark:border-cyan-500/20 shadow-sm flex items-center justify-center text-center">
+            <span className="text-[11px] sm:text-xs font-bold text-emerald-600 dark:text-emerald-400 tracking-wider">
+              oppo
+            </span>
+          </div>
+
+          {/* Vivo */}
+          <div className="p-2.5 sm:p-3 rounded-xl bg-white dark:bg-[#061224] border border-slate-200 dark:border-cyan-500/20 shadow-sm flex items-center justify-center text-center">
+            <span className="text-[11px] sm:text-xs font-bold text-sky-600 dark:text-sky-400 tracking-wider">
+              vivo
+            </span>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
+    </div>
   );
 }

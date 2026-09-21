@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Locale } from '@/i18n/config';
@@ -61,59 +61,59 @@ export default async function SeriesDetailPage(
   const freePreviewsCount = videos.filter(v => v.isFreePreview).length;
 
   return (
-    <div className="min-h-screen bg-[#0F0F1A] text-white pt-24 pb-20 font-sans" dir={isAr ? 'rtl' : 'ltr'}>
+    <div className="min-h-screen bg-slate-50 text-slate-900 dark:bg-[#0F0F1A] dark:text-white pt-24 pb-20 font-sans" dir={isAr ? 'rtl' : 'ltr'}>
       <div className="container mx-auto px-4 max-w-6xl">
         {/* Breadcrumb Navigation */}
-        <div className="mb-6 flex items-center gap-2 text-xs md:text-sm text-gray-400">
-          <Link href={`/${params.lang}/academy`} className="hover:text-indigo-400 transition-colors flex items-center gap-1">
+        <div className="mb-6 flex items-center gap-2 text-xs md:text-sm text-slate-500 dark:text-gray-400">
+          <Link href={`/${params.lang}/academy`} className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors flex items-center gap-1">
             <span className="material-symbols-outlined text-sm">school</span>
             <span>{isAr ? 'الأكاديمية والكورسات' : 'Academy & Courses'}</span>
           </Link>
-          <span className="material-symbols-outlined text-sm rtl:rotate-180">chevron_right</span>
-          <span className="text-gray-200 font-bold truncate max-w-md">{title}</span>
+          <span className="material-symbols-outlined text-sm rtl:rotate-180 text-slate-400 dark:text-gray-600">chevron_right</span>
+          <span className="text-slate-800 dark:text-gray-200 font-bold truncate max-w-md">{title}</span>
         </div>
 
         {/* Hero Course Header Card */}
-        <div className="bg-[#1A1A2E] border border-gray-800 rounded-3xl overflow-hidden shadow-2xl mb-12">
+        <div className="bg-white dark:bg-[#1A1A2E] border border-slate-200 dark:border-gray-800 rounded-3xl overflow-hidden shadow-xl mb-12">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 p-6 md:p-10 items-center">
             {/* Course Info */}
             <div className="lg:col-span-7 space-y-6">
               <div className="flex flex-wrap items-center gap-3">
-                <span className="bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 px-3.5 py-1 rounded-full text-xs font-bold flex items-center gap-1.5">
+                <span className="bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 border border-indigo-500/30 px-3.5 py-1 rounded-full text-xs font-bold flex items-center gap-1.5">
                   <span className="material-symbols-outlined text-sm">video_library</span>
                   <span>{isAr ? 'كورس تدريبي' : 'Training Course'}</span>
                 </span>
 
-                <span className={`px-3.5 py-1 rounded-full text-xs font-bold border ${series.isSubscriptionRequired ? 'bg-amber-500/20 text-amber-400 border-amber-500/30' : 'bg-violet-500/20 text-violet-400 border-violet-500/30'}`}>
+                <span className={`px-3.5 py-1 rounded-full text-xs font-bold border ${series.isSubscriptionRequired ? 'bg-amber-500/20 text-amber-600 dark:text-amber-400 border-amber-500/30' : 'bg-violet-500/20 text-violet-600 dark:text-violet-400 border-violet-500/30'}`}>
                   {series.isSubscriptionRequired ? (isAr ? `مدفوع ($${(series.price || 0).toFixed(2)})` : `Paid ($${(series.price || 0).toFixed(2)})`) : (isAr ? 'مجاني بالكامل' : 'Free Course')}
                 </span>
               </div>
 
-              <h1 className="text-2xl sm:text-3xl md:text-5xl font-extrabold text-white leading-tight">
+              <h1 className="text-2xl sm:text-3xl md:text-5xl font-extrabold text-slate-900 dark:text-white leading-tight">
                 {title}
               </h1>
 
               {description && (
-                <p className="text-gray-300 text-sm sm:text-base leading-relaxed">
+                <p className="text-slate-600 dark:text-gray-300 text-sm sm:text-base leading-relaxed">
                   {description}
                 </p>
               )}
 
               {/* Course Meta Stats */}
-              <div className="grid grid-cols-3 gap-3 pt-4 border-t border-gray-800/80 max-w-lg">
-                <div className="bg-[#151525] p-3 rounded-2xl border border-gray-800 text-center">
-                  <span className="block text-xl font-bold text-indigo-400">{videos.length}</span>
-                  <span className="text-[11px] text-gray-400">{isAr ? 'إجمالي الدروس' : 'Total Lessons'}</span>
+              <div className="grid grid-cols-3 gap-3 pt-4 border-t border-slate-100 dark:border-gray-800/80 max-w-lg">
+                <div className="bg-slate-100 dark:bg-[#151525] p-3 rounded-2xl border border-slate-200 dark:border-gray-800 text-center">
+                  <span className="block text-xl font-bold text-indigo-600 dark:text-indigo-400">{videos.length}</span>
+                  <span className="text-[11px] text-slate-500 dark:text-gray-400">{isAr ? 'إجمالي الدروس' : 'Total Lessons'}</span>
                 </div>
 
-                <div className="bg-[#151525] p-3 rounded-2xl border border-gray-800 text-center">
-                  <span className="block text-xl font-bold text-violet-400">{freePreviewsCount}</span>
-                  <span className="text-[11px] text-gray-400">{isAr ? 'معاينة مجانية' : 'Free Previews'}</span>
+                <div className="bg-slate-100 dark:bg-[#151525] p-3 rounded-2xl border border-slate-200 dark:border-gray-800 text-center">
+                  <span className="block text-xl font-bold text-violet-600 dark:text-violet-400">{freePreviewsCount}</span>
+                  <span className="text-[11px] text-slate-500 dark:text-gray-400">{isAr ? 'معاينة مجانية' : 'Free Previews'}</span>
                 </div>
 
-                <div className="bg-[#151525] p-3 rounded-2xl border border-gray-800 text-center">
-                  <span className="block text-xl font-bold text-purple-400">HD</span>
-                  <span className="text-[11px] text-gray-400">{isAr ? 'جودة عالية' : 'HD Video'}</span>
+                <div className="bg-slate-100 dark:bg-[#151525] p-3 rounded-2xl border border-slate-200 dark:border-gray-800 text-center">
+                  <span className="block text-xl font-bold text-purple-600 dark:text-purple-400">HD</span>
+                  <span className="text-[11px] text-slate-500 dark:text-gray-400">{isAr ? 'جودة عالية' : 'HD Video'}</span>
                 </div>
               </div>
 
@@ -172,27 +172,27 @@ export default async function SeriesDetailPage(
 
         {/* Course Curriculum Section */}
         <div className="space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-gray-800">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200 dark:border-gray-800">
             <div>
-              <h2 className="text-2xl font-bold text-white flex items-center gap-3">
-                <span className="material-symbols-outlined text-indigo-400">format_list_numbered</span>
+              <h2 className="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-3">
+                <span className="material-symbols-outlined text-indigo-600 dark:text-indigo-400">format_list_numbered</span>
                 <span>{isAr ? 'منهج ومحتوى الكورس' : 'Course Curriculum'}</span>
               </h2>
-              <p className="text-xs text-gray-400 mt-1">
+              <p className="text-xs text-slate-500 dark:text-gray-400 mt-1">
                 {isAr
                   ? 'جميع الدروس والفيديوهات التعليمية المتاحة في هذه السلسلة مرتبة خطوة بخطوة.'
                   : 'All lessons and video tutorials in this series organized step-by-step.'}
               </p>
             </div>
-            <span className="text-xs text-gray-400 font-bold bg-[#1A1A2E] px-4 py-2 rounded-xl border border-gray-800">
+            <span className="text-xs text-slate-600 dark:text-gray-400 font-bold bg-white dark:bg-[#1A1A2E] px-4 py-2 rounded-xl border border-slate-200 dark:border-gray-800 shadow-sm">
               {videos.length} {isAr ? 'دروس متوفرة' : 'Lessons Available'}
             </span>
           </div>
 
           {videos.length === 0 ? (
-            <div className="bg-[#1A1A2E] border border-gray-800 rounded-3xl p-12 text-center text-gray-400">
-              <span className="material-symbols-outlined text-5xl text-gray-600 mb-3">movie</span>
-              <p className="font-bold">{isAr ? 'جاري رفع وتجهيز دروس هذا الكورس قريباً.' : 'Course lessons are being prepared soon.'}</p>
+            <div className="bg-white dark:bg-[#1A1A2E] border border-slate-200 dark:border-gray-800 rounded-3xl p-12 text-center text-slate-600 dark:text-gray-400 shadow-sm">
+              <span className="material-symbols-outlined text-5xl text-slate-400 dark:text-gray-600 mb-3">movie</span>
+              <p className="font-bold text-slate-900 dark:text-white">{isAr ? 'جاري رفع وتجهيز دروس هذا الكورس قريباً.' : 'Course lessons are being prepared soon.'}</p>
             </div>
           ) : (
             <div className="space-y-3">
@@ -204,20 +204,20 @@ export default async function SeriesDetailPage(
                 return (
                   <div
                     key={video.id}
-                    className="bg-[#1A1A2E] hover:bg-[#22223D] border border-gray-800/80 hover:border-indigo-500/40 p-4 sm:p-5 rounded-2xl transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4 group"
+                    className="bg-white dark:bg-[#1A1A2E] hover:bg-slate-50 dark:hover:bg-[#22223D] border border-slate-200 dark:border-gray-800/80 hover:border-indigo-500/40 p-4 sm:p-5 rounded-2xl transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4 group shadow-sm"
                   >
                     <div className="flex items-start gap-4">
                       {/* Lesson Number */}
-                      <div className="w-10 h-10 rounded-xl bg-[#151525] border border-gray-800 flex items-center justify-center font-bold text-sm text-indigo-400 shrink-0">
+                      <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-[#151525] border border-slate-200 dark:border-gray-800 flex items-center justify-center font-bold text-sm text-indigo-600 dark:text-indigo-400 shrink-0">
                         {video.orderIndex || index + 1}
                       </div>
 
                       {/* Video Thumbnail */}
-                      <div className="relative w-20 h-14 sm:w-24 sm:h-16 rounded-xl overflow-hidden bg-black/50 border border-gray-800 shrink-0 flex items-center justify-center">
+                      <div className="relative w-20 h-14 sm:w-24 sm:h-16 rounded-xl overflow-hidden bg-black/50 border border-slate-200 dark:border-gray-800 shrink-0 flex items-center justify-center">
                         {video.thumbnail ? (
                           <img src={video.thumbnail} alt="" className="w-full h-full object-cover" />
                         ) : (
-                          <span className="material-symbols-outlined text-2xl text-gray-600">smart_display</span>
+                          <span className="material-symbols-outlined text-2xl text-slate-400 dark:text-gray-600">smart_display</span>
                         )}
                         {isFree ? (
                           <div className="absolute inset-0 bg-black/40 group-hover:bg-indigo-600/30 transition-all flex items-center justify-center">
@@ -233,16 +233,16 @@ export default async function SeriesDetailPage(
                       {/* Lesson Details */}
                       <div className="space-y-1">
                         <div className="flex items-center gap-2 flex-wrap">
-                          <h3 className="font-bold text-base text-white group-hover:text-indigo-400 transition-colors">
+                          <h3 className="font-bold text-base text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
                             {videoTitle}
                           </h3>
-                          <span className={`px-2.5 py-0.5 rounded-md text-[10px] font-bold ${isFree ? 'bg-violet-500/15 text-violet-400 border border-violet-500/30' : 'bg-amber-500/15 text-amber-400 border border-amber-500/30'}`}>
+                          <span className={`px-2.5 py-0.5 rounded-md text-[10px] font-bold ${isFree ? 'bg-violet-500/15 text-violet-600 dark:text-violet-400 border border-violet-500/30' : 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30'}`}>
                             {isFree ? (isAr ? 'متاح مجاناً' : 'Free Preview') : (isAr ? 'للمشتركين فقط' : 'Members Only')}
                           </span>
                         </div>
 
                         {videoDesc && (
-                          <p className="text-xs text-gray-400 line-clamp-2 leading-relaxed">
+                          <p className="text-xs text-slate-500 dark:text-gray-400 line-clamp-2 leading-relaxed">
                             {videoDesc}
                           </p>
                         )}
@@ -254,7 +254,7 @@ export default async function SeriesDetailPage(
                       {isFree ? (
                         <Link
                           href={`/${params.lang}/academy/video/${video.id}`}
-                          className="bg-indigo-600/20 hover:bg-indigo-600 text-indigo-300 hover:text-white px-5 py-2.5 rounded-xl font-bold text-xs transition-all flex items-center gap-1.5 border border-indigo-500/30"
+                          className="bg-indigo-600/15 hover:bg-indigo-600 text-indigo-700 dark:text-indigo-300 hover:text-white px-5 py-2.5 rounded-xl font-bold text-xs transition-all flex items-center gap-1.5 border border-indigo-500/30"
                         >
                           <span className="material-symbols-outlined text-sm">play_arrow</span>
                           <span>{isAr ? 'مشاهدة الدرس' : 'Watch Lesson'}</span>
@@ -262,7 +262,7 @@ export default async function SeriesDetailPage(
                       ) : (
                         <Link
                           href={`/${params.lang}/wallet`}
-                          className="bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 px-4 py-2 rounded-xl font-bold text-xs transition-all flex items-center gap-1.5"
+                          className="bg-amber-500/10 hover:bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/30 px-4 py-2 rounded-xl font-bold text-xs transition-all flex items-center gap-1.5"
                         >
                           <span className="material-symbols-outlined text-sm">lock</span>
                           <span>{isAr ? 'فتح الكورس' : 'Unlock Course'}</span>
