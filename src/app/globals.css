@@ -1115,3 +1115,47 @@ html.dark body {
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45) !important;
   }
 }
+
+/* ============================================================
+   Campaign Banner Motion & Cyber Sheen Animations
+   ============================================================ */
+@keyframes bannerSheen {
+  0% {
+    transform: translateX(-160%) skewX(-20deg);
+  }
+  35%, 100% {
+    transform: translateX(260%) skewX(-20deg);
+  }
+}
+
+@keyframes bannerFloat {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-8px) rotate(0.8deg);
+  }
+}
+
+@keyframes bannerAuraPulse {
+  0%, 100% {
+    opacity: 0.35;
+    transform: scale(0.95);
+  }
+  50% {
+    opacity: 0.65;
+    transform: scale(1.08);
+  }
+}
+
+.animate-banner-sheen {
+  animation: bannerSheen 7s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+.animate-banner-float {
+  animation: bannerFloat 5s ease-in-out infinite;
+}
+
+.animate-banner-aura {
+  animation: bannerAuraPulse 4s ease-in-out infinite;
+}

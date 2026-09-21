@@ -192,7 +192,7 @@ export default async function Home(props: { params: Promise<{ lang: Locale }> })
         <PackagesSlider lang={params.lang} packages={hp?.featuredPackages} />
 
         {/* Verified Reseller Campaigns & Samsung FRP Banner */}
-        <CampaignBanner lang={params.lang} />
+        <CampaignBanner lang={params.lang} campaigns={hp?.campaigns} />
 
         {/* 3-Step Instant Fulfillment & Platform Trust + Stats + Brands */}
         <WorkflowTrustSection lang={params.lang} />

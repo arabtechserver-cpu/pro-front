@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import CampaignBanner from "@/components/CampaignBanner";
 
 // Preset icon suggestions for quick picking
 const PRESET_ICONS = [
@@ -14,8 +15,112 @@ const PRESET_ICONS = [
   { label: "Phoenix", url: "/images/tools/tool_phoenix.png" },
   { label: "Cheetah", url: "/images/tools/tool_cheetah.png" },
   { label: "FKey", url: "/images/tools/tool_fkey.png" },
-  { label: "Samsung", url: "/images/promo_samsung.webp" },
-  { label: "Gift Box", url: "/images/promo_gift_box.png" }
+  { label: "Samsung", url: "/images/promo_samsung_clean.png" },
+  { label: "Gift Box", url: "/images/promo_gift_box_clean.png" }
+];
+
+// Preset high-resolution graphics for campaign offers
+const PRESET_CAMPAIGN_IMAGES = [
+  { label: "Samsung FRP", url: "/images/promo_samsung_clean.png" },
+  { label: "Gift Box", url: "/images/promo_gift_box_clean.png" },
+  { label: "Chimera Tool", url: "/images/promo_chimera.png" },
+  { label: "Borneo Schematics", url: "/images/promo_borneo.png" },
+  { label: "Server Rack", url: "/images/promo_server.png" },
+  { label: "Tools Store", url: "/images/promo_store.png" },
+  { label: "IMEI Unlock", url: "/images/promo_imei.png" },
+  { label: "Remote Support", url: "/images/promo_remote.png" }
+];
+
+// Default 4 Modern Animated Campaigns
+const DEFAULT_CAMPAIGNS = [
+  {
+    id: "samsung_frp",
+    tagEn: "Limited Time Offer",
+    tagAr: "عرض حصري لفترة محدودة",
+    titleEn: "Samsung FRP Remove",
+    titleAr: "حذف حساب سامسونج FRP الفوري",
+    descEn: "Instant removal for all Samsung models via direct official server API.",
+    descAr: "فك فوري وتلقائي لجميع طرازات سامسونج عبر السيرفر الرسمي بأعلى سرعة وأمان.",
+    badgeEn: "Direct API Link",
+    badgeAr: "ربط سيرفر مباشر",
+    turnaroundEn: "1 - 5 Mins",
+    turnaroundAr: "1 - 5 دقائق",
+    guaranteeEn: "100% REFUND",
+    guaranteeAr: "ضمان مالي 100%",
+    connectionEn: "DIRECT API",
+    connectionAr: "ربط فوري API",
+    theme: "purple",
+    image: "/images/promo_samsung_clean.png",
+    url: "/pricing?search=Samsung",
+    buttonTextEn: "Order & Activate Now",
+    buttonTextAr: "اطلب الآن وابدأ التفعيل"
+  },
+  {
+    id: "reseller_bundles",
+    tagEn: "Official Reseller",
+    tagAr: "موزع رسمي معتمد",
+    titleEn: "Official Reseller Campaigns",
+    titleAr: "عروض وحملات الموزعين الرسمية",
+    descEn: "Best wholesale rates, instant activations, and full warranty on tools.",
+    descAr: "أفضل أسعار الجملة المعتمدة، إصدارات جديدة، وتفعيل فوري مع ضمان كامل.",
+    badgeEn: "Full Warranty",
+    badgeAr: "ضمان معتمد كامل",
+    turnaroundEn: "Instant Delivery",
+    turnaroundAr: "تسليم فوري 24/7",
+    guaranteeEn: "100% Guaranteed",
+    guaranteeAr: "ضمان رسمي كامل",
+    connectionEn: "AUTO SERVER",
+    connectionAr: "سيرفر مؤتمت",
+    theme: "cyan",
+    image: "/images/promo_gift_box_clean.png",
+    url: "/pricing",
+    buttonTextEn: "View All Offers",
+    buttonTextAr: "عرض جميع العروض"
+  },
+  {
+    id: "chimera_tool",
+    tagEn: "Best Seller Tool",
+    tagAr: "الأداة الأكثر طلباً",
+    titleEn: "Chimera Tool Pro",
+    titleAr: "أداة شيميرا (Chimera Tool)",
+    descEn: "All Brands and Samsung activations with instant server token generation.",
+    descAr: "تراخيص سنوية وتعبئة أرصدة شيميرا بأسعار منافسة وتسليم فوري خلال دقيقة.",
+    badgeEn: "Instant License",
+    badgeAr: "ترخيص فوري مباشر",
+    turnaroundEn: "Under 1 Min",
+    turnaroundAr: "أقل من دقيقة",
+    guaranteeEn: "100% REFUND",
+    guaranteeAr: "ضمان استرجاع 100%",
+    connectionEn: "GSM SERVER",
+    connectionAr: "سيرفر رسمي",
+    theme: "blue",
+    image: "/images/promo_chimera.png",
+    url: "/pricing?section=Chimera%20Tool",
+    buttonTextEn: "Get Chimera License",
+    buttonTextAr: "احصل على ترخيص شيميرا"
+  },
+  {
+    id: "borneo_schematics",
+    tagEn: "Hardware Diagnostics",
+    tagAr: "مخططات الهاردوير",
+    titleEn: "Borneo Schematics",
+    titleAr: "مخططات بورنيو (Borneo)",
+    descEn: "Official activation codes for 1-PC and 2-PC with instant daily updates.",
+    descAr: "تفعيل رسمي لمخططات بورنيو مع تحديثات يومية ودعم لجميع اللوحات الإلكترونية.",
+    badgeEn: "Daily Updates",
+    badgeAr: "تحديثات يومية متواصلة",
+    turnaroundEn: "Instant 24/7",
+    turnaroundAr: "فوري على مدار الساعة",
+    guaranteeEn: "Official Code",
+    guaranteeAr: "كود تفعيل أصلي",
+    connectionEn: "OFFICIAL DB",
+    connectionAr: "قاعدة بيانات رسمية",
+    theme: "emerald",
+    image: "/images/promo_borneo.png",
+    url: "/pricing?search=Borneo",
+    buttonTextEn: "Activate Borneo",
+    buttonTextAr: "تفعيل باقة بورنيو"
+  }
 ];
 
 // Default 3 Featured Packages matching the production homepage
@@ -267,6 +372,7 @@ export default function AdminHomepageManager() {
   // Default to the requested controls tab
   const [activeTab, setActiveTab] = useState<string>("packages");
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [previewLang, setPreviewLang] = useState<"ar" | "en">("ar");
 
   // Service picker modal states
   const [siteItems, setSiteItems] = useState<Array<{ name: string; minPrice: number; count: number; time: string; categoryName: string }>>([]);
@@ -288,16 +394,19 @@ export default function AdminHomepageManager() {
             const c = data.campaigns;
             if (c.promo1Image || c.promo1TitleAr || c.promo1TitleEn) {
               campaignsArray.push({
-                tagEn: c.promo1TagEn || "Hot Offer",
-                tagAr: c.promo1TagAr || "عرض خاص",
+                tagEn: c.promo1TagEn || "Limited Time Offer",
+                tagAr: c.promo1TagAr || "عرض حصري",
                 titleEn: c.promo1TitleEn || "Samsung FRP Remove",
-                titleAr: c.promo1TitleAr || "حذف حساب جوجل لسامسونج",
+                titleAr: c.promo1TitleAr || "حذف حساب سامسونج FRP",
                 descEn: c.promo1DescEn || "",
                 descAr: c.promo1DescAr || "",
-                image: c.promo1Image || "/images/promo_samsung.webp",
+                image: c.promo1Image || "/images/promo_samsung_clean.png",
                 url: c.promo1Url || "/pricing"
               });
             }
+          }
+          if (campaignsArray.length === 0) {
+            campaignsArray = DEFAULT_CAMPAIGNS;
           }
           data.campaigns = campaignsArray;
 
@@ -707,46 +816,6 @@ export default function AdminHomepageManager() {
         >
           <span className="material-symbols-outlined text-lg">local_fire_department</span>
           3. بنرات وعروض الترويج (Campaign Offers)
-        </button>
-
-        <button
-          onClick={() => setActiveTab("hero")}
-          className={`px-4 py-2.5 rounded-xl font-medium text-sm transition-all flex items-center gap-2 ${
-            activeTab === "hero" ? "bg-primary text-surface font-bold shadow-md" : "bg-surface-container text-on-surface-variant hover:bg-surface-container-high"
-          }`}
-        >
-          <span className="material-symbols-outlined text-lg">space_dashboard</span>
-          4. الواجهة والصورة الرئيسية (Hero Showcase)
-        </button>
-
-        <button
-          onClick={() => setActiveTab("lanes")}
-          className={`px-4 py-2.5 rounded-xl font-medium text-sm transition-all flex items-center gap-2 ${
-            activeTab === "lanes" ? "bg-primary text-surface font-bold shadow-md" : "bg-surface-container text-on-surface-variant hover:bg-surface-container-high"
-          }`}
-        >
-          <span className="material-symbols-outlined text-lg">grid_view</span>
-          5. كروت الأقسام الأربعة (Service Lanes)
-        </button>
-
-        <button
-          onClick={() => setActiveTab("notice")}
-          className={`px-4 py-2.5 rounded-xl font-medium text-sm transition-all flex items-center gap-2 ${
-            activeTab === "notice" ? "bg-primary text-surface font-bold shadow-md" : "bg-surface-container text-on-surface-variant hover:bg-surface-container-high"
-          }`}
-        >
-          <span className="material-symbols-outlined text-lg">campaign</span>
-          6. شريط الإشعارات العلوي (Notice Bar)
-        </button>
-
-        <button
-          onClick={() => setActiveTab("ribbon")}
-          className={`px-4 py-2.5 rounded-xl font-medium text-sm transition-all flex items-center gap-2 ${
-            activeTab === "ribbon" ? "bg-primary text-surface font-bold shadow-md" : "bg-surface-container text-on-surface-variant hover:bg-surface-container-high"
-          }`}
-        >
-          <span className="material-symbols-outlined text-lg">verified</span>
-          7. شريط المميزات (Feature Ribbon)
         </button>
       </div>
 
@@ -1298,62 +1367,282 @@ export default function AdminHomepageManager() {
       {/* ============================================================= */}
       {activeTab === "campaigns" && (
         <div className="glass-card rounded-3xl p-6 md:p-8 border border-outline-variant/30 flex flex-col gap-6">
-          <div className="border-b border-outline-variant/20 pb-3 flex justify-between items-center">
+          <div className="border-b border-outline-variant/20 pb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
             <div>
               <h2 className="text-xl font-bold text-primary flex items-center gap-2">
                 <span className="material-symbols-outlined">local_fire_department</span>
                 3. بنرات وعروض الترويج الساخنة (Campaign Offers)
               </h2>
               <p className="text-xs text-on-surface-variant mt-1">
-                إدارة البنرات الإعلانية الترويجية (مثل بنر سامسونج وبنر شيميرا).
+                إدارة البنرات الإعلانية الترويجية التفاعلية مع دعم السلايدر المتحرك والتأثيرات الحديثة.
               </p>
             </div>
-            <button
-              type="button"
-              onClick={() => {
-                setConfig((prev: any) => {
-                  const campaigns = Array.isArray(prev.campaigns) ? [...prev.campaigns] : [];
-                  campaigns.push({
-                    tagEn: "Special Offer",
-                    tagAr: "عرض مميز",
-                    titleEn: "Service Title",
-                    titleAr: "عنوان الخدمة",
-                    descEn: "100% Guaranteed",
-                    descAr: "ضمان كامل وتنفيذ فوري",
-                    image: "/images/promo_samsung.webp",
-                    url: "/pricing"
+            
+            <div className="flex flex-wrap items-center gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setConfig((prev: any) => ({
+                    ...prev,
+                    campaigns: DEFAULT_CAMPAIGNS
+                  }));
+                  setToastMessage("تمت استعادة البنرات النموذجية الافتراضية بنجاح");
+                  setTimeout(() => setToastMessage(null), 3000);
+                }}
+                className="btn-secondary text-xs px-3 py-2 rounded-xl flex items-center gap-1.5"
+              >
+                <span className="material-symbols-outlined text-sm">restart_alt</span>
+                استعادة البنرات النموذجية
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setConfig((prev: any) => {
+                    const campaigns = Array.isArray(prev.campaigns) ? [...prev.campaigns] : [];
+                    campaigns.push({
+                      id: `camp_${Date.now()}`,
+                      tagEn: "Limited Time Offer",
+                      tagAr: "عرض حصري لفترة محدودة",
+                      titleEn: "New Service Promo",
+                      titleAr: "عرض ترويجي جديد",
+                      descEn: "Fast automated fulfillment with official server integration.",
+                      descAr: "تنفيذ فوري وتلقائي عبر السيرفر الرسمي بأعلى كفاءة وأمان.",
+                      badgeEn: "Direct API Link",
+                      badgeAr: "ربط سيرفر مباشر",
+                      turnaroundEn: "1 - 5 Mins",
+                      turnaroundAr: "1 - 5 دقائق",
+                      guaranteeEn: "100% REFUND",
+                      guaranteeAr: "ضمان مالي 100%",
+                      connectionEn: "DIRECT API",
+                      connectionAr: "ربط فوري API",
+                      theme: "purple",
+                      image: "/images/promo_samsung_clean.png",
+                      url: "/pricing",
+                      buttonTextEn: "Order & Activate Now",
+                      buttonTextAr: "اطلب الآن وابدأ التفعيل"
+                    });
+                    return { ...prev, campaigns };
                   });
-                  return { ...prev, campaigns };
-                });
-              }}
-              className="btn-primary text-xs px-3.5 py-2 rounded-xl flex items-center gap-1.5"
-            >
-              <span className="material-symbols-outlined text-sm">add</span> إضافة إعلان جديد
-            </button>
+                }}
+                className="btn-primary text-xs px-3.5 py-2 rounded-xl flex items-center gap-1.5"
+              >
+                <span className="material-symbols-outlined text-sm">add</span>
+                إضافة إعلان جديد
+              </button>
+            </div>
           </div>
 
+          {/* Live Interactive Animated Preview Box */}
+          <div className="rounded-2xl p-4 sm:p-5 bg-surface-container-lowest border border-outline-variant/30 flex flex-col gap-3 shadow-inner">
+            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-outline-variant/20 pb-2.5">
+              <div className="flex items-center gap-2">
+                <span className="relative flex h-2.5 w-2.5">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75" />
+                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-primary" />
+                </span>
+                <span className="text-xs font-bold text-on-surface">معاينة حية ومتحركة على الموقع (Live Interactive Preview)</span>
+              </div>
+
+              <div className="flex items-center gap-1 bg-surface-container p-1 rounded-xl border border-outline-variant/20">
+                <button
+                  type="button"
+                  onClick={() => setPreviewLang("ar")}
+                  className={`text-[11px] px-2.5 py-1 rounded-lg font-bold transition-all ${
+                    previewLang === "ar"
+                      ? "bg-primary text-on-primary shadow-xs"
+                      : "text-on-surface-variant hover:text-on-surface"
+                  }`}
+                >
+                  العربية (RTL)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPreviewLang("en")}
+                  className={`text-[11px] px-2.5 py-1 rounded-lg font-bold transition-all ${
+                    previewLang === "en"
+                      ? "bg-primary text-on-primary shadow-xs"
+                      : "text-on-surface-variant hover:text-on-surface"
+                  }`}
+                >
+                  English (LTR)
+                </button>
+              </div>
+            </div>
+
+            <div className="w-full">
+              <CampaignBanner
+                lang={previewLang}
+                campaigns={config.campaigns}
+                isPreview={true}
+              />
+            </div>
+          </div>
+
+          {/* Campaign List Editor */}
           <div className="flex flex-col gap-6">
             {Array.isArray(config.campaigns) && config.campaigns.map((camp: any, idx: number) => (
-              <div key={idx} className="p-5 bg-surface-container-low rounded-2xl border border-outline-variant/30 flex flex-col gap-4 relative">
-                <div className="flex justify-between items-center border-b border-outline-variant/20 pb-2">
-                  <span className="font-bold text-primary text-sm">إعلان #{idx + 1}</span>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setConfig((prev: any) => {
-                        const campaigns = [...prev.campaigns];
-                        campaigns.splice(idx, 1);
-                        return { ...prev, campaigns };
-                      });
-                    }}
-                    className="text-error hover:bg-error/10 p-1.5 rounded-lg transition-colors"
-                  >
-                    <span className="material-symbols-outlined text-sm">delete</span>
-                  </button>
+              <div
+                key={camp.id || idx}
+                className="p-5 bg-surface-container-low rounded-2xl border border-outline-variant/30 flex flex-col gap-4 relative shadow-xs"
+              >
+                {/* Item Top Bar */}
+                <div className="flex flex-wrap items-center justify-between gap-2 border-b border-outline-variant/20 pb-2.5">
+                  <div className="flex items-center gap-2">
+                    <span className="px-2.5 py-0.5 rounded-lg bg-primary/10 border border-primary/30 text-primary font-mono font-bold text-xs">
+                      #{idx + 1}
+                    </span>
+                    <span className="font-bold text-on-surface text-sm">
+                      {camp.titleAr || camp.titleEn || `إعلان #${idx + 1}`}
+                    </span>
+                    <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded-full bg-surface-container text-on-surface-variant">
+                      {camp.theme || "purple"}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-1">
+                    {/* Move Up */}
+                    <button
+                      type="button"
+                      disabled={idx === 0}
+                      onClick={() => {
+                        setConfig((prev: any) => {
+                          const campaigns = [...prev.campaigns];
+                          const temp = campaigns[idx];
+                          campaigns[idx] = campaigns[idx - 1];
+                          campaigns[idx - 1] = temp;
+                          return { ...prev, campaigns };
+                        });
+                      }}
+                      className="p-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface disabled:opacity-30 transition-colors"
+                      title="تحريك لأعلى"
+                    >
+                      <span className="material-symbols-outlined text-sm">arrow_upward</span>
+                    </button>
+
+                    {/* Move Down */}
+                    <button
+                      type="button"
+                      disabled={idx === config.campaigns.length - 1}
+                      onClick={() => {
+                        setConfig((prev: any) => {
+                          const campaigns = [...prev.campaigns];
+                          const temp = campaigns[idx];
+                          campaigns[idx] = campaigns[idx + 1];
+                          campaigns[idx + 1] = temp;
+                          return { ...prev, campaigns };
+                        });
+                      }}
+                      className="p-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface disabled:opacity-30 transition-colors"
+                      title="تحريك لأسفل"
+                    >
+                      <span className="material-symbols-outlined text-sm">arrow_downward</span>
+                    </button>
+
+                    {/* Duplicate */}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setConfig((prev: any) => {
+                          const campaigns = [...prev.campaigns];
+                          const copy = { ...campaigns[idx], id: `camp_${Date.now()}` };
+                          campaigns.splice(idx + 1, 0, copy);
+                          return { ...prev, campaigns };
+                        });
+                      }}
+                      className="p-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-primary transition-colors"
+                      title="نسخ البنر"
+                    >
+                      <span className="material-symbols-outlined text-sm">content_copy</span>
+                    </button>
+
+                    {/* Delete */}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setConfig((prev: any) => {
+                          const campaigns = [...prev.campaigns];
+                          campaigns.splice(idx, 1);
+                          return { ...prev, campaigns };
+                        });
+                      }}
+                      className="p-1.5 rounded-lg text-error hover:bg-error/10 transition-colors"
+                      title="حذف البنر"
+                    >
+                      <span className="material-symbols-outlined text-sm">delete</span>
+                    </button>
+                  </div>
                 </div>
 
+                {/* Theme Selector */}
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-[10px] text-on-surface-variant uppercase font-bold">
+                    طابع وتدرج الألوان (Color Theme)
+                  </label>
+                  <div className="flex flex-wrap items-center gap-2">
+                    {[
+                      { key: "purple", label: "بنفسجي نيون (Purple)", dot: "bg-purple-500" },
+                      { key: "cyan", label: "سيان سايبر (Cyan)", dot: "bg-cyan-400" },
+                      { key: "blue", label: "أزرق ملكي (Royal Blue)", dot: "bg-blue-600" },
+                      { key: "emerald", label: "زمردي سريع (Emerald)", dot: "bg-emerald-500" },
+                      { key: "amber", label: "ذهبي برونزي (Amber)", dot: "bg-amber-500" }
+                    ].map((t) => (
+                      <button
+                        key={t.key}
+                        type="button"
+                        onClick={() => {
+                          setConfig((prev: any) => {
+                            const campaigns = [...prev.campaigns];
+                            campaigns[idx] = { ...campaigns[idx], theme: t.key };
+                            return { ...prev, campaigns };
+                          });
+                        }}
+                        className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 border ${
+                          (camp.theme || "purple") === t.key
+                            ? "bg-primary text-on-primary border-primary shadow-xs"
+                            : "bg-surface-container-lowest text-on-surface-variant border-outline-variant/30 hover:border-primary/50"
+                        }`}
+                      >
+                        <span className={`w-2.5 h-2.5 rounded-full ${t.dot}`} />
+                        <span>{t.label}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Preset Images Quick Pick */}
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-[10px] text-on-surface-variant uppercase font-bold">
+                    اختيار سريع لصورة ثلاثية الأبعاد جاهزة (Preset 3D Graphics)
+                  </label>
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    {PRESET_CAMPAIGN_IMAGES.map((p, pIdx) => (
+                      <button
+                        key={pIdx}
+                        type="button"
+                        onClick={() => {
+                          setConfig((prev: any) => {
+                            const campaigns = [...prev.campaigns];
+                            campaigns[idx] = { ...campaigns[idx], image: p.url };
+                            return { ...prev, campaigns };
+                          });
+                        }}
+                        className={`text-[11px] px-2.5 py-1 rounded-lg font-bold border transition-all flex items-center gap-1.5 ${
+                          camp.image === p.url
+                            ? "bg-primary/15 text-primary border-primary"
+                            : "bg-surface-container-lowest text-on-surface-variant border-outline-variant/30 hover:text-on-surface hover:border-primary/40"
+                        }`}
+                      >
+                        <img src={p.url} alt={p.label} className="w-4 h-4 object-contain" />
+                        <span>{p.label}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Image Picker Input (Upload or Custom URL) */}
                 <ImagePickerInput
-                  label={`صورة الإعلان رقم ${idx + 1}`}
+                  label={`رابط صورة الإعلان رقم ${idx + 1}`}
                   value={camp.image || ""}
                   onChange={(newUrl) => {
                     setConfig((prev: any) => {
@@ -1364,9 +1653,13 @@ export default function AdminHomepageManager() {
                   }}
                 />
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {/* Main Titles & Tags Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                  {/* Title Ar */}
                   <div className="flex flex-col gap-1">
-                    <label className="text-[10px] text-on-surface-variant uppercase font-bold">العنوان (بالعربية)</label>
+                    <label className="text-[10px] text-on-surface-variant uppercase font-bold">
+                      العنوان الرئيسي (بالعربية)
+                    </label>
                     <input
                       type="text"
                       value={camp.titleAr || ""}
@@ -1378,11 +1671,16 @@ export default function AdminHomepageManager() {
                           return { ...prev, campaigns };
                         });
                       }}
-                      className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-2 text-xs"
+                      className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-2.5 text-xs text-on-surface"
+                      placeholder="مثال: حذف حساب سامسونج FRP الفوري"
                     />
                   </div>
+
+                  {/* Title En */}
                   <div className="flex flex-col gap-1">
-                    <label className="text-[10px] text-on-surface-variant uppercase font-bold">العنوان (بالإنجليزية)</label>
+                    <label className="text-[10px] text-on-surface-variant uppercase font-bold">
+                      العنوان الرئيسي (بالإنجليزية)
+                    </label>
                     <input
                       type="text"
                       value={camp.titleEn || ""}
@@ -1394,11 +1692,124 @@ export default function AdminHomepageManager() {
                           return { ...prev, campaigns };
                         });
                       }}
-                      className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-2 text-xs"
+                      className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-2.5 text-xs text-on-surface"
+                      placeholder="e.g. Samsung FRP Remove"
                     />
                   </div>
+
+                  {/* Tag Ar */}
+                  <div className="flex flex-col gap-1">
+                    <label className="text-[10px] text-on-surface-variant uppercase font-bold">
+                      شارة التمييز / التاج (بالعربية)
+                    </label>
+                    <input
+                      type="text"
+                      value={camp.tagAr || ""}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setConfig((prev: any) => {
+                          const campaigns = [...prev.campaigns];
+                          campaigns[idx] = { ...campaigns[idx], tagAr: val };
+                          return { ...prev, campaigns };
+                        });
+                      }}
+                      className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-2 text-xs text-on-surface"
+                      placeholder="مثال: عرض حصري لفترة محدودة"
+                    />
+                  </div>
+
+                  {/* Tag En */}
+                  <div className="flex flex-col gap-1">
+                    <label className="text-[10px] text-on-surface-variant uppercase font-bold">
+                      شارة التمييز / التاج (بالإنجليزية)
+                    </label>
+                    <input
+                      type="text"
+                      value={camp.tagEn || ""}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setConfig((prev: any) => {
+                          const campaigns = [...prev.campaigns];
+                          campaigns[idx] = { ...campaigns[idx], tagEn: val };
+                          return { ...prev, campaigns };
+                        });
+                      }}
+                      className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-2 text-xs text-on-surface"
+                      placeholder="e.g. Limited Time Offer"
+                    />
+                  </div>
+
+                  {/* Description Ar */}
+                  <div className="flex flex-col gap-1">
+                    <label className="text-[10px] text-on-surface-variant uppercase font-bold">
+                      الوصف المختصر (بالعربية)
+                    </label>
+                    <textarea
+                      rows={2}
+                      value={camp.descAr || ""}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setConfig((prev: any) => {
+                          const campaigns = [...prev.campaigns];
+                          campaigns[idx] = { ...campaigns[idx], descAr: val };
+                          return { ...prev, campaigns };
+                        });
+                      }}
+                      className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-2 text-xs text-on-surface"
+                      placeholder="فك فوري وتلقائي لجميع طرازات سامسونج عبر السيرفر الرسمي بأعلى سرعة وأمان."
+                    />
+                  </div>
+
+                  {/* Description En */}
+                  <div className="flex flex-col gap-1">
+                    <label className="text-[10px] text-on-surface-variant uppercase font-bold">
+                      الوصف المختصر (بالإنجليزية)
+                    </label>
+                    <textarea
+                      rows={2}
+                      value={camp.descEn || ""}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setConfig((prev: any) => {
+                          const campaigns = [...prev.campaigns];
+                          campaigns[idx] = { ...campaigns[idx], descEn: val };
+                          return { ...prev, campaigns };
+                        });
+                      }}
+                      className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-2 text-xs text-on-surface"
+                      placeholder="Instant removal for all Samsung models via direct official server API."
+                    />
+                  </div>
+
+                  {/* Target URL */}
                   <div className="flex flex-col gap-1 md:col-span-2">
-                    <label className="text-[10px] text-primary uppercase font-bold">رابط التوجيه (URL)</label>
+                    <div className="flex justify-between items-center">
+                      <label className="text-[10px] text-primary uppercase font-bold">رابط التوجيه (URL)</label>
+                      <div className="flex items-center gap-1 text-[10px]">
+                        <span className="text-on-surface-variant">مقترحات:</span>
+                        {[
+                          { label: "Samsung", url: "/pricing?search=Samsung" },
+                          { label: "Chimera", url: "/pricing?section=Chimera%20Tool" },
+                          { label: "Borneo", url: "/pricing?search=Borneo" },
+                          { label: "Pricing", url: "/pricing" }
+                        ].map((link, lIdx) => (
+                          <button
+                            key={lIdx}
+                            type="button"
+                            onClick={() => {
+                              setConfig((prev: any) => {
+                                const campaigns = [...prev.campaigns];
+                                campaigns[idx] = { ...campaigns[idx], url: link.url };
+                                return { ...prev, campaigns };
+                              });
+                            }}
+                            className="px-1.5 py-0.5 rounded-md bg-surface-container text-primary hover:bg-primary/10 font-mono"
+                          >
+                            {link.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
                     <input
                       type="text"
                       value={camp.url || "/pricing"}
@@ -1414,246 +1825,127 @@ export default function AdminHomepageManager() {
                     />
                   </div>
                 </div>
+
+                {/* Operational Badges & Metrics Row */}
+                <div className="p-3 bg-surface-container rounded-xl border border-outline-variant/20 flex flex-col gap-2.5">
+                  <span className="text-[10px] font-bold text-on-surface-variant uppercase">
+                    بيانات الأداء والضمان السريعة (Operational Performance Badges)
+                  </span>
+                  
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                    {/* Speed / Turnaround */}
+                    <div className="flex flex-col gap-1">
+                      <label className="text-[9px] text-on-surface-variant">سرعة الإنجاز (عربي / إنجليزي)</label>
+                      <div className="grid grid-cols-2 gap-1">
+                        <input
+                          type="text"
+                          value={camp.turnaroundAr || ""}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            setConfig((prev: any) => {
+                              const campaigns = [...prev.campaigns];
+                              campaigns[idx] = { ...campaigns[idx], turnaroundAr: val };
+                              return { ...prev, campaigns };
+                            });
+                          }}
+                          placeholder="1 - 5 دقائق"
+                          className="bg-surface-container-lowest border border-outline-variant/30 rounded-lg p-1.5 text-[11px]"
+                        />
+                        <input
+                          type="text"
+                          value={camp.turnaroundEn || ""}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            setConfig((prev: any) => {
+                              const campaigns = [...prev.campaigns];
+                              campaigns[idx] = { ...campaigns[idx], turnaroundEn: val };
+                              return { ...prev, campaigns };
+                            });
+                          }}
+                          placeholder="1 - 5 Mins"
+                          className="bg-surface-container-lowest border border-outline-variant/30 rounded-lg p-1.5 text-[11px]"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Guarantee */}
+                    <div className="flex flex-col gap-1">
+                      <label className="text-[9px] text-on-surface-variant">الضمان المالي (عربي / إنجليزي)</label>
+                      <div className="grid grid-cols-2 gap-1">
+                        <input
+                          type="text"
+                          value={camp.guaranteeAr || ""}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            setConfig((prev: any) => {
+                              const campaigns = [...prev.campaigns];
+                              campaigns[idx] = { ...campaigns[idx], guaranteeAr: val };
+                              return { ...prev, campaigns };
+                            });
+                          }}
+                          placeholder="ضمان مالي 100%"
+                          className="bg-surface-container-lowest border border-outline-variant/30 rounded-lg p-1.5 text-[11px]"
+                        />
+                        <input
+                          type="text"
+                          value={camp.guaranteeEn || ""}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            setConfig((prev: any) => {
+                              const campaigns = [...prev.campaigns];
+                              campaigns[idx] = { ...campaigns[idx], guaranteeEn: val };
+                              return { ...prev, campaigns };
+                            });
+                          }}
+                          placeholder="100% REFUND"
+                          className="bg-surface-container-lowest border border-outline-variant/30 rounded-lg p-1.5 text-[11px]"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Gateway */}
+                    <div className="flex flex-col gap-1">
+                      <label className="text-[9px] text-on-surface-variant">نوع الربط (عربي / إنجليزي)</label>
+                      <div className="grid grid-cols-2 gap-1">
+                        <input
+                          type="text"
+                          value={camp.connectionAr || ""}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            setConfig((prev: any) => {
+                              const campaigns = [...prev.campaigns];
+                              campaigns[idx] = { ...campaigns[idx], connectionAr: val };
+                              return { ...prev, campaigns };
+                            });
+                          }}
+                          placeholder="ربط فوري API"
+                          className="bg-surface-container-lowest border border-outline-variant/30 rounded-lg p-1.5 text-[11px]"
+                        />
+                        <input
+                          type="text"
+                          value={camp.connectionEn || ""}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            setConfig((prev: any) => {
+                              const campaigns = [...prev.campaigns];
+                              campaigns[idx] = { ...campaigns[idx], connectionEn: val };
+                              return { ...prev, campaigns };
+                            });
+                          }}
+                          placeholder="DIRECT API"
+                          className="bg-surface-container-lowest border border-outline-variant/30 rounded-lg p-1.5 text-[11px]"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
               </div>
             ))}
           </div>
         </div>
       )}
 
-      {/* ============================================================= */}
-      {/* TAB 4: HERO SHOWCASE (القسم الرئيسي)                           */}
-      {/* ============================================================= */}
-      {activeTab === "hero" && (
-        <div className="glass-card rounded-3xl p-6 md:p-8 border border-outline-variant/30 flex flex-col gap-6">
-          <div className="border-b border-outline-variant/20 pb-3">
-            <h2 className="text-xl font-bold text-primary flex items-center gap-2">
-              <span className="material-symbols-outlined">space_dashboard</span>
-              4. الواجهة والصورة الرئيسية (Hero Showcase)
-            </h2>
-            <p className="text-xs text-on-surface-variant mt-1">تعديل نصوص وأزرار والصورة التوضيحية لقسم الـ Hero.</p>
-          </div>
-
-          <ImagePickerInput
-            label="صورة الموكاب الرئيسية للهاتف (Hero Device Mockup)"
-            value={config.heroSection?.heroImage || ""}
-            onChange={(newUrl) => updateSectionField("heroSection", "heroImage", newUrl)}
-          />
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="flex flex-col gap-1">
-              <label className="text-[10px] text-on-surface-variant uppercase font-bold">العنوان الأول (بالعربية)</label>
-              <input
-                type="text"
-                value={config.heroSection?.title1Ar || ""}
-                onChange={(e) => updateSectionField("heroSection", "title1Ar", e.target.value)}
-                className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-2.5 text-sm"
-              />
-            </div>
-            <div className="flex flex-col gap-1">
-              <label className="text-[10px] text-on-surface-variant uppercase font-bold">العنوان الأول (بالإنجليزية)</label>
-              <input
-                type="text"
-                value={config.heroSection?.title1En || ""}
-                onChange={(e) => updateSectionField("heroSection", "title1En", e.target.value)}
-                className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-2.5 text-sm"
-              />
-            </div>
-            <div className="flex flex-col gap-1">
-              <label className="text-[10px] text-on-surface-variant uppercase font-bold">العنوان الملون الثاني (بالعربية)</label>
-              <input
-                type="text"
-                value={config.heroSection?.title2Ar || ""}
-                onChange={(e) => updateSectionField("heroSection", "title2Ar", e.target.value)}
-                className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-2.5 text-sm"
-              />
-            </div>
-            <div className="flex flex-col gap-1">
-              <label className="text-[10px] text-on-surface-variant uppercase font-bold">العنوان الملون الثاني (بالإنجليزية)</label>
-              <input
-                type="text"
-                value={config.heroSection?.title2En || ""}
-                onChange={(e) => updateSectionField("heroSection", "title2En", e.target.value)}
-                className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-2.5 text-sm"
-              />
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ============================================================= */}
-      {/* TAB 5: SERVICE LANES (كروت الأقسام الأربعة)                   */}
-      {/* ============================================================= */}
-      {activeTab === "lanes" && (
-        <div className="glass-card rounded-3xl p-6 md:p-8 border border-outline-variant/30 flex flex-col gap-6">
-          <div className="border-b border-outline-variant/20 pb-3">
-            <h2 className="text-xl font-bold text-primary flex items-center gap-2">
-              <span className="material-symbols-outlined">grid_view</span>
-              5. كروت بوابات الخدمات الأربعة (Service Lanes)
-            </h2>
-            <p className="text-xs text-on-surface-variant mt-1">تعديل عناوين ووصف وروابط الأقسام الأربعة (IMEI، سيرفر، تحكم عن بعد، المتجر).</p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* IMEI */}
-            <div className="p-4 bg-surface-container-low rounded-2xl border border-outline-variant/30 flex flex-col gap-3">
-              <span className="font-bold text-primary text-sm">قسم خدمات IMEI</span>
-              <input
-                type="text"
-                placeholder="العنوان بالعربية"
-                value={config.serviceLanes?.imeiTitleAr || ""}
-                onChange={(e) => updateSectionField("serviceLanes", "imeiTitleAr", e.target.value)}
-                className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-2 text-xs font-bold"
-              />
-              <input
-                type="text"
-                placeholder="الوصف بالعربية"
-                value={config.serviceLanes?.imeiDescAr || ""}
-                onChange={(e) => updateSectionField("serviceLanes", "imeiDescAr", e.target.value)}
-                className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-2 text-xs"
-              />
-            </div>
-
-            {/* Server */}
-            <div className="p-4 bg-surface-container-low rounded-2xl border border-outline-variant/30 flex flex-col gap-3">
-              <span className="font-bold text-primary text-sm">قسم خدمات السيرفرات والأرصدة</span>
-              <input
-                type="text"
-                placeholder="العنوان بالعربية"
-                value={config.serviceLanes?.serverTitleAr || ""}
-                onChange={(e) => updateSectionField("serviceLanes", "serverTitleAr", e.target.value)}
-                className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-2 text-xs font-bold"
-              />
-              <input
-                type="text"
-                placeholder="الوصف بالعربية"
-                value={config.serviceLanes?.serverDescAr || ""}
-                onChange={(e) => updateSectionField("serviceLanes", "serverDescAr", e.target.value)}
-                className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-2 text-xs"
-              />
-            </div>
-
-            {/* Remote */}
-            <div className="p-4 bg-surface-container-low rounded-2xl border border-outline-variant/30 flex flex-col gap-3">
-              <span className="font-bold text-primary text-sm">قسم خدمات التحكم عن بعد</span>
-              <input
-                type="text"
-                placeholder="العنوان بالعربية"
-                value={config.serviceLanes?.remoteTitleAr || ""}
-                onChange={(e) => updateSectionField("serviceLanes", "remoteTitleAr", e.target.value)}
-                className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-2 text-xs font-bold"
-              />
-              <input
-                type="text"
-                placeholder="الوصف بالعربية"
-                value={config.serviceLanes?.remoteDescAr || ""}
-                onChange={(e) => updateSectionField("serviceLanes", "remoteDescAr", e.target.value)}
-                className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-2 text-xs"
-              />
-            </div>
-
-            {/* Store */}
-            <div className="p-4 bg-surface-container-low rounded-2xl border border-outline-variant/30 flex flex-col gap-3">
-              <span className="font-bold text-primary text-sm">قسم الأدوات والمتجر</span>
-              <input
-                type="text"
-                placeholder="العنوان بالعربية"
-                value={config.serviceLanes?.storeTitleAr || ""}
-                onChange={(e) => updateSectionField("serviceLanes", "storeTitleAr", e.target.value)}
-                className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-2 text-xs font-bold"
-              />
-              <input
-                type="text"
-                placeholder="الوصف بالعربية"
-                value={config.serviceLanes?.storeDescAr || ""}
-                onChange={(e) => updateSectionField("serviceLanes", "storeDescAr", e.target.value)}
-                className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-2 text-xs"
-              />
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ============================================================= */}
-      {/* TAB 6: NOTICE BAR                                             */}
-      {/* ============================================================= */}
-      {activeTab === "notice" && (
-        <div className="glass-card rounded-3xl p-6 md:p-8 border border-outline-variant/30 flex flex-col gap-6">
-          <div className="border-b border-outline-variant/20 pb-3">
-            <h2 className="text-xl font-bold text-primary flex items-center gap-2">
-              <span className="material-symbols-outlined">campaign</span>
-              6. شريط الإشعارات العلوي (Notice Bar)
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="flex flex-col gap-1">
-              <label className="text-[10px] text-on-surface-variant uppercase font-bold">الإعلان الأول (بالعربية)</label>
-              <input
-                type="text"
-                value={config.noticeBar?.text1Ar || ""}
-                onChange={(e) => updateSectionField("noticeBar", "text1Ar", e.target.value)}
-                className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-2.5 text-xs text-on-surface"
-              />
-            </div>
-            <div className="flex flex-col gap-1">
-              <label className="text-[10px] text-on-surface-variant uppercase font-bold">الإعلان الثاني (بالعربية)</label>
-              <input
-                type="text"
-                value={config.noticeBar?.text2Ar || ""}
-                onChange={(e) => updateSectionField("noticeBar", "text2Ar", e.target.value)}
-                className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-2.5 text-xs text-on-surface"
-              />
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ============================================================= */}
-      {/* TAB 7: FEATURE RIBBON                                         */}
-      {/* ============================================================= */}
-      {activeTab === "ribbon" && (
-        <div className="glass-card rounded-3xl p-6 md:p-8 border border-outline-variant/30 flex flex-col gap-6">
-          <div className="border-b border-outline-variant/20 pb-3">
-            <h2 className="text-xl font-bold text-primary flex items-center gap-2">
-              <span className="material-symbols-outlined">verified</span>
-              7. شريط المميزات الثلاثي (Feature Ribbon)
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="p-4 bg-surface-container-low rounded-2xl border border-outline-variant/30 flex flex-col gap-2">
-              <span className="font-bold text-primary text-xs">الميزة الأولى</span>
-              <input
-                type="text"
-                value={config.featureRibbon?.feat1TitleAr || ""}
-                onChange={(e) => updateSectionField("featureRibbon", "feat1TitleAr", e.target.value)}
-                className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-2 text-xs"
-                placeholder="العنوان"
-              />
-            </div>
-            <div className="p-4 bg-surface-container-low rounded-2xl border border-outline-variant/30 flex flex-col gap-2">
-              <span className="font-bold text-primary text-xs">الميزة الثانية</span>
-              <input
-                type="text"
-                value={config.featureRibbon?.feat2TitleAr || ""}
-                onChange={(e) => updateSectionField("featureRibbon", "feat2TitleAr", e.target.value)}
-                className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-2 text-xs"
-                placeholder="العنوان"
-              />
-            </div>
-            <div className="p-4 bg-surface-container-low rounded-2xl border border-outline-variant/30 flex flex-col gap-2">
-              <span className="font-bold text-primary text-xs">الميزة الثالثة</span>
-              <input
-                type="text"
-                value={config.featureRibbon?.feat3TitleAr || ""}
-                onChange={(e) => updateSectionField("featureRibbon", "feat3TitleAr", e.target.value)}
-                className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-2 text-xs"
-                placeholder="العنوان"
-              />
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* ============================================================= */}
       {/* SERVICE PICKER MODAL                                          */}
