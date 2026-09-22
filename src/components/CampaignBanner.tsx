@@ -134,88 +134,58 @@ const DEFAULT_CAMPAIGNS: CampaignItem[] = [
 ];
 
 interface ThemeStyle {
-  bgLight: string;
-  bgDark: string;
-  borderLight: string;
-  borderDark: string;
-  shadowLight: string;
-  shadowDark: string;
-  auraLight: string;
-  auraDark: string;
-  pillBgLight: string;
-  pillBgDark: string;
+  cardBg: string;
+  cardBorder: string;
+  cardShadow: string;
+  auraBg: string;
+  pillBg: string;
   progressGradient: string;
   buttonGradient: string;
 }
 
 const THEME_STYLES: Record<string, ThemeStyle> = {
   purple: {
-    bgLight: "from-slate-50 via-white to-blue-50/50",
-    bgDark: "from-[#060e22] via-[#0b1b42] to-[#040916]",
-    borderLight: "border-blue-200/90 hover:border-blue-300",
-    borderDark: "border-blue-500/35 hover:border-blue-400/50",
-    shadowLight: "shadow-xl shadow-blue-950/5",
-    shadowDark: "shadow-2xl shadow-blue-950/60",
-    auraLight: "bg-blue-400/15",
-    auraDark: "bg-blue-600/25",
-    pillBgLight: "bg-blue-100/80 border-blue-300 text-blue-900",
-    pillBgDark: "bg-blue-950/90 border-blue-500/40 text-blue-300",
+    cardBg: "bg-gradient-to-br from-slate-50 via-white to-blue-50/50 dark:from-[#060e22] dark:via-[#0b1b42] dark:to-[#040916]",
+    cardBorder: "border-blue-200/90 hover:border-blue-300 dark:border-blue-500/35 dark:hover:border-blue-400/50",
+    cardShadow: "shadow-xl shadow-blue-950/5 dark:shadow-2xl dark:shadow-blue-950/60",
+    auraBg: "bg-blue-400/15 dark:bg-blue-600/25",
+    pillBg: "bg-blue-100/80 border-blue-300 text-blue-900 dark:bg-blue-950/90 dark:border-blue-500/40 dark:text-blue-300",
     progressGradient: "from-blue-600 via-indigo-600 to-sky-500",
     buttonGradient: "from-blue-600 via-indigo-600 to-blue-700 hover:from-blue-500 hover:to-indigo-500 text-white shadow-md shadow-blue-600/25"
   },
   cyan: {
-    bgLight: "from-cyan-50/40 via-white to-sky-50/40",
-    bgDark: "from-[#031322] via-[#062038] to-[#020b14]",
-    borderLight: "border-cyan-200/90 hover:border-cyan-300",
-    borderDark: "border-cyan-500/35 hover:border-cyan-400/50",
-    shadowLight: "shadow-xl shadow-cyan-950/5",
-    shadowDark: "shadow-2xl shadow-cyan-950/60",
-    auraLight: "bg-cyan-400/15",
-    auraDark: "bg-cyan-500/25",
-    pillBgLight: "bg-cyan-100/80 border-cyan-300 text-cyan-900",
-    pillBgDark: "bg-cyan-950/90 border-cyan-500/40 text-cyan-300",
+    cardBg: "bg-gradient-to-br from-cyan-50/40 via-white to-sky-50/40 dark:from-[#031322] dark:via-[#062038] dark:to-[#020b14]",
+    cardBorder: "border-cyan-200/90 hover:border-cyan-300 dark:border-cyan-500/35 dark:hover:border-cyan-400/50",
+    cardShadow: "shadow-xl shadow-cyan-950/5 dark:shadow-2xl dark:shadow-cyan-950/60",
+    auraBg: "bg-cyan-400/15 dark:bg-cyan-500/25",
+    pillBg: "bg-cyan-100/80 border-cyan-300 text-cyan-900 dark:bg-cyan-950/90 dark:border-cyan-500/40 dark:text-cyan-300",
     progressGradient: "from-cyan-500 via-sky-400 to-blue-500",
     buttonGradient: "from-cyan-600 via-sky-600 to-blue-600 hover:from-cyan-500 hover:to-sky-500 text-white shadow-md shadow-cyan-600/25"
   },
   blue: {
-    bgLight: "from-blue-50/40 via-white to-slate-50",
-    bgDark: "from-[#051026] via-[#091b40] to-[#030a18]",
-    borderLight: "border-blue-200/90 hover:border-blue-300",
-    borderDark: "border-blue-500/35 hover:border-blue-400/50",
-    shadowLight: "shadow-xl shadow-blue-950/5",
-    shadowDark: "shadow-2xl shadow-blue-950/60",
-    auraLight: "bg-blue-400/15",
-    auraDark: "bg-blue-500/25",
-    pillBgLight: "bg-blue-100/80 border-blue-300 text-blue-900",
-    pillBgDark: "bg-blue-950/90 border-blue-500/40 text-sky-300",
+    cardBg: "bg-gradient-to-br from-blue-50/40 via-white to-slate-50 dark:from-[#051026] dark:via-[#091b40] dark:to-[#030a18]",
+    cardBorder: "border-blue-200/90 hover:border-blue-300 dark:border-blue-500/35 dark:hover:border-blue-400/50",
+    cardShadow: "shadow-xl shadow-blue-950/5 dark:shadow-2xl dark:shadow-blue-950/60",
+    auraBg: "bg-blue-400/15 dark:bg-blue-500/25",
+    pillBg: "bg-blue-100/80 border-blue-300 text-blue-900 dark:bg-blue-950/90 dark:border-blue-500/40 dark:text-sky-300",
     progressGradient: "from-blue-600 via-indigo-500 to-sky-400",
     buttonGradient: "from-blue-600 via-indigo-600 to-blue-700 hover:from-blue-500 hover:to-indigo-500 text-white shadow-md shadow-blue-600/25"
   },
   emerald: {
-    bgLight: "from-emerald-50/40 via-white to-teal-50/40",
-    bgDark: "from-[#031510] via-[#06241b] to-[#020c09]",
-    borderLight: "border-emerald-200/90 hover:border-emerald-300",
-    borderDark: "border-emerald-500/35 hover:border-emerald-400/50",
-    shadowLight: "shadow-xl shadow-emerald-950/5",
-    shadowDark: "shadow-2xl shadow-emerald-950/60",
-    auraLight: "bg-emerald-400/15",
-    auraDark: "bg-emerald-500/25",
-    pillBgLight: "bg-emerald-100/80 border-emerald-300 text-emerald-900",
-    pillBgDark: "bg-emerald-950/90 border-emerald-500/40 text-emerald-300",
+    cardBg: "bg-gradient-to-br from-emerald-50/40 via-white to-teal-50/40 dark:from-[#031510] dark:via-[#06241b] dark:to-[#020c09]",
+    cardBorder: "border-emerald-200/90 hover:border-emerald-300 dark:border-emerald-500/35 dark:hover:border-emerald-400/50",
+    cardShadow: "shadow-xl shadow-emerald-950/5 dark:shadow-2xl dark:shadow-emerald-950/60",
+    auraBg: "bg-emerald-400/15 dark:bg-emerald-500/25",
+    pillBg: "bg-emerald-100/80 border-emerald-300 text-emerald-900 dark:bg-emerald-950/90 dark:border-emerald-500/40 dark:text-emerald-300",
     progressGradient: "from-emerald-500 via-teal-400 to-green-500",
     buttonGradient: "from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-500 hover:to-teal-500 text-white shadow-md shadow-emerald-600/25"
   },
   amber: {
-    bgLight: "from-amber-50/40 via-white to-orange-50/40",
-    bgDark: "from-[#160f03] via-[#261a05] to-[#0c0801]",
-    borderLight: "border-amber-200/90 hover:border-amber-300",
-    borderDark: "border-amber-500/35 hover:border-amber-400/50",
-    shadowLight: "shadow-xl shadow-amber-950/5",
-    shadowDark: "shadow-2xl shadow-amber-950/60",
-    auraLight: "bg-amber-400/15",
-    auraDark: "bg-amber-500/25",
-    pillBgLight: "bg-amber-100/80 border-amber-300 text-amber-900",
-    pillBgDark: "bg-amber-950/90 border-amber-500/40 text-amber-300",
+    cardBg: "bg-gradient-to-br from-amber-50/40 via-white to-orange-50/40 dark:from-[#160f03] dark:via-[#261a05] dark:to-[#0c0801]",
+    cardBorder: "border-amber-200/90 hover:border-amber-300 dark:border-amber-500/35 dark:hover:border-amber-400/50",
+    cardShadow: "shadow-xl shadow-amber-950/5 dark:shadow-2xl dark:shadow-amber-950/60",
+    auraBg: "bg-amber-400/15 dark:bg-amber-500/25",
+    pillBg: "bg-amber-100/80 border-amber-300 text-amber-900 dark:bg-amber-950/90 dark:border-amber-500/40 dark:text-amber-300",
     progressGradient: "from-amber-500 via-orange-400 to-amber-600",
     buttonGradient: "from-amber-600 via-orange-600 to-amber-700 hover:from-amber-500 hover:to-orange-500 text-white shadow-md shadow-amber-600/25"
   }
@@ -350,7 +320,7 @@ export default function CampaignBanner({
 
       {/* 2. Flagship Modern Cockpit Card (Supports Both Light and Dark Modes with Zero Pink) */}
       <div
-        className={`relative w-full rounded-2xl sm:rounded-3xl p-5 sm:p-7 md:p-8 lg:p-9 bg-gradient-to-br ${theme.bgLight} dark:${theme.bgDark} border ${theme.borderLight} dark:${theme.borderDark} backdrop-blur-2xl ${theme.shadowLight} dark:${theme.shadowDark} overflow-hidden transition-all duration-500 group`}
+        className={`relative w-full rounded-2xl sm:rounded-3xl p-5 sm:p-7 md:p-8 lg:p-9 ${theme.cardBg} border ${theme.cardBorder} backdrop-blur-2xl ${theme.cardShadow} overflow-hidden transition-all duration-500 group`}
         onMouseEnter={() => setIsPaused(true)}
         onMouseLeave={() => setIsPaused(false)}
       >
@@ -371,7 +341,7 @@ export default function CampaignBanner({
 
         {/* Atmospheric Radial Aura Behind Graphic */}
         <div
-          className={`absolute -bottom-16 end-4 sm:end-12 w-64 h-64 sm:w-80 sm:h-80 rounded-full ${theme.auraLight} dark:${theme.auraDark} blur-3xl pointer-events-none animate-banner-aura`}
+          className={`absolute -bottom-16 end-4 sm:end-12 w-64 h-64 sm:w-80 sm:h-80 rounded-full ${theme.auraBg} blur-3xl pointer-events-none animate-banner-aura`}
         />
 
         {/* Card Content Grid */}
@@ -384,7 +354,7 @@ export default function CampaignBanner({
             <div className="space-y-3.5">
               <div className="flex flex-wrap items-center gap-2">
                 <span
-                  className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] sm:text-xs font-bold border shadow-xs ${theme.pillBgLight} dark:${theme.pillBgDark}`}
+                  className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] sm:text-xs font-bold border shadow-xs ${theme.pillBg}`}
                 >
                   <Flame className="w-3.5 h-3.5 text-amber-500 dark:text-amber-400 animate-pulse" />
                   <span>
