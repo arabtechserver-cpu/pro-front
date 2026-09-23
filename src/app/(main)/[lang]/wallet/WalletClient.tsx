@@ -370,17 +370,57 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      setReceiptFileName(file.name);
-      const reader = new FileReader();
-      reader.onload = () => {
-        setReceiptImage((reader.result as string) || "");
-      };
-      reader.onerror = () => {
-        setErrorMessage(lang === "ar" ? "تعذر قراءة ملف الصورة، يُرجى تجربة ملف آخر" : "Could not read image file");
-      };
-      reader.readAsDataURL(file);
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      setErrorMessage(lang === "ar" ? "يرجى اختيار ملف صورة صالح (JPG, PNG, WEBP)" : "Please select a valid image file");
+      return;
     }
+
+    setReceiptFileName(file.name);
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const rawDataUrl = (event.target?.result as string) || "";
+      if (!rawDataUrl) return;
+
+      const img = new Image();
+      img.onload = () => {
+        const MAX_DIM = 1600;
+        let width = img.width;
+        let height = img.height;
+
+        if (width > MAX_DIM || height > MAX_DIM) {
+          if (width > height) {
+            height = Math.round((height * MAX_DIM) / width);
+            width = MAX_DIM;
+          } else {
+            width = Math.round((width * MAX_DIM) / height);
+            height = MAX_DIM;
+          }
+        }
+
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, width, height);
+          const compressed = canvas.toDataURL("image/jpeg", 0.85);
+          setReceiptImage(compressed);
+        } else {
+          setReceiptImage(rawDataUrl);
+        }
+      };
+      img.onerror = () => {
+        setReceiptImage(rawDataUrl);
+      };
+      img.src = rawDataUrl;
+    };
+    reader.onerror = () => {
+      setErrorMessage(lang === "ar" ? "تعذر قراءة ملف الصورة، يُرجى تجربة ملف آخر" : "Could not read image file");
+    };
+    reader.readAsDataURL(file);
   };
 
   const handleDepositSubmit = async (e: React.FormEvent) => {
