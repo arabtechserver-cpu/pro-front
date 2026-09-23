@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { getAdminProfile, updateAdminCredentials } from "./actions";
+import { isServerActionMismatchError } from "@/lib/server-action-utils";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
@@ -154,6 +155,10 @@ export default function AdminSettingsPage() {
         setConfirmPassword("");
       }
     } catch (err: any) {
+      if (isServerActionMismatchError(err)) {
+        window.location.reload();
+        return;
+      }
       setError("تعذر الاتصال بالسيرفر");
     } finally {
       setIsLoading(false);

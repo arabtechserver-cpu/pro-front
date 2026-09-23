@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { addBlogPost, addVideoTutorial, updateBlogPost, deleteBlogPost } from "./actions";
+import { isServerActionMismatchError } from "@/lib/server-action-utils";
 import RichTextEditor from "@/components/RichTextEditor";
 import ImageUploader from "@/components/ImageUploader";
 
@@ -103,6 +104,10 @@ export default function AdminBlog() {
       setActiveTab("articles");
       setTimeout(() => setToastMessage(null), 3000);
     } catch (error: any) {
+      if (isServerActionMismatchError(error)) {
+        window.location.reload();
+        return;
+      }
       alert("حدث خطأ أثناء النشر: " + error.message);
     }
   };
@@ -127,6 +132,10 @@ export default function AdminBlog() {
       fetchPosts();
       setTimeout(() => setToastMessage(null), 3000);
     } catch (error: any) {
+      if (isServerActionMismatchError(error)) {
+        window.location.reload();
+        return;
+      }
       alert("حدث خطأ أثناء التحديث: " + error.message);
     }
   };
@@ -139,6 +148,10 @@ export default function AdminBlog() {
       fetchPosts();
       setTimeout(() => setToastMessage(null), 3000);
     } catch (err: any) {
+      if (isServerActionMismatchError(err)) {
+        window.location.reload();
+        return;
+      }
       alert("فشل حذف المقال: " + err.message);
     }
   };
@@ -153,6 +166,10 @@ export default function AdminBlog() {
       setToastMessage("تم نشر الفيديو بنجاح!");
       setTimeout(() => setToastMessage(null), 3000);
     } catch (error: any) {
+      if (isServerActionMismatchError(error)) {
+        window.location.reload();
+        return;
+      }
       alert("حدث خطأ أثناء النشر: " + error.message);
     }
   };

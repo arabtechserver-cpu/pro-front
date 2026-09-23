@@ -23,6 +23,24 @@ function getLocale(request: NextRequest): string | undefined {
 }
 
 export async function proxy(request: NextRequest) {
+  const nextAction = request.headers.get('next-action');
+  if (nextAction !== null) {
+    if (!/^[a-f0-9]{42}$/i.test(nextAction)) {
+      return new NextResponse(
+        JSON.stringify({
+          error: 'Invalid or outdated action reference',
+          code: 'INVALID_SERVER_ACTION',
+        }),
+        {
+          status: 400,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+    }
+  }
+
   const pathname = request.nextUrl.pathname;
 
   if (pathname === '/api-docs' || pathname.startsWith('/api-docs')) {

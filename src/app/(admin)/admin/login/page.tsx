@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { loginAdmin, verifyAdminOtpAction, resendAdminOtpAction } from "./actions";
+import { isServerActionMismatchError } from "@/lib/server-action-utils";
 import CloudflareTurnstile, { resetTurnstile } from "@/components/CloudflareTurnstile";
 import { getOrCreateDeviceToken, getDeviceFingerprint, getLocalIpViaWebRTC } from "@/utils/deviceUtils";
 
@@ -174,8 +175,7 @@ export default function AdminLogin() {
         resetTurnstile();
       }
     } catch (err: any) {
-      const msg = err?.message || String(err);
-      if (msg.includes("Failed to find Server Action") || msg.includes("deployment")) {
+      if (isServerActionMismatchError(err)) {
         window.location.reload();
         return;
       }
@@ -251,7 +251,11 @@ export default function AdminLogin() {
       } else {
         setError(result.message || "رمز التحقق غير صحيح");
       }
-    } catch {
+    } catch (err: any) {
+      if (isServerActionMismatchError(err)) {
+        window.location.reload();
+        return;
+      }
       setError("حدث خطأ أثناء التحقق من الرمز، يرجى المحاولة لاحقاً.");
     } finally {
       setLoading(false);
@@ -289,7 +293,11 @@ export default function AdminLogin() {
       } else {
         setError(result.message || "تعذر إعادة إرسال الرمز");
       }
-    } catch {
+    } catch (err: any) {
+      if (isServerActionMismatchError(err)) {
+        window.location.reload();
+        return;
+      }
       setError("حدث خطأ أثناء إعادة إرسال الكود");
     } finally {
       setResending(false);
