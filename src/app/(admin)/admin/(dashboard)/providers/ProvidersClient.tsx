@@ -40,7 +40,7 @@ export function getServiceRequiredFields(service: any): { label: string; type?: 
       if (Array.isArray(parsed)) {
         parsed.forEach((f: any) => {
           if ([true, 1, "1", "true"].includes(f.adminonly)) return;
-          const name = f.fieldname || f.reqid || f.name || f.label || "حقل مخصص";
+          const name = f.label || f.fieldname || f.name || f.field_id || f.reqid || "حقل مخصص";
           const rawOpts = f.options || f.fieldoptions || f.FIELDOPTIONS;
           let opts: string[] = [];
           if (Array.isArray(rawOpts)) opts = rawOpts.map((o: any) => String(o?.value || o || "").trim()).filter(Boolean);
@@ -71,7 +71,7 @@ export function getServiceRequiredFields(service: any): { label: string; type?: 
       } else if (typeof parsed === "object" && parsed !== null) {
         Object.entries(parsed).forEach(([key, val]: [string, any]) => {
           if ([true, 1, "1", "true"].includes(val.adminonly)) return;
-          const name = val.label || val.name || val.fieldname || val.reqid || key;
+          const name = val.label || val.name || val.fieldname || val.field_id || val.reqid || key;
           const rawOpts = val.options || val.fieldoptions || val.FIELDOPTIONS;
           let opts: string[] = [];
           if (Array.isArray(rawOpts)) opts = rawOpts.map((o: any) => String(o?.value || o || "").trim()).filter(Boolean);
@@ -103,12 +103,56 @@ export function getServiceRequiredFields(service: any): { label: string; type?: 
     } catch (e) {}
   }
 
+  // دعم الحقول المباشرة في حالة عدم وجود requiresCustom
+  if (fields.length === 0 && Array.isArray(service?.customFields) && service.customFields.length > 0) {
+    service.customFields.forEach((f: any) => {
+      if ([true, 1, "1", "true"].includes(f.adminonly)) return;
+      const name = f.label || f.fieldname || f.name || f.field_id || f.reqid || "حقل مخصص";
+      const cleanName = String(name).replace(/^custom_/, "").trim();
+      const rawOpts = f.options || f.fieldoptions || f.FIELDOPTIONS;
+      let opts: string[] = [];
+      if (Array.isArray(rawOpts)) opts = rawOpts.map((o: any) => String(o?.value || o || "").trim()).filter(Boolean);
+      else if (typeof rawOpts === "string" && rawOpts.trim()) opts = rawOpts.split(/[\r\n,|]+/).map(s => s.trim()).filter(Boolean);
+
+      const isQty = f.is_quantity === true || f.type === "quantity" || f.fieldtype === "quantity" || /^(qnt|quantity|الكمية)$/i.test(cleanName);
+      if (isQty) {
+        const min = f.min_quantity ?? f.minQty ?? 1;
+        const max = f.max_quantity ?? f.maxQty ?? 0;
+        const limitText = max > 0 ? `(من ${min} إلى ${max})` : `(الحد الأدنى: ${min})`;
+        fields.push({
+          label: `الكمية ${limitText}`,
+          type: "quantity",
+          required: true
+        });
+        return;
+      }
+
+      fields.push({
+        label: cleanName,
+        type: opts.length > 0 ? "select" : (f.fieldtype || f.type || "text"),
+        required: f.required === "1" || f.required === true || f.required === "on",
+        options: opts
+      });
+    });
+  }
+
+  // إضافة حقل IMEI الافتراضي لخدمات الـ IMEI في حال عدم وجود حقل صريح
+  const isImei = String(service?.service_type || service?.apiServiceType || service?.category_name || service?.categoryName || service?.group_name || service?.groupName || service?.dhruCategory?.name || "").toLowerCase().includes("imei");
+  const hasImei = fields.some(f => /imei|serial|sn/i.test(f.label));
+  if (isImei && !hasImei) {
+    fields.unshift({
+      label: "رقم IMEI / السيريال",
+      type: "text",
+      required: true
+    });
+  }
+
   // إذا كانت الخدمة تدعم الكمية صراحة ولم يُضف حقل كمية بعد
   const hasQty = fields.some(f => f.type === "quantity" || f.label.includes("الكمية"));
-  const min = service.minQty ?? service.min_quantity ?? service.QNT_MIN ?? 1;
-  const max = service.maxQty ?? service.max_quantity ?? service.QNT_MAX ?? 0;
+  const min = service?.minQty ?? service?.min_quantity ?? service?.QNT_MIN ?? 1;
+  const max = service?.maxQty ?? service?.max_quantity ?? service?.QNT_MAX ?? 0;
 
-  if (!hasQty && service.requires_quantity !== false && (service.requires_quantity === true || service.supportsQty === true || service.supports_quantity === true)) {
+  if (!hasQty && service?.requires_quantity !== false && (service?.requires_quantity === true || service?.supportsQty === true || service?.supports_quantity === true)) {
     const limitText = Number(max) > 0 ? `(من ${min} إلى ${max})` : `(الحد الأدنى: ${min})`;
     fields.push({
       label: `الكمية ${limitText}`,
@@ -715,7 +759,7 @@ export default function ProvidersClient() {
       }
 
       // Fallback: build JSON from stored provider services
-      const storedRes = await fetch(`/api/providers/${provider.id}/services`);
+      const storedRes = await fetch(`/api/providers/${provider.id}/services?include_info=true`);
       const storedData = await storedRes.json().catch(() => ({}));
       const services = Array.isArray(storedData.services) ? storedData.services : [];
 

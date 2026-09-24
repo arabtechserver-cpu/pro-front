@@ -70,7 +70,7 @@ function getProviderCustomFields(service) {
     const parsed = typeof raw === 'string' ? JSON.parse(raw) : raw;
     if (!parsed || typeof parsed !== 'object') return null;
     const entries = Array.isArray(parsed)
-      ? parsed.map(field => [field?.field_id || field?.reqid || field?.REQID || field?.id || field?.name || field?.label, field])
+      ? parsed.map(field => [field?.fieldname || field?.field_id || field?.reqid || field?.REQID || field?.id || field?.name || field?.label, field])
       : Object.entries(parsed);
     /** @type {Record<string, any>} */
     const result = {};
@@ -94,10 +94,11 @@ function isProviderQuantityField(field, key) {
 }
 
 function supportsProviderQuantity(service) {
-  if (!service?.providerId) return false;
-  // The detail API supplies the same decision used to price and validate orders.
+  if (!service) return false;
+  if (service.providerId === null) return false;
   if (typeof service.supportsQty === 'boolean') return service.supportsQty;
   if (typeof service.supports_quantity === 'boolean') return service.supports_quantity;
+  if (!service.providerId) return false;
   const flag = service.QNT ?? service.requires_quantity ?? service.REQUIRES_QUANTITY;
   if ([false, 0, '0'].includes(flag)) return false;
   if ([true, 1, '1'].includes(flag)) return true;

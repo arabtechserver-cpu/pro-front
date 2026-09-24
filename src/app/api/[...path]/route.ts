@@ -108,7 +108,7 @@ async function handler(
 
       const responseHeaders = new Headers();
       res.headers.forEach((val, key) => {
-        if (!['content-encoding', 'transfer-encoding', 'connection', 'content-security-policy', 'cross-origin-opener-policy'].includes(key.toLowerCase())) {
+        if (!['content-encoding', 'transfer-encoding', 'connection', 'content-security-policy', 'cross-origin-opener-policy', 'content-length'].includes(key.toLowerCase())) {
           responseHeaders.set(key, val);
         }
       });
@@ -120,6 +120,12 @@ async function handler(
       }
 
       const responseBody = await res.arrayBuffer();
+      responseHeaders.set('content-length', responseBody.byteLength.toString());
+
+      if (res.status >= 400) {
+        console.warn(`[API Proxy] ${request.method} /api/${path} returned status ${res.status}`);
+      }
+
       return new NextResponse(responseBody, {
         status: res.status,
         headers: responseHeaders,

@@ -24,7 +24,19 @@ export default function ServicesPage() {
   const [editCredit, setEditCredit] = useState<number>(0);
   const [editMargin, setEditMargin] = useState<number>(0);
   const [editIsActive, setEditIsActive] = useState<boolean>(true);
-  const [editFields, setEditFields] = useState<Array<{label: string; fieldname: string; fieldtype: string; required: boolean}>>([]);
+interface EditCustomField {
+  id?: string;
+  field_id?: string;
+  fieldname: string;
+  label: string;
+  fieldtype: string;
+  type?: string;
+  required: boolean;
+  options?: string[];
+  optionsStr?: string;
+}
+
+  const [editFields, setEditFields] = useState<EditCustomField[]>([]);
   const [isSavingEdit, setIsSavingEdit] = useState(false);
 
   // Filter state (all, active, hidden, zeroPrice)
@@ -276,15 +288,42 @@ export default function ServicesPage() {
     // تحليل الحقول المخصصة الحالية للخدمة
     try {
       if (service.requiresCustom) {
-        const parsed = JSON.parse(service.requiresCustom);
+        const parsed = typeof service.requiresCustom === 'string' ? JSON.parse(service.requiresCustom) : service.requiresCustom;
         const fields = Array.isArray(parsed)
-          ? parsed
-          : Object.entries(parsed).map(([k, v]: any) => ({
-              label: v?.label || k,
-              fieldname: k,
-              fieldtype: v?.fieldtype || 'text',
-              required: v?.required !== false
-            }));
+          ? parsed.map((f: any, idx: number) => {
+              const rawOpts = f?.options || f?.fieldoptions;
+              const optsList = Array.isArray(rawOpts)
+                ? rawOpts.map((o: any) => String(o?.value || o || '').trim()).filter(Boolean)
+                : (typeof rawOpts === 'string' && rawOpts.trim() ? rawOpts.split(/[\r\n,|]+/).map((s: string) => s.trim()).filter(Boolean) : []);
+              return {
+                id: f?.id || f?.field_id || f?.fieldname || `field_${idx + 1}`,
+                field_id: f?.field_id || f?.reqid || f?.id || f?.fieldname || `field_${idx + 1}`,
+                fieldname: f?.fieldname || f?.field_id || f?.name || f?.reqid || `field_${idx + 1}`,
+                label: f?.label || f?.name || f?.fieldname || f?.field_id || `حقل ${idx + 1}`,
+                fieldtype: f?.fieldtype || f?.type || (optsList.length > 0 ? 'select' : 'text'),
+                type: f?.type || f?.fieldtype || (optsList.length > 0 ? 'select' : 'text'),
+                required: f?.required === true || f?.required === 1 || f?.required === '1' || f?.required === 'on' || f?.required !== false,
+                options: optsList,
+                optionsStr: optsList.join(', ')
+              };
+            })
+          : Object.entries(parsed).map(([k, v]: any) => {
+              const rawOpts = v?.options || v?.fieldoptions;
+              const optsList = Array.isArray(rawOpts)
+                ? rawOpts.map((o: any) => String(o?.value || o || '').trim()).filter(Boolean)
+                : (typeof rawOpts === 'string' && rawOpts.trim() ? rawOpts.split(/[\r\n,|]+/).map((s: string) => s.trim()).filter(Boolean) : []);
+              return {
+                id: v?.id || v?.field_id || k,
+                field_id: v?.field_id || v?.reqid || v?.id || k,
+                fieldname: v?.fieldname || k,
+                label: v?.label || v?.name || k,
+                fieldtype: v?.fieldtype || v?.type || (optsList.length > 0 ? 'select' : 'text'),
+                type: v?.type || v?.fieldtype || (optsList.length > 0 ? 'select' : 'text'),
+                required: v?.required === true || v?.required === 1 || v?.required === '1' || v?.required === 'on' || v?.required !== false,
+                options: optsList,
+                optionsStr: optsList.join(', ')
+              };
+            });
         setEditFields(fields);
       } else {
         setEditFields([]);
@@ -304,17 +343,25 @@ export default function ServicesPage() {
       // بناء requiresCustom JSON من الحقول المعدّلة
       let requiresCustom: string | null = null;
       if (editFields.length > 0) {
-        const fieldsObj: any = {};
-        editFields.forEach(f => {
-          if (f.fieldname.trim()) {
-            fieldsObj[f.fieldname.trim()] = {
-              label: f.label || f.fieldname,
-              fieldtype: f.fieldtype || 'text',
-              required: f.required !== false
-            };
-          }
+        const fieldsList = editFields.map((f, idx) => {
+          const rawKey = String(f.fieldname || f.field_id || `field_${idx + 1}`).trim().replace(/\s+/g, '_');
+          const opts = f.optionsStr
+            ? f.optionsStr.split(/[\r\n,|]+/).map((o: string) => o.trim()).filter(Boolean)
+            : (Array.isArray(f.options) ? f.options : []);
+
+          return {
+            id: f.id || `custom_${rawKey}`,
+            field_id: f.field_id || rawKey,
+            fieldname: rawKey,
+            name: (f.label && String(f.label).trim()) || rawKey,
+            label: (f.label && String(f.label).trim()) || rawKey,
+            type: f.fieldtype || 'text',
+            fieldtype: f.fieldtype || 'text',
+            required: Boolean(f.required),
+            ...(opts.length > 0 ? { options: opts, fieldoptions: opts } : {})
+          };
         });
-        requiresCustom = Object.keys(fieldsObj).length > 0 ? JSON.stringify(fieldsObj) : null;
+        requiresCustom = fieldsList.length > 0 ? JSON.stringify(fieldsList) : null;
       }
 
       const res = await fetch("/api/dhru/services/update", {
@@ -543,7 +590,24 @@ export default function ServicesPage() {
                   </div>
                   <button
                     type="button"
-                    onClick={() => setEditFields(prev => [...prev, { label: '', fieldname: `field_${Date.now()}`, fieldtype: 'text', required: true }])}
+                    onClick={() => {
+                      const newIdx = editFields.length + 1;
+                      const newKey = `field_${Date.now()}`;
+                      setEditFields(prev => [
+                        ...prev,
+                        {
+                          id: newKey,
+                          field_id: newKey,
+                          fieldname: newKey,
+                          label: `حقل مخصص ${newIdx}`,
+                          fieldtype: 'text',
+                          type: 'text',
+                          required: true,
+                          options: [],
+                          optionsStr: ''
+                        }
+                      ]);
+                    }}
                     className="flex items-center gap-1 text-[11px] bg-primary/10 text-primary px-3 py-1.5 rounded-lg hover:bg-primary/20 transition-colors font-bold"
                   >
                     <span className="material-symbols-outlined text-sm">add</span>
@@ -613,6 +677,24 @@ export default function ServicesPage() {
                             <span className="material-symbols-outlined text-base">delete</span>
                           </button>
                         </div>
+                        {field.fieldtype === 'select' && (
+                          <div>
+                            <label className="text-[10px] text-on-surface-variant font-bold block mb-1">
+                              خيارات القائمة المنسدلة (مفصولة بفاصلة)
+                            </label>
+                            <input
+                              type="text"
+                              value={field.optionsStr || ""}
+                              onChange={e => {
+                                const val = e.target.value;
+                                const opts = val.split(/[\r\n,|]+/).map(s => s.trim()).filter(Boolean);
+                                setEditFields(prev => prev.map((f, i) => i === idx ? { ...f, optionsStr: val, options: opts } : f));
+                              }}
+                              placeholder="مثال: خيار 1, خيار 2, خيار 3"
+                              className="w-full px-3 py-2 bg-surface-container border border-outline-variant/40 rounded-lg text-xs outline-none focus:border-primary"
+                            />
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>
