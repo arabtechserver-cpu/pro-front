@@ -46,4 +46,59 @@ assert.equal(
   false
 );
 
+// Xiaomi Remove Mi Account and lock code services must NOT show duplicate default IMEI input
+assert.equal(
+  shouldShowDefaultImeiField("IMEI Service", {
+    "LOCK CODE": {
+      fieldname: "LOCK CODE",
+      label: "LOCK CODE",
+      type: "text",
+      required: true
+    }
+  }),
+  false
+);
+
+assert.equal(
+  shouldShowDefaultImeiField("IMEI Service", {
+    "Lock Code": {
+      fieldname: "custom_Lock Code",
+      reqid: "Lock Code",
+      type: "text",
+      required: true
+    }
+  }),
+  false
+);
+
+assert.equal(
+  shouldShowDefaultImeiField("IMEI Service", {
+    "custom_lock": {
+      fieldname: "custom_lock",
+      label: "رمز القفل",
+      type: "text",
+      required: true
+    }
+  }),
+  false
+);
+
+// If service has BOTH secondary picture and primary LOCK CODE, do not show default IMEI
+assert.equal(
+  shouldShowDefaultImeiField("IMEI Service", {
+    "Mi Lock Code Screen Picture": {
+      fieldname: "custom_Mi Lock Code Screen Picture",
+      type: "text",
+      required: true
+    },
+    "LOCK CODE": {
+      fieldname: "custom_LOCK CODE",
+      type: "text",
+      required: true
+    }
+  }),
+  false
+);
+
 console.log("purchase service field tests passed");
+

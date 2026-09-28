@@ -3,7 +3,7 @@
 import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { shouldShowDefaultImeiField, getProviderCustomFields, isProviderQuantityField as isQuantityField, supportsProviderQuantity } from "../../../../lib/purchase-service-fields";
+import { shouldShowDefaultImeiField, getProviderCustomFields, isProviderQuantityField as isQuantityField, supportsProviderQuantity, isPrimaryTargetCustomField } from "../../../../lib/purchase-service-fields";
 import { cleanHtmlToText, stripEmojis } from "@/utils/cleanHtml";
 
 function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
@@ -160,15 +160,7 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
   };
 
   const isPrimaryImeiProviderField = (key: string, fieldObj: any): boolean => {
-    const identity = getFieldIdentityText(key, fieldObj);
-    if (!identity) return false;
-
-    // حقول الروابط/الصور/التقارير لا تُعتبر بديلاً عن حقل IMEI الأساسي.
-    if (/(link|url|http|https|screenshot|screen shot|image|photo|picture|hint|report|proof)/i.test(identity)) {
-      return false;
-    }
-
-    return /(imei|ecid|serial number|sn\b)/i.test(identity);
+    return isPrimaryTargetCustomField(key, fieldObj);
   };
 
   // 1. Load User Session & Sync Live Balance

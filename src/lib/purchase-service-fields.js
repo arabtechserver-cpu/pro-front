@@ -3,6 +3,30 @@ function isImeiCategoryOrService(categoryName, serviceType, groupName) {
   return text.includes('imei');
 }
 
+function isPrimaryTargetCustomField(key, field) {
+  const identity = [
+    key,
+    field?.label,
+    field?.fieldname,
+    field?.reqid,
+    field?.name,
+    field?.customname
+  ]
+    .filter(Boolean)
+    .join(' ')
+    .toLowerCase();
+
+  if (!identity) return false;
+
+  // Secondary auxiliary fields (links, screenshots, pictures, reports, proofs) are NOT primary target fields
+  if (/(link|url|http|https|screenshot|screen shot|image|photo|pic\b|picture|hint|report|proof)/i.test(identity)) {
+    return false;
+  }
+
+  // Primary identifiers (IMEI, Serial, Lock Code, Unlock Code, ECID, UDID, CPID, Account/User IDs)
+  return /(imei|ecid|serial number|\bsn\b|\bserial\b|lock\s*code|code\s*lock|keylock|unlock\s*code|remove\s*code|old\s*code|bootloader\s*key|frp\s*key|udid|cpid|playerid|player_id|user_id|userid|account_id|accountid|targetlogin|apple\s*id|icloud\s*email|\bemail\b|phone\s*number|phonenumber|\bcode\b|\bkey\b|رمز\s*القفل|كود\s*القفل|كود\s*الفك|الرقم\s*التسلسلي|سيريال|ايمي)/i.test(identity);
+}
+
 function shouldShowDefaultImeiField(categoryName, providerFields, serviceType, groupName) {
   const isImei = isImeiCategoryOrService(categoryName, serviceType, groupName);
   if (!isImei) return false;
@@ -10,55 +34,15 @@ function shouldShowDefaultImeiField(categoryName, providerFields, serviceType, g
 
   const fieldEntries = Object.entries(providerFields);
 
-  // If the provider explicitly defines a primary IMEI / SN custom field (not a link/photo/screenshot)
-  const hasImeiOrSnInCustom = fieldEntries.some(([key, field]) => {
-    const identity = [
-      key,
-      field?.label,
-      field?.fieldname,
-      field?.reqid,
-      field?.name,
-      field?.customname
-    ]
-      .filter(Boolean)
-      .join(' ')
-      .toLowerCase();
+  // If the provider or service definition explicitly defines a primary target field
+  // (e.g. IMEI, SN, Lock Code, Unlock Code, ECID, UDID, CPID, PlayerID, AccountID, etc.)
+  const hasPrimaryTarget = fieldEntries.some(([key, field]) => isPrimaryTargetCustomField(key, field));
 
-    // Secondary fields (links, screenshots, pictures, reports) are NOT the primary IMEI field
-    if (/(link|url|http|https|screenshot|screen shot|image|photo|hint|picture|report|proof)/i.test(identity)) {
-      return false;
-    }
-
-    return /(imei|ecid|serial number|\bsn\b)/i.test(identity);
-  });
-
-  if (hasImeiOrSnInCustom) {
-    return false; // The provider already has a dedicated custom field for IMEI/SN
+  if (hasPrimaryTarget) {
+    return false; // The service already has a dedicated input field for its primary target
   }
 
-  // If the service has a primary non-IMEI target field (e.g. PlayerID, UserID, AccountID)
-  // this occurs when gaming/account services were placed under an IMEI category by mistake
-  const hasNonImeiPrimaryTarget = fieldEntries.some(([key, field]) => {
-    const identity = [
-      key,
-      field?.label,
-      field?.fieldname,
-      field?.reqid,
-      field?.name,
-      field?.customname
-    ]
-      .filter(Boolean)
-      .join(' ')
-      .toLowerCase();
-
-    return /(playerid|player_id|user_id|account_id|targetlogin)/i.test(identity);
-  });
-
-  if (hasNonImeiPrimaryTarget) {
-    return false;
-  }
-
-  // In all other cases (e.g. Battery Picture Link, Model, Carrier, Current Country),
+  // In other cases where custom fields are only secondary attachments (e.g. Battery Picture Link, Country),
   // the default IMEI / Serial field MUST be shown!
   return true;
 }
@@ -105,4 +89,4 @@ function supportsProviderQuantity(service) {
   return Object.entries(getProviderCustomFields(service) || {}).some(([key, field]) => isProviderQuantityField(field, key));
 }
 
-module.exports = { shouldShowDefaultImeiField, getProviderCustomFields, isProviderQuantityField, supportsProviderQuantity };
+module.exports = { shouldShowDefaultImeiField, getProviderCustomFields, isProviderQuantityField, supportsProviderQuantity, isPrimaryTargetCustomField };
