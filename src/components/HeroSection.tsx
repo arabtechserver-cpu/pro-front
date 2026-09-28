@@ -55,12 +55,23 @@ export default function HeroSection({ lang, config }: HeroSectionProps) {
         {/* User-Uploaded Custom Hero Banner with Interactive Action Hotspots */}
         <div className="relative w-full rounded-2xl sm:rounded-3xl overflow-hidden border border-slate-200 dark:border-cyan-500/30 shadow-md dark:shadow-2xl dark:shadow-cyan-950/40 group mb-6 sm:mb-8 bg-slate-100 dark:bg-[#040a14]">
           <div className="relative w-full aspect-[2/1] sm:aspect-[1024/377] select-none">
+            {/* Light Mode Banner */}
             <Image
               src="/images/hero_banner_custom.png"
               alt="Arab Tech Pro Server - كل ما تحتاجه لإدارة أعمال الـ GSM في مكان واحد"
               fill
               priority
-              className="w-full h-full object-cover object-left sm:object-contain sm:object-center"
+              className="w-full h-full object-cover object-left sm:object-contain sm:object-center dark:hidden"
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 95vw, 1400px"
+            />
+
+            {/* Dark Mode Banner */}
+            <Image
+              src="/images/hero_banner_custom_dark.png"
+              alt="Arab Tech Pro Server - كل ما تحتاجه لإدارة أعمال الـ GSM في مكان واحد"
+              fill
+              priority
+              className="w-full h-full object-cover object-left sm:object-contain sm:object-center hidden dark:block"
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 95vw, 1400px"
             />
 
