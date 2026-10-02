@@ -492,7 +492,11 @@ export default function FoxreloadAdminPage() {
     setIsTesting(true);
     setTestResult(null);
     try {
-      const res = await adminFetch("/api/foxreload/admin/test-connection", { method: "POST" });
+      const res = await adminFetch("/api/foxreload/admin/test-connection", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ apiKey: settings.apiKey }),
+      });
       const data = await res.json();
       setTestResult(data);
       if (res.ok && data.success) {
