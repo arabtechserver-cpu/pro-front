@@ -5,6 +5,7 @@ import { Locale, i18n } from "@/i18n/config";
 import HeroSection from "@/components/HeroSection";
 import ServiceLanes from "@/components/ServiceLanes";
 import SupportedToolsBar from "@/components/SupportedToolsBar";
+import GamingShowcaseSection from "@/components/GamingShowcaseSection";
 import CapabilitiesGrid from "@/components/CapabilitiesGrid";
 import PackagesSlider from "@/components/PackagesSlider";
 import CampaignBanner from "@/components/CampaignBanner";
@@ -184,6 +185,9 @@ export default async function Home(props: { params: Promise<{ lang: Locale }> })
 
         {/* 10 Supported Tools Bar (Box 2 in User's Drawing) */}
         <SupportedToolsBar lang={params.lang} tools={hp?.supportedTools} />
+
+        {/* Dedicated Gaming & Digital Entertainment Showcase Section */}
+        <GamingShowcaseSection lang={params.lang} />
 
         {/* 6 Capabilities Architecture Grid (Why Choose Us) */}
         <CapabilitiesGrid lang={params.lang} />

@@ -564,6 +564,45 @@ export default function GamingClient({
   const initialUrlCheckedRef = useRef(false);
   const dismissedBundleRef = useRef<string | null>(null);
 
+  // Horizontal Tab Scrolling References and State
+  const tabsContainerRef = useRef<HTMLDivElement>(null);
+  const [isMouseDown, setIsMouseDown] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [scrollLeftState, setScrollLeftState] = useState(0);
+
+  const scrollTabs = (direction: "left" | "right") => {
+    if (!tabsContainerRef.current) return;
+    const scrollAmount = 260;
+    const delta = direction === "left" ? (isAr ? scrollAmount : -scrollAmount) : (isAr ? -scrollAmount : scrollAmount);
+    tabsContainerRef.current.scrollBy({ left: delta, behavior: "smooth" });
+  };
+
+  const handleTabsWheel = (e: React.WheelEvent<HTMLDivElement>) => {
+    if (!tabsContainerRef.current) return;
+    if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+      tabsContainerRef.current.scrollLeft += (isAr ? -e.deltaY : e.deltaY);
+    }
+  };
+
+  const handleTabsMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!tabsContainerRef.current) return;
+    setIsMouseDown(true);
+    setStartX(e.pageX - tabsContainerRef.current.offsetLeft);
+    setScrollLeftState(tabsContainerRef.current.scrollLeft);
+  };
+
+  const handleTabsMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!isMouseDown || !tabsContainerRef.current) return;
+    e.preventDefault();
+    const x = e.pageX - tabsContainerRef.current.offsetLeft;
+    const walk = (x - startX) * 1.5;
+    tabsContainerRef.current.scrollLeft = scrollLeftState - walk;
+  };
+
+  const handleTabsMouseUpOrLeave = () => {
+    setIsMouseDown(false);
+  };
+
   useEffect(() => {
     const savedCurrency = localStorage.getItem("app_currency");
     if (savedCurrency && CURRENCY_RATES[savedCurrency]) {
@@ -1681,36 +1720,78 @@ export default function GamingClient({
           /* ALL CATEGORIES & CATALOG VIEW MODE (WITH PAGINATION & IMAGES)             */
           /* ========================================================================= */
           <>
-            {/* Navigation Tabs Bar */}
-            <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none border-b border-outline-variant/30">
-              {SECTION_TABS.map((tab) => {
-                const isActive = activeSection === tab.id && !searchQuery.trim();
-                const count = tabCounts[tab.id] || 0;
-                return (
-                  <button
-                    key={tab.id}
-                    type="button"
-                    onClick={() => handleTabClick(tab.id)}
-                    className={`flex items-center gap-2 px-4 sm:px-5 py-2.5 sm:py-3 rounded-2xl font-bold text-xs sm:text-sm whitespace-nowrap transition-all ${
-                      isActive
-                        ? "bg-primary text-on-primary shadow-lg shadow-primary/25 scale-[1.02]"
-                        : "bg-surface-container/70 hover:bg-surface-container-highest text-on-surface-variant hover:text-on-surface border border-outline-variant/30"
-                    }`}
-                  >
-                    <span className="material-symbols-outlined text-lg">{tab.icon}</span>
-                    <span>{isAr ? tab.labelAr : tab.labelEn}</span>
-                    <span
-                      className={`text-[10px] sm:text-xs px-2 py-0.5 rounded-full font-mono font-bold transition-colors ${
+            {/* Navigation Tabs Bar with Desktop Scroll Controls & Smooth Wheel */}
+            <div className="relative group/tabnav">
+              {/* Left Arrow Button */}
+              <button
+                type="button"
+                onClick={() => scrollTabs("left")}
+                className="hidden sm:flex absolute -left-3.5 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full bg-surface-container-high/95 hover:bg-primary text-on-surface hover:text-white border border-outline-variant/40 shadow-xl items-center justify-center transition-all duration-200 cursor-pointer hover:scale-110 active:scale-95 backdrop-blur-md"
+                aria-label="Scroll left"
+                title={isAr ? "تمرير لليسار" : "Scroll left"}
+              >
+                <span className="material-symbols-outlined text-xl select-none">
+                  {isAr ? "chevron_right" : "chevron_left"}
+                </span>
+              </button>
+
+              <div
+                ref={tabsContainerRef}
+                onWheel={handleTabsWheel}
+                onMouseDown={handleTabsMouseDown}
+                onMouseMove={handleTabsMouseMove}
+                onMouseUp={handleTabsMouseUpOrLeave}
+                onMouseLeave={handleTabsMouseUpOrLeave}
+                className={`flex items-center gap-2 overflow-x-auto pb-3 pt-1 select-none scroll-smooth border-b border-outline-variant/30 ${
+                  isMouseDown ? "cursor-grabbing" : "cursor-grab"
+                }`}
+                style={{
+                  scrollbarWidth: "thin",
+                  scrollbarColor: "rgba(59, 130, 246, 0.4) transparent",
+                }}
+              >
+                {SECTION_TABS.map((tab) => {
+                  const isActive = activeSection === tab.id && !searchQuery.trim();
+                  const count = tabCounts[tab.id] || 0;
+                  return (
+                    <button
+                      key={tab.id}
+                      type="button"
+                      onClick={() => handleTabClick(tab.id)}
+                      className={`flex items-center gap-2 px-4 sm:px-5 py-2.5 sm:py-3 rounded-2xl font-bold text-xs sm:text-sm whitespace-nowrap transition-all shrink-0 ${
                         isActive
-                          ? "bg-white/25 text-white"
-                          : "bg-surface-container-highest text-on-surface-variant border border-outline-variant/20"
+                          ? "bg-primary text-on-primary shadow-lg shadow-primary/25 scale-[1.02]"
+                          : "bg-surface-container/70 hover:bg-surface-container-highest text-on-surface-variant hover:text-on-surface border border-outline-variant/30"
                       }`}
                     >
-                      {count}
-                    </span>
-                  </button>
-                );
-              })}
+                      <span className="material-symbols-outlined text-lg">{tab.icon}</span>
+                      <span>{isAr ? tab.labelAr : tab.labelEn}</span>
+                      <span
+                        className={`text-[10px] sm:text-xs px-2 py-0.5 rounded-full font-mono font-bold transition-colors ${
+                          isActive
+                            ? "bg-white/25 text-white"
+                            : "bg-surface-container-highest text-on-surface-variant border border-outline-variant/20"
+                        }`}
+                      >
+                        {count}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Right Arrow Button */}
+              <button
+                type="button"
+                onClick={() => scrollTabs("right")}
+                className="hidden sm:flex absolute -right-3.5 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full bg-surface-container-high/95 hover:bg-primary text-on-surface hover:text-white border border-outline-variant/40 shadow-xl items-center justify-center transition-all duration-200 cursor-pointer hover:scale-110 active:scale-95 backdrop-blur-md"
+                aria-label="Scroll right"
+                title={isAr ? "تمرير لليمين" : "Scroll right"}
+              >
+                <span className="material-symbols-outlined text-xl select-none">
+                  {isAr ? "chevron_left" : "chevron_right"}
+                </span>
+              </button>
             </div>
 
             {/* Search Bar & Header */}
