@@ -316,6 +316,19 @@ export default function Navbar({ lang, dict }: NavbarProps) {
                 </div>
               </div>
 
+              {/* Gaming & Entertainment Top-Up */}
+              <Link 
+                href={`/${lang}/gaming`} 
+                className={`px-4 py-2 rounded-full text-sm font-semibold transition-all duration-200 flex items-center gap-1.5 ${
+                  isActive("/gaming") 
+                    ? "bg-primary text-white font-bold shadow-md shadow-blue-950/40" 
+                    : "text-slate-700 dark:text-slate-300 hover:text-primary dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5"
+                }`}
+              >
+                <span className="material-symbols-outlined text-base select-none" aria-hidden="true">sports_esports</span>
+                <span>{lang === "ar" ? "الخدمات الرقمية والترفيه" : "Digital Services & Entertainment"}</span>
+              </Link>
+
               {/* My Orders History Page */}
               <Link 
                 href={`/${lang}/orders`} 
@@ -351,17 +364,6 @@ export default function Navbar({ lang, dict }: NavbarProps) {
                 }`}
               >
                 {dict.blog}
-              </Link>
-
-              <Link 
-                href={`/${lang}/tutorials`} 
-                className={`px-4 py-2 rounded-full text-sm font-semibold transition-all duration-200 ${
-                  isActive("/tutorials") 
-                    ? "bg-primary text-white font-bold shadow-md shadow-blue-950/40" 
-                    : "text-slate-700 dark:text-slate-300 hover:text-primary dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5"
-                }`}
-              >
-                {dict.tutorials}
               </Link>
 
               <Link 
@@ -692,6 +694,25 @@ export default function Navbar({ lang, dict }: NavbarProps) {
 
       {/* 3. Navigation List - Exact Partitioning */}
       <div className="flex-1 overflow-y-auto overscroll-contain divide-y divide-slate-100 dark:divide-white/[0.06]">
+        {/* الخدمات الرقمية والترفيه */}
+        <Link
+          href={`/${lang}/gaming`}
+          onClick={() => setMobileMenuOpen(false)}
+          className="flex items-center justify-between px-4 py-3 text-slate-800 dark:text-slate-100 hover:bg-slate-50 dark:hover:bg-white/[0.04] transition-colors group"
+        >
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-7 h-7 rounded-lg bg-purple-500/10 dark:bg-purple-500/15 border border-purple-500/20 dark:border-purple-500/30 flex items-center justify-center text-purple-600 dark:text-purple-400 shrink-0">
+              <span className="material-symbols-outlined text-base select-none" aria-hidden="true">sports_esports</span>
+            </div>
+            <span className="font-bold text-xs sm:text-sm text-slate-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors truncate">
+              {lang === "ar" ? "الخدمات الرقمية والترفيه" : "Digital Services & Entertainment"}
+            </span>
+          </div>
+          <span className="text-[10px] px-2 py-0.5 rounded bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20 font-semibold shrink-0">
+            {lang === "ar" ? "جديد" : "NEW"}
+          </span>
+        </Link>
+
         {/* أسعار إعادة البيع */}
         <Link
           href={`/${lang}/pricing`}
@@ -848,17 +869,6 @@ export default function Navbar({ lang, dict }: NavbarProps) {
           <i className={`fas ${lang === "ar" ? "fa-chevron-left" : "fa-chevron-right"} text-[10px] text-slate-400 dark:text-slate-500`}></i>
         </Link>
 
-        <Link
-          href={`/${lang}/tutorials`}
-          onClick={() => setMobileMenuOpen(false)}
-          className="flex items-center justify-between px-4 py-2.5 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-white/[0.03] transition-colors text-xs sm:text-sm group"
-        >
-          <span className="flex items-center gap-2.5">
-            <span className="material-symbols-outlined text-base text-indigo-600 dark:text-indigo-400">play_circle</span>
-            <span className="font-medium text-slate-800 dark:text-slate-200 group-hover:text-slate-900 dark:group-hover:text-white">{dict.tutorials}</span>
-          </span>
-          <i className={`fas ${lang === "ar" ? "fa-chevron-left" : "fa-chevron-right"} text-[10px] text-slate-400 dark:text-slate-500`}></i>
-        </Link>
 
         <Link
           href={`/${lang}/contact`}

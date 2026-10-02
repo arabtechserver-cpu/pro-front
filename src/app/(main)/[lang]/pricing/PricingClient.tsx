@@ -563,9 +563,18 @@ export default function PricingClient({
                 <p className="text-xs text-on-surface-variant max-w-md">
                   {lang === 'ar' ? 'قد يكون تم تحديث اسم القسم أو نقل الخدمات. يمكنك استعراض كافة الأقسام المتاحة أو استخدام البحث.' : 'The section may have been renamed or moved. You can browse all sections or use the search bar.'}
                 </p>
-                <button onClick={closeSingleSection} className="btn-primary mt-3 py-2.5 px-6 text-xs sm:text-sm rounded-xl font-bold">
-                  {lang === 'ar' ? 'استعراض كافة الأقسام والخدمات' : 'Browse All Services'}
-                </button>
+                <div className="flex flex-wrap items-center justify-center gap-3 mt-3">
+                  <button onClick={closeSingleSection} className="btn-secondary py-2.5 px-6 text-xs sm:text-sm rounded-xl font-bold">
+                    {lang === 'ar' ? 'استعراض كافة الأقسام والخدمات' : 'Browse All Services'}
+                  </button>
+                  <Link
+                    href={`/${lang}/gaming?section=${encodeURIComponent(singleSectionData.groupName)}`}
+                    className="btn-primary py-2.5 px-6 text-xs sm:text-sm rounded-xl font-bold flex items-center gap-2"
+                  >
+                    <span className="material-symbols-outlined text-base">sports_esports</span>
+                    <span>{lang === 'ar' ? `البحث عن "${singleSectionData.groupName}" في قسم الألعاب والبطاقات` : `Search in Digital & Gaming Services`}</span>
+                  </Link>
+                </div>
               </div>
             ) : (
               <ServicesListRenderer servicesList={singleSectionData.servicesList} lang={lang} dict={dict} discountPercent={discountPercent} />

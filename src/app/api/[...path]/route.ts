@@ -94,6 +94,13 @@ async function handler(
   }
 
   const candidates = getBackendCandidates(cachedBackendUrl, process.env.INTERNAL_API_URL);
+  if (process.platform === 'win32') {
+    if (!cachedBackendUrl && !candidates.includes('http://127.0.0.1:5000')) {
+      candidates.unshift('http://127.0.0.1:5000');
+    } else if (!candidates.includes('http://127.0.0.1:5000')) {
+      candidates.push('http://127.0.0.1:5000');
+    }
+  }
   const isIdempotent = ['GET', 'HEAD', 'OPTIONS'].includes(request.method);
   const targets = isIdempotent ? candidates : candidates.slice(0, 1);
 
