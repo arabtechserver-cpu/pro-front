@@ -375,6 +375,8 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
 
   const normalizedMethodId = selectedMethodId === "rewarble" ? "bnb" : selectedMethodId;
   const activeMethod = paymentMethods.find((m) => m.id === normalizedMethodId) || paymentMethods[0];
+  const bnbMethod = paymentMethods.find((m) => m.id === "bnb");
+  const otherMethods = paymentMethods.filter((m) => m.id !== "bnb");
 
   const handleCopy = (text: string, id: string) => {
     navigator.clipboard.writeText(text);
@@ -637,13 +639,159 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
 
             <form onSubmit={handleDepositSubmit} className="space-y-6">
               {/* PAYMENT METHODS SELECTOR */}
-              <div className="space-y-3">
-                <label className="text-xs font-extrabold text-on-surface uppercase tracking-wider block">
-                  {lang === "ar" ? "اختر وسيلة الدفع المتاحة:" : "Select Payment Method:"}
-                </label>
+              <div className="space-y-6">
+                {/* 1. DISTINGUISHED BNB METHOD (SEPARATED & HIGHLIGHTED) */}
+                {bnbMethod && (
+                  <div className="space-y-2.5">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className="w-2.5 h-2.5 rounded-full bg-amber-400 animate-ping"></span>
+                        <label className="text-xs font-black text-amber-400 uppercase tracking-wider">
+                          {lang === "ar"
+                            ? "طريقة التحويل المعتمدة لخدمات الألعاب والبطاقات الرقمية و Rewarble:"
+                            : "Approved Payment Method for Gaming, Digital Cards & Rewarble:"}
+                        </label>
+                      </div>
+                      <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40">
+                        {lang === "ar" ? "طريقة موحدة مميزة" : "Featured Method"}
+                      </span>
+                    </div>
 
+                    <div
+                      role="button"
+                      tabIndex={0}
+                      onClick={() => setSelectedMethodId("bnb")}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          setSelectedMethodId("bnb");
+                        }
+                      }}
+                      className={`w-full p-4 sm:p-5 rounded-2xl border-2 text-start transition-all relative overflow-hidden cursor-pointer group ${
+                        normalizedMethodId === "bnb"
+                          ? "bg-gradient-to-br from-amber-500/20 via-surface-container-high to-yellow-500/10 border-amber-400 shadow-xl ring-2 ring-amber-400/40"
+                          : "bg-surface-container-high/60 border-amber-500/40 text-on-surface hover:border-amber-400 hover:bg-surface-container-high shadow-md"
+                      }`}
+                    >
+                      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div className="flex items-start sm:items-center gap-3.5">
+                          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500 via-amber-600 to-yellow-600 text-white flex items-center justify-center text-2xl shrink-0 shadow-lg shadow-amber-500/25 group-hover:scale-105 transition-transform">
+                            <span className="material-symbols-outlined">account_balance_wallet</span>
+                          </div>
+
+                          <div className="space-y-1">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <h3 className="font-black text-base text-on-surface">
+                                {lang === "ar"
+                                  ? "تحويل BNB (رابط الدفع والشحن المباشر)"
+                                  : "BNB Transfer (Direct Top-up Link)"}
+                              </h3>
+                              <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-300 border border-amber-500/40">
+                                BEP20 / BSC
+                              </span>
+                            </div>
+
+                            <p className="text-xs text-on-surface-variant font-mono font-medium dir-ltr text-right">
+                              {lang === "ar"
+                                ? "اسم التحويل: BNB | الرابط: 0xaCc3ab6f0165B39Cf2F1286ED8A778735Ae8314f"
+                                : "Transfer Name: BNB | Link: 0xaCc3ab6f0165B39Cf2F1286ED8A778735Ae8314f"}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-2 self-end md:self-center shrink-0">
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleCopy(bnbMethod.copyValue, "bnb-btn-copy");
+                            }}
+                            className={`px-3 py-1.5 rounded-xl text-xs font-bold border transition-all flex items-center gap-1.5 active:scale-95 ${
+                              copiedId === "bnb-btn-copy"
+                                ? "bg-emerald-500 text-white border-emerald-400"
+                                : "bg-surface-container-lowest/80 text-amber-300 border-amber-500/40 hover:bg-amber-500/20"
+                            }`}
+                          >
+                            <span className="material-symbols-outlined text-sm">
+                              {copiedId === "bnb-btn-copy" ? "check" : "content_copy"}
+                            </span>
+                            <span>{copiedId === "bnb-btn-copy" ? (lang === "ar" ? "تم النسخ" : "Copied") : (lang === "ar" ? "نسخ الرابط" : "Copy Link")}</span>
+                          </button>
+
+                          <span
+                            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all ${
+                              normalizedMethodId === "bnb"
+                                ? "bg-amber-500 text-slate-950 shadow-md font-extrabold"
+                                : "bg-surface-container-highest text-on-surface-variant group-hover:text-amber-300"
+                            }`}
+                          >
+                            <span className="material-symbols-outlined text-sm">
+                              {normalizedMethodId === "bnb" ? "check_circle" : "radio_button_unchecked"}
+                            </span>
+                            <span>
+                              {normalizedMethodId === "bnb"
+                                ? (lang === "ar" ? "محدد للشحن" : "Selected")
+                                : (lang === "ar" ? "اختيار هذه الطريقة" : "Select")}
+                            </span>
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* 6 Supported services grid */}
+                      <div className="mt-3.5 pt-3 border-t border-outline-variant/20">
+                        <p className="text-[11px] font-bold text-amber-300/90 mb-2">
+                          {lang === "ar"
+                            ? "الخدمات التي تدعمها طريقة التحويل هذه مباشرة:"
+                            : "Directly supported services by this method:"}
+                        </p>
+                        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 text-[11px]">
+                          <div className="px-2.5 py-1.5 rounded-xl bg-surface-container-lowest/90 border border-outline-variant/25 flex items-center gap-1.5 text-on-surface">
+                            <span className="material-symbols-outlined text-amber-400 text-sm shrink-0">sports_esports</span>
+                            <span className="font-semibold truncate">{lang === "ar" ? "شحن الألعاب" : "Gaming"}</span>
+                          </div>
+                          <div className="px-2.5 py-1.5 rounded-xl bg-surface-container-lowest/90 border border-outline-variant/25 flex items-center gap-1.5 text-on-surface">
+                            <span className="material-symbols-outlined text-amber-400 text-sm shrink-0">store</span>
+                            <span className="font-semibold truncate">{lang === "ar" ? "متاجر التطبيقات" : "App Stores"}</span>
+                          </div>
+                          <div className="px-2.5 py-1.5 rounded-xl bg-surface-container-lowest/90 border border-outline-variant/25 flex items-center gap-1.5 text-on-surface">
+                            <span className="material-symbols-outlined text-amber-400 text-sm shrink-0">vpn_key</span>
+                            <span className="font-semibold truncate">{lang === "ar" ? "أكواد الألعاب" : "Game Codes"}</span>
+                          </div>
+                          <div className="px-2.5 py-1.5 rounded-xl bg-surface-container-lowest/90 border border-outline-variant/25 flex items-center gap-1.5 text-on-surface">
+                            <span className="material-symbols-outlined text-amber-400 text-sm shrink-0">subscriptions</span>
+                            <span className="font-semibold truncate">{lang === "ar" ? "الاشتراكات" : "Subscriptions"}</span>
+                          </div>
+                          <div className="px-2.5 py-1.5 rounded-xl bg-surface-container-lowest/90 border border-outline-variant/25 flex items-center gap-1.5 text-on-surface">
+                            <span className="material-symbols-outlined text-amber-400 text-sm shrink-0">sim_card</span>
+                            <span className="font-semibold truncate">{lang === "ar" ? "شرائح eSIM" : "eSIM"}</span>
+                          </div>
+                          <div className="px-2.5 py-1.5 rounded-xl bg-surface-container-lowest/90 border border-outline-variant/25 flex items-center gap-1.5 text-on-surface">
+                            <span className="material-symbols-outlined text-amber-400 text-sm shrink-0">account_balance_wallet</span>
+                            <span className="font-semibold truncate">Rewarble</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* 2. SEPARATOR */}
+                <div className="relative flex items-center justify-center pt-2">
+                  <div className="absolute inset-0 flex items-center">
+                    <div className="w-full border-t border-outline-variant/30"></div>
+                  </div>
+                  <div className="relative px-4 bg-surface-container-lowest text-xs font-bold text-on-surface-variant flex items-center gap-2">
+                    <span className="material-symbols-outlined text-sm text-on-surface-variant">credit_card</span>
+                    <span>
+                      {lang === "ar"
+                        ? "أو اختر من وسائل الدفع والتحويل الأخرى:"
+                        : "Or select from other payment methods:"}
+                    </span>
+                  </div>
+                </div>
+
+                {/* 3. OTHER PAYMENT METHODS GRID */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {paymentMethods.map((m) => {
+                  {otherMethods.map((m) => {
                     const isSelected = selectedMethodId === m.id;
                     return (
                       <button
