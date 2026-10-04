@@ -24,6 +24,8 @@ interface PaymentMethod {
   isAutomaticPayPal?: boolean;
   isBankak?: boolean;
   isFawry?: boolean;
+  isRewarble?: boolean;
+  isBnbServices?: boolean;
 }
 
 interface CurrencyConfig {
@@ -60,6 +62,13 @@ interface CurrencyConfig {
   cryptoBnb: {
     address: string;
     network: string;
+    instructionsAr: string;
+    instructionsEn: string;
+    isActive: boolean;
+  };
+  rewarble?: {
+    address: string;
+    transferName: string;
     instructionsAr: string;
     instructionsEn: string;
     isActive: boolean;
@@ -138,9 +147,14 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
 
     fetchRealTransactions(currentUser?.id, currentUser?.email);
 
-    // AUTO CAPTURE PAYPAL ORDER RETURN IF ANY
+    // AUTO SELECT PAYMENT METHOD FROM URL IF SPECIFIED
     if (typeof window !== "undefined") {
       const urlParams = new URLSearchParams(window.location.search);
+      const methodParam = urlParams.get("method");
+      if (methodParam) {
+        setSelectedMethodId(methodParam.toLowerCase());
+      }
+
       const paypalToken = urlParams.get("token");
       const paypalStatus = urlParams.get("paypal");
 
@@ -243,26 +257,27 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
     },
     {
       id: "bnb",
-      nameAr: "BNB Smart Chain (BEP20)",
-      nameEn: "BNB Smart Chain (BEP20)",
-      badge: "BSC",
-      icon: "currency_bitcoin",
-      color: "from-yellow-500 to-amber-600",
-      copyValue: currencyConfig?.cryptoBnb?.address || "0xaCc3ab6f0165B39Cf2F1286ED8A778735Ae8314f",
-      detailLabelAr: "عنوان المحفظة (BEP20 Address):",
-      detailLabelEn: "BEP20 Wallet Address:",
+      nameAr: "تحويل BNB (شحن الألعاب، البطاقات، الاشتراكات، eSIM، و Rewarble)",
+      nameEn: "BNB Transfer (Top-ups, Cards, Subscriptions, eSIM & Rewarble)",
+      badge: "BNB",
+      icon: "account_balance_wallet",
+      color: "from-amber-500 to-yellow-600",
+      copyValue: currencyConfig?.cryptoBnb?.address || currencyConfig?.rewarble?.address || "0xaCc3ab6f0165B39Cf2F1286ED8A778735Ae8314f",
+      detailLabelAr: "اسم التحويل: BNB | الرابط (عنوان المحفظة BEP20):",
+      detailLabelEn: "Transfer Name: BNB | Address (BEP20 Link):",
       instructionsAr:
         currencyConfig?.cryptoBnb?.instructionsAr ||
-        "تأكد من اختيار شبكة (BNB Smart Chain - BEP20) ثم ارفع صورة إثبات المعاملة للتأكيد.",
+        "طريقة تحويل عبر BNB معتمدة لكافة الأقسام والخدمات (شحن الألعاب المباشر، متاجر التطبيقات، أكواد الألعاب، الاشتراكات والترفيه، شرائح eSIM، وقسائم Rewarble): اسم التحويل BNB، قم بالتحويل إلى رابط المحفظة (0xaCc3ab6f0165B39Cf2F1286ED8A778735Ae8314f) ثم ارفع صورة إشعار التحويل للتأكيد الفوري.",
       instructionsEn:
         currencyConfig?.cryptoBnb?.instructionsEn ||
-        "Ensure network selected is BNB Smart Chain (BEP20) then upload transaction receipt screenshot."
+        "Approved BNB transfer method for all sections (In-Game Top-Ups, App Stores, Game Codes, Subscriptions, eSIMs, and Rewarble Vouchers): Transfer Name BNB, transfer to wallet address (0xaCc3ab6f0165B39Cf2F1286ED8A778735Ae8314f) then upload transfer receipt.",
+      isBnbServices: true
     },
     {
       id: "paypal",
       nameAr: "باي بال PayPal (تلقائي فوري)",
       nameEn: "PayPal (Instant Auto)",
-      badge: "🅿️",
+      badge: "PP",
       icon: "payments",
       color: "from-blue-600 to-indigo-600",
       copyValue: currencyConfig?.paypal?.email || "paypal@gsmteam.com",
@@ -358,7 +373,8 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
     }
   };
 
-  const activeMethod = paymentMethods.find((m) => m.id === selectedMethodId) || paymentMethods[0];
+  const normalizedMethodId = selectedMethodId === "rewarble" ? "bnb" : selectedMethodId;
+  const activeMethod = paymentMethods.find((m) => m.id === normalizedMethodId) || paymentMethods[0];
 
   const handleCopy = (text: string, id: string) => {
     navigator.clipboard.writeText(text);
@@ -440,6 +456,15 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
 
     if (!transactionRef.trim()) {
       setErrorMessage(lang === "ar" ? "الرجاء إدخال رقم المعاملة أو رقم الحساب/المحفظة المحول منها!" : "Please enter transaction reference / sender number!");
+      return;
+    }
+
+    if (!receiptImage) {
+      setErrorMessage(
+        lang === "ar"
+          ? "يرجى إرفاق صورة إشعار أو إيصال التحويل للمتابعة (إجباري)"
+          : "Please attach transfer receipt image (required)!"
+      );
       return;
     }
 
@@ -781,6 +806,51 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
                     </code>
                   </div>
 
+                  {(activeMethod.isBnbServices || activeMethod.id === "bnb") && (
+                    <div className="p-4 rounded-2xl bg-surface-container-lowest border border-primary/30 space-y-3">
+                      <div className="flex items-center justify-between text-xs font-bold text-primary">
+                        <span className="flex items-center gap-1.5">
+                          <span className="material-symbols-outlined text-base">verified</span>
+                          <span>
+                            {lang === "ar"
+                              ? "طريقة التحويل والشحن المعتمدة لكافة الأقسام والخدمات:"
+                              : "Approved Top-Up Method for All Store Sections:"}
+                          </span>
+                        </span>
+                        <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-primary/15 text-primary">
+                          {lang === "ar" ? "اسم التحويل: BNB" : "Transfer: BNB"}
+                        </span>
+                      </div>
+
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs">
+                        <div className="p-2.5 rounded-xl bg-surface-container border border-outline-variant/30 flex items-center gap-2 text-on-surface">
+                          <span className="material-symbols-outlined text-primary text-base">sports_esports</span>
+                          <span className="font-semibold">{lang === "ar" ? "شحن الألعاب المباشر" : "In-Game Topups"}</span>
+                        </div>
+                        <div className="p-2.5 rounded-xl bg-surface-container border border-outline-variant/30 flex items-center gap-2 text-on-surface">
+                          <span className="material-symbols-outlined text-primary text-base">store</span>
+                          <span className="font-semibold">{lang === "ar" ? "متاجر التطبيقات" : "App Stores"}</span>
+                        </div>
+                        <div className="p-2.5 rounded-xl bg-surface-container border border-outline-variant/30 flex items-center gap-2 text-on-surface">
+                          <span className="material-symbols-outlined text-primary text-base">vpn_key</span>
+                          <span className="font-semibold">{lang === "ar" ? "أكواد الألعاب" : "Game Codes"}</span>
+                        </div>
+                        <div className="p-2.5 rounded-xl bg-surface-container border border-outline-variant/30 flex items-center gap-2 text-on-surface">
+                          <span className="material-symbols-outlined text-primary text-base">subscriptions</span>
+                          <span className="font-semibold">{lang === "ar" ? "الاشتراكات والترفيه" : "Subscriptions"}</span>
+                        </div>
+                        <div className="p-2.5 rounded-xl bg-surface-container border border-outline-variant/30 flex items-center gap-2 text-on-surface">
+                          <span className="material-symbols-outlined text-primary text-base">sim_card</span>
+                          <span className="font-semibold">{lang === "ar" ? "شرائح الإنترنت eSIM" : "eSIM"}</span>
+                        </div>
+                        <div className="p-2.5 rounded-xl bg-surface-container border border-outline-variant/30 flex items-center gap-2 text-on-surface">
+                          <span className="material-symbols-outlined text-primary text-base">account_balance_wallet</span>
+                          <span className="font-semibold">Rewarble</span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
                   <p className="text-xs text-on-surface-variant leading-relaxed font-medium whitespace-pre-wrap block">
                     {cleanHtmlToText(lang === "ar" ? activeMethod.instructionsAr : activeMethod.instructionsEn)}
                   </p>
@@ -848,16 +918,27 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
                 </div>
               )}
 
-              {/* RECEIPT FILE UPLOAD FIELD */}
+              {/* RECEIPT FILE UPLOAD FIELD - MANDATORY */}
               {!activeMethod.isAutomaticPayPal && (
                 <div className="space-y-2 pt-2 border-t border-outline-variant/20">
-                  <label className="text-xs font-extrabold text-on-surface uppercase tracking-wider block">
-                    {lang === "ar" ? "إرفاق صورة إشعار أو إيصال التحويل (اختياري)" : "Attach Receipt Screenshot"}
-                  </label>
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-extrabold text-on-surface uppercase tracking-wider flex items-center gap-1.5">
+                      <span>{lang === "ar" ? "إرفاق صورة إشعار أو إيصال التحويل" : "Attach Receipt Screenshot"}</span>
+                      <span className="text-rose-500 font-bold">* ({lang === "ar" ? "إجباري" : "Required"})</span>
+                    </label>
+                    <span className="text-[11px] font-bold text-rose-500 bg-rose-500/10 px-2.5 py-0.5 rounded-lg border border-rose-500/20">
+                      {lang === "ar" ? "مطلوب لتأكيد الشحن" : "Required for confirmation"}
+                    </span>
+                  </div>
 
-                  <div className="relative flex flex-col items-center justify-center p-6 border-2 border-dashed border-primary/40 rounded-2xl bg-surface-container-lowest hover:border-primary transition-all text-center group cursor-pointer">
+                  <div className={`relative flex flex-col items-center justify-center p-6 border-2 border-dashed rounded-2xl bg-surface-container-lowest transition-all text-center group cursor-pointer ${
+                    receiptImage
+                      ? "border-emerald-500/60 bg-emerald-500/5"
+                      : "border-primary/50 hover:border-primary ring-1 ring-primary/20"
+                  }`}>
                     <input
                       type="file"
+                      required
                       accept="image/*"
                       onChange={handleImageChange}
                       className="absolute inset-0 opacity-0 cursor-pointer w-full h-full z-10"
@@ -891,8 +972,9 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
                         <div className="w-12 h-12 rounded-full bg-primary/15 text-primary flex items-center justify-center group-hover:scale-110 transition-transform">
                           <span className="material-symbols-outlined text-2xl">add_photo_alternate</span>
                         </div>
-                        <p className="font-bold text-sm text-on-surface">
-                          {lang === "ar" ? "انقر هنا لاختيار صورة الإيصال من جهازك" : "Click to select receipt screenshot"}
+                        <p className="font-bold text-sm text-on-surface flex items-center gap-1.5">
+                          <span>{lang === "ar" ? "انقر هنا لاختيار صورة الإيصال من جهازك" : "Click to select receipt screenshot"}</span>
+                          <span className="text-rose-500 text-xs font-bold">({lang === "ar" ? "إجباري *" : "Required *"})</span>
                         </p>
                         <p className="text-xs text-on-surface-variant">
                           {lang === "ar" ? "مفتوح الحجم والأبعاد: جميع صيغ الصور (PNG, JPG, WEBP وغيرها) بدقتها الكاملة" : "Open size & dimensions: all image formats supported in full resolution"}

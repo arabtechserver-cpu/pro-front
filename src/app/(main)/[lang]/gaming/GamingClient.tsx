@@ -1753,6 +1753,68 @@ export default function GamingClient({
               </div>
             </div>
 
+            {/* All Sections Dedicated BNB Top-Up Banner */}
+            <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-emerald-500/15 via-surface-container to-teal-500/15 border border-emerald-500/30 flex flex-col lg:flex-row lg:items-center justify-between gap-4 shadow-lg animate-in fade-in slide-in-from-top-2">
+              <div className="flex items-start sm:items-center gap-3">
+                <div className="w-11 h-11 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
+                  <span className="material-symbols-outlined text-2xl">account_balance_wallet</span>
+                </div>
+                <div>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <h4 className="text-sm font-bold text-on-surface">
+                      {isAr
+                        ? "طريقة الدفع والشحن المعتمدة لكافة الأقسام والخدمات"
+                        : "Approved Top-Up Method for All Sections & Services"}
+                    </h4>
+                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 font-mono font-bold">
+                      BNB / BEP20
+                    </span>
+                  </div>
+
+                  <p className="text-xs text-on-surface-variant font-mono select-all mt-1">
+                    {isAr ? "اسم التحويل: BNB | الرابط: " : "Transfer Name: BNB | Link: "}
+                    <span className="text-emerald-400 font-bold">0xaCc3ab6f0165B39Cf2F1286ED8A778735Ae8314f</span>
+                  </p>
+
+                  <div className="flex items-center gap-1.5 mt-2.5 flex-wrap text-[11px] text-on-surface-variant">
+                    <span className="text-primary font-bold">{isAr ? "تشمل:" : "Includes:"}</span>
+                    <span className="px-2 py-0.5 rounded-lg bg-surface-container-highest border border-outline-variant/30 flex items-center gap-1">
+                      <span className="material-symbols-outlined text-xs">sports_esports</span>
+                      <span>{isAr ? "شحن الألعاب المباشر" : "In-Game Topups"}</span>
+                    </span>
+                    <span className="px-2 py-0.5 rounded-lg bg-surface-container-highest border border-outline-variant/30 flex items-center gap-1">
+                      <span className="material-symbols-outlined text-xs">store</span>
+                      <span>{isAr ? "متاجر التطبيقات" : "App Stores"}</span>
+                    </span>
+                    <span className="px-2 py-0.5 rounded-lg bg-surface-container-highest border border-outline-variant/30 flex items-center gap-1">
+                      <span className="material-symbols-outlined text-xs">vpn_key</span>
+                      <span>{isAr ? "أكواد الألعاب" : "Game Codes"}</span>
+                    </span>
+                    <span className="px-2 py-0.5 rounded-lg bg-surface-container-highest border border-outline-variant/30 flex items-center gap-1">
+                      <span className="material-symbols-outlined text-xs">subscriptions</span>
+                      <span>{isAr ? "الاشتراكات والترفيه" : "Subscriptions"}</span>
+                    </span>
+                    <span className="px-2 py-0.5 rounded-lg bg-surface-container-highest border border-outline-variant/30 flex items-center gap-1">
+                      <span className="material-symbols-outlined text-xs">sim_card</span>
+                      <span>{isAr ? "شرائح الإنترنت eSIM" : "eSIM"}</span>
+                    </span>
+                    <span className="px-2 py-0.5 rounded-lg bg-surface-container-highest border border-outline-variant/30 flex items-center gap-1">
+                      <span className="material-symbols-outlined text-xs">account_balance_wallet</span>
+                      <span>Rewarble</span>
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <Link
+                href={`/${lang}/wallet?method=bnb`}
+                className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition-all shadow-md shrink-0 active:scale-95"
+              >
+                <span className="material-symbols-outlined text-base">add_card</span>
+                <span>{isAr ? "شحن المحفظة عبر BNB" : "Top-up Wallet via BNB"}</span>
+              </Link>
+            </div>
+
             {/* Bundles Grid with Rich Visual Cards */}
             {loading ? (
               <div className="py-24 flex flex-col items-center justify-center gap-4">

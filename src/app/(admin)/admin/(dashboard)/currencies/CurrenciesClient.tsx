@@ -40,6 +40,13 @@ interface CurrencyConfig {
     instructionsEn: string;
     isActive: boolean;
   };
+  rewarble?: {
+    address: string;
+    transferName: string;
+    instructionsAr: string;
+    instructionsEn: string;
+    isActive: boolean;
+  };
   paypal: {
     email: string;
     isActive: boolean;
@@ -543,8 +550,8 @@ export default function CurrenciesClient() {
             <div className="p-4 rounded-2xl bg-surface-container-lowest border border-outline-variant/20 space-y-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <span className="material-symbols-outlined text-yellow-400 text-lg">token</span>
-                  <span className="font-bold text-xs text-on-surface">BNB Smart Chain (BEP20 Address)</span>
+                  <span className="material-symbols-outlined text-yellow-400 text-lg">account_balance_wallet</span>
+                  <span className="font-bold text-xs text-on-surface">تحويل BNB (شحن الألعاب والبطاقات و Rewarble)</span>
                 </div>
                 <input
                   type="checkbox"
@@ -571,6 +578,81 @@ export default function CurrenciesClient() {
                     })
                   }
                   className="w-full px-3.5 py-2.5 bg-surface-container border border-outline-variant/40 rounded-xl font-mono text-xs text-on-surface text-left dir-ltr"
+                />
+              </div>
+            </div>
+
+            {/* Rewarble (BNB) */}
+            <div className="p-4 rounded-2xl bg-surface-container-lowest border border-outline-variant/20 space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="material-symbols-outlined text-emerald-400 text-lg">account_balance_wallet</span>
+                  <span className="font-bold text-xs text-on-surface">Rewarble (تحويل BNB)</span>
+                </div>
+                <input
+                  type="checkbox"
+                  checked={config.rewarble?.isActive ?? true}
+                  onChange={(e) =>
+                    setConfig({
+                      ...config,
+                      rewarble: {
+                        ...(config.rewarble || {
+                          address: "0xaCc3ab6f0165B39Cf2F1286ED8A778735Ae8314f",
+                          transferName: "BNB",
+                          instructionsAr: "",
+                          instructionsEn: ""
+                        }),
+                        isActive: e.target.checked
+                      }
+                    })
+                  }
+                  className="w-4 h-4 accent-primary"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-bold text-on-surface-variant mb-1">اسم التحويل:</label>
+                <input
+                  type="text"
+                  value={config.rewarble?.transferName || "BNB"}
+                  onChange={(e) =>
+                    setConfig({
+                      ...config,
+                      rewarble: {
+                        ...(config.rewarble || {
+                          address: "0xaCc3ab6f0165B39Cf2F1286ED8A778735Ae8314f",
+                          instructionsAr: "",
+                          instructionsEn: "",
+                          isActive: true
+                        }),
+                        transferName: e.target.value
+                      }
+                    })
+                  }
+                  className="w-full px-3.5 py-2.5 bg-surface-container border border-outline-variant/40 rounded-xl font-mono text-xs font-bold text-on-surface text-left dir-ltr"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-bold text-on-surface-variant mb-1">الرابط / عنوان المحفظة (Address):</label>
+                <input
+                  type="text"
+                  value={config.rewarble?.address || "0xaCc3ab6f0165B39Cf2F1286ED8A778735Ae8314f"}
+                  onChange={(e) =>
+                    setConfig({
+                      ...config,
+                      rewarble: {
+                        ...(config.rewarble || {
+                          transferName: "BNB",
+                          instructionsAr: "",
+                          instructionsEn: "",
+                          isActive: true
+                        }),
+                        address: e.target.value
+                      }
+                    })
+                  }
+                  className="w-full px-3.5 py-2.5 bg-surface-container border border-outline-variant/40 rounded-xl font-mono text-xs font-bold text-on-surface text-left dir-ltr"
                 />
               </div>
             </div>
