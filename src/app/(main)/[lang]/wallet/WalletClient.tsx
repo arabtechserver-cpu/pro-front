@@ -666,31 +666,31 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
                           setSelectedMethodId("bnb");
                         }
                       }}
-                      className={`w-full p-4 sm:p-5 rounded-2xl border-2 text-start transition-all relative overflow-hidden cursor-pointer group ${
+                      className={`w-full p-3 sm:py-3 sm:px-4 rounded-2xl border-2 text-start transition-all relative overflow-hidden cursor-pointer group ${
                         normalizedMethodId === "bnb"
                           ? "bg-gradient-to-br from-amber-500/20 via-surface-container-high to-yellow-500/10 border-amber-400 shadow-xl ring-2 ring-amber-400/40"
                           : "bg-surface-container-high/60 border-amber-500/40 text-on-surface hover:border-amber-400 hover:bg-surface-container-high shadow-md"
                       }`}
                     >
-                      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                        <div className="flex items-start sm:items-center gap-3.5">
-                          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500 via-amber-600 to-yellow-600 text-white flex items-center justify-center text-2xl shrink-0 shadow-lg shadow-amber-500/25 group-hover:scale-105 transition-transform">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 via-amber-600 to-yellow-600 text-white flex items-center justify-center text-xl shrink-0 shadow-md shadow-amber-500/20 group-hover:scale-105 transition-transform">
                             <span className="material-symbols-outlined">account_balance_wallet</span>
                           </div>
 
-                          <div className="space-y-1">
+                          <div className="space-y-0.5 min-w-0">
                             <div className="flex items-center gap-2 flex-wrap">
-                              <h3 className="font-black text-base text-on-surface">
+                              <h3 className="font-black text-sm sm:text-base text-on-surface">
                                 {lang === "ar"
                                   ? "تحويل BNB (رابط الدفع والشحن المباشر)"
                                   : "BNB Transfer (Direct Top-up Link)"}
                               </h3>
-                              <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-300 border border-amber-500/40">
+                              <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40">
                                 BEP20 / BSC
                               </span>
                             </div>
 
-                            <p className="text-xs text-on-surface-variant font-mono font-medium dir-ltr text-right">
+                            <p className="text-[11px] sm:text-xs text-on-surface-variant font-mono font-medium dir-ltr text-right">
                               {lang === "ar"
                                 ? "اسم التحويل: BNB | الرابط: 0xaCc3ab6f0165B39Cf2F1286ED8A778735Ae8314f"
                                 : "Transfer Name: BNB | Link: 0xaCc3ab6f0165B39Cf2F1286ED8A778735Ae8314f"}
@@ -698,14 +698,14 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
                           </div>
                         </div>
 
-                        <div className="flex items-center gap-2 self-end md:self-center shrink-0">
+                        <div className="flex items-center gap-2 self-end sm:self-center shrink-0">
                           <button
                             type="button"
                             onClick={(e) => {
                               e.stopPropagation();
                               handleCopy(bnbMethod.copyValue, "bnb-btn-copy");
                             }}
-                            className={`px-3 py-1.5 rounded-xl text-xs font-bold border transition-all flex items-center gap-1.5 active:scale-95 ${
+                            className={`px-2.5 py-1 rounded-lg text-xs font-bold border transition-all flex items-center gap-1 active:scale-95 ${
                               copiedId === "bnb-btn-copy"
                                 ? "bg-emerald-500 text-white border-emerald-400"
                                 : "bg-surface-container-lowest/80 text-amber-300 border-amber-500/40 hover:bg-amber-500/20"
@@ -718,9 +718,9 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
                           </button>
 
                           <span
-                            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all ${
+                            className={`px-3 py-1 rounded-lg text-xs font-bold flex items-center gap-1 transition-all ${
                               normalizedMethodId === "bnb"
-                                ? "bg-amber-500 text-slate-950 shadow-md font-extrabold"
+                                ? "bg-amber-500 text-slate-950 shadow-sm font-extrabold"
                                 : "bg-surface-container-highest text-on-surface-variant group-hover:text-amber-300"
                             }`}
                           >
@@ -736,39 +736,35 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
                         </div>
                       </div>
 
-                      {/* 6 Supported services grid */}
-                      <div className="mt-3.5 pt-3 border-t border-outline-variant/20">
-                        <p className="text-[11px] font-bold text-amber-300/90 mb-2">
-                          {lang === "ar"
-                            ? "الخدمات التي تدعمها طريقة التحويل هذه مباشرة:"
-                            : "Directly supported services by this method:"}
-                        </p>
-                        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 text-[11px]">
-                          <div className="px-2.5 py-1.5 rounded-xl bg-surface-container-lowest/90 border border-outline-variant/25 flex items-center gap-1.5 text-on-surface">
-                            <span className="material-symbols-outlined text-amber-400 text-sm shrink-0">sports_esports</span>
-                            <span className="font-semibold truncate">{lang === "ar" ? "شحن الألعاب" : "Gaming"}</span>
-                          </div>
-                          <div className="px-2.5 py-1.5 rounded-xl bg-surface-container-lowest/90 border border-outline-variant/25 flex items-center gap-1.5 text-on-surface">
-                            <span className="material-symbols-outlined text-amber-400 text-sm shrink-0">store</span>
-                            <span className="font-semibold truncate">{lang === "ar" ? "متاجر التطبيقات" : "App Stores"}</span>
-                          </div>
-                          <div className="px-2.5 py-1.5 rounded-xl bg-surface-container-lowest/90 border border-outline-variant/25 flex items-center gap-1.5 text-on-surface">
-                            <span className="material-symbols-outlined text-amber-400 text-sm shrink-0">vpn_key</span>
-                            <span className="font-semibold truncate">{lang === "ar" ? "أكواد الألعاب" : "Game Codes"}</span>
-                          </div>
-                          <div className="px-2.5 py-1.5 rounded-xl bg-surface-container-lowest/90 border border-outline-variant/25 flex items-center gap-1.5 text-on-surface">
-                            <span className="material-symbols-outlined text-amber-400 text-sm shrink-0">subscriptions</span>
-                            <span className="font-semibold truncate">{lang === "ar" ? "الاشتراكات" : "Subscriptions"}</span>
-                          </div>
-                          <div className="px-2.5 py-1.5 rounded-xl bg-surface-container-lowest/90 border border-outline-variant/25 flex items-center gap-1.5 text-on-surface">
-                            <span className="material-symbols-outlined text-amber-400 text-sm shrink-0">sim_card</span>
-                            <span className="font-semibold truncate">{lang === "ar" ? "شرائح eSIM" : "eSIM"}</span>
-                          </div>
-                          <div className="px-2.5 py-1.5 rounded-xl bg-surface-container-lowest/90 border border-outline-variant/25 flex items-center gap-1.5 text-on-surface">
-                            <span className="material-symbols-outlined text-amber-400 text-sm shrink-0">account_balance_wallet</span>
-                            <span className="font-semibold truncate">Rewarble</span>
-                          </div>
-                        </div>
+                      {/* Supported services compact row showing FULL text without truncation */}
+                      <div className="mt-2.5 pt-2 border-t border-outline-variant/15 flex flex-wrap items-center gap-1.5 text-[11px]">
+                        <span className="font-bold text-amber-300/90 shrink-0 text-[11px] ml-1">
+                          {lang === "ar" ? "الخدمات المعتمدة:" : "Services:"}
+                        </span>
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-surface-container-lowest/80 border border-outline-variant/20 text-on-surface whitespace-nowrap font-medium">
+                          <span className="material-symbols-outlined text-amber-400 text-xs shrink-0">sports_esports</span>
+                          <span>{lang === "ar" ? "شحن الألعاب المباشر" : "Direct In-Game Topups"}</span>
+                        </span>
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-surface-container-lowest/80 border border-outline-variant/20 text-on-surface whitespace-nowrap font-medium">
+                          <span className="material-symbols-outlined text-amber-400 text-xs shrink-0">store</span>
+                          <span>{lang === "ar" ? "متاجر التطبيقات" : "App Stores"}</span>
+                        </span>
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-surface-container-lowest/80 border border-outline-variant/20 text-on-surface whitespace-nowrap font-medium">
+                          <span className="material-symbols-outlined text-amber-400 text-xs shrink-0">vpn_key</span>
+                          <span>{lang === "ar" ? "أكواد الألعاب" : "Game Codes"}</span>
+                        </span>
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-surface-container-lowest/80 border border-outline-variant/20 text-on-surface whitespace-nowrap font-medium">
+                          <span className="material-symbols-outlined text-amber-400 text-xs shrink-0">subscriptions</span>
+                          <span>{lang === "ar" ? "الاشتراكات والترفيه" : "Subscriptions & Entertainment"}</span>
+                        </span>
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-surface-container-lowest/80 border border-outline-variant/20 text-on-surface whitespace-nowrap font-medium">
+                          <span className="material-symbols-outlined text-amber-400 text-xs shrink-0">sim_card</span>
+                          <span>{lang === "ar" ? "شرائح الإنترنت eSIM" : "eSIM Internet"}</span>
+                        </span>
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-surface-container-lowest/80 border border-outline-variant/20 text-on-surface whitespace-nowrap font-medium">
+                          <span className="material-symbols-outlined text-amber-400 text-xs shrink-0">account_balance_wallet</span>
+                          <span>Rewarble</span>
+                        </span>
                       </div>
                     </div>
                   </div>
