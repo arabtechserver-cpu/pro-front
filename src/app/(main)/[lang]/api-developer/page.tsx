@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect, use } from "react";
 import { useRouter } from "next/navigation";
@@ -17,7 +17,10 @@ export default function ApiDeveloperPage(props: { params: Promise<{ lang: string
 
   const [siteName, setSiteName] = useState("");
   const [siteUrl, setSiteUrl] = useState("");
+  const [apiAllowedIps, setApiAllowedIps] = useState("");
+  const [apiDailyLimit, setApiDailyLimit] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSavingSecurity, setIsSavingSecurity] = useState(false);
   const [showActivationConfirmation, setShowActivationConfirmation] = useState(false);
   const [isRegenerating, setIsRegenerating] = useState(false);
   const [toastMessage, setToastMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
@@ -43,6 +46,8 @@ export default function ApiDeveloperPage(props: { params: Promise<{ lang: string
           setUserSession(data.user);
           setSiteName(data.user.apiSiteName || "");
           setSiteUrl(data.user.apiSiteUrl || "");
+          setApiAllowedIps(data.user.apiAllowedIps || "");
+          setApiDailyLimit(data.user.apiDailyLimit ? String(data.user.apiDailyLimit) : "");
         } else {
           router.push(`/${lang}/login`);
         }
@@ -129,6 +134,43 @@ export default function ApiDeveloperPage(props: { params: Promise<{ lang: string
       setToastMessage({ type: "error", text: "تعذر الاتصال بالخادم" });
     } finally {
       setIsRegenerating(false);
+      setTimeout(() => setToastMessage(null), 3000);
+    }
+  };
+
+  const handleSaveSecurity = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSavingSecurity(true);
+    try {
+      const token = localStorage.getItem("user_token");
+      const res = await fetch("/api/users/save-api-security", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        credentials: "omit",
+        body: JSON.stringify({
+          apiAllowedIps: apiAllowedIps.trim(),
+          apiDailyLimit: apiDailyLimit ? parseFloat(apiDailyLimit) : null
+        })
+      });
+
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setToastMessage({ type: "success", text: data.message || "تم حفظ إعدادات الأمان بنجاح" });
+        setUserSession((prev: any) => ({
+          ...prev,
+          apiAllowedIps: data.user?.apiAllowedIps || apiAllowedIps.trim(),
+          apiDailyLimit: data.user?.apiDailyLimit || (apiDailyLimit ? parseFloat(apiDailyLimit) : null)
+        }));
+      } else {
+        setToastMessage({ type: "error", text: data.error || "حدث خطأ أثناء حفظ إعدادات الأمان" });
+      }
+    } catch (err) {
+      setToastMessage({ type: "error", text: "تعذر الاتصال بالخادم" });
+    } finally {
+      setIsSavingSecurity(false);
       setTimeout(() => setToastMessage(null), 3000);
     }
   };
@@ -435,6 +477,80 @@ export default function ApiDeveloperPage(props: { params: Promise<{ lang: string
             </div>
           )}
 
+          {/* API Security & Restrictions Card */}
+          {isApiEnabled && (
+            <div className="glass-card rounded-3xl p-6 md:p-8 border border-outline-variant/30">
+              <div className="flex items-center gap-3 mb-4">
+                <span className="material-symbols-outlined text-primary text-2xl">security</span>
+                <div>
+                  <h2 className="text-xl font-bold text-on-surface">
+                    {lang === "ar" ? "أمان الـ API وتقييد الوصول" : "API Security & Restrictions"}
+                  </h2>
+                  <p className="text-xs text-on-surface-variant">
+                    {lang === "ar" 
+                      ? "احمِ رصيدك عبر تقييد الـ API بخوادمك المعتمدة وتحديد سقف للإنفاق اليومي." 
+                      : "Protect your balance by restricting API requests to authorized server IPs and setting a daily spending cap."}
+                  </p>
+                </div>
+              </div>
+
+              <form onSubmit={handleSaveSecurity} className="space-y-4">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-on-surface-variant flex items-center justify-between">
+                    <span>{lang === "ar" ? "قائمة خوادم الـ IP المسموحة (IP Whitelist)" : "Allowed Server IPs (Whitelist)"}</span>
+                    <span className="text-[11px] text-primary font-normal">{lang === "ar" ? "اتركه فارغاً للسماح لجميع الـ IPs" : "Leave empty to allow all IPs"}</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={apiAllowedIps}
+                    onChange={(e) => setApiAllowedIps(e.target.value)}
+                    placeholder="e.g. 195.201.10.45, 104.21.55.2"
+                    className="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-xl py-2.5 px-4 text-sm text-on-surface font-mono focus:outline-none focus:border-purple-400 dir-ltr text-left"
+                  />
+                  <p className="text-[11px] text-on-surface-variant">
+                    {lang === "ar" 
+                      ? "أدخل عناوين IP لخوادمك مفصولة بفاصلة. سيتم حظر أي طلب يرد من أي عنوان IP آخر فوراً." 
+                      : "Enter comma-separated server IP addresses. Any request from other IPs will be strictly blocked."}
+                  </p>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-on-surface-variant flex items-center justify-between">
+                    <span>{lang === "ar" ? "الحد الأقصى للإنفاق اليومي (USD)" : "Daily Spending Limit (USD)"}</span>
+                    <span className="text-[11px] text-primary font-normal">{lang === "ar" ? "اتركه فارغاً لإنفاق غير محدود" : "Leave empty for unlimited"}</span>
+                  </label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    value={apiDailyLimit}
+                    onChange={(e) => setApiDailyLimit(e.target.value)}
+                    placeholder={lang === "ar" ? "مثال: 500" : "Ex: 500"}
+                    className="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-xl py-2.5 px-4 text-sm text-on-surface font-mono focus:outline-none focus:border-purple-400 dir-ltr text-left"
+                  />
+                  <p className="text-[11px] text-on-surface-variant">
+                    {lang === "ar" 
+                      ? "الحد الأقصى للمبلغ المالي الإجمالي المسموح بإنفاقه عبر الـ API خلال يوم واحد." 
+                      : "Maximum total USD allowed to be spent via API within a single day."}
+                  </p>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={isSavingSecurity}
+                  className="bg-primary text-on-primary py-2.5 px-6 rounded-xl font-bold text-sm hover:opacity-90 transition-all flex items-center gap-2 shadow-md disabled:opacity-50"
+                >
+                  {isSavingSecurity ? (
+                    <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                  ) : (
+                    <span className="material-symbols-outlined text-base">save</span>
+                  )}
+                  <span>{lang === "ar" ? "حفظ إعدادات الأمان" : "Save Security Settings"}</span>
+                </button>
+              </form>
+            </div>
+          )}
+
           {/* Documentation / Instructions */}
           <div className="glass-card rounded-3xl p-6 md:p-8 border border-outline-variant/30">
             <h2 className="text-xl font-bold text-on-surface flex items-center gap-2 mb-6">
@@ -442,45 +558,104 @@ export default function ApiDeveloperPage(props: { params: Promise<{ lang: string
               {lang === "ar" ? "طرق وخطوات الربط (Documentation)" : "Integration Documentation"}
             </h2>
 
-            <div className="space-y-5 text-sm text-on-surface-variant">
-              <p>
-                {lang === "ar" 
-                  ? "نظامنا متوافق بنسبة 100% مع نظام Dhru Fusion. يمكنك سحب خدماتنا بسهولة إلى موقعك عبر اتباع الخطوات التالية:"
-                  : "Our system is 100% compatible with the Dhru Fusion system. You can easily fetch our services to your site by following these steps:"}
-              </p>
+            <div className="space-y-6 text-sm text-on-surface-variant">
+              {/* Security Advisory */}
+              <div className="p-4 rounded-2xl bg-surface-container-lowest border border-outline-variant/20 space-y-2">
+                <div className="flex items-center gap-2 text-primary font-bold text-sm">
+                  <span className="material-symbols-outlined text-base">verified</span>
+                  <span>{lang === "ar" ? "توجيهات أمان الربط الموصى بها" : "Recommended API Security Directives"}</span>
+                </div>
+                <ul className="text-xs space-y-1 list-disc list-inside text-on-surface-variant">
+                  <li>{lang === "ar" ? "أرسل المفتاح السري عبر ترويسة الطلب: Authorization: Bearer <API_KEY> أو x-api-key لتجنب تسريبه في الـ URL." : "Send API key via Authorization: Bearer <API_KEY> or x-api-key header to avoid URL query leaks."}</li>
+                  <li>{lang === "ar" ? "قم بتفعيل قائمة الـ IP المسموحة لخوادمك في الصندوق أعلاه لمنع استخدام المفتاح خارج خوادمك." : "Activate your server IP whitelist above to restrict API calls to your servers only."}</li>
+                  <li>{lang === "ar" ? "يدعم النظام مفتاح التفرد (x-idempotency-key أو clientorderid) لمنع تكرار خصم الرصيد في حالات انقطاع الاتصال." : "System supports x-idempotency-key and clientorderid to prevent duplicate charge attempts."}</li>
+                </ul>
+              </div>
 
+              {/* Hierarchical REST API Documentation */}
+              <div className="bg-surface-container-lowest border border-outline-variant/20 rounded-2xl p-5 space-y-4 relative">
+                <div className="absolute top-0 left-0 w-2 h-full bg-violet-500 rounded-l-2xl"></div>
+                <h3 className="font-bold text-on-surface text-base flex items-center gap-2">
+                  <span className="material-symbols-outlined text-violet-400">account_tree</span>
+                  <span>{lang === "ar" ? "1. واجهة الـ REST API الهرمية (الأقسام -> الخدمات -> الباقات)" : "1. Modern Hierarchical REST API"}</span>
+                </h3>
+                <p className="text-xs leading-relaxed">
+                  {lang === "ar" 
+                    ? "يتيح هذا النمط تصفح الكتالوج بتفريع هرمي كامل (الأكثر شعبية 18، شحن الألعاب 219، متاجر التطبيقات 3، أكواد الألعاب 70، الاشتراكات 23، شرائح eSIM 243، وخدمات السيرفر وIMEI):" 
+                    : "Allows navigating full hierarchical catalog (Popular: 18, Top-ups: 219, App Stores: 3, Game Codes: 70, Subscriptions: 23, eSIM: 243, Server & IMEI):"}
+                </p>
+
+                <div className="space-y-3 font-mono text-xs">
+                  <div className="p-3 rounded-xl bg-surface-container-high/60 border border-outline-variant/20 space-y-1">
+                    <div className="flex items-center justify-between">
+                      <span className="font-bold text-violet-400">GET /api/v1/provider/sections</span>
+                      <span className="text-[10px] text-on-surface-variant font-sans">{lang === "ar" ? "جلب الأقسام الرئيسية" : "Fetch all sections"}</span>
+                    </div>
+                    <p className="text-[11px] font-sans text-on-surface-variant">{lang === "ar" ? "يعيد قائمة بجميع الأقسام الرئيسية مع أعداد الخدمات المتاحة داخل كل قسم." : "Returns all sections with total available services count."}</p>
+                  </div>
+
+                  <div className="p-3 rounded-xl bg-surface-container-high/60 border border-outline-variant/20 space-y-1">
+                    <div className="flex items-center justify-between">
+                      <span className="font-bold text-violet-400">GET /api/v1/provider/services?section=topups</span>
+                      <span className="text-[10px] text-on-surface-variant font-sans">{lang === "ar" ? "جلب خدمات / ألعاب القسم" : "Fetch section services"}</span>
+                    </div>
+                    <p className="text-[11px] font-sans text-on-surface-variant">{lang === "ar" ? "يعيد قائمة الألعاب والخدمات التابعة للقسم (مثل PUBG, Free Fire, Valorant) مع المناطق المتاحة." : "Returns games and services for the section with available regions."}</p>
+                  </div>
+
+                  <div className="p-3 rounded-xl bg-surface-container-high/60 border border-outline-variant/20 space-y-1">
+                    <div className="flex items-center justify-between">
+                      <span className="font-bold text-violet-400">GET /api/v1/provider/service/:serviceId/packages</span>
+                      <span className="text-[10px] text-on-surface-variant font-sans">{lang === "ar" ? "جلب باقات اللعبة / الخدمة" : "Fetch service packages"}</span>
+                    </div>
+                    <p className="text-[11px] font-sans text-on-surface-variant">{lang === "ar" ? "يعيد جميع الباقات التابعة للعبة مع الأسعار النهائية، وحالة المخزون، وحقول الإدخال الإجبارية (Player ID, Server ID)." : "Returns packages with final prices, stock, and required fields (Player ID, Zone ID, etc.)."}</p>
+                  </div>
+
+                  <div className="p-3 rounded-xl bg-surface-container-high/60 border border-outline-variant/20 space-y-1">
+                    <div className="flex items-center justify-between">
+                      <span className="font-bold text-violet-400">GET /api/v1/provider/tree</span>
+                      <span className="text-[10px] text-on-surface-variant font-sans">{lang === "ar" ? "جلب الشجرة المتفرعة كاملة" : "Full Catalog Tree"}</span>
+                    </div>
+                    <p className="text-[11px] font-sans text-on-surface-variant">{lang === "ar" ? "يعيد الشجرة المتفرعة كاملة بطلب واحد مع كاش فائق السرعة." : "Returns entire branched catalog tree in a single cached call."}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Dhru Fusion Protocol Compatibility */}
               <div className="bg-surface-container-lowest border border-outline-variant/20 rounded-2xl p-5 space-y-4 relative">
                 <div className="absolute top-0 left-0 w-2 h-full bg-purple-500 rounded-l-2xl"></div>
-                <h3 className="font-bold text-on-surface text-base">
-                  {lang === "ar" ? "إذا كان موقعك يعمل بنظام Dhru أو ما يماثله:" : "If your site uses Dhru or similar:"}
+                <h3 className="font-bold text-on-surface text-base flex items-center gap-2">
+                  <span className="material-symbols-outlined text-purple-400">sync_alt</span>
+                  <span>{lang === "ar" ? "2. التوافق الكامل مع بروتوكول Dhru Fusion" : "2. Dhru Fusion Protocol Compatibility"}</span>
                 </h3>
-                <ul className="space-y-3 list-none pl-0">
-                  <li className="flex gap-3">
-                    <span className="w-6 h-6 rounded-full bg-purple-500/10 text-purple-400 flex items-center justify-center font-bold shrink-0">1</span>
-                    <div>
-                      <p className="font-bold text-on-surface">{lang === "ar" ? "انتقل إلى إعدادات مزودي الخدمة" : "Go to API Providers settings"}</p>
-                      <p className="text-xs mt-1">{lang === "ar" ? "في لوحة تحكم موقعك، أضف مزود خدمة جديد (API Provider)." : "In your admin panel, add a new API Provider."}</p>
-                    </div>
-                  </li>
-                  <li className="flex gap-3">
-                    <span className="w-6 h-6 rounded-full bg-purple-500/10 text-purple-400 flex items-center justify-center font-bold shrink-0">2</span>
-                    <div>
-                      <p className="font-bold text-on-surface">{lang === "ar" ? "أدخل بيانات الربط" : "Enter Connection Details"}</p>
-                      <p className="text-xs mt-1">
-                        {lang === "ar" ? "استخدم رابط الـ API والمفتاح السري (API KEY) الموجودين في الأعلى، واسم المستخدم الخاص بك." : "Use the API URL and API KEY provided above, along with your username."}
-                      </p>
-                    </div>
-                  </li>
-                  <li className="flex gap-3">
-                    <span className="w-6 h-6 rounded-full bg-purple-500/10 text-purple-400 flex items-center justify-center font-bold shrink-0">3</span>
-                    <div>
-                      <p className="font-bold text-on-surface">{lang === "ar" ? "مزامنة الخدمات" : "Sync Services"}</p>
-                      <p className="text-xs mt-1">
-                        {lang === "ar" ? "قم بجلب قائمة الخدمات، سيتم سحب الخدمات متضمنة حقول الإدخال المطلوبة (مثل حقل الـ IMEI الذي سيكون إجبارياً وفي المركز الأول بشكل تلقائي لخدمات IMEI)." : "Fetch the service list. Services will be imported along with required input fields (like the IMEI field, which is automatically required and placed first for IMEI services)."}
-                      </p>
-                    </div>
-                  </li>
-                </ul>
+                <p className="text-xs leading-relaxed">
+                  {lang === "ar" 
+                    ? "إذا كان موقعك يعمل بنظام Dhru Fusion، أضف السيرفر كمزود خدمة (Provider)، وسيتم سحب خدمات السيرفر وشحن الألعاب والبطاقات تلقائياً:" 
+                    : "If your system runs on Dhru Fusion, add this server as an API Provider. Server services, gaming top-ups, and vouchers will sync automatically:"}
+                </p>
+
+                {/* Supported Endpoints Table */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs font-mono">
+                  <div className="p-2.5 rounded-xl bg-surface-container-high/60 border border-outline-variant/20">
+                    <span className="text-primary font-bold">accountinfo</span>
+                    <p className="text-[11px] font-sans text-on-surface-variant mt-0.5">{lang === "ar" ? "استعلام عن الرصيد وسقف الإنفاق" : "Check balance and spending limit"}</p>
+                  </div>
+                  <div className="p-2.5 rounded-xl bg-surface-container-high/60 border border-outline-variant/20">
+                    <span className="text-primary font-bold">serverservicelist</span>
+                    <p className="text-[11px] font-sans text-on-surface-variant mt-0.5">{lang === "ar" ? "قائمة خدمات السيرفر وباقات الألعاب والحقول" : "Server services and gaming packages"}</p>
+                  </div>
+                  <div className="p-2.5 rounded-xl bg-surface-container-high/60 border border-outline-variant/20">
+                    <span className="text-primary font-bold">imeiservicelist</span>
+                    <p className="text-[11px] font-sans text-on-surface-variant mt-0.5">{lang === "ar" ? "قائمة خدمات IMEI والوقت والأسعار" : "IMEI services, time, and prices"}</p>
+                  </div>
+                  <div className="p-2.5 rounded-xl bg-surface-container-high/60 border border-outline-variant/20">
+                    <span className="text-primary font-bold">placeserverorder / placeimeiorder</span>
+                    <p className="text-[11px] font-sans text-on-surface-variant mt-0.5">{lang === "ar" ? "تنفيذ طلب فوري لأي باقة ألعاب أو سيرفر" : "Place instant order with custom fields"}</p>
+                  </div>
+                  <div className="p-2.5 rounded-xl bg-surface-container-high/60 border border-outline-variant/20 sm:col-span-2">
+                    <span className="text-violet-400 font-bold">getserverorder / getimeiorder</span>
+                    <p className="text-[11px] font-sans text-on-surface-variant mt-0.5">{lang === "ar" ? "فحص حالة الطلب واستلام الكود / النتيجة فورياً" : "Check order status and receive code/voucher"}</p>
+                  </div>
+                </div>
               </div>
 
               <div className="bg-surface-container-high rounded-xl p-4 border-l-4 border-amber-500 flex items-start gap-3">
@@ -491,36 +666,6 @@ export default function ApiDeveloperPage(props: { params: Promise<{ lang: string
                     ? "تظهر جميع أسعار الخدمات والباقات تلقائياً بسعر تكلفة المزود مضافاً إليها نسبة ربح 8% فقط. كما يجب أن تمتلك رصيداً كافياً في محفظتك ليتم قبول الطلبات، وتدخل الطلبات إلى الداشبورد لموافقة الإدارة عليها فوراً."
                     : "All services and packages are priced automatically at provider cost plus an 8% profit margin only. You must have a sufficient wallet balance to place orders, which are sent to the admin dashboard for verification and approval."}
                 </p>
-              </div>
-
-              {/* Supported Endpoints Table */}
-              <div className="bg-surface-container-lowest border border-outline-variant/20 rounded-2xl p-5 space-y-3">
-                <h3 className="font-bold text-on-surface text-base flex items-center gap-2">
-                  <span className="material-symbols-outlined text-primary text-base">code</span>
-                  <span>{lang === "ar" ? "الإجراءات البرمجية المدعومة (Supported API Actions)" : "Supported API Actions"}</span>
-                </h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs font-mono">
-                  <div className="p-2.5 rounded-xl bg-surface-container-high/60 border border-outline-variant/20">
-                    <span className="text-primary font-bold">accountinfo</span>
-                    <p className="text-[11px] font-sans text-on-surface-variant mt-0.5">{lang === "ar" ? "استعلام عن الرصيد وحالة الحساب" : "Check balance and account status"}</p>
-                  </div>
-                  <div className="p-2.5 rounded-xl bg-surface-container-high/60 border border-outline-variant/20">
-                    <span className="text-primary font-bold">serverservicelist</span>
-                    <p className="text-[11px] font-sans text-on-surface-variant mt-0.5">{lang === "ar" ? "قائمة خدمات السيرفر والباقات والحقول" : "Server services, packages, and custom fields"}</p>
-                  </div>
-                  <div className="p-2.5 rounded-xl bg-surface-container-high/60 border border-outline-variant/20">
-                    <span className="text-primary font-bold">imeiservicelist</span>
-                    <p className="text-[11px] font-sans text-on-surface-variant mt-0.5">{lang === "ar" ? "قائمة خدمات IMEI والوقت والأسعار" : "IMEI services, time, and prices"}</p>
-                  </div>
-                  <div className="p-2.5 rounded-xl bg-surface-container-high/60 border border-outline-variant/20">
-                    <span className="text-primary font-bold">placeserverorder / placeimeiorder</span>
-                    <p className="text-[11px] font-sans text-on-surface-variant mt-0.5">{lang === "ar" ? "إرسال طلب جديد مع الحقول المخصصة" : "Place order with custom fields & quantity"}</p>
-                  </div>
-                  <div className="p-2.5 rounded-xl bg-surface-container-high/60 border border-outline-variant/20 sm:col-span-2">
-                    <span className="text-violet-400 font-bold">getserverorder / getimeiorder</span>
-                    <p className="text-[11px] font-sans text-on-surface-variant mt-0.5">{lang === "ar" ? "فحص حالة الطلب واستلام الكود / النتيجة فور اعتمادها من الإدارة" : "Check order status and receive code/voucher once approved"}</p>
-                  </div>
-                </div>
               </div>
             </div>
           </div>
