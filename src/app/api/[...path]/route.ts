@@ -58,6 +58,11 @@ async function proxyRequest(
     'x-client-local-ip',
     'x-local-ip',
     'x-device-fingerprint',
+    'x-api-key',
+    'x-username',
+    'x-action',
+    'apiaccesskey',
+    'key',
   ];
   headersToCopy.forEach(h => {
     const val = request.headers.get(h);
