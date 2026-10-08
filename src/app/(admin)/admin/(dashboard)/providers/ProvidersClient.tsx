@@ -3,16 +3,16 @@
 import { useState, useEffect, useRef, useCallback, useDeferredValue, useMemo } from "react";
 import Link from "next/link";
 import {
-  filterProviderServicesByType,
+  filterProviderServicesBySection,
   getProviderServiceType,
-  getProviderServiceTypeCounts,
+  getProviderServiceSectionCounts,
   getProviderServiceTypeLabel
 } from "../../../../../lib/provider-service-types";
 import { getProviderCustomFields } from "../../../../../lib/purchase-service-fields";
 import { loadProviderServicesForBrowse } from "../../../../../lib/provider-service-browse";
 
 type ProviderServiceType = "imei" | "server" | "remote";
-type ProviderServiceTypeFilter = "all" | ProviderServiceType;
+type ProviderServiceTypeFilter = "all" | ProviderServiceType | "topups" | "gift-cards" | "app-stores" | "subscriptions" | "esim" | "unknown";
 
 interface Provider {
   id: string;
@@ -495,12 +495,12 @@ export default function ProvidersClient() {
   };
 
   const serviceTypeCounts = useMemo(
-    () => getProviderServiceTypeCounts(providerServices),
+    () => getProviderServiceSectionCounts(providerServices),
     [providerServices]
   );
 
   const typeFilteredProviderServices = useMemo(
-    () => filterProviderServicesByType(providerServices, serviceTypeFilter),
+    () => filterProviderServicesBySection(providerServices, serviceTypeFilter),
     [providerServices, serviceTypeFilter]
   );
 
@@ -1578,7 +1578,13 @@ export default function ProvidersClient() {
                   { type: "all", label: "الكل", count: serviceTypeCounts.all, icon: "apps" },
                   { type: "imei", label: "IMEI", count: serviceTypeCounts.imei, icon: "fingerprint" },
                   { type: "server", label: "Server", count: serviceTypeCounts.server, icon: "dns" },
-                  { type: "remote", label: "Remote", count: serviceTypeCounts.remote, icon: "settings_remote" }
+                  { type: "remote", label: "Remote", count: serviceTypeCounts.remote, icon: "settings_remote" },
+                  { type: "topups", label: "شحن ألعاب", count: serviceTypeCounts.topups, icon: "sports_esports" },
+                  { type: "gift-cards", label: "أكواد وبطاقات", count: serviceTypeCounts['gift-cards'], icon: "vpn_key" },
+                  { type: "app-stores", label: "متاجر وتطبيقات", count: serviceTypeCounts['app-stores'], icon: "store" },
+                  { type: "subscriptions", label: "اشتراكات", count: serviceTypeCounts.subscriptions, icon: "subscriptions" },
+                  { type: "esim", label: "eSIM", count: serviceTypeCounts.esim, icon: "sim_card" },
+                  ...(serviceTypeCounts.unknown ? [{ type: "unknown" as const, label: "غير مصنّف", count: serviceTypeCounts.unknown, icon: "category" }] : [])
                 ] as const).map((option) => (
                   <button
                     key={option.type}
