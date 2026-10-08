@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
+import { authProxyBudget } from '../../../../../lib/auth-proxy-budget';
 
 export async function POST(request: NextRequest) {
+  return authProxyBudget(request, async (body, signal) => {
   try {
-    const body = await request.json().catch(() => ({}));
     const { challengeToken } = body;
 
     if (!challengeToken) {
@@ -29,7 +30,8 @@ export async function POST(request: NextRequest) {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ challengeToken }),
-          cache: "no-store"
+          cache: "no-store",
+          signal
         });
 
         if (res.ok) {
@@ -47,8 +49,10 @@ export async function POST(request: NextRequest) {
           if (errData?.error || errData?.message) {
             lastErrorMessage = errData.error || errData.message;
           }
+          return NextResponse.json({ success: false, message: lastErrorMessage || 'تعذر إعادة الإرسال' }, { status: res.status });
         }
       } catch {
+        if (signal.aborted) throw new Error('REQUEST_TIMEOUT');
         // Try next candidate URL
       }
     }
@@ -58,9 +62,11 @@ export async function POST(request: NextRequest) {
       { status: 502 }
     );
   } catch (err: any) {
+    if (signal.aborted) throw err;
     return NextResponse.json(
       { success: false, message: "حدث خطأ أثناء إعادة إرسال الرمز" },
       { status: 500 }
     );
   }
+  });
 }

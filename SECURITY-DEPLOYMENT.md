@@ -7,6 +7,7 @@
 ### مفتاح تشفير دوال الخادم الثابت (Server Actions Persistent Key)
 يجب تعيين متغير البيئة `NEXT_SERVER_ACTIONS_ENCRYPTION_KEY` في بيئة الإنتاج والحاوية (Docker) لضمان عدم توليد مفتاح عشوائي جديد عند كل إعادة تشغيل للسيرفر أو عند وجود أكثر من حاوية خلف Load Balancer، مما يمنع حدوث أخطاء `failed-to-find-server-action`:
 ```bash
-NEXT_SERVER_ACTIONS_ENCRYPTION_KEY=KumNXbsXHTxE7lZZO8nfK/ZpXgU6K3z9x46dXP342YY=
+openssl rand -base64 32
 ```
 
+احفظ الناتج الخاص بك في `NEXT_SERVER_ACTIONS_ENCRYPTION_KEY` وقت البناء والتشغيل، واستخدم نفس المفتاح بين نسخ تطبيقك. لا تستخدم مفتاحًا منشورًا أو مثالًا ثابتًا.

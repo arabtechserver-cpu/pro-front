@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getBackendCandidates } from "../../../lib/api-proxy-candidates";
+import { streamRequestBody, forwardBody, admitProxyRequest } from '../../../lib/proxy-stream';
 
 /**
  * Smart catch-all API proxy with working URL caching.
@@ -20,7 +21,8 @@ let cachedBackendUrl: string | null = null;
 async function proxyRequest(
   request: NextRequest,
   targetUrl: string,
-  body: ArrayBuffer | undefined
+  body: ReadableStream<Uint8Array> | undefined,
+  signal: AbortSignal
 ): Promise<Response> {
   const forwardHeaders = new Headers();
 
@@ -69,13 +71,16 @@ async function proxyRequest(
     if (val) forwardHeaders.set(h, val);
   });
 
-  return fetch(targetUrl, {
+  const init: RequestInit & { duplex?: 'half' } = {
     method: request.method,
     headers: forwardHeaders,
     body,
     redirect: 'manual',
-    signal: AbortSignal.timeout(180000),
-  });
+    signal,
+    cache: 'no-store',
+  };
+  if (body) init.duplex = 'half';
+  return fetch(targetUrl, init);
 }
 
 
@@ -83,6 +88,8 @@ async function handler(
   request: NextRequest,
   { params }: { params: Promise<{ path: string[] }> }
 ) {
+  // One budget covers backend discovery and reading the complete response body.
+  const signal = AbortSignal.timeout(29000);
   const resolvedParams = await params;
   let path = resolvedParams.path.join('/');
   const search = request.nextUrl.search;
@@ -98,9 +105,9 @@ async function handler(
     return NextResponse.json({ ok: false }, { status: 404 });
   }
 
-  const candidates = getBackendCandidates(cachedBackendUrl, process.env.INTERNAL_API_URL);
+  const candidates = getBackendCandidates(cachedBackendUrl, process.env.INTERNAL_API_URL, process.platform === 'win32');
   if (process.platform === 'win32') {
-    if (!cachedBackendUrl && !candidates.includes('http://127.0.0.1:5000')) {
+    if (!cachedBackendUrl && !process.env.INTERNAL_API_URL && !candidates.includes('http://127.0.0.1:5000')) {
       candidates.unshift('http://127.0.0.1:5000');
     } else if (!candidates.includes('http://127.0.0.1:5000')) {
       candidates.push('http://127.0.0.1:5000');
@@ -109,14 +116,21 @@ async function handler(
   const isIdempotent = ['GET', 'HEAD', 'OPTIONS'].includes(request.method);
   const targets = isIdempotent ? candidates : candidates.slice(0, 1);
 
-  const body = isIdempotent ? undefined : await request.arrayBuffer();
+  const heavy = !isIdempotent && (/^(upload|transactions|backup|providers|api-providers)(\/|$)/.test(path) || Number(request.headers.get('content-length')) > 1024 * 1024 || (request.body !== null && !request.headers.has('content-length')));
+  let release: () => void;
+  try { release = await admitProxyRequest(heavy, signal); }
+  catch { return NextResponse.json({ error: 'Request queue timed out or is full. Please retry shortly.' }, { status: signal.aborted ? 504 : 503, headers: { 'Retry-After': '2' } }); }
+  let body: ReadableStream<Uint8Array> | undefined;
+  const imageBody = /^(upload|transactions)(\/|$)/.test(path);
+  try { body = isIdempotent ? undefined : streamRequestBody(request, (imageBody ? 15 : 5) * 1024 * 1024, signal); }
+  catch { release(); return NextResponse.json({ error: signal.aborted ? 'Request body timed out' : 'Request body exceeds the allowed size' }, { status: signal.aborted ? 408 : 413 }); }
 
   let lastError: unknown;
 
   for (const baseUrl of targets) {
     const targetUrl = `${baseUrl}/api/${path}${search}`;
     try {
-      const res = await proxyRequest(request, targetUrl, body);
+      const res = await proxyRequest(request, targetUrl, body, signal);
 
       const responseHeaders = new Headers();
       res.headers.forEach((val, key) => {
@@ -131,19 +145,18 @@ async function handler(
         console.log(`[API Proxy] Backend found at: ${baseUrl} - caching for future requests`);
       }
 
-      const responseBody = await res.arrayBuffer();
-      responseHeaders.set('content-length', responseBody.byteLength.toString());
 
       if (res.status >= 400) {
         console.warn(`[API Proxy] ${request.method} /api/${path} returned status ${res.status}`);
       }
 
-      return new NextResponse(responseBody, {
+      return new NextResponse(forwardBody(res.body, release), {
         status: res.status,
         headers: responseHeaders,
       });
     } catch (err: unknown) {
       lastError = err;
+      if (signal.aborted) break;
       const msg = err instanceof Error ? err.message : String(err);
       if (!msg.includes('ECONNREFUSED') && !msg.includes('ENOTFOUND')) {
         console.warn(`[API Proxy] ${baseUrl} failed: ${msg}`);
@@ -158,12 +171,15 @@ async function handler(
   }
 
   console.error(`[API Proxy] All backend URLs failed for /api/${path}`);
+  release();
   return NextResponse.json(
     {
-      error: 'Backend unavailable',
+      error: signal.aborted
+        ? (isIdempotent ? 'API request timed out after 29 seconds. Please retry.' : 'API request timed out. Check the request status before submitting it again.')
+        : 'Backend unavailable',
       hint: 'Set INTERNAL_API_URL=http://pro-b-i0r2xu:5000 in Dokploy frontend env vars',
     },
-    { status: 502 }
+    { status: signal.aborted ? 504 : 502 }
   );
 }
 

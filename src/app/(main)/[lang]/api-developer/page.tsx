@@ -1,5 +1,8 @@
 "use client";
 
+import { userApiFetch } from "@/lib/user-api-fetch";
+import { getUserAuthToken } from "@/lib/client-auth-token";
+
 import { useState, useEffect, use } from "react";
 import { useRouter } from "next/navigation";
 import { buildApiActivationPayload } from "../../../../lib/api-activation";
@@ -28,13 +31,13 @@ export default function ApiDeveloperPage(props: { params: Promise<{ lang: string
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const token = localStorage.getItem("user_token");
+        const token = getUserAuthToken(localStorage);
         if (!token) {
           router.push(`/${lang}/login`);
           return;
         }
 
-        const res = await fetch("/api/users/profile", {
+        const res = await userApiFetch("/api/users/profile", {
           headers: {
             "Authorization": `Bearer ${token}`
           },
@@ -70,8 +73,8 @@ export default function ApiDeveloperPage(props: { params: Promise<{ lang: string
   const handleActivateApi = async () => {
     setIsSubmitting(true);
     try {
-      const token = localStorage.getItem("user_token");
-      const res = await fetch("/api/users/request-api", {
+      const token = getUserAuthToken(localStorage);
+      const res = await userApiFetch("/api/users/request-api", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -111,8 +114,8 @@ export default function ApiDeveloperPage(props: { params: Promise<{ lang: string
 
     setIsRegenerating(true);
     try {
-      const token = localStorage.getItem("user_token");
-      const res = await fetch("/api/users/regenerate-api-key", {
+      const token = getUserAuthToken(localStorage);
+      const res = await userApiFetch("/api/users/regenerate-api-key", {
         method: "POST",
         headers: {
           "Authorization": `Bearer ${token}`
@@ -142,8 +145,8 @@ export default function ApiDeveloperPage(props: { params: Promise<{ lang: string
     e.preventDefault();
     setIsSavingSecurity(true);
     try {
-      const token = localStorage.getItem("user_token");
-      const res = await fetch("/api/users/save-api-security", {
+      const token = getUserAuthToken(localStorage);
+      const res = await userApiFetch("/api/users/save-api-security", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

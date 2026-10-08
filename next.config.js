@@ -4,12 +4,18 @@ const nextConfig = {
   output: 'standalone',
   compress: true,
   poweredByHeader: false,
+  cacheMaxMemorySize: 8 * 1024 * 1024,
   experimental: {
+    preloadEntriesOnStart: false,
+    imgOptConcurrency: 1,
+    imgOptSequentialRead: true,
+    imgOptMaxInputPixels: 16_000_000,
     serverActions: {
       bodySizeLimit: '10mb',
     },
   },
   images: {
+    maximumResponseBody: 10 * 1024 * 1024,
     formats: ['image/avif', 'image/webp'],
     remotePatterns: [
       {

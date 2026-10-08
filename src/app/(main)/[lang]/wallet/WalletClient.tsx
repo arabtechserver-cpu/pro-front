@@ -1,5 +1,7 @@
 "use client";
 
+import { userApiFetch } from "@/lib/user-api-fetch";
+
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -295,7 +297,7 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
     setIsVerifyingPayPal(true);
     try {
       const token = localStorage.getItem("user_token");
-      const res = await fetch("/api/wallet/paypal/capture-order", {
+      const res = await userApiFetch("/api/wallet/paypal/capture-order", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -482,7 +484,7 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
         headers["Authorization"] = `Bearer ${token}`;
       }
 
-      const res = await fetch("/api/transactions", {
+      const res = await userApiFetch("/api/transactions", {
         method: "POST",
         headers,
         credentials: "include",
@@ -1165,7 +1167,7 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
                         }
 
                         const token = localStorage.getItem("user_token");
-                        const res = await fetch("/api/wallet/paypal/create-order", {
+                        const res = await userApiFetch("/api/wallet/paypal/create-order", {
                           method: "POST",
                           headers: {
                             "Content-Type": "application/json",

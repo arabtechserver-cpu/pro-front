@@ -1,5 +1,7 @@
 "use client";
 
+import { userApiFetch } from "@/lib/user-api-fetch";
+
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -168,7 +170,7 @@ export default function ProfileClient({ lang, dict }: { lang: string; dict: any 
       }
 
       const query = parsed.id ? `userId=${encodeURIComponent(parsed.id)}` : `email=${encodeURIComponent(parsed.email)}`;
-      const res = await fetch(`/api/users/profile?${query}`, {
+      const res = await userApiFetch(`/api/users/profile?${query}`, {
         headers,
         credentials: "omit"
       });
@@ -208,7 +210,7 @@ export default function ProfileClient({ lang, dict }: { lang: string; dict: any 
       }
 
       const query = userSession.id ? `userId=${encodeURIComponent(userSession.id)}` : `email=${encodeURIComponent(userSession.email)}`;
-      const res = await fetch(`/api/orders?${query}`, {
+      const res = await userApiFetch(`/api/orders?${query}`, {
         headers,
         credentials: "include"
       });
@@ -238,7 +240,7 @@ export default function ProfileClient({ lang, dict }: { lang: string; dict: any 
       }
 
       const query = userSession.id ? `userId=${encodeURIComponent(userSession.id)}` : `email=${encodeURIComponent(userSession.email)}`;
-      const res = await fetch(`/api/transactions?${query}`, {
+      const res = await userApiFetch(`/api/transactions?${query}`, {
         headers,
         credentials: "include"
       });
@@ -308,7 +310,7 @@ export default function ProfileClient({ lang, dict }: { lang: string; dict: any 
         payload.newPassword = formData.newPassword;
       }
 
-      const res = await fetch("/api/users/update-credentials", {
+      const res = await userApiFetch("/api/users/update-credentials", {
         method: "POST",
         headers,
         body: JSON.stringify(payload)
@@ -316,6 +318,7 @@ export default function ProfileClient({ lang, dict }: { lang: string; dict: any 
 
       const data = await res.json();
       if (res.ok && data.success) {
+        if (data.token) localStorage.setItem('user_token', data.token);
         setSettingsSuccess(isAr ? "تم تحديث بيانات حسابك بنجاح!" : "Your account details were updated successfully!");
         setFormData(prev => ({
           ...prev,

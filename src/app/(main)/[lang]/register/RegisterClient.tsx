@@ -1,6 +1,7 @@
 ﻿"use client";
 
 import { useState, useMemo, useEffect, useCallback } from "react";
+import { securePassword } from '@/lib/secure-password';
 import Link from "next/link";
 import Script from "next/script";
 import { Locale } from "@/i18n/config";
@@ -356,11 +357,7 @@ export default function RegisterClient({ lang, dict }: { lang: Locale; dict: any
 
   // Generate Strong Password Generator (e.g. 3r43t54#X9!)
   const generateStrongPassword = () => {
-    const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*";
-    let generated = "";
-    for (let i = 0; i < 12; i++) {
-      generated += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
+    const generated = securePassword();
     setPassword(generated);
     setConfirmPassword(generated);
     setShowPassword(true);

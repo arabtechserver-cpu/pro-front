@@ -17,6 +17,12 @@ export default function LoginClient({ lang, dict }: { lang: Locale; dict: any })
   const [successMessage, setSuccessMessage] = useState("");
   const [turnstileToken, setTurnstileToken] = useState("");
 
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get("reason") === "session-expired") {
+      setErrorMessage(lang === "ar" ? "انتهت جلسة الدخول. سجّل دخولك مرة أخرى لاستكمال استخدام حسابك." : "Your session expired. Sign in again to continue.");
+    }
+  }, [lang]);
+
   // FORGOT PASSWORD MODAL STATE
   const [forgotModalOpen, setForgotModalOpen] = useState(false);
   const [forgotStep, setForgotStep] = useState<"email" | "otp_verify">("email");

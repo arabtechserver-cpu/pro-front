@@ -9,8 +9,8 @@ function isLocalhost(url) {
   return /localhost|127\.0\.0\.1|::1/.test(url);
 }
 
-function getBackendCandidates(cachedBackendUrl, internalApiUrl) {
-  const configuredUrl = internalApiUrl && !isLocalhost(internalApiUrl) ? internalApiUrl : null;
+function getBackendCandidates(cachedBackendUrl, internalApiUrl, allowLocal = false) {
+  const configuredUrl = internalApiUrl && (allowLocal || !isLocalhost(internalApiUrl)) ? internalApiUrl : null;
   return [cachedBackendUrl, configuredUrl, ...knownBackendUrls].filter(
     (url, index, all) => Boolean(url) && all.indexOf(url) === index
   );

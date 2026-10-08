@@ -1,5 +1,7 @@
 "use client";
 
+import { userApiFetch } from "@/lib/user-api-fetch";
+
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
@@ -32,7 +34,7 @@ export default function OrdersClient({ lang, dict }: { lang: string, dict: any }
           if (token && token !== "null" && token !== "undefined") {
             headers["Authorization"] = `Bearer ${token}`;
           }
-          fetch(`/api/users/profile?${queryParam}`, {
+          userApiFetch(`/api/users/profile?${queryParam}`, {
             headers,
             credentials: "include"
           })
@@ -66,7 +68,7 @@ export default function OrdersClient({ lang, dict }: { lang: string, dict: any }
       if (token && token !== "null" && token !== "undefined") {
         headers["Authorization"] = `Bearer ${token}`;
       }
-      const res = await fetch(`/api/orders?${param}`, {
+      const res = await userApiFetch(`/api/orders?${param}`, {
         headers,
         credentials: "include"
       });

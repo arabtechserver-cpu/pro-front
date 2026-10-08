@@ -1,5 +1,7 @@
 "use client";
 
+import { userApiFetch } from "@/lib/user-api-fetch";
+
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
@@ -110,7 +112,7 @@ export default function Navbar({ lang, dict }: NavbarProps) {
             if (token && token !== "null" && token !== "undefined") {
               headers["Authorization"] = `Bearer ${token}`;
             }
-            const res = await fetch(`/api/users/profile?${queryParam}`, {
+            const res = await userApiFetch(`/api/users/profile?${queryParam}`, {
               headers,
               credentials: "omit"  // لا نرسل cookies (admin_token) مع طلب البروفايل للمستخدم العادي
             });

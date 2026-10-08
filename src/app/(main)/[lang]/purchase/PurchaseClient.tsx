@@ -1,5 +1,7 @@
 "use client";
 
+import { userApiFetch } from "@/lib/user-api-fetch";
+
 import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
@@ -179,7 +181,7 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
           if (token && token !== "null" && token !== "undefined") {
             headers["Authorization"] = `Bearer ${token}`;
           }
-          fetch(`/api/users/profile?${queryParam}`, {
+          userApiFetch(`/api/users/profile?${queryParam}`, {
             headers,
             credentials: "include"
           })
@@ -739,7 +741,7 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
         headers["Authorization"] = `Bearer ${token}`;
       }
 
-      const res = await fetch("/api/orders", {
+      const res = await userApiFetch("/api/orders", {
         method: "POST",
         headers,
         credentials: "omit",

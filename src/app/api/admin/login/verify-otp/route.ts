@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import { authProxyBudget } from '../../../../../lib/auth-proxy-budget';
 
 export async function POST(request: NextRequest) {
+  return authProxyBudget(request, async (body, signal) => {
   try {
-    const body = await request.json().catch(() => ({}));
     const { challengeToken, otp } = body;
 
     if (!challengeToken || !otp) {
@@ -45,7 +46,8 @@ export async function POST(request: NextRequest) {
           method: "POST",
           headers: forwardHeaders,
           body: JSON.stringify({ challengeToken, otp, deviceToken, localIp, fingerprint: deviceFingerprint }),
-          cache: "no-store"
+          cache: "no-store",
+          signal
         });
 
         if (res.ok) {
@@ -85,8 +87,10 @@ export async function POST(request: NextRequest) {
           if (errData?.error || errData?.message) {
             lastErrorMessage = errData.error || errData.message;
           }
+          return NextResponse.json({ success: false, message: lastErrorMessage || 'تعذر التحقق' }, { status: res.status });
         }
       } catch {
+        if (signal.aborted) throw new Error('REQUEST_TIMEOUT');
         // Try next candidate URL
       }
     }
@@ -96,9 +100,11 @@ export async function POST(request: NextRequest) {
       { status: 502 }
     );
   } catch (err: any) {
+    if (signal.aborted) throw err;
     return NextResponse.json(
       { success: false, message: "حدث خطأ أثناء التحقق من الرمز" },
       { status: 500 }
     );
   }
+  });
 }

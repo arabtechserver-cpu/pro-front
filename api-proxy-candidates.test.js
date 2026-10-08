@@ -10,4 +10,6 @@ assert.deepEqual(candidates, [
   "http://pro-back:5000"
 ]);
 
+assert.equal(getBackendCandidates(null, 'http://127.0.0.1:5105', true)[0], 'http://127.0.0.1:5105');
+assert.ok(!getBackendCandidates(null, 'http://127.0.0.1:5105').includes('http://127.0.0.1:5105'));
 console.log("api proxy candidate tests passed");

@@ -1,5 +1,7 @@
 "use client";
 
+import { userApiFetch } from "@/lib/user-api-fetch";
+
 import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
@@ -587,7 +589,7 @@ export default function GamingClient({
           if (token && token !== "null" && token !== "undefined") {
             headers["Authorization"] = `Bearer ${token}`;
           }
-          fetch(`/api/users/profile?${queryParam}`, {
+          userApiFetch(`/api/users/profile?${queryParam}`, {
             headers,
             credentials: "include",
           })
@@ -1016,7 +1018,7 @@ export default function GamingClient({
         Object.values(fieldInputs)[0] ||
         (selectedProduct.deliveryType === "code" ? "كود رقمي فوري" : "شحن مباشر");
 
-      const res = await fetch("/api/foxreload/order", {
+      const res = await userApiFetch("/api/foxreload/order", {
         method: "POST",
         headers,
         body: JSON.stringify({

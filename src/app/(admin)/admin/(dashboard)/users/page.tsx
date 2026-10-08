@@ -1,6 +1,7 @@
 ﻿"use client";
 
 import { useState, useEffect, useMemo, useRef, useCallback } from "react";
+import { securePassword } from '@/lib/secure-password';
 
 interface UserItem {
   id: string;
@@ -361,11 +362,7 @@ export default function AdminUsersPage() {
 
   // Random Strong Password Generator
   const generateRandomNewPassword = () => {
-    const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*";
-    let generated = "";
-    for (let i = 0; i < 12; i++) {
-      generated += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
+    const generated = securePassword();
     setNewPassword(generated);
     setShowNewPassword(true);
   };

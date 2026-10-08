@@ -1,6 +1,10 @@
 function getUserAuthToken(storage) {
-  const token = storage.getItem("user_token") || storage.getItem("token");
-  return token && token !== "null" && token !== "undefined" ? token : null;
+  for (const key of ["user_token", "token"]) {
+    const raw = storage.getItem(key);
+    const token = raw && raw.trim().replace(/^["']|["']$/g, "").replace(/^Bearer\s+/i, "").trim();
+    if (token && !["null", "undefined", "false", "[object Object]"].includes(token)) return token;
+  }
+  return null;
 }
 
 module.exports = { getUserAuthToken };
