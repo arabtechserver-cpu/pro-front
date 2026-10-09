@@ -208,6 +208,7 @@ export default function ProvidersClient() {
   // Browse Services Modal State
   const [browseProvider, setBrowseProvider] = useState<Provider | null>(null);
   const [providerServices, setProviderServices] = useState<any[]>([]);
+  const [catalogWarning, setCatalogWarning] = useState<string>('');
   const [loadingServices, setLoadingServices] = useState(false);
   const [serviceLoadSource, setServiceLoadSource] = useState<"stored" | "remote" | null>(null);
   const [serviceSearch, setServiceSearch] = useState("");
@@ -466,6 +467,7 @@ export default function ProvidersClient() {
 
   const handleBrowseServices = async (provider: Provider, forceSource?: "stored" | "remote" | "auto") => {
     setBrowseProvider(provider);
+    setCatalogWarning('');
     setLoadingServices(true);
     setServiceSearch("");
     setPackageFilter("all");
@@ -481,6 +483,7 @@ export default function ProvidersClient() {
         return { ok: res.ok, data };
       }, preferred);
       setProviderServices(result.services);
+      setCatalogWarning(result.warning || '');
       setServiceLoadSource(result.source);
       setProviders((current) => current.map((item) => (
         item.id === provider.id && result.source === "stored" ? { ...item, servicesCount: result.services.length } : item
@@ -1477,6 +1480,7 @@ export default function ProvidersClient() {
                   </button>
                 </div>
 
+                {catalogWarning && <p role="status" className="text-xs text-amber-400 bg-amber-500/10 rounded-xl p-3">{catalogWarning}</p>}
                 {serviceLoadSource === "remote" && (
                   <span className="text-[10px] sm:text-[11px] text-sky-400 font-bold bg-sky-500/10 border border-sky-500/20 px-2.5 py-0.5 sm:py-1 rounded-xl flex items-center gap-1">
                     <span className="material-symbols-outlined text-xs">tune</span>

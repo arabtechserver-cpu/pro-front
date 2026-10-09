@@ -42,6 +42,16 @@ async function run() {
   assert.equal(storedResult.source, "stored");
   assert.equal(storedResult.services[0].id, "stored-1");
 
+  for (const services of [[], [{ id: 'ready-service' }]]) {
+    const refreshing = await loadProviderServicesForBrowse('refreshing-provider', async () => ({
+      ok: true, data: { success: true, services, catalogComplete: false, warning: 'Provider is refreshing' }
+    }), 'remote');
+    assert.deepEqual(refreshing, { services, source: 'remote', warning: 'Provider is refreshing' });
+  }
+  await assert.rejects(loadProviderServicesForBrowse('empty-provider', async () => ({
+    ok: true, data: { success: true, services: [] }
+  }), 'remote'), /لم يتم العثور/);
+
   console.log("provider service browse tests passed");
 }
 

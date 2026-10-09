@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getBackendCandidates } from "../../../lib/api-proxy-candidates";
 import { streamRequestBody, forwardBody, admitProxyRequest } from '../../../lib/proxy-stream';
+import { isBackendConnectionFailure } from '../../../lib/api-proxy-errors';
 
 /**
  * Smart catch-all API proxy with working URL caching.
@@ -126,6 +127,7 @@ async function handler(
   catch { release(); return NextResponse.json({ error: signal.aborted ? 'Request body timed out' : 'Request body exceeds the allowed size' }, { status: signal.aborted ? 408 : 413 }); }
 
   let lastError: unknown;
+  let cachedConnectionFailed = false;
 
   for (const baseUrl of targets) {
     const targetUrl = `${baseUrl}/api/${path}${search}`;
@@ -156,6 +158,7 @@ async function handler(
       });
     } catch (err: unknown) {
       lastError = err;
+      if (baseUrl === cachedBackendUrl && isBackendConnectionFailure(err)) cachedConnectionFailed = true;
       if (signal.aborted) break;
       const msg = err instanceof Error ? err.message : String(err);
       if (!msg.includes('ECONNREFUSED') && !msg.includes('ENOTFOUND')) {
@@ -164,20 +167,21 @@ async function handler(
     }
   }
 
-  // If cached URL failed (backend restarted?), clear cache and let next request retry
-  if (cachedBackendUrl) {
+  // Forget a cached address only after a connection or DNS failure.
+  if (cachedBackendUrl && cachedConnectionFailed) {
     console.warn(`[API Proxy] Cached backend ${cachedBackendUrl} is down - resetting cache`);
     cachedBackendUrl = null;
   }
 
-  console.error(`[API Proxy] All backend URLs failed for /api/${path}`);
+  if (signal.aborted) console.warn(`[API Proxy] Request deadline exceeded for /api/${path}; timeout alone does not mark the backend down`);
+  else console.error(`[API Proxy] Backend request failed for /api/${path}`);
   release();
   return NextResponse.json(
     {
       error: signal.aborted
         ? (isIdempotent ? 'API request timed out after 29 seconds. Please retry.' : 'API request timed out. Check the request status before submitting it again.')
         : 'Backend unavailable',
-      hint: 'Set INTERNAL_API_URL=http://pro-b-i0r2xu:5000 in Dokploy frontend env vars',
+      ...(!signal.aborted ? { hint: 'Check the backend service and INTERNAL_API_URL in Dokploy frontend env vars' } : {}),
     },
     { status: signal.aborted ? 504 : 502 }
   );

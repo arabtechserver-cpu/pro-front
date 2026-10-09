@@ -4,7 +4,7 @@
  * @param {string} providerId
  * @param {(url: string) => Promise<{ ok: boolean, data: any }>} request
  * @param {"auto" | "stored" | "remote"} [sourcePreference="auto"]
- * @returns {Promise<{ services: any[], source: "stored" | "remote" }>}
+ * @returns {Promise<{ services: any[], source: "stored" | "remote", warning?: string }>}
  */
 async function loadProviderServicesForBrowse(providerId, request, sourcePreference = "auto") {
   if (sourcePreference === "remote") {
@@ -13,8 +13,8 @@ async function loadProviderServicesForBrowse(providerId, request, sourcePreferen
       ? liveResponse.data.services
       : [];
 
-    if (liveResponse.ok && liveResponse.data?.success && liveServices.length > 0) {
-      return { services: liveServices, source: "remote" };
+    if (liveResponse.ok && liveResponse.data?.success && (liveServices.length > 0 || liveResponse.data?.catalogComplete === false)) {
+      return { services: liveServices, source: "remote", ...(liveResponse.data?.catalogComplete === false ? { warning: liveResponse.data.warning || 'خدمات إضافية من المزود ما زالت تتحدث.' } : {}) };
     }
     throw new Error(liveResponse.data?.error || "لم يتم العثور على خدمات في API المزود أو تعذر الاتصال");
   }
@@ -52,8 +52,8 @@ async function loadProviderServicesForBrowse(providerId, request, sourcePreferen
     ? liveResponse.data.services
     : [];
 
-  if (liveResponse.ok && liveResponse.data?.success && liveServices.length > 0) {
-    return { services: liveServices, source: "remote" };
+  if (liveResponse.ok && liveResponse.data?.success && (liveServices.length > 0 || liveResponse.data?.catalogComplete === false)) {
+    return { services: liveServices, source: "remote", ...(liveResponse.data?.catalogComplete === false ? { warning: liveResponse.data.warning || 'خدمات إضافية من المزود ما زالت تتحدث.' } : {}) };
   }
 
   throw new Error(liveResponse.data?.error || storedError || "لم يتم العثور على خدمات للمزود");
