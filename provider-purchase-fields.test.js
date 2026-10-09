@@ -1,6 +1,17 @@
 const assert = require('node:assert/strict');
 const { test } = require('node:test');
 const { getProviderCustomFields, supportsProviderQuantity } = require('./src/lib/purchase-service-fields');
+const { getProviderFieldOptionChoices, getFoxreloadNoteFields } = require('./src/lib/purchase-service-fields');
+
+test('provider selects show labels while sending exact values; FoxReload optional fields remain visible', () => {
+ const choices = [{ value: 'eu-1', label: 'Europe' }, { value: 'us-2', label: 'United States' }];
+ assert.deepEqual(getProviderFieldOptionChoices({ options: choices }), choices);
+ assert.deepEqual(getProviderFieldOptionChoices({ options: ['eu-1', 'us-2'], option_choices: choices }), choices);
+ assert.deepEqual(getProviderFieldOptionChoices({ options: 'A|B' }), [{ value: 'A', label: 'A' }, { value: 'B', label: 'B' }]);
+ const fields = getFoxreloadNoteFields({ requiredNoteFields: ['Email'], noteFieldTypes: { Email: 'email', extra: 'integer' }, noteFieldOptions: { region: choices } });
+ assert.deepEqual(fields.map(f => [f.name, f.required]), [['Email', true], ['extra', false], ['region', false]]);
+ assert.deepEqual(fields[2].choices, choices);
+});
 test('preserve provider QNT and omit admin-only fields in both formats', () => {
  for (const raw of [
  [{ id: 'custom_QNT', field_id: 'QNT', type: 'quantity' }, { field_id: 'Email', adminonly: '0' }, { field_id: 'Internal', adminonly: '1' }],

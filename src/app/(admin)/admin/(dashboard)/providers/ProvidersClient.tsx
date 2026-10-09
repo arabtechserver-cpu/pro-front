@@ -465,7 +465,7 @@ export default function ProvidersClient() {
     }
   };
 
-  const handleBrowseServices = async (provider: Provider, forceSource?: "stored" | "remote" | "auto") => {
+  const handleBrowseServices = async (provider: Provider, forceSource?: "stored" | "remote" | "auto", section: ProviderServiceTypeFilter = "all") => {
     setBrowseProvider(provider);
     setCatalogWarning('');
     setLoadingServices(true);
@@ -473,7 +473,7 @@ export default function ProvidersClient() {
     setPackageFilter("all");
     setSelectedGroupNames([]);
     setExpandedGroups({});
-    setServiceTypeFilter("all");
+    setServiceTypeFilter(section);
     setVisibleGroupsLimit(25);
     try {
       const preferred = forceSource || (serviceLoadSource || "auto");
@@ -1712,6 +1712,17 @@ export default function ProvidersClient() {
                 <div className="p-16 text-center text-on-surface-variant text-xs space-y-3">
                   <span className="material-symbols-outlined text-4xl text-on-surface-variant/40">category</span>
                   <p className="font-bold text-on-surface text-sm">لا توجد باقات أو خدمات مطابقة للبحث.</p>
+                  {serviceTypeFilter === 'esim' && !serviceSearch.trim() && packageFilter === 'all' && browseProvider && (
+                    <>
+                      <p>{serviceLoadSource === 'stored'
+                        ? 'القائمة المحفوظة لا تحتوي على باقات eSIM. اجلب الباقات من API Live ثم استورد الدول والباقات التي تريد إظهارها للعملاء.'
+                        : catalogWarning ? 'قسم eSIM ما زال يتحدث من المزود. أعد جلب الباقات بعد اكتمال التحديث.' : 'المزود لم يرجع باقات eSIM في هذه القائمة. جرّب تحديث API Live.'}</p>
+                      <button type="button" onClick={() => handleBrowseServices(browseProvider, 'remote', 'esim')} className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-on-primary font-bold">
+                        <span className="material-symbols-outlined text-base">cloud_sync</span>
+                        جلب باقات eSIM من API Live
+                      </button>
+                    </>
+                  )}
                 </div>
               ) : (
                 <>

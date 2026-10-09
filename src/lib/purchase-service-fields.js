@@ -89,4 +89,26 @@ function supportsProviderQuantity(service) {
   return Object.entries(getProviderCustomFields(service) || {}).some(([key, field]) => isProviderQuantityField(field, key));
 }
 
-module.exports = { shouldShowDefaultImeiField, getProviderCustomFields, isProviderQuantityField, supportsProviderQuantity, isPrimaryTargetCustomField };
+function getProviderFieldOptionChoices(field) {
+  let raw = field?.option_choices ?? field?.options ?? field?.fieldoptions ?? field?.FIELDOPTIONS ?? field?.Options;
+  if (typeof raw === 'string') {
+    try { raw = JSON.parse(raw); } catch { raw = raw.split(/\\n|[\r\n,|]+/).map(v => v.trim()).filter(Boolean); }
+  }
+  if (!raw || typeof raw !== 'object') return [];
+  const entries = Array.isArray(raw) ? raw.map((v, i) => [String(i), v]) : Object.entries(raw);
+  return entries.flatMap(([key, item]) => {
+    const value = item && typeof item === 'object' ? item.value ?? item.id : Array.isArray(raw) ? item : key;
+    if (value === undefined || value === null || String(value) === '' || typeof value === 'object') return [];
+    return [{ value: String(value), label: String(item && typeof item === 'object' ? item.label ?? item.name ?? value : item) }];
+  });
+}
+
+function getFoxreloadNoteFields(product) {
+  const required = product?.requiredNoteFields || [];
+  return Array.from(new Set([...required, ...Object.keys(product?.noteFieldTypes || {}), ...Object.keys(product?.noteFieldOptions || {})]), name => ({
+    name, required: required.includes(name), type: product?.noteFieldTypes?.[name] || 'string',
+    choices: getProviderFieldOptionChoices({ options: product?.noteFieldOptions?.[name] })
+  }));
+}
+
+module.exports = { shouldShowDefaultImeiField, getProviderCustomFields, isProviderQuantityField, supportsProviderQuantity, isPrimaryTargetCustomField, getProviderFieldOptionChoices, getFoxreloadNoteFields };

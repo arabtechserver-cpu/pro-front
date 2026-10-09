@@ -5,7 +5,7 @@ import { userApiFetch } from "@/lib/user-api-fetch";
 import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { shouldShowDefaultImeiField, getProviderCustomFields, isProviderQuantityField as isQuantityField, supportsProviderQuantity, isPrimaryTargetCustomField } from "../../../../lib/purchase-service-fields";
+import { shouldShowDefaultImeiField, getProviderCustomFields, isProviderQuantityField as isQuantityField, supportsProviderQuantity, isPrimaryTargetCustomField, getProviderFieldOptionChoices } from "../../../../lib/purchase-service-fields";
 import { cleanHtmlToText, stripEmojis } from "@/utils/cleanHtml";
 
 function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
@@ -84,30 +84,6 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
   };
 
   // Helper to extract options list for select/dropdown fields — يقرأ من بيانات Dhru API الحقيقية
-  const extractFieldOptions = (key: string, fieldObj: any): string[] => {
-    let options: string[] = [];
-    const raw = fieldObj?.options ?? fieldObj?.fieldoptions ?? fieldObj?.FIELDOPTIONS ?? fieldObj?.Options;
-
-    if (Array.isArray(raw)) {
-      options = raw
-        .map((item: any) => {
-          if (typeof item === 'string') return item.trim();
-          if (item?.value !== undefined) return String(item.value).trim();
-          if (item?.label !== undefined) return String(item.label).trim();
-          return String(item).trim();
-        })
-        .filter(Boolean);
-    } else if (typeof raw === 'string' && raw.trim()) {
-      if (raw.includes('Router Beeline')) {
-        options = ['Router Beeline TC-100', 'Router Beeline TC-150'];
-      } else {
-        options = raw.split(/\\n|[\r\n,|]+/).map((s: string) => s.trim()).filter(Boolean);
-      }
-    }
-
-    return options;
-  };
-
   const getLocalizedFieldLabel = (rawKey: string, fieldObj: any, lang: string): string => {
     const raw = fieldObj?.label || fieldObj?.fieldname || fieldObj?.reqid || fieldObj?.name || rawKey;
     const clean = String(raw).replace(/^custom_/i, '').trim();
@@ -1260,7 +1236,7 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
                         const cleanLabel = getLocalizedFieldLabel(key, fieldObj, lang);
                         const fieldType = (fieldObj?.fieldtype || fieldObj?.type || fieldObj?.FIELDTYPE || '').toLowerCase();
                         const fieldDesc = fieldObj?.description || fieldObj?.DESCRIPTION || fieldObj?.hint || fieldObj?.custominfo || '';
-                        const optionsList = extractFieldOptions(key, fieldObj);
+                        const optionsList = getProviderFieldOptionChoices(fieldObj);
                         const isLong = isLongTextField(key, fieldObj);
                         const isRequired = fieldObj?.required === true || fieldObj?.required === 1 || fieldObj?.required === '1' || fieldObj?.required === 'on';
                         const fieldId = `custom-field-${key}`;
@@ -1290,7 +1266,7 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
                               >
                                 <option value="">{lang === 'ar' ? '-- اختر من القائمة --' : '-- Select from list --'}</option>
                                 {optionsList.map((opt, i) => (
-                                  <option key={i} value={opt}>{opt}</option>
+                                  <option key={i} value={opt.value}>{opt.label}</option>
                                 ))}
                               </select>
                               {fieldDesc && (
@@ -1356,7 +1332,8 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
                               id={fieldId}
                               name={key}
                               aria-label={cleanLabel}
-                              type={fieldType === "password" ? "password" : "text"}
+                              type={["password", "email", "number"].includes(fieldType) ? fieldType : "text"}
+                              step={fieldType === 'number' && fieldObj?.provider_field_type === 'number' ? 'any' : undefined}
                               value={customFieldValues[key] || ""}
                               onChange={(e) => setCustomFieldValues({ ...customFieldValues, [key]: e.target.value })}
                               placeholder={lang === 'ar' ? `أدخل ${cleanLabel}...` : `Enter ${cleanLabel}...`}

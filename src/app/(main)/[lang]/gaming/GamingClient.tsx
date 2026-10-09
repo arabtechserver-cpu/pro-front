@@ -1,6 +1,7 @@
 "use client";
 
 import { userApiFetch } from "@/lib/user-api-fetch";
+import { getFoxreloadNoteFields } from "@/lib/purchase-service-fields";
 
 import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import Link from "next/link";
@@ -1494,24 +1495,29 @@ export default function GamingClient({
                   )}
 
                   {/* REQUIRED DATA FIELDS (بيانات الشحن المطلوبة) */}
-                  {selectedProduct.deliveryType !== "code" &&
-                  Array.isArray(selectedProduct.requiredNoteFields) &&
-                  selectedProduct.requiredNoteFields.length > 0 ? (
+                  {getFoxreloadNoteFields(selectedProduct).length > 0 ? (
                     <div className="space-y-3.5 bg-surface-container/60 p-4 sm:p-5 rounded-2xl border border-outline-variant/30">
                       <div className="text-xs font-extrabold text-primary flex items-center gap-1.5 uppercase tracking-wider">
                         <span className="material-symbols-outlined text-base">person</span>
-                        <span>{isAr ? "بيانات الحساب المطلوبة للشحن المباشر:" : "Required Account Information:"}</span>
+                        <span>{isAr ? "بيانات تنفيذ الطلب:" : "Order Information:"}</span>
                       </div>
 
-                      {selectedProduct.requiredNoteFields.map((field) => (
+                      {getFoxreloadNoteFields(selectedProduct).map(({ name: field, required, type, choices }) => (
                         <div key={field} className="space-y-1.5">
                           <label className="block text-xs font-bold text-on-surface">
-                            {getFieldLabel(field)} <span className="text-rose-400">*</span>
+                            {getFieldLabel(field)} {required ? <span className="text-rose-400">*</span> : <span className="text-on-surface-variant">{isAr ? '(اختياري)' : '(Optional)'}</span>}
                           </label>
-                          <input
-                            type="text"
-                            required
-                            autoFocus
+                          {choices.length > 0 ? (
+                            <select aria-label={getFieldLabel(field)} required={required}
+                              value={fieldInputs[field] || ''} onChange={(e) => handleFieldChange(field, e.target.value)}
+                              className="w-full px-4 py-3 bg-surface-container-highest border border-outline-variant/40 rounded-xl text-sm text-on-surface focus:outline-none focus:border-primary">
+                              <option value="">{isAr ? '-- اختر من القائمة --' : '-- Select --'}</option>
+                              {choices.map(choice => <option key={choice.value} value={choice.value}>{choice.label}</option>)}
+                            </select>
+                          ) : <input
+                            type={type === 'email' ? 'email' : ['integer', 'number'].includes(type) ? 'number' : 'text'}
+                            step={type === 'integer' ? 1 : type === 'number' ? 'any' : undefined}
+                            required={required}
                             placeholder={
                               isAr
                                 ? `أدخل ${getFieldLabel(field)} الخاص بك هنا بدقة...`
@@ -1520,30 +1526,29 @@ export default function GamingClient({
                             value={fieldInputs[field] || ""}
                             onChange={(e) => handleFieldChange(field, e.target.value)}
                             className="w-full px-4 py-3 bg-surface-container-highest border border-outline-variant/40 rounded-xl text-sm text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none focus:border-primary font-mono shadow-inner"
-                          />
+                          />}
                         </div>
                       ))}
 
-                      {selectedProduct.userGuide && (
-                        <div className="text-[11px] text-on-surface-variant flex items-start gap-1.5 pt-1">
-                          <span className="material-symbols-outlined text-sm text-primary shrink-0">info</span>
-                          <span>{selectedProduct.userGuide}</span>
-                        </div>
-                      )}
                     </div>
                   ) : (
                     <div className="p-4 rounded-2xl bg-surface-container/60 border border-outline-variant/30 text-xs sm:text-sm text-on-surface-variant flex items-center gap-3">
                       <span className="material-symbols-outlined text-primary text-2xl">confirmation_number</span>
                       <div>
                         <span className="font-bold text-on-surface block text-sm">
-                          {isAr ? "تسليم كود رقمي فوري" : "Instant Digital Voucher"}
+                          {selectedProduct.deliveryType === 'code' ? (isAr ? 'تسليم كود رقمي' : 'Digital Voucher') : (isAr ? 'تنفيذ الطلب' : 'Order Delivery')}
                         </span>
                         <span className="text-xs">
-                          {isAr
-                            ? "هذه الخدمة كود رقمي ولا تتطلب إدخال آيدي، سيتم تسليم الكود وتفاصيل البطاقة مباشرة على الشاشة فور تأكيد الطلب وحفظها في حسابك."
-                            : "No account ID required. Your voucher code will be displayed instantly upon checkout."}
+                          {isAr ? 'الخدمة لا تتطلب بيانات إضافية. تابع نتيجة التنفيذ من طلباتك.' : 'No additional information is required. Track delivery in your orders.'}
                         </span>
                       </div>
+                    </div>
+                  )}
+
+                  {(selectedProduct.description || selectedProduct.userGuide) && (
+                    <div className="text-xs text-on-surface-variant space-y-2 whitespace-pre-wrap rounded-xl border border-outline-variant/30 p-4">
+                      {selectedProduct.description && <p>{selectedProduct.description}</p>}
+                      {selectedProduct.userGuide && <p>{selectedProduct.userGuide}</p>}
                     </div>
                   )}
 
