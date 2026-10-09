@@ -24,6 +24,7 @@ interface PaymentMethod {
   instructionsAr: string;
   instructionsEn: string;
   isAutomaticPayPal?: boolean;
+  isAutomaticBinance?: boolean;
   isBankak?: boolean;
   isFawry?: boolean;
   isRewarble?: boolean;
@@ -108,6 +109,16 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
 
   const [currencyConfig, setCurrencyConfig] = useState<CurrencyConfig | null>(null);
   const [isVerifyingPayPal, setIsVerifyingPayPal] = useState<boolean>(false);
+  const [isVerifyingBinance, setIsVerifyingBinance] = useState<boolean>(false);
+  const [binanceModalData, setBinanceModalData] = useState<{
+    orderId: string;
+    prepayId?: string;
+    checkoutUrl?: string;
+    universalUrl?: string;
+    qrContent?: string;
+    amount: number;
+  } | null>(null);
+  const [binancePollingActive, setBinancePollingActive] = useState<boolean>(false);
   const [transactions, setTransactions] = useState<DBTransaction[]>([]);
 
   // Fetch Currency & Payment Settings from Backend
@@ -164,6 +175,17 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
         handlePayPalReturnCapture(paypalToken, currentUser);
       } else if (paypalStatus === "cancel") {
         setErrorMessage(lang === "ar" ? "تم إلغاء عملية الدفع عبر PayPal." : "PayPal payment was cancelled.");
+      }
+
+      const binanceStatus = urlParams.get("binance");
+      const binanceOrderId = urlParams.get("orderId");
+      if (binanceStatus === "success" || binanceOrderId) {
+        const targetId = binanceOrderId || (typeof window !== "undefined" ? localStorage.getItem("pending_binance_order") : null);
+        if (targetId) {
+          handleBinanceCheckOrder(targetId, currentUser);
+        }
+      } else if (binanceStatus === "cancel") {
+        setErrorMessage(lang === "ar" ? "تم إلغاء عملية الدفع عبر باينانس." : "Binance Pay payment was cancelled.");
       }
     }
   }, [lang, router]);
@@ -242,20 +264,17 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
     },
     {
       id: "binance",
-      nameAr: "Binance Pay (باينانس)",
-      nameEn: "Binance Pay",
+      nameAr: "Binance Pay (باينانس فوري تلقائي)",
+      nameEn: "Binance Pay (Instant Auto)",
       badge: "PAY",
       icon: "currency_exchange",
       color: "from-amber-500 to-yellow-600",
       copyValue: currencyConfig?.binance?.payId || "",
-      detailLabelAr: "معرف باينانس باي (Binance Pay ID):",
-      detailLabelEn: "Binance Pay ID:",
-      instructionsAr:
-        currencyConfig?.binance?.instructionsAr ||
-        "افتح تطبيق باينانس واكتب معرف Binance Pay ID ثم ارفق لقطة الشاشة للتأكيد.",
-      instructionsEn:
-        currencyConfig?.binance?.instructionsEn ||
-        "Open Binance App and send funds via Pay ID then attach payment screenshot."
+      detailLabelAr: "الدفع التلقائي المباشر عبر باينانس (Binance Pay):",
+      detailLabelEn: "Direct Binance Pay Instant Payment:",
+      instructionsAr: "ادخل المبلغ واضغط على دفع عبر باينانس لفتح بوابة Binance Pay مباشرة، والخصم من حسابك وشحن المحفظة فوراً دون انتظار.",
+      instructionsEn: "Enter amount and click Pay with Binance to open Binance Pay gateway directly with instant automatic credit.",
+      isAutomaticBinance: true
     },
     {
       id: "bnb",
@@ -339,6 +358,124 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
       setIsVerifyingPayPal(false);
     }
   };
+
+  // Handle Binance Pay Order Creation & Modal Activation
+  const handleStartBinancePay = async () => {
+    setErrorMessage("");
+    setSuccessMessage("");
+    const num = parseFloat(depositAmount || "0");
+    if (isNaN(num) || num < 1.0) {
+      setErrorMessage(lang === "ar" ? "الحد الأدنى للإيداع عبر Binance Pay هو $1.00 USD" : "Minimum deposit is $1.00 USD");
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const token = localStorage.getItem("user_token");
+      const res = await userApiFetch("/api/wallet/binance/create-order", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {})
+        },
+        body: JSON.stringify({ amount: num })
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.success || !data.orderId) {
+        setErrorMessage(data.error || (lang === "ar" ? "فشل إنشاء طلب الدفع عبر Binance Pay" : "Failed to create Binance Pay order"));
+        return;
+      }
+
+      if (typeof window !== "undefined") {
+        localStorage.setItem("pending_binance_order", data.orderId);
+      }
+
+      setBinanceModalData({
+        orderId: data.orderId,
+        prepayId: data.prepayId,
+        checkoutUrl: data.checkoutUrl,
+        universalUrl: data.universalUrl,
+        qrContent: data.qrContent,
+        amount: data.amount
+      });
+      setBinancePollingActive(true);
+    } catch {
+      setErrorMessage(lang === "ar" ? "خطأ في الاتصال بسيرفر Binance Pay" : "Connection error creating Binance Pay order");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Check Binance Order Status (Manual & Auto Polling)
+  const handleBinanceCheckOrder = async (orderId: string, userObj?: any, silent = false) => {
+    if (!orderId) return false;
+    if (!silent) setIsVerifyingBinance(true);
+
+    try {
+      const token = localStorage.getItem("user_token");
+      const res = await userApiFetch("/api/wallet/binance/check-order", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {})
+        },
+        body: JSON.stringify({ orderId })
+      });
+
+      const data = await res.json();
+      if (res.ok && data.success && data.paid) {
+        setBinancePollingActive(false);
+        setBinanceModalData(null);
+        if (typeof window !== "undefined") {
+          localStorage.removeItem("pending_binance_order");
+        }
+
+        const successMsg = lang === "ar"
+          ? `تم استلام الدفعة واعتماد الشحن التلقائي بمبلغ $${data.amount} USD بنجاح! رصيدك الجديد: $${data.balance}`
+          : `Payment successful! $${data.amount} USD added. New balance: $${data.balance}`;
+        setSuccessMessage(successMsg);
+
+        if (userObj || userSession) {
+          const updated = { ...(userObj || userSession), balance: data.balance };
+          localStorage.setItem("user_session", JSON.stringify(updated));
+          setUserSession(updated);
+          window.dispatchEvent(new Event("user_session_change"));
+        }
+
+        fetchRealTransactions(userObj?.id || userSession?.id, userObj?.email || userSession?.email);
+
+        if (window.history.replaceState) {
+          window.history.replaceState({}, document.title, window.location.pathname);
+        }
+        return true;
+      } else if (!silent && data.error) {
+        setErrorMessage(data.error);
+      }
+      return false;
+    } catch {
+      if (!silent) {
+        setErrorMessage(lang === "ar" ? "خطأ في الاتصال أثناء التحقق من الدفع" : "Connection error checking payment");
+      }
+      return false;
+    } finally {
+      if (!silent) setIsVerifyingBinance(false);
+    }
+  };
+
+  // Auto-polling for active Binance Pay order
+  useEffect(() => {
+    if (!binancePollingActive || !binanceModalData?.orderId) return;
+
+    const interval = setInterval(async () => {
+      const isPaid = await handleBinanceCheckOrder(binanceModalData.orderId, userSession, true);
+      if (isPaid) {
+        clearInterval(interval);
+      }
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, [binancePollingActive, binanceModalData?.orderId, userSession]);
 
   const fetchRealTransactions = async (userId?: string, email?: string) => {
     setIsFetchingTx(true);
@@ -454,7 +591,7 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
       return;
     }
 
-    if (activeMethod.isAutomaticPayPal) {
+    if (activeMethod.isAutomaticPayPal || activeMethod.isAutomaticBinance) {
       return;
     }
 
@@ -554,6 +691,119 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
                   ? "يتم الآن التواصل مع خوادم PayPal للتحقق من وصول المبلغ وتأكيد الشحن الفوري في محفظتك."
                   : "Contacting PayPal servers to confirm real payment receipt and credit your wallet."}
               </p>
+            </div>
+          </div>
+        )}
+
+        {/* BINANCE VERIFICATION OVERLAY */}
+        {isVerifyingBinance && (
+          <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-xl flex items-center justify-center p-4 animate-in fade-in duration-300">
+            <div className="bg-surface-container-lowest border border-amber-400/40 rounded-3xl p-8 max-w-md w-full shadow-2xl space-y-4 text-center">
+              <span className="w-12 h-12 border-4 border-amber-400 border-t-transparent rounded-full animate-spin mx-auto block"></span>
+              <h3 className="text-xl font-bold text-white">
+                {lang === "ar" ? "جاري التحقق من عملية الدفع عبر باينانس..." : "Verifying Binance payment..."}
+              </h3>
+              <p className="text-sm text-slate-300 leading-relaxed">
+                {lang === "ar"
+                  ? "يتم الآن التواصل مع خوادم Binance Pay للتحقق من وصول المبلغ وتأكيد الشحن الفوري في محفظتك."
+                  : "Contacting Binance servers to confirm payment receipt and credit your wallet."}
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* BINANCE PAY CHECKOUT MODAL */}
+        {binanceModalData && (
+          <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-xl flex items-center justify-center p-4 animate-in fade-in duration-200">
+            <div className="bg-surface-container-lowest border-2 border-amber-500/50 rounded-3xl p-6 sm:p-8 max-w-lg w-full shadow-2xl space-y-5 text-center relative overflow-hidden">
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-500 to-yellow-600 text-white flex items-center justify-center text-3xl mx-auto shadow-lg shadow-amber-500/30">
+                <span className="material-symbols-outlined">currency_exchange</span>
+              </div>
+
+              <div className="space-y-1">
+                <h3 className="text-xl font-black text-white">
+                  {lang === "ar" ? "بوابة الدفع - باينانس باي (Binance Pay)" : "Binance Pay Gateway"}
+                </h3>
+                <p className="text-xs text-on-surface-variant font-mono">
+                  {lang === "ar" ? "رقم العملية:" : "Order Ref:"} {binanceModalData.orderId}
+                </p>
+                <div className="inline-block px-4 py-1.5 rounded-full bg-amber-500/20 border border-amber-500/40 text-amber-300 font-mono font-black text-lg mt-1">
+                  ${binanceModalData.amount.toFixed(2)} USDT
+                </div>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-surface-container border border-outline-variant/30 text-start space-y-2 text-xs">
+                <div className="flex items-center gap-2 text-amber-400 font-bold">
+                  <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span>
+                  <span>{lang === "ar" ? "خطوات إتمام الدفع والخصم:" : "Payment Instructions:"}</span>
+                </div>
+                <ol className="list-decimal list-inside space-y-1.5 text-slate-300 font-medium">
+                  <li>
+                    {lang === "ar"
+                      ? "اضغط على الزر بالأسفل للانتقال لصفحة الدفع في باينانس أو فتح التطبيق."
+                      : "Click below to proceed to Binance Pay checkout or open the app."}
+                  </li>
+                  <li>
+                    {lang === "ar"
+                      ? "قم بتأكيد الدفع في باينانس وسيتم خصم المبلغ وإيداعه في محفظتك تلقائياً."
+                      : "Confirm payment in Binance. Funds are credited to your balance instantly."}
+                  </li>
+                </ol>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="space-y-3">
+                {binanceModalData.checkoutUrl && (
+                  <a
+                    href={binanceModalData.checkoutUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full bg-gradient-to-r from-amber-500 via-amber-600 to-yellow-600 text-slate-950 py-3.5 px-4 rounded-xl font-black text-sm hover:shadow-xl hover:shadow-amber-500/30 transition-all flex items-center justify-center gap-2 shadow-md active:scale-95"
+                  >
+                    <span className="material-symbols-outlined text-lg">open_in_new</span>
+                    <span>{lang === "ar" ? "الانتقال لصفحة الدفع الرسمية (Binance Checkout)" : "Go to Binance Checkout"}</span>
+                  </a>
+                )}
+
+                {binanceModalData.universalUrl && (
+                  <a
+                    href={binanceModalData.universalUrl}
+                    className="w-full bg-surface-container-high border border-amber-500/40 text-amber-300 hover:bg-amber-500/20 py-3 px-4 rounded-xl font-bold text-xs transition-all flex items-center justify-center gap-2"
+                  >
+                    <span className="material-symbols-outlined text-base">smartphone</span>
+                    <span>{lang === "ar" ? "فتح تطبيق باينانس على الهاتف (App Deep Link)" : "Open Binance App"}</span>
+                  </a>
+                )}
+              </div>
+
+              {/* Live Status Tracker */}
+              <div className="p-3.5 rounded-xl bg-surface-container-low border border-outline-variant/20 flex items-center justify-between gap-3 text-xs">
+                <div className="flex items-center gap-2 text-slate-300">
+                  <span className="w-3.5 h-3.5 border-2 border-amber-400 border-t-transparent rounded-full animate-spin"></span>
+                  <span>{lang === "ar" ? "في انتظار إتمام الدفع في باينانس..." : "Waiting for Binance confirmation..."}</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => handleBinanceCheckOrder(binanceModalData.orderId, userSession)}
+                  disabled={isVerifyingBinance}
+                  className="px-3 py-1.5 rounded-lg bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 font-bold border border-amber-500/40 disabled:opacity-50"
+                >
+                  {isVerifyingBinance
+                    ? (lang === "ar" ? "جاري الفحص..." : "Checking...")
+                    : (lang === "ar" ? "تحقق الآن" : "Check Now")}
+                </button>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setBinanceModalData(null);
+                  setBinancePollingActive(false);
+                }}
+                className="text-xs text-on-surface-variant hover:text-white font-semibold underline underline-offset-4"
+              >
+                {lang === "ar" ? "إغلاق النافذة (يمكنك التحقق لاحقاً)" : "Close (You can verify later)"}
+              </button>
             </div>
           </div>
         )}
@@ -818,6 +1068,8 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
                               ? `سعر الصرف: 1$ = ${sdgRate} SDG`
                               : m.isAutomaticPayPal
                               ? (lang === "ar" ? "شحن تلقائي داخل الموقع" : "In-Page Direct Top-up")
+                              : m.isAutomaticBinance
+                              ? (lang === "ar" ? "دفع وخصم وتأكيد فوري" : "Instant Pay & Auto Credit")
                               : isSelected
                               ? (lang === "ar" ? "محدد الآن" : "Selected")
                               : (lang === "ar" ? "انقر لعرض البيانات والنسخ" : "Click to view details")}
@@ -923,8 +1175,51 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
                 </div>
               )}
 
+              {/* BINANCE PAY INSTANT PAYMENT CARD */}
+              {activeMethod.isAutomaticBinance && (
+                <div className="p-5 rounded-2xl bg-gradient-to-br from-amber-500/15 via-surface-container-high to-yellow-500/10 border-2 border-amber-500/50 shadow-xl space-y-4 animate-in fade-in slide-in-from-top-2">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 font-black text-sm text-amber-400">
+                      <span className="w-2.5 h-2.5 rounded-full bg-amber-400 animate-ping"></span>
+                      <span className="text-xl">PAY</span>
+                      <span>{lang === "ar" ? "بوابة الدفع الفوري التلقائي (Binance Pay)" : "Binance Pay Instant Gateway"}</span>
+                    </div>
+
+                    <span className="text-xs font-mono font-bold text-amber-300 bg-amber-500/20 px-2.5 py-1 rounded-lg border border-amber-500/30">
+                      1 USD = 1.00 USDT
+                    </span>
+                  </div>
+
+                  <div className="p-3.5 rounded-xl bg-surface-container-lowest border border-amber-500/30 space-y-2">
+                    <p className="text-xs text-on-surface font-semibold leading-relaxed">
+                      {lang === "ar"
+                        ? "الدفع المباشر عبر باينانس باي: اضغط على زر الدفع بالأسفل لفتح الجلسة الآمنة، وسيتم خصم المبلغ من حساب باينانس الخاص بك وشحن رصيد محفظتك تلقائياً في الحال دون انتظار أو مراجعة يدوية."
+                        : "Instant checkout with Binance Pay: Click the button below to initiate secure payment. Your wallet is credited automatically."}
+                    </p>
+                    {activeMethod.copyValue && (
+                      <div className="flex items-center justify-between pt-2 border-t border-outline-variant/20 text-xs">
+                        <span className="text-on-surface-variant font-mono">
+                          {lang === "ar" ? "معرف باينانس باي:" : "Binance Pay ID:"} <strong className="text-amber-400">{activeMethod.copyValue}</strong>
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => handleCopy(activeMethod.copyValue, "binance-pay-id")}
+                          className="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-amber-500/20 text-amber-300 hover:bg-amber-500/30"
+                        >
+                          {copiedId === "binance-pay-id" ? (lang === "ar" ? "تم النسخ" : "Copied") : (lang === "ar" ? "نسخ المعرف" : "Copy ID")}
+                        </button>
+                      </div>
+                    )}
+                  </div>
+
+                  <p className="text-xs text-on-surface-variant leading-relaxed font-medium">
+                    {cleanHtmlToText(lang === "ar" ? activeMethod.instructionsAr : activeMethod.instructionsEn)}
+                  </p>
+                </div>
+              )}
+
               {/* OTHER MANUAL PAYMENT DETAILS CARD */}
-              {!activeMethod.isAutomaticPayPal && !activeMethod.isBankak && !activeMethod.isFawry && (
+              {!activeMethod.isAutomaticPayPal && !activeMethod.isAutomaticBinance && !activeMethod.isBankak && !activeMethod.isFawry && (
                 <div className="p-5 rounded-2xl bg-gradient-to-r from-primary/15 via-surface-container-high to-primary/15 border-2 border-primary/50 shadow-xl space-y-3 animate-in fade-in slide-in-from-top-2">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2 font-extrabold text-sm text-primary">
@@ -1024,7 +1319,7 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
                     </div>
                   </div>
 
-                  {!activeMethod.isAutomaticPayPal && (
+                  {!activeMethod.isAutomaticPayPal && !activeMethod.isAutomaticBinance && (
                     <div className="space-y-2">
                       <label className="text-xs font-extrabold text-on-surface uppercase tracking-wider block">
                         {lang === "ar" ? "رقم التحويل / رقم المحفظة المحول منها" : "Transaction Ref / Sender Number"}
@@ -1036,6 +1331,30 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
                         placeholder={lang === "ar" ? "مثال: VF-984321 أو رقم الحساب" : "e.g. Ref #984321"}
                         className="w-full bg-surface-container-lowest border border-outline-variant/60 rounded-xl py-3 px-4 text-on-surface font-mono text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary placeholder:text-on-surface-variant/40"
                       />
+                    </div>
+                  )}
+
+                  {activeMethod.isAutomaticBinance && (
+                    <div className="space-y-2">
+                      <label className="text-xs font-extrabold text-on-surface uppercase tracking-wider block">
+                        {lang === "ar" ? "اختيار سريع للمبلغ ($ USD):" : "Quick Amount ($ USD):"}
+                      </label>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        {["5", "10", "25", "50", "100"].map((quickVal) => (
+                          <button
+                            key={quickVal}
+                            type="button"
+                            onClick={() => setDepositAmount(quickVal + ".00")}
+                            className={`px-3.5 py-2 rounded-xl text-xs font-mono font-bold transition-all border ${
+                              parseFloat(depositAmount) === parseFloat(quickVal)
+                                ? "bg-amber-500 text-slate-950 border-amber-400 shadow-md font-extrabold"
+                                : "bg-surface-container border-outline-variant/30 text-on-surface hover:border-amber-400/50"
+                            }`}
+                          >
+                            ${quickVal}
+                          </button>
+                        ))}
+                      </div>
                     </div>
                   )}
                 </div>
@@ -1065,7 +1384,7 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
               )}
 
               {/* RECEIPT FILE UPLOAD FIELD - MANDATORY */}
-              {!activeMethod.isAutomaticPayPal && (
+              {!activeMethod.isAutomaticPayPal && !activeMethod.isAutomaticBinance && (
                 <div className="space-y-2 pt-2 border-t border-outline-variant/20">
                   <div className="flex items-center justify-between">
                     <label className="text-xs font-extrabold text-on-surface uppercase tracking-wider flex items-center gap-1.5">
@@ -1197,6 +1516,43 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
                       }}
                     />
                   </div>
+                </div>
+              ) : activeMethod.isAutomaticBinance ? (
+                <div className="space-y-3 pt-2">
+                  <div className="p-4 rounded-2xl bg-amber-500/15 border-2 border-amber-400/50 shadow-lg text-amber-200 space-y-1">
+                    <div className="flex items-center gap-2 text-amber-300 font-extrabold text-sm">
+                      <span className="material-symbols-outlined text-xl text-amber-400 shrink-0">bolt</span>
+                      <span>{lang === "ar" ? "الدفع المباشر والخصم الفوري عبر باينانس (Binance Pay)" : "In-Page Direct Binance Pay Checkout"}</span>
+                    </div>
+                    <p className="text-xs text-slate-200 font-medium leading-relaxed">
+                      {lang === "ar"
+                        ? `المبلغ المطلوب إيداعه: $${parseFloat(depositAmount || "10.00").toFixed(2)} USD (يعادل ${parseFloat(depositAmount || "10.00").toFixed(2)} USDT). اضغط بالأسفل لفتح بوابة باينانس باي فوراً.`
+                        : `Top-up Amount: $${parseFloat(depositAmount || "10.00").toFixed(2)} USD. Click below to pay via Binance Pay directly.`}
+                    </p>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={handleStartBinancePay}
+                    disabled={isLoading || isVerifyingBinance || !depositAmount || parseFloat(depositAmount) < 1.0}
+                    className="w-full bg-gradient-to-r from-amber-500 via-amber-600 to-yellow-600 text-slate-950 py-4 rounded-2xl font-black text-sm hover:shadow-xl hover:shadow-amber-500/30 transition-all flex items-center justify-center gap-2 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
+                  >
+                    {isLoading ? (
+                      <>
+                        <span className="material-symbols-outlined animate-spin text-lg">refresh</span>
+                        <span>{lang === "ar" ? "جاري فتح بوابة Binance Pay..." : "Opening Binance Pay Gateway..."}</span>
+                      </>
+                    ) : (
+                      <>
+                        <span className="material-symbols-outlined text-xl">currency_exchange</span>
+                        <span>
+                          {lang === "ar"
+                            ? `فتح بوابة Binance Pay والدفع الآن ($${parseFloat(depositAmount || "0").toFixed(2)} USD)`
+                            : `Pay with Binance Pay ($${parseFloat(depositAmount || "0").toFixed(2)} USD)`}
+                        </span>
+                      </>
+                    )}
+                  </button>
                 </div>
               ) : (
                 <button
