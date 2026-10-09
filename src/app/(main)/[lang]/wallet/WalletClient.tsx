@@ -269,7 +269,7 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
       badge: "PAY",
       icon: "currency_exchange",
       color: "from-amber-500 to-yellow-600",
-      copyValue: currencyConfig?.binance?.payId || "",
+      copyValue: "",
       detailLabelAr: "الدفع التلقائي المباشر عبر باينانس (Binance Pay):",
       detailLabelEn: "Direct Binance Pay Instant Payment:",
       instructionsAr: "ادخل المبلغ واضغط على دفع عبر باينانس لفتح بوابة Binance Pay مباشرة، والخصم من حسابك وشحن المحفظة فوراً دون انتظار.",
@@ -381,7 +381,7 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
         body: JSON.stringify({ amount: num })
       });
 
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
       if (!res.ok || !data.success || !data.orderId) {
         setErrorMessage(data.error || (lang === "ar" ? "فشل إنشاء طلب الدفع عبر Binance Pay" : "Failed to create Binance Pay order"));
         return;
@@ -400,8 +400,8 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
         amount: data.amount
       });
       setBinancePollingActive(true);
-    } catch {
-      setErrorMessage(lang === "ar" ? "خطأ في الاتصال بسيرفر Binance Pay" : "Connection error creating Binance Pay order");
+    } catch (err: any) {
+      setErrorMessage(err?.message || (lang === "ar" ? "خطأ في الاتصال بسيرفر Binance Pay" : "Connection error creating Binance Pay order"));
     } finally {
       setIsLoading(false);
     }
@@ -670,14 +670,7 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
   const userBalanceSdg = Math.round(userBalanceUsd * sdgRate);
 
   return (
-    <PayPalScriptProvider
-      options={{
-        clientId: PAYPAL_CLIENT_ID,
-        currency: "USD",
-        intent: "capture"
-      }}
-    >
-      <div className="container mx-auto px-4 py-8 max-w-6xl relative" dir="rtl">
+    <div className="container mx-auto px-4 py-8 max-w-6xl relative" dir="rtl">
         {/* PAYPAL VERIFICATION OVERLAY */}
         {isVerifyingPayPal && (
           <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-xl flex items-center justify-center p-4 animate-in fade-in duration-300">
@@ -1177,7 +1170,7 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
 
               {/* BINANCE PAY INSTANT PAYMENT CARD */}
               {activeMethod.isAutomaticBinance && (
-                <div className="p-5 rounded-2xl bg-gradient-to-br from-amber-500/15 via-surface-container-high to-yellow-500/10 border-2 border-amber-500/50 shadow-xl space-y-4 animate-in fade-in slide-in-from-top-2">
+                <div className="p-5 rounded-2xl bg-gradient-to-br from-amber-500/15 via-surface-container-high to-yellow-500/10 border-2 border-amber-500/50 shadow-xl space-y-3 animate-in fade-in slide-in-from-top-2">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2 font-black text-sm text-amber-400">
                       <span className="w-2.5 h-2.5 rounded-full bg-amber-400 animate-ping"></span>
@@ -1188,28 +1181,6 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
                     <span className="text-xs font-mono font-bold text-amber-300 bg-amber-500/20 px-2.5 py-1 rounded-lg border border-amber-500/30">
                       1 USD = 1.00 USDT
                     </span>
-                  </div>
-
-                  <div className="p-3.5 rounded-xl bg-surface-container-lowest border border-amber-500/30 space-y-2">
-                    <p className="text-xs text-on-surface font-semibold leading-relaxed">
-                      {lang === "ar"
-                        ? "الدفع المباشر عبر باينانس باي: اضغط على زر الدفع بالأسفل لفتح الجلسة الآمنة، وسيتم خصم المبلغ من حساب باينانس الخاص بك وشحن رصيد محفظتك تلقائياً في الحال دون انتظار أو مراجعة يدوية."
-                        : "Instant checkout with Binance Pay: Click the button below to initiate secure payment. Your wallet is credited automatically."}
-                    </p>
-                    {activeMethod.copyValue && (
-                      <div className="flex items-center justify-between pt-2 border-t border-outline-variant/20 text-xs">
-                        <span className="text-on-surface-variant font-mono">
-                          {lang === "ar" ? "معرف باينانس باي:" : "Binance Pay ID:"} <strong className="text-amber-400">{activeMethod.copyValue}</strong>
-                        </span>
-                        <button
-                          type="button"
-                          onClick={() => handleCopy(activeMethod.copyValue, "binance-pay-id")}
-                          className="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-amber-500/20 text-amber-300 hover:bg-amber-500/30"
-                        >
-                          {copiedId === "binance-pay-id" ? (lang === "ar" ? "تم النسخ" : "Copied") : (lang === "ar" ? "نسخ المعرف" : "Copy ID")}
-                        </button>
-                      </div>
-                    )}
                   </div>
 
                   <p className="text-xs text-on-surface-variant leading-relaxed font-medium">
@@ -1466,55 +1437,71 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
                   </div>
 
                   <div className="w-full relative z-10">
-                    <PayPalButtons
-                      key={`paypal-btn-${depositAmount || "10"}`}
-                      disabled={!depositAmount || parseFloat(depositAmount) < 1.0 || isLoading || isVerifyingPayPal}
-                      style={{
-                        layout: "vertical",
-                        color: "gold",
-                        shape: "rect",
-                        label: "pay",
-                        height: 48
-                      }}
-                      createOrder={async () => {
-                        setErrorMessage("");
-                        setSuccessMessage("");
-                        const num = parseFloat(depositAmount || "0");
-                        if (isNaN(num) || num < 1.0) {
-                          setErrorMessage(lang === "ar" ? "الحد الأدنى للإيداع هو $1.00 USD" : "Minimum deposit is $1.00 USD");
-                          throw new Error("Invalid deposit amount");
-                        }
+                    {PAYPAL_CLIENT_ID ? (
+                      <PayPalScriptProvider
+                        options={{
+                          clientId: PAYPAL_CLIENT_ID,
+                          currency: "USD",
+                          intent: "capture"
+                        }}
+                      >
+                        <PayPalButtons
+                          key={`paypal-btn-${depositAmount || "10"}`}
+                          disabled={!depositAmount || parseFloat(depositAmount) < 1.0 || isLoading || isVerifyingPayPal}
+                          style={{
+                            layout: "vertical",
+                            color: "gold",
+                            shape: "rect",
+                            label: "pay",
+                            height: 48
+                          }}
+                          createOrder={async () => {
+                            setErrorMessage("");
+                            setSuccessMessage("");
+                            const num = parseFloat(depositAmount || "0");
+                            if (isNaN(num) || num < 1.0) {
+                              setErrorMessage(lang === "ar" ? "الحد الأدنى للإيداع هو $1.00 USD" : "Minimum deposit is $1.00 USD");
+                              throw new Error("Invalid deposit amount");
+                            }
 
-                        const token = localStorage.getItem("user_token");
-                        const res = await userApiFetch("/api/wallet/paypal/create-order", {
-                          method: "POST",
-                          headers: {
-                            "Content-Type": "application/json",
-                            ...(token ? { Authorization: `Bearer ${token}` } : {})
-                          },
-                          body: JSON.stringify({
-                            amount: num
-                          })
-                        });
+                            const token = localStorage.getItem("user_token");
+                            const res = await userApiFetch("/api/wallet/paypal/create-order", {
+                              method: "POST",
+                              headers: {
+                                "Content-Type": "application/json",
+                                ...(token ? { Authorization: `Bearer ${token}` } : {})
+                              },
+                              body: JSON.stringify({
+                                amount: num
+                              })
+                            });
 
-                        const data = await res.json();
-                        if (!res.ok || !data.success || !data.orderId) {
-                          const errMsg = data.error || (lang === "ar" ? "فشل إنشاء طلب الدفع عبر PayPal" : "Failed to create PayPal order");
-                          setErrorMessage(errMsg);
-                          throw new Error(errMsg);
-                        }
+                            const data = await res.json();
+                            if (!res.ok || !data.success || !data.orderId) {
+                              const errMsg = data.error || (lang === "ar" ? "فشل إنشاء طلب الدفع عبر PayPal" : "Failed to create PayPal order");
+                              setErrorMessage(errMsg);
+                              throw new Error(errMsg);
+                            }
 
-                        return data.orderId;
-                      }}
-                      onApprove={async (data) => {
-                        if (data.orderID) {
-                          await handlePayPalReturnCapture(data.orderID, userSession);
-                        }
-                      }}
-                      onError={() => {
-                        setErrorMessage(lang === "ar" ? "حدث خطأ أثناء الاتصال ببوابة PayPal" : "Error connecting to PayPal");
-                      }}
-                    />
+                            return data.orderId;
+                          }}
+                          onApprove={async (data) => {
+                            if (data.orderID) {
+                              await handlePayPalReturnCapture(data.orderID, userSession);
+                            }
+                          }}
+                          onError={() => {
+                            setErrorMessage(lang === "ar" ? "حدث خطأ أثناء الاتصال ببوابة PayPal" : "Error connecting to PayPal");
+                          }}
+                        />
+                      </PayPalScriptProvider>
+                    ) : (
+                      <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs text-center font-medium">
+                        {lang === "ar"
+                          ? "بوابة PayPal غير مهيأة حالياً. يرجى اختيار وسيلة دفع أخرى أو ضبط مفتاح PayPal."
+                          : "PayPal gateway is currently not configured. Please choose another payment method."}
+                      </div>
+                    )}
                   </div>
                 </div>
               ) : activeMethod.isAutomaticBinance ? (
@@ -1717,6 +1704,5 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
           )}
         </div>
       </div>
-    </PayPalScriptProvider>
   );
 }
