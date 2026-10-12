@@ -732,7 +732,7 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
           price: unitPrice,
           couponCode: appliedCoupon ? appliedCoupon.code : undefined,
           notes: notes.trim(),
-          customFields: Object.keys(finalCustomValues).length > 0 ? finalCustomValues : null
+          customFields: Object.keys(finalCustomValues).length > 0 ? finalCustomValues : undefined
         })
       });
 
@@ -764,7 +764,13 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
           localStorage.setItem("user_session", JSON.stringify(updated));
         }
       } else {
-        setSubmitFeedback({ type: "error", text: data.error || "حدث خطأ أثناء تنفيذ الطلب" });
+        const errorDetails = Array.isArray(data.details) && data.details.length > 0
+          ? data.details.map((d: any) => d.message || d.field).filter(Boolean).join(" | ")
+          : "";
+        const finalError = errorDetails && errorDetails !== data.error
+          ? `${data.error || (lang === 'ar' ? 'خطأ في بيانات الطلب' : 'Invalid order data')}: ${errorDetails}`
+          : (data.error || (lang === 'ar' ? 'حدث خطأ أثناء تنفيذ الطلب' : 'Failed to submit order'));
+        setSubmitFeedback({ type: "error", text: finalError });
       }
     } catch {
       setSubmitFeedback({ type: "error", text: "تعذر الاتصال بالسيرفر لإكمال عملية الشراء" });

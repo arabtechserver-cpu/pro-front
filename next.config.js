@@ -24,6 +24,14 @@ const nextConfig = {
       },
       {
         protocol: 'https',
+        hostname: 'api.borai.store',
+      },
+      {
+        protocol: 'https',
+        hostname: 'borai.store',
+      },
+      {
+        protocol: 'https',
         hostname: 'images.unsplash.com',
       },
     ],
@@ -62,7 +70,7 @@ const nextConfig = {
               "font-src 'self' data: https://fonts.gstatic.com",
               "img-src 'self' data: blob: https:",
               "media-src 'self' data: blob: https:",
-              "connect-src 'self' https://api.arabtechproserver.tech https://accounts.google.com https://challenges.cloudflare.com https://www.paypal.com https://www.sandbox.paypal.com https://fonts.googleapis.com https://fonts.gstatic.com",
+              "connect-src 'self' https://api.arabtechproserver.tech https://api.borai.store https://borai.store https://www.borai.store https://accounts.google.com https://challenges.cloudflare.com https://www.paypal.com https://www.sandbox.paypal.com https://fonts.googleapis.com https://fonts.gstatic.com",
               "frame-src 'self' https://accounts.google.com https://challenges.cloudflare.com https://www.sandbox.paypal.com https://www.paypal.com",
               "object-src 'none'",
               "base-uri 'self'",

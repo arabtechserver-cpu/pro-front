@@ -100,6 +100,10 @@ export default function FoxreloadAdminPage() {
 
   const [bundles, setBundles] = useState<FoxreloadBundle[]>([]);
   const [loadingBundles, setLoadingBundles] = useState(false);
+  const [isSynced, setIsSynced] = useState(false);
+  const [syncedAt, setSyncedAt] = useState<string | null>(null);
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [isClearing, setIsClearing] = useState(false);
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -209,32 +213,104 @@ export default function FoxreloadAdminPage() {
     }
   };
 
-  const fetchCatalogData = async (force: boolean = false) => {
+  const fetchCatalogData = async (_force: boolean = false) => {
     setLoadingBundles(true);
     try {
-      const res = await adminFetch(`/api/foxreload/admin/catalog${force ? "?refresh=true" : ""}`);
+      const res = await adminFetch("/api/foxreload/admin/catalog");
       const data = await res.json();
-      if (res.ok && data.catalog?.sections) {
+      if (res.ok) {
+        setIsSynced(Boolean(data.isSynced));
+        setSyncedAt(data.syncedAt || null);
+        if (data.isSynced && data.catalog?.sections) {
+          const aggregatedBundles: FoxreloadBundle[] = [];
+          const seenIds = new Set<string>();
+
+          Object.entries(data.catalog.sections).forEach(([secKey, sec]: [string, any]) => {
+            if (secKey !== "popular" && Array.isArray(sec.bundles)) {
+              sec.bundles.forEach((b: FoxreloadBundle) => {
+                if (!seenIds.has(b.id)) {
+                  seenIds.add(b.id);
+                  aggregatedBundles.push(b);
+                }
+              });
+            }
+          });
+
+          setBundles(aggregatedBundles);
+        } else {
+          setBundles([]);
+        }
+      }
+    } catch {
+      showToast("تعذر جلب بيانات كتالوج FoxReload من الخادم", "error");
+    } finally {
+      setLoadingBundles(false);
+    }
+  };
+
+  const handleSyncCatalog = async () => {
+    setIsSyncing(true);
+    try {
+      const res = await adminFetch("/api/foxreload/admin/sync", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setIsSynced(true);
+        setSyncedAt(data.syncedAt || new Date().toISOString());
         const aggregatedBundles: FoxreloadBundle[] = [];
         const seenIds = new Set<string>();
 
-        Object.entries(data.catalog.sections).forEach(([secKey, sec]: [string, any]) => {
-          if (secKey !== "popular" && Array.isArray(sec.bundles)) {
-            sec.bundles.forEach((b: FoxreloadBundle) => {
-              if (!seenIds.has(b.id)) {
-                seenIds.add(b.id);
-                aggregatedBundles.push(b);
-              }
-            });
-          }
-        });
-
+        if (data.catalog?.sections) {
+          Object.entries(data.catalog.sections).forEach(([secKey, sec]: [string, any]) => {
+            if (secKey !== "popular" && Array.isArray(sec.bundles)) {
+              sec.bundles.forEach((b: FoxreloadBundle) => {
+                if (!seenIds.has(b.id)) {
+                  seenIds.add(b.id);
+                  aggregatedBundles.push(b);
+                }
+              });
+            }
+          });
+        }
         setBundles(aggregatedBundles);
+        showToast(data.message || `تم سحب وحفظ ${aggregatedBundles.length} باقة بنجاح`);
+      } else {
+        showToast(data.error || "فشل سحب البيانات من مزود FoxReload", "error");
       }
     } catch {
-      showToast("تعذر جلب كتالوج الألعاب والخدمات من المزود", "error");
+      showToast("خطأ أثناء الاتصال بالخادم لسحب البيانات", "error");
     } finally {
-      setLoadingBundles(false);
+      setIsSyncing(false);
+    }
+  };
+
+  const handleClearCatalog = async () => {
+    if (!window.confirm("هل أنت متأكد من رغبتك في حذف بيانات كتالوج FoxReload من قاعدة البيانات؟ لن تظهر الباقات للمستخدمين حتى تقوم بالسحب مجدداً.")) {
+      return;
+    }
+    setIsClearing(true);
+    try {
+      const res = await adminFetch("/api/foxreload/admin/clear-catalog", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setIsSynced(false);
+        setSyncedAt(null);
+        setBundles([]);
+        setInspectedBundle(null);
+        setInspectedProducts([]);
+        showToast("تم حذف بيانات الكتالوج من قاعدة البيانات بنجاح");
+      } else {
+        showToast(data.error || "فشل حذف البيانات", "error");
+      }
+    } catch {
+      showToast("خطأ أثناء الاتصال بالخادم", "error");
+    } finally {
+      setIsClearing(false);
     }
   };
 
@@ -578,23 +654,40 @@ export default function FoxreloadAdminPage() {
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 flex-wrap">
           <button
-            onClick={() => {
-              refreshBalance();
-              fetchCatalogData(true);
-            }}
-            disabled={refreshingBalance || loadingBundles}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-surface-container-highest text-on-surface hover:bg-surface-container-highest/80 border border-outline-variant/40 text-sm font-medium transition-all"
+            onClick={handleSyncCatalog}
+            disabled={isSyncing || loadingBundles}
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-on-primary hover:bg-primary/90 font-bold text-sm shadow-md transition-all disabled:opacity-50"
           >
-            <span
-              className={`material-symbols-outlined text-lg ${
-                refreshingBalance || loadingBundles ? "animate-spin" : ""
-              }`}
-            >
-              sync
+            <span className={`material-symbols-outlined text-lg ${isSyncing ? "animate-spin" : ""}`}>
+              {isSyncing ? "sync" : "cloud_download"}
             </span>
-            <span>تحديث شامل من السيرفر</span>
+            <span>{isSyncing ? "جاري سحب وحفظ البيانات..." : "سحب البيانات من المزود (حفظ بالداتا بيز)"}</span>
+          </button>
+
+          {isSynced && (
+            <button
+              onClick={handleClearCatalog}
+              disabled={isClearing}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 border border-rose-500/30 text-xs font-semibold transition-all disabled:opacity-50"
+              title="حذف البيانات من قاعدة البيانات"
+            >
+              <span className="material-symbols-outlined text-base">delete_sweep</span>
+              <span>مسح الكتالوج من الداتا بيز</span>
+            </button>
+          )}
+
+          <button
+            onClick={() => refreshBalance()}
+            disabled={refreshingBalance}
+            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-surface-container-highest text-on-surface hover:bg-surface-container-highest/80 border border-outline-variant/40 text-sm font-medium transition-all"
+            title="تحديث الرصيد الحي"
+          >
+            <span className={`material-symbols-outlined text-lg ${refreshingBalance ? "animate-spin" : ""}`}>
+              refresh
+            </span>
+            <span>تحديث الرصيد</span>
           </button>
         </div>
       </div>
@@ -693,17 +786,28 @@ export default function FoxreloadAdminPage() {
         <div className="bg-surface-container/80 p-5 rounded-2xl border border-outline-variant/30 flex flex-col justify-between">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold uppercase tracking-wider text-on-surface-variant">
-              الخدمات المسجلة والطلبات
+              حالة التخزين بقاعدة البيانات
             </span>
-            <span className="material-symbols-outlined text-primary text-2xl">category</span>
+            <span className={`material-symbols-outlined text-2xl ${isSynced ? "text-emerald-400" : "text-amber-400"}`}>
+              {isSynced ? "database" : "cloud_off"}
+            </span>
           </div>
           <div className="mt-3">
-            <div className="text-3xl font-extrabold text-primary">
-              {bundles.length}
-              <span className="text-xs font-normal text-on-surface-variant mr-2">لعبة وخدمة معتمدة</span>
+            <div className="flex items-baseline gap-2">
+              <span className="text-3xl font-extrabold text-primary">
+                {isSynced ? bundles.length : 0}
+              </span>
+              <span className="text-xs font-normal text-on-surface-variant">
+                {isSynced ? "باقة محفوظة بالداتا بيز" : "لم يتم السحب بعد"}
+              </span>
             </div>
-            <div className="text-xs text-on-surface-variant mt-1">
-              طلبات معلقة: {pendingOrdersCount} | الإجمالي: {totalOrdersCount}
+            <div className="text-xs text-on-surface-variant mt-1.5 flex items-center gap-1.5">
+              <span className={`w-2 h-2 rounded-full ${isSynced ? "bg-emerald-500" : "bg-amber-500"}`}></span>
+              <span>
+                {isSynced
+                  ? (syncedAt ? `آخر سحب: ${new Date(syncedAt).toLocaleTimeString("ar-EG")}` : "محفوظة بالداتا بيز")
+                  : "غير محفوظة - اضغط زر السحب"}
+              </span>
             </div>
           </div>
         </div>
@@ -802,6 +906,61 @@ export default function FoxreloadAdminPage() {
       {/* TAB 1: BUNDLES & SERVICES MANAGEMENT */}
       {activeTab === "services" && (
         <div className="space-y-4">
+          {/* Sync Status Banner */}
+          {isSynced ? (
+            <div className="bg-emerald-500/10 border border-emerald-500/30 p-4 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-emerald-300">
+              <div className="flex items-center gap-2.5">
+                <span className="material-symbols-outlined text-xl text-emerald-400">cloud_done</span>
+                <div>
+                  <div className="font-bold text-sm text-emerald-200">البيانات مسحوبة ومحفوظة في قاعدة البيانات ({bundles.length} باقة وخدمة)</div>
+                  <div className="text-[11px] text-emerald-300/70 mt-0.5">
+                    {syncedAt ? `آخر سحب وتحديث: ${new Date(syncedAt).toLocaleString("ar-EG")}` : "البيانات مخزنة وجاهزة للعرض للمستخدمين"}
+                  </div>
+                </div>
+              </div>
+              <div className="flex items-center gap-2 shrink-0">
+                <button
+                  onClick={handleSyncCatalog}
+                  disabled={isSyncing}
+                  className="px-3.5 py-1.5 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/40 text-emerald-200 font-bold transition-all flex items-center gap-1.5 disabled:opacity-50"
+                >
+                  <span className={`material-symbols-outlined text-sm ${isSyncing ? "animate-spin" : ""}`}>sync</span>
+                  <span>سحب وتحديث مجدداً</span>
+                </button>
+                <button
+                  onClick={handleClearCatalog}
+                  disabled={isClearing}
+                  className="px-3 py-1.5 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 border border-rose-500/40 text-rose-300 font-bold transition-all flex items-center gap-1.5 disabled:opacity-50"
+                >
+                  <span className="material-symbols-outlined text-sm">delete</span>
+                  <span>مسح من الداتا بيز</span>
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="bg-amber-500/10 border border-amber-500/30 p-4 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-amber-300">
+              <div className="flex items-center gap-2.5">
+                <span className="material-symbols-outlined text-xl text-amber-400">cloud_off</span>
+                <div>
+                  <div className="font-bold text-sm text-amber-200">لم يتم سحب بيانات FoxReload بعد (غير محفوظة في الداتا بيز)</div>
+                  <div className="text-[11px] text-amber-300/70 mt-0.5">
+                    البيانات لا تظهر تلقائياً بدون سحب صريح. اضغط على زر السحب لجلب البيانات وحفظها وعرضها.
+                  </div>
+                </div>
+              </div>
+              <button
+                onClick={handleSyncCatalog}
+                disabled={isSyncing}
+                className="px-5 py-2 rounded-xl bg-primary text-on-primary font-bold shadow transition-all flex items-center gap-2 shrink-0 disabled:opacity-50"
+              >
+                <span className={`material-symbols-outlined text-base ${isSyncing ? "animate-spin" : ""}`}>
+                  {isSyncing ? "sync" : "cloud_download"}
+                </span>
+                <span>{isSyncing ? "جاري سحب وحفظ البيانات..." : "سحب وحفظ البيانات الآن"}</span>
+              </button>
+            </div>
+          )}
+
           {/* Category Filter Pills & Search */}
           <div className="bg-surface-container/60 p-4 rounded-2xl border border-outline-variant/30 flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="flex flex-wrap items-center gap-1.5 w-full md:w-auto">
@@ -847,7 +1006,36 @@ export default function FoxreloadAdminPage() {
             {loadingBundles ? (
               <div className="p-16 text-center text-on-surface-variant text-sm font-medium flex flex-col items-center justify-center gap-3">
                 <div className="w-8 h-8 border-3 border-primary border-t-transparent rounded-full animate-spin"></div>
-                <span>جاري استيراد كافة باقات وألعاب FoxReload...</span>
+                <span>جاري تحميل بيانات الكتالوج من قاعدة البيانات...</span>
+              </div>
+            ) : !isSynced ? (
+              <div className="p-16 text-center flex flex-col items-center justify-center gap-4">
+                <div className="w-16 h-16 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
+                  <span className="material-symbols-outlined text-4xl">cloud_download</span>
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-on-surface">لم يتم سحب بيانات FoxReload بعد</h3>
+                  <p className="text-sm text-on-surface-variant max-w-lg mx-auto mt-1 leading-relaxed">
+                    البيانات لا تظهر تلقائياً بدون سحب صريح. اضغط على زر السحب أدناه لجلب جميع الألعاب، الباقات، والدول من مزود FoxReload وتخزينها في قاعدة البيانات وعرضها.
+                  </p>
+                </div>
+                <button
+                  onClick={handleSyncCatalog}
+                  disabled={isSyncing}
+                  className="mt-2 px-6 py-3 rounded-xl bg-primary text-on-primary font-bold text-sm hover:bg-primary/90 transition-all flex items-center gap-2 shadow-lg disabled:opacity-50"
+                >
+                  {isSyncing ? (
+                    <>
+                      <span className="w-4 h-4 border-2 border-on-primary border-t-transparent rounded-full animate-spin"></span>
+                      <span>جاري سحب وحفظ البيانات في قاعدة البيانات...</span>
+                    </>
+                  ) : (
+                    <>
+                      <span className="material-symbols-outlined">download</span>
+                      <span>سحب البيانات وحفظها في قاعدة البيانات الآن</span>
+                    </>
+                  )}
+                </button>
               </div>
             ) : filteredBundles.length === 0 ? (
               <div className="p-16 text-center text-on-surface-variant text-sm font-medium">
