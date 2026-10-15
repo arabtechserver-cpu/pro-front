@@ -26,7 +26,7 @@ const NAV_ITEMS = [
   { href: "/admin/analytics", label: "الإحصائيات", icon: "bar_chart" },
   { href: "/admin/backups", label: "النسخ الاحتياطي", icon: "backup" },
   { href: "/admin/ip-access", label: "إدارة عناوين الـ IP", icon: "shield" },
-  { href: "/admin/settings", label: "إعدادات الحساب", icon: "settings" },
+  { href: "/admin/settings", label: "الإعدادات وطرق الدفع", icon: "settings" },
 ];
 
 export default function AdminLayout({

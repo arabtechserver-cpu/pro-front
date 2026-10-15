@@ -65,6 +65,7 @@ interface CurrencyConfig {
   cryptoBnb: {
     address: string;
     network: string;
+    transferName?: string;
     instructionsAr: string;
     instructionsEn: string;
     isActive: boolean;
@@ -80,6 +81,18 @@ interface CurrencyConfig {
     email: string;
     isActive: boolean;
   };
+  customMethods?: Array<{
+    id: string;
+    nameAr: string;
+    nameEn?: string;
+    type?: string;
+    accountOrAddress: string;
+    network?: string;
+    transferName?: string;
+    instructionsAr?: string;
+    instructionsEn?: string;
+    isActive: boolean;
+  }>;
 }
 
 interface DBTransaction {
@@ -309,6 +322,26 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
       isAutomaticPayPal: true
     }
   ];
+
+  if (Array.isArray(currencyConfig?.customMethods)) {
+    currencyConfig.customMethods.forEach((cm) => {
+      if (cm.isActive && cm.accountOrAddress) {
+        paymentMethods.push({
+          id: cm.id,
+          nameAr: cm.nameAr,
+          nameEn: cm.nameEn || cm.nameAr,
+          badge: cm.network || "PAY",
+          icon: cm.type === "crypto" ? "toll" : cm.type === "bank" ? "account_balance" : "account_balance_wallet",
+          color: "from-emerald-600 to-teal-700",
+          copyValue: cm.accountOrAddress,
+          detailLabelAr: `العنوان / رقم الحساب (${cm.network || cm.nameAr}):`,
+          detailLabelEn: `Address / Account (${cm.network || cm.nameEn || cm.nameAr}):`,
+          instructionsAr: cm.instructionsAr || "حول المبلغ إلى العنوان أو رقم الحساب الموضح ثم ارفع إشعار التحويل للتأكيد.",
+          instructionsEn: cm.instructionsEn || "Transfer funds to the specified account or address then upload receipt screenshot."
+        });
+      }
+    });
+  }
 
   // Handle Automatic Return Capture from PayPal Checkout
   const handlePayPalReturnCapture = async (orderId: string, userObj?: any) => {
@@ -937,8 +970,8 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
 
                             <p className="text-[11px] sm:text-xs text-on-surface-variant font-mono font-medium dir-ltr text-right">
                               {lang === "ar"
-                                ? "اسم التحويل: BNB | الرابط: 0xaCc3ab6f0165B39Cf2F1286ED8A778735Ae8314f"
-                                : "Transfer Name: BNB | Link: 0xaCc3ab6f0165B39Cf2F1286ED8A778735Ae8314f"}
+                                ? `اسم التحويل: ${currencyConfig?.cryptoBnb?.transferName || currencyConfig?.rewarble?.transferName || "BNB"} | الرابط: ${bnbMethod.copyValue}`
+                                : `Transfer Name: ${currencyConfig?.cryptoBnb?.transferName || currencyConfig?.rewarble?.transferName || "BNB"} | Link: ${bnbMethod.copyValue}`}
                             </p>
                           </div>
                         </div>

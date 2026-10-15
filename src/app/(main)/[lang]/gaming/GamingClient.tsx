@@ -567,6 +567,29 @@ export default function GamingClient({
   const initialUrlCheckedRef = useRef(false);
   const dismissedBundleRef = useRef<string | null>(null);
 
+  const [bnbPaymentConfig, setBnbPaymentConfig] = useState<{ address: string; transferName: string }>({
+    address: "0xaCc3ab6f0165B39Cf2F1286ED8A778735Ae8314f",
+    transferName: "BNB"
+  });
+
+  useEffect(() => {
+    fetch("/api/currencies")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data?.success && data?.config) {
+          const addr = data.config.cryptoBnb?.address || data.config.rewarble?.address;
+          const tName = data.config.cryptoBnb?.transferName || data.config.rewarble?.transferName;
+          if (addr) {
+            setBnbPaymentConfig({
+              address: addr,
+              transferName: tName || "BNB"
+            });
+          }
+        }
+      })
+      .catch(() => {});
+  }, []);
+
 
   useEffect(() => {
     const savedCurrency = localStorage.getItem("app_currency");
@@ -1779,8 +1802,8 @@ export default function GamingClient({
                   </div>
 
                   <p className="text-xs text-on-surface-variant font-mono select-all mt-1">
-                    {isAr ? "اسم التحويل: BNB | الرابط: " : "Transfer Name: BNB | Link: "}
-                    <span className="text-emerald-400 font-bold">0xaCc3ab6f0165B39Cf2F1286ED8A778735Ae8314f</span>
+                    {isAr ? `اسم التحويل: ${bnbPaymentConfig.transferName} | الرابط: ` : `Transfer Name: ${bnbPaymentConfig.transferName} | Link: `}
+                    <span className="text-emerald-400 font-bold">{bnbPaymentConfig.address}</span>
                   </p>
 
                   <div className="flex items-center gap-1.5 mt-2.5 flex-wrap text-[11px] text-on-surface-variant">
