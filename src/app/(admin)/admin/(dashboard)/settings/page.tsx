@@ -51,6 +51,8 @@ interface PaymentMethodsConfig {
     isActive: boolean;
   };
   cryptoBnb: {
+    nameAr?: string;
+    nameEn?: string;
     address: string;
     network: string;
     transferName?: string;
@@ -101,6 +103,8 @@ const DEFAULT_PAYMENTS_CONFIG: PaymentMethodsConfig = {
     isActive: true
   },
   cryptoBnb: {
+    nameAr: "تحويل العملات الرقمية (BNB / BEP20 Smart Chain)",
+    nameEn: "Crypto Transfer (BNB / BEP20 Smart Chain)",
     address: "0xaCc3ab6f0165B39Cf2F1286ED8A778735Ae8314f",
     network: "BNB Smart Chain (BEP20)",
     transferName: "BNB",
@@ -145,8 +149,9 @@ export default function AdminSettingsPage() {
   const [paymentSecurityPassword, setPaymentSecurityPassword] = useState("");
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
 
-  // New Custom Method Modal / Form State
+  // New / Edit Custom Method Modal State
   const [showAddCustomModal, setShowAddCustomModal] = useState(false);
+  const [editingCustomMethodId, setEditingCustomMethodId] = useState<string | null>(null);
   const [newCustomNameAr, setNewCustomNameAr] = useState("");
   const [newCustomNameEn, setNewCustomNameEn] = useState("");
   const [newCustomType, setNewCustomType] = useState("crypto");
@@ -335,31 +340,75 @@ export default function AdminSettingsPage() {
     }
   };
 
-  const handleAddCustomMethod = () => {
+  const handleOpenEditCustomMethod = (method: CustomMethod) => {
+    setEditingCustomMethodId(method.id);
+    setNewCustomNameAr(method.nameAr || "");
+    setNewCustomNameEn(method.nameEn || "");
+    setNewCustomType(method.type || "crypto");
+    setNewCustomAddress(method.accountOrAddress || "");
+    setNewCustomNetwork(method.network || "");
+    setNewCustomTransferName(method.transferName || "");
+    setNewCustomInstructionsAr(method.instructionsAr || "");
+    setNewCustomInstructionsEn(method.instructionsEn || "");
+    setShowAddCustomModal(true);
+  };
+
+  const handleQuickAddCrypto = () => {
+    setEditingCustomMethodId(null);
+    setNewCustomNameAr("تيذر USDT (شبكة TRC20)");
+    setNewCustomNameEn("Tether USDT (TRC20 Network)");
+    setNewCustomType("crypto");
+    setNewCustomAddress("");
+    setNewCustomNetwork("TRON (TRC20)");
+    setNewCustomTransferName("USDT");
+    setNewCustomInstructionsAr("قم بالتحويل عبر شبكة TRON (TRC20) فقط ثم ارفع إشعار التحويل للتأكيد الفوري.");
+    setNewCustomInstructionsEn("Transfer via TRON (TRC20) network only then upload receipt screenshot.");
+    setShowAddCustomModal(true);
+  };
+
+  const handleSaveCustomMethod = () => {
     if (!newCustomNameAr.trim() || !newCustomAddress.trim()) {
       setPaymentsError("يرجى إدخال اسم الطريقة وعنوان المحفظة أو رقم الحساب على الأقل");
       return;
     }
 
-    const newMethod: CustomMethod = {
-      id: `custom_${Date.now()}`,
-      nameAr: newCustomNameAr.trim(),
-      nameEn: newCustomNameEn.trim() || undefined,
-      type: newCustomType,
-      accountOrAddress: newCustomAddress.trim(),
-      network: newCustomNetwork.trim() || undefined,
-      transferName: newCustomTransferName.trim() || undefined,
-      instructionsAr: newCustomInstructionsAr.trim() || undefined,
-      instructionsEn: newCustomInstructionsEn.trim() || undefined,
-      isActive: true
-    };
+    if (editingCustomMethodId) {
+      setPayments(prev => ({
+        ...prev,
+        customMethods: prev.customMethods.map(m => m.id === editingCustomMethodId ? {
+          ...m,
+          nameAr: newCustomNameAr.trim(),
+          nameEn: newCustomNameEn.trim() || undefined,
+          type: newCustomType,
+          accountOrAddress: newCustomAddress.trim(),
+          network: newCustomNetwork.trim() || undefined,
+          transferName: newCustomTransferName.trim() || undefined,
+          instructionsAr: newCustomInstructionsAr.trim() || undefined,
+          instructionsEn: newCustomInstructionsEn.trim() || undefined,
+        } : m)
+      }));
+    } else {
+      const newMethod: CustomMethod = {
+        id: `custom_${Date.now()}`,
+        nameAr: newCustomNameAr.trim(),
+        nameEn: newCustomNameEn.trim() || undefined,
+        type: newCustomType,
+        accountOrAddress: newCustomAddress.trim(),
+        network: newCustomNetwork.trim() || undefined,
+        transferName: newCustomTransferName.trim() || undefined,
+        instructionsAr: newCustomInstructionsAr.trim() || undefined,
+        instructionsEn: newCustomInstructionsEn.trim() || undefined,
+        isActive: true
+      };
 
-    setPayments(prev => ({
-      ...prev,
-      customMethods: [...prev.customMethods, newMethod]
-    }));
+      setPayments(prev => ({
+        ...prev,
+        customMethods: [...prev.customMethods, newMethod]
+      }));
+    }
 
     // Reset inputs
+    setEditingCustomMethodId(null);
     setNewCustomNameAr("");
     setNewCustomNameEn("");
     setNewCustomType("crypto");
@@ -964,19 +1013,23 @@ export default function AdminSettingsPage() {
           </div>
 
           {/* CARD 5: CRYPTO BNB / BEP20 */}
-          <div className="bg-surface-container rounded-3xl border border-amber-500/30 p-6 sm:p-7 space-y-5 shadow-lg bg-gradient-to-br from-amber-500/5 via-surface-container to-surface-container">
+          <div className="bg-surface-container rounded-3xl border border-amber-500/30 p-6 sm:p-7 space-y-6 shadow-lg bg-gradient-to-br from-amber-500/5 via-surface-container to-surface-container">
             <div className="flex items-center justify-between pb-4 border-b border-outline-variant/20 flex-wrap gap-3">
               <div className="flex items-center gap-3">
                 <div className="w-11 h-11 rounded-2xl bg-amber-500/20 text-amber-500 flex items-center justify-center font-bold">
                   <span className="material-symbols-outlined text-2xl">toll</span>
                 </div>
                 <div>
-                  <div className="flex items-center gap-2">
-                    <h3 className="text-base font-bold text-on-surface">عنوان محفظة الكريبتو (BNB / BEP20 Smart Chain)</h3>
-                    <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-400">BSC / BEP20</span>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <h3 className="text-base font-bold text-on-surface">
+                      {payments.cryptoBnb.nameAr || "عنوان محفظة الكريبتو (BNB / BEP20 Smart Chain)"}
+                    </h3>
+                    <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-400 font-mono">
+                      {payments.cryptoBnb.network || "BSC / BEP20"}
+                    </span>
                   </div>
                   <p className="text-xs text-on-surface-variant mt-0.5">
-                    العنوان المعتمد لجميع أقسام الألعاب، البطاقات، الاشتراكات، eSIM، و Rewarble
+                    طريقة الدفع المعتمدة لجميع أقسام الألعاب، البطاقات، الاشتراكات، eSIM، و Rewarble
                   </p>
                 </div>
               </div>
@@ -1001,7 +1054,23 @@ export default function AdminSettingsPage() {
             <div className="space-y-4">
               <div>
                 <label className="block text-xs font-bold text-on-surface mb-2">
-                  عنوان المحفظة (Wallet Address - BSC BEP20) *
+                  اسم طريقة الدفع التي تظهر للعملاء (Display Name)
+                </label>
+                <input
+                  type="text"
+                  value={payments.cryptoBnb.nameAr || ""}
+                  onChange={(e) => setPayments({
+                    ...payments,
+                    cryptoBnb: { ...payments.cryptoBnb, nameAr: e.target.value }
+                  })}
+                  placeholder="مثال: تحويل العملات الرقمية (BNB / BEP20 Smart Chain)"
+                  className="w-full bg-surface px-4 py-2.5 rounded-xl border border-outline-variant/50 focus:border-amber-500 outline-none text-xs font-bold text-on-surface"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-on-surface mb-2">
+                  عنوان المحفظة ({payments.cryptoBnb.network || "الكريبتو"}) *
                 </label>
                 <div className="relative">
                   <input
@@ -1029,7 +1098,7 @@ export default function AdminSettingsPage() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold text-on-surface mb-2">اسم الشبكة (Network Name)</label>
+                  <label className="block text-xs font-bold text-on-surface mb-1.5">اسم الشبكة (Network Name)</label>
                   <input
                     type="text"
                     value={payments.cryptoBnb.network}
@@ -1037,12 +1106,27 @@ export default function AdminSettingsPage() {
                       ...payments,
                       cryptoBnb: { ...payments.cryptoBnb, network: e.target.value }
                     })}
-                    className="w-full bg-surface px-4 py-2.5 rounded-xl border border-outline-variant/50 focus:border-primary outline-none text-xs font-bold text-on-surface text-left dir-ltr"
+                    className="w-full bg-surface px-4 py-2.5 rounded-xl border border-outline-variant/50 focus:border-amber-500 outline-none text-xs font-bold text-on-surface text-left dir-ltr"
                   />
+                  <div className="flex flex-wrap gap-1 mt-1.5">
+                    {["BNB Smart Chain (BEP20)", "TRON (TRC20)", "Ethereum (ERC20)", "Polygon", "Solana"].map(net => (
+                      <button
+                        key={net}
+                        type="button"
+                        onClick={() => setPayments({
+                          ...payments,
+                          cryptoBnb: { ...payments.cryptoBnb, network: net }
+                        })}
+                        className="text-[10px] px-2 py-0.5 rounded bg-surface border border-outline-variant/30 text-on-surface-variant hover:border-amber-500 hover:text-amber-400 font-mono"
+                      >
+                        {net}
+                      </button>
+                    ))}
+                  </div>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-on-surface mb-2">اسم التحويل (Transfer Name)</label>
+                  <label className="block text-xs font-bold text-on-surface mb-1.5">اسم التحويل أو رمز العملة (Transfer Name / Asset)</label>
                   <input
                     type="text"
                     value={payments.cryptoBnb.transferName || "BNB"}
@@ -1050,8 +1134,23 @@ export default function AdminSettingsPage() {
                       ...payments,
                       cryptoBnb: { ...payments.cryptoBnb, transferName: e.target.value }
                     })}
-                    className="w-full bg-surface px-4 py-2.5 rounded-xl border border-outline-variant/50 focus:border-primary outline-none text-xs font-bold text-on-surface text-left dir-ltr"
+                    className="w-full bg-surface px-4 py-2.5 rounded-xl border border-outline-variant/50 focus:border-amber-500 outline-none text-xs font-bold text-on-surface text-left dir-ltr"
                   />
+                  <div className="flex flex-wrap gap-1 mt-1.5">
+                    {["BNB", "USDT", "USDC", "BUSD", "TRX", "SOL"].map(sym => (
+                      <button
+                        key={sym}
+                        type="button"
+                        onClick={() => setPayments({
+                          ...payments,
+                          cryptoBnb: { ...payments.cryptoBnb, transferName: sym }
+                        })}
+                        className="text-[10px] px-2 py-0.5 rounded bg-surface border border-outline-variant/30 text-on-surface-variant hover:border-amber-500 hover:text-amber-400 font-mono"
+                      >
+                        {sym}
+                      </button>
+                    ))}
+                  </div>
                 </div>
 
                 <div className="sm:col-span-2">
@@ -1065,9 +1164,49 @@ export default function AdminSettingsPage() {
                       ...payments,
                       cryptoBnb: { ...payments.cryptoBnb, instructionsAr: e.target.value }
                     })}
-                    className="w-full bg-surface px-4 py-2.5 rounded-xl border border-outline-variant/50 focus:border-primary outline-none text-xs text-on-surface leading-relaxed"
+                    className="w-full bg-surface px-4 py-2.5 rounded-xl border border-outline-variant/50 focus:border-amber-500 outline-none text-xs text-on-surface leading-relaxed"
                   />
                 </div>
+              </div>
+
+              {/* Live Client Preview */}
+              <div className="p-4 rounded-2xl bg-surface border border-amber-500/30 space-y-2">
+                <div className="flex items-center justify-between text-[11px] font-bold text-amber-400">
+                  <span className="flex items-center gap-1">
+                    <span className="material-symbols-outlined text-sm">visibility</span>
+                    <span>معاينة ما يظهر للعميل في واجهة المحفظة:</span>
+                  </span>
+                  <span className="px-2 py-0.5 rounded bg-amber-500/10 font-mono">
+                    {payments.cryptoBnb.network || "BNB Smart Chain (BEP20)"}
+                  </span>
+                </div>
+                <div className="text-xs font-bold text-on-surface">
+                  {payments.cryptoBnb.nameAr || "تحويل العملات الرقمية (BNB / BEP20 Smart Chain)"}
+                </div>
+                <div className="p-2.5 rounded-xl bg-surface-container font-mono text-xs font-bold text-amber-400 dir-ltr text-left break-all select-all flex items-center justify-between gap-2">
+                  <span>{payments.cryptoBnb.address || "0x..."}</span>
+                  <span className="text-[10px] px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 shrink-0 font-sans">
+                    اسم التحويل: {payments.cryptoBnb.transferName || "BNB"}
+                  </span>
+                </div>
+                <p className="text-[11px] text-on-surface-variant leading-relaxed">
+                  {payments.cryptoBnb.instructionsAr}
+                </p>
+              </div>
+
+              {/* Quick Action to Add Another Crypto Network */}
+              <div className="pt-2 border-t border-outline-variant/20 flex items-center justify-between flex-wrap gap-3">
+                <span className="text-[11px] text-on-surface-variant">
+                  هل تريد توفير أكثر من عنوان أو شبكة كريبتو للعميل (مثل USDT TRC20 أو Solana إلى جانب BEP20)؟
+                </span>
+                <button
+                  type="button"
+                  onClick={handleQuickAddCrypto}
+                  className="px-3.5 py-1.5 rounded-xl bg-amber-500/15 text-amber-400 hover:bg-amber-500/25 border border-amber-500/30 text-xs font-bold flex items-center gap-1.5 transition-all"
+                >
+                  <span className="material-symbols-outlined text-sm">add</span>
+                  <span>إضافة شبكة كريبتو أخرى (مثل USDT TRC20)</span>
+                </button>
               </div>
             </div>
           </div>
@@ -1235,13 +1374,99 @@ export default function AdminSettingsPage() {
                 </p>
               </div>
 
+              <div className="flex items-center gap-2 flex-wrap">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEditingCustomMethodId(null);
+                    setNewCustomNameAr("");
+                    setNewCustomNameEn("");
+                    setNewCustomType("crypto");
+                    setNewCustomAddress("");
+                    setNewCustomNetwork("");
+                    setNewCustomTransferName("");
+                    setNewCustomInstructionsAr("");
+                    setNewCustomInstructionsEn("");
+                    setShowAddCustomModal(true);
+                  }}
+                  className="px-4 py-2.5 bg-primary/10 text-primary hover:bg-primary/20 font-bold text-xs rounded-xl transition-all flex items-center gap-1.5"
+                >
+                  <span className="material-symbols-outlined text-base">add</span>
+                  <span>إضافة طريقة أو عنوان مخصص</span>
+                </button>
+              </div>
+            </div>
+
+            {/* QUICK PRESET BUTTONS */}
+            <div className="flex items-center gap-2 flex-wrap text-xs">
+              <span className="text-[11px] font-bold text-on-surface-variant">إضافة سريعة:</span>
               <button
                 type="button"
-                onClick={() => setShowAddCustomModal(true)}
-                className="px-4 py-2.5 bg-primary/10 text-primary hover:bg-primary/20 font-bold text-xs rounded-xl transition-all flex items-center gap-1.5"
+                onClick={() => {
+                  setEditingCustomMethodId(null);
+                  setNewCustomNameAr("تيذر USDT (شبكة TRC20)");
+                  setNewCustomNameEn("Tether USDT (TRC20 Network)");
+                  setNewCustomType("crypto");
+                  setNewCustomAddress("");
+                  setNewCustomNetwork("TRON (TRC20)");
+                  setNewCustomTransferName("USDT");
+                  setNewCustomInstructionsAr("قم بالتحويل عبر شبكة TRON (TRC20) حصراً ثم ارفع إشعار العملية.");
+                  setShowAddCustomModal(true);
+                }}
+                className="px-2.5 py-1 rounded-lg bg-surface border border-outline-variant/30 text-on-surface hover:border-primary hover:text-primary font-medium transition-all"
               >
-                <span className="material-symbols-outlined text-base">add</span>
-                <span>إضافة طريقة أو عنوان جديد</span>
+                + USDT (TRC20)
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setEditingCustomMethodId(null);
+                  setNewCustomNameAr("تيذر USDT (شبكة BEP20)");
+                  setNewCustomNameEn("Tether USDT (BEP20 Network)");
+                  setNewCustomType("crypto");
+                  setNewCustomAddress("");
+                  setNewCustomNetwork("BNB Smart Chain (BEP20)");
+                  setNewCustomTransferName("USDT");
+                  setNewCustomInstructionsAr("حول عبر شبكة BSC BEP20 وارفق إيصال المعاملة.");
+                  setShowAddCustomModal(true);
+                }}
+                className="px-2.5 py-1 rounded-lg bg-surface border border-outline-variant/30 text-on-surface hover:border-primary hover:text-primary font-medium transition-all"
+              >
+                + USDT (BEP20)
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setEditingCustomMethodId(null);
+                  setNewCustomNameAr("حساب مصرفي إضافي");
+                  setNewCustomNameEn("Additional Bank Account");
+                  setNewCustomType("bank");
+                  setNewCustomAddress("");
+                  setNewCustomNetwork("البنك الأهلي / الراجحي / بنك محلي");
+                  setNewCustomTransferName("");
+                  setNewCustomInstructionsAr("حول المبلغ إلى الحساب البنكي الموضح ثم ارفع إشعار التحويل للتأكيد.");
+                  setShowAddCustomModal(true);
+                }}
+                className="px-2.5 py-1 rounded-lg bg-surface border border-outline-variant/30 text-on-surface hover:border-primary hover:text-primary font-medium transition-all"
+              >
+                + حساب بنكي
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setEditingCustomMethodId(null);
+                  setNewCustomNameAr("محفظة كاش إلكترونية");
+                  setNewCustomNameEn("E-Wallet Top-up");
+                  setNewCustomType("wallet");
+                  setNewCustomAddress("");
+                  setNewCustomNetwork("زين كاش / سيريتل / STC");
+                  setNewCustomTransferName("");
+                  setNewCustomInstructionsAr("حول المبلغ إلى رقم المحفظة ثم ارفع لقطة الشاشة للتأكيد.");
+                  setShowAddCustomModal(true);
+                }}
+                className="px-2.5 py-1 rounded-lg bg-surface border border-outline-variant/30 text-on-surface hover:border-primary hover:text-primary font-medium transition-all"
+              >
+                + محفظة إلكترونية
               </button>
             </div>
 
@@ -1258,14 +1483,19 @@ export default function AdminSettingsPage() {
                 {payments.customMethods.map((cm) => (
                   <div
                     key={cm.id}
-                    className="p-5 rounded-2xl bg-surface border border-outline-variant/40 space-y-3 relative group"
+                    className="p-5 rounded-2xl bg-surface border border-outline-variant/40 space-y-3 relative group hover:border-primary/50 transition-all"
                   >
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 flex-wrap">
                         <span className="font-bold text-sm text-on-surface">{cm.nameAr}</span>
                         {cm.network && (
                           <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-primary/10 text-primary font-bold">
                             {cm.network}
+                          </span>
+                        )}
+                        {cm.transferName && (
+                          <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 font-bold">
+                            {cm.transferName}
                           </span>
                         )}
                       </div>
@@ -1278,6 +1508,14 @@ export default function AdminSettingsPage() {
                           onChange={(e) => handleToggleCustomMethod(cm.id, e.target.checked)}
                           className="w-3.5 h-3.5 accent-primary cursor-pointer"
                         />
+                        <button
+                          type="button"
+                          onClick={() => handleOpenEditCustomMethod(cm)}
+                          className="text-primary hover:bg-primary/10 p-1.5 rounded-lg transition-colors"
+                          title="تعديل بيانات هذه الطريقة"
+                        >
+                          <span className="material-symbols-outlined text-base">edit</span>
+                        </button>
                         <button
                           type="button"
                           onClick={() => handleRemoveCustomMethod(cm.id)}
@@ -1316,18 +1554,27 @@ export default function AdminSettingsPage() {
             )}
           </div>
 
-          {/* ADD CUSTOM METHOD MODAL */}
+          {/* ADD / EDIT CUSTOM METHOD MODAL */}
           {showAddCustomModal && (
             <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
               <div className="bg-surface-container w-full max-w-lg rounded-3xl border border-outline-variant/40 p-6 space-y-4 shadow-2xl animate-in fade-in zoom-in-95">
                 <div className="flex items-center justify-between pb-3 border-b border-outline-variant/20">
                   <h3 className="font-bold text-base text-on-surface flex items-center gap-2">
-                    <span className="material-symbols-outlined text-primary">add_circle</span>
-                    <span>إضافة طريقة دفع أو عنوان استقبال جديد</span>
+                    <span className="material-symbols-outlined text-primary">
+                      {editingCustomMethodId ? "edit_note" : "add_circle"}
+                    </span>
+                    <span>
+                      {editingCustomMethodId
+                        ? "تعديل طريقة الدفع والعنوان"
+                        : "إضافة طريقة دفع أو عنوان استقبال جديد"}
+                    </span>
                   </h3>
                   <button
                     type="button"
-                    onClick={() => setShowAddCustomModal(false)}
+                    onClick={() => {
+                      setShowAddCustomModal(false);
+                      setEditingCustomMethodId(null);
+                    }}
                     className="p-1 rounded-lg text-on-surface-variant hover:bg-surface-variant/30"
                   >
                     <span className="material-symbols-outlined">close</span>
@@ -1377,7 +1624,7 @@ export default function AdminSettingsPage() {
                     </div>
 
                     <div>
-                      <label className="block text-xs font-bold text-on-surface mb-1">اسم الشبكة / الملاحظة</label>
+                      <label className="block text-xs font-bold text-on-surface mb-1">اسم الشبكة / البنك</label>
                       <input
                         type="text"
                         value={newCustomNetwork}
@@ -1388,17 +1635,32 @@ export default function AdminSettingsPage() {
                     </div>
                   </div>
 
-                  <div>
-                    <label className="block text-xs font-bold text-on-surface mb-1">
-                      عنوان المحفظة أو رقم الحساب *
-                    </label>
-                    <input
-                      type="text"
-                      value={newCustomAddress}
-                      onChange={(e) => setNewCustomAddress(e.target.value)}
-                      placeholder="أدخل العنوان أو رقم الحساب بدقة"
-                      className="w-full bg-surface px-3.5 py-2.5 rounded-xl border border-outline-variant/50 focus:border-primary outline-none font-mono text-xs font-bold text-on-surface text-left dir-ltr"
-                    />
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs font-bold text-on-surface mb-1">
+                        عنوان المحفظة أو رقم الحساب *
+                      </label>
+                      <input
+                        type="text"
+                        value={newCustomAddress}
+                        onChange={(e) => setNewCustomAddress(e.target.value)}
+                        placeholder="أدخل العنوان أو رقم الحساب بدقة"
+                        className="w-full bg-surface px-3.5 py-2.5 rounded-xl border border-outline-variant/50 focus:border-primary outline-none font-mono text-xs font-bold text-on-surface text-left dir-ltr"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-on-surface mb-1">
+                        اسم التحويل / الميمو (Transfer Name / Memo)
+                      </label>
+                      <input
+                        type="text"
+                        value={newCustomTransferName}
+                        onChange={(e) => setNewCustomTransferName(e.target.value)}
+                        placeholder="مثال: USDT أو Memo ID"
+                        className="w-full bg-surface px-3.5 py-2.5 rounded-xl border border-outline-variant/50 focus:border-primary outline-none text-xs font-bold text-on-surface text-left dir-ltr"
+                      />
+                    </div>
                   </div>
 
                   <div>
@@ -1416,17 +1678,20 @@ export default function AdminSettingsPage() {
                 <div className="flex justify-end gap-2.5 pt-3 border-t border-outline-variant/20">
                   <button
                     type="button"
-                    onClick={() => setShowAddCustomModal(false)}
+                    onClick={() => {
+                      setShowAddCustomModal(false);
+                      setEditingCustomMethodId(null);
+                    }}
                     className="px-4 py-2.5 rounded-xl border border-outline-variant/40 text-xs font-bold text-on-surface-variant hover:bg-surface"
                   >
                     إلغاء
                   </button>
                   <button
                     type="button"
-                    onClick={handleAddCustomMethod}
+                    onClick={handleSaveCustomMethod}
                     className="px-5 py-2.5 rounded-xl bg-primary text-on-primary text-xs font-bold hover:bg-primary/90 transition-all shadow-md"
                   >
-                    إضافة الطريقة
+                    {editingCustomMethodId ? "حفظ التعديلات" : "إضافة الطريقة"}
                   </button>
                 </div>
               </div>

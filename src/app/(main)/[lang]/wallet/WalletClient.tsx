@@ -23,6 +23,10 @@ interface PaymentMethod {
   detailLabelEn: string;
   instructionsAr: string;
   instructionsEn: string;
+  network?: string;
+  transferName?: string;
+  accountName?: string;
+  isCustom?: boolean;
   isAutomaticPayPal?: boolean;
   isAutomaticBinance?: boolean;
   isBankak?: boolean;
@@ -65,6 +69,8 @@ interface CurrencyConfig {
   cryptoBnb: {
     address: string;
     network: string;
+    nameAr?: string;
+    nameEn?: string;
     transferName?: string;
     instructionsAr: string;
     instructionsEn: string;
@@ -221,8 +227,11 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
   };
 
   // Build Dynamic Payment Methods from Live Config
-  const paymentMethods: PaymentMethod[] = [
-    {
+  const paymentMethods: PaymentMethod[] = [];
+
+  // Bankak
+  if (currencyConfig?.bankak?.isActive !== false) {
+    paymentMethods.push({
       id: "bankak",
       nameAr: "بنك الخرطوم (بنكك)",
       nameEn: "Bank of Khartoum (Bankak)",
@@ -230,35 +239,53 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
       icon: "account_balance",
       color: "from-violet-600 to-purple-700",
       copyValue: currencyConfig?.bankak?.accountNumber || "",
-      detailLabelAr: currencyConfig?.bankak?.accountName ? `رقم حساب بنكك (باسم: ${currencyConfig.bankak.accountName}):` : "رقم حساب بنكك:",
-      detailLabelEn: currencyConfig?.bankak?.accountName ? `Bankak Account # (Name: ${currencyConfig.bankak.accountName}):` : "Bankak Account #:",
+      detailLabelAr: currencyConfig?.bankak?.accountName
+        ? `رقم حساب بنكك (باسم: ${currencyConfig.bankak.accountName}):`
+        : "رقم حساب بنك الخرطوم (بنكك):",
+      detailLabelEn: currencyConfig?.bankak?.accountName
+        ? `Bankak Account # (Name: ${currencyConfig.bankak.accountName}):`
+        : "Bankak Account #:",
       instructionsAr:
         currencyConfig?.bankak?.instructionsAr ||
         "حول المبلغ بالجنيه السوداني عبر تطبيق بنكك إلى رقم الحساب ثم ارفع صورة إشعار التحويل للتأكيد.",
       instructionsEn:
         currencyConfig?.bankak?.instructionsEn ||
         "Transfer via Bankak app in Sudanese Pounds then upload receipt image for confirmation.",
+      accountName: currencyConfig?.bankak?.accountName,
       isBankak: true
-    },
-    {
+    });
+  }
+
+  // Fawri (Faisal Islamic Bank)
+  if (currencyConfig?.fawry?.isActive !== false) {
+    paymentMethods.push({
       id: "fawry",
       nameAr: "فوري - بنك فيصل (الرقم الموحد)",
       nameEn: "Fawri - Faisal Bank (Unified ID)",
       badge: "FAWRI",
       icon: "account_balance",
       color: "from-purple-700 to-indigo-800",
-      copyValue: currencyConfig?.fawry?.accountNumber || "51589889",
-      detailLabelAr: "الرقم البنكي الموحد (تطبيق فوري):",
-      detailLabelEn: "Unified Banking ID (Fawri App):",
+      copyValue: currencyConfig?.fawry?.accountNumber || "",
+      detailLabelAr: currencyConfig?.fawry?.accountName
+        ? `الرقم البنكي الموحد (باسم: ${currencyConfig.fawry.accountName}):`
+        : "الرقم البنكي الموحد (تطبيق فوري):",
+      detailLabelEn: currencyConfig?.fawry?.accountName
+        ? `Unified Banking ID (Name: ${currencyConfig.fawry.accountName}):`
+        : "Unified Banking ID (Fawri App):",
       instructionsAr:
         currencyConfig?.fawry?.instructionsAr ||
-        "حول المبلغ بالجنيه السوداني عبر تطبيق فوري إلى الرقم البنكي الموحد (51589889) ثم ارفع صورة إشعار التحويل للتأكيد.",
+        "حول المبلغ بالجنيه السوداني عبر تطبيق فوري إلى الرقم البنكي الموحد ثم ارفع صورة إشعار التحويل للتأكيد.",
       instructionsEn:
         currencyConfig?.fawry?.instructionsEn ||
-        "Transfer in Sudanese Pounds via Fawri app to Unified Banking ID # 51589889 then upload receipt image for confirmation.",
+        "Transfer in Sudanese Pounds via Fawri app then upload receipt image for confirmation.",
+      accountName: currencyConfig?.fawry?.accountName,
       isFawry: true
-    },
-    {
+    });
+  }
+
+  // Vodafone Cash
+  if (currencyConfig?.vodafone?.isActive !== false) {
+    paymentMethods.push({
       id: "vodafone",
       nameAr: "فودافون كاش (Vodafone Cash)",
       nameEn: "Vodafone Cash",
@@ -274,40 +301,71 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
       instructionsEn:
         currencyConfig?.vodafone?.instructionsEn ||
         "Transfer funds to the designated wallet number then attach receipt screenshot."
-    },
-    {
+    });
+  }
+
+  // Binance Pay
+  if (currencyConfig?.binance?.isActive !== false) {
+    paymentMethods.push({
       id: "binance",
       nameAr: "Binance Pay (باينانس فوري تلقائي)",
       nameEn: "Binance Pay (Instant Auto)",
       badge: "PAY",
       icon: "currency_exchange",
       color: "from-amber-500 to-yellow-600",
-      copyValue: "",
+      copyValue: currencyConfig?.binance?.payId || "",
       detailLabelAr: "الدفع التلقائي المباشر عبر باينانس (Binance Pay):",
       detailLabelEn: "Direct Binance Pay Instant Payment:",
-      instructionsAr: "ادخل المبلغ واضغط على دفع عبر باينانس لفتح بوابة Binance Pay مباشرة، والخصم من حسابك وشحن المحفظة فوراً دون انتظار.",
-      instructionsEn: "Enter amount and click Pay with Binance to open Binance Pay gateway directly with instant automatic credit.",
+      instructionsAr:
+        currencyConfig?.binance?.instructionsAr ||
+        "ادخل المبلغ واضغط على دفع عبر باينانس لفتح بوابة Binance Pay مباشرة، والخصم من حسابك وشحن المحفظة فوراً دون انتظار.",
+      instructionsEn:
+        currencyConfig?.binance?.instructionsEn ||
+        "Enter amount and click Pay with Binance to open Binance Pay gateway directly with instant automatic credit.",
       isAutomaticBinance: true
-    },
-    {
+    });
+  }
+
+  // Primary Crypto Method (Configurable BNB or other network)
+  if (currencyConfig?.cryptoBnb?.isActive !== false) {
+    const cryptoNetwork = currencyConfig?.cryptoBnb?.network || "BNB Smart Chain (BEP20)";
+    const cryptoTransferName = currencyConfig?.cryptoBnb?.transferName || "BNB";
+    const cryptoNameAr =
+      currencyConfig?.cryptoBnb?.nameAr ||
+      `تحويل العملات الرقمية (${cryptoTransferName} / ${cryptoNetwork})`;
+    const cryptoNameEn =
+      currencyConfig?.cryptoBnb?.nameEn ||
+      `Crypto Transfer (${cryptoTransferName} / ${cryptoNetwork})`;
+    const cryptoAddr =
+      currencyConfig?.cryptoBnb?.address ||
+      currencyConfig?.rewarble?.address ||
+      "0xaCc3ab6f0165B39Cf2F1286ED8A778735Ae8314f";
+
+    paymentMethods.push({
       id: "bnb",
-      nameAr: "تحويل BNB (شحن الألعاب، البطاقات، الاشتراكات، eSIM، و Rewarble)",
-      nameEn: "BNB Transfer (Top-ups, Cards, Subscriptions, eSIM & Rewarble)",
-      badge: "BNB",
+      nameAr: cryptoNameAr,
+      nameEn: cryptoNameEn,
+      badge: cryptoNetwork.includes("(") ? cryptoNetwork.split("(")[1].replace(")", "").trim() : cryptoTransferName,
       icon: "account_balance_wallet",
       color: "from-amber-500 to-yellow-600",
-      copyValue: currencyConfig?.cryptoBnb?.address || currencyConfig?.rewarble?.address || "0xaCc3ab6f0165B39Cf2F1286ED8A778735Ae8314f",
-      detailLabelAr: "اسم التحويل: BNB | الرابط (عنوان المحفظة BEP20):",
-      detailLabelEn: "Transfer Name: BNB | Address (BEP20 Link):",
+      copyValue: cryptoAddr,
+      network: cryptoNetwork,
+      transferName: cryptoTransferName,
+      detailLabelAr: `اسم التحويل: ${cryptoTransferName} | عنوان المحفظة (${cryptoNetwork}):`,
+      detailLabelEn: `Transfer Name: ${cryptoTransferName} | Wallet Address (${cryptoNetwork}):`,
       instructionsAr:
         currencyConfig?.cryptoBnb?.instructionsAr ||
-        "طريقة تحويل عبر BNB معتمدة لكافة الأقسام والخدمات (شحن الألعاب المباشر، متاجر التطبيقات، أكواد الألعاب، الاشتراكات والترفيه، شرائح eSIM، وقسائم Rewarble): اسم التحويل BNB، قم بالتحويل إلى رابط المحفظة (0xaCc3ab6f0165B39Cf2F1286ED8A778735Ae8314f) ثم ارفع صورة إشعار التحويل للتأكيد الفوري.",
+        `طريقة تحويل معتمدة لكافة الأقسام والخدمات: اسم التحويل ${cryptoTransferName}، الشبكة ${cryptoNetwork}، قم بالتحويل إلى عنوان المحفظة ثم ارفع صورة إشعار التحويل للتأكيد الفوري.`,
       instructionsEn:
         currencyConfig?.cryptoBnb?.instructionsEn ||
-        "Approved BNB transfer method for all sections (In-Game Top-Ups, App Stores, Game Codes, Subscriptions, eSIMs, and Rewarble Vouchers): Transfer Name BNB, transfer to wallet address (0xaCc3ab6f0165B39Cf2F1286ED8A778735Ae8314f) then upload transfer receipt.",
+        `Approved crypto transfer: Transfer Name ${cryptoTransferName}, Network ${cryptoNetwork}, send to wallet address then upload transfer receipt.`,
       isBnbServices: true
-    },
-    {
+    });
+  }
+
+  // PayPal
+  if (currencyConfig?.paypal?.isActive !== false) {
+    paymentMethods.push({
       id: "paypal",
       nameAr: "باي بال PayPal (تلقائي فوري)",
       nameEn: "PayPal (Instant Auto)",
@@ -320,9 +378,10 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
       instructionsAr: "ادخل المبلغ واضغط دفع لفتح نافذة PayPal الآمنة داخل الموقع دون مغادرة الصفحة.",
       instructionsEn: "Enter amount and click Pay to open in-page secure PayPal window without leaving.",
       isAutomaticPayPal: true
-    }
-  ];
+    });
+  }
 
+  // Custom Methods Added by Admin
   if (Array.isArray(currencyConfig?.customMethods)) {
     currencyConfig.customMethods.forEach((cm) => {
       if (cm.isActive && cm.accountOrAddress) {
@@ -330,14 +389,26 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
           id: cm.id,
           nameAr: cm.nameAr,
           nameEn: cm.nameEn || cm.nameAr,
-          badge: cm.network || "PAY",
+          badge: cm.network || (cm.type === "crypto" ? "CRYPTO" : cm.type === "bank" ? "BANK" : "WALLET"),
           icon: cm.type === "crypto" ? "toll" : cm.type === "bank" ? "account_balance" : "account_balance_wallet",
-          color: "from-emerald-600 to-teal-700",
+          color:
+            cm.type === "crypto"
+              ? "from-emerald-600 to-teal-700"
+              : cm.type === "bank"
+              ? "from-sky-600 to-blue-700"
+              : "from-purple-600 to-indigo-700",
           copyValue: cm.accountOrAddress,
+          network: cm.network,
+          transferName: cm.transferName,
           detailLabelAr: `العنوان / رقم الحساب (${cm.network || cm.nameAr}):`,
           detailLabelEn: `Address / Account (${cm.network || cm.nameEn || cm.nameAr}):`,
-          instructionsAr: cm.instructionsAr || "حول المبلغ إلى العنوان أو رقم الحساب الموضح ثم ارفع إشعار التحويل للتأكيد.",
-          instructionsEn: cm.instructionsEn || "Transfer funds to the specified account or address then upload receipt screenshot."
+          instructionsAr:
+            cm.instructionsAr ||
+            "حول المبلغ إلى العنوان أو رقم الحساب الموضح ثم ارفع إشعار التحويل للتأكيد.",
+          instructionsEn:
+            cm.instructionsEn ||
+            "Transfer funds to the specified account or address then upload receipt screenshot.",
+          isCustom: true
         });
       }
     });
@@ -960,18 +1031,18 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
                             <div className="flex items-center gap-2 flex-wrap">
                               <h3 className="font-black text-sm sm:text-base text-on-surface">
                                 {lang === "ar"
-                                  ? "تحويل BNB (رابط الدفع والشحن المباشر)"
-                                  : "BNB Transfer (Direct Top-up Link)"}
+                                  ? (bnbMethod.nameAr || "تحويل العملات الرقمية المعتمد")
+                                  : (bnbMethod.nameEn || "Approved Crypto Transfer")}
                               </h3>
                               <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40">
-                                BEP20 / BSC
+                                {bnbMethod.network || "BNB Smart Chain (BEP20)"}
                               </span>
                             </div>
 
                             <p className="text-[11px] sm:text-xs text-on-surface-variant font-mono font-medium dir-ltr text-right">
                               {lang === "ar"
-                                ? `اسم التحويل: ${currencyConfig?.cryptoBnb?.transferName || currencyConfig?.rewarble?.transferName || "BNB"} | الرابط: ${bnbMethod.copyValue}`
-                                : `Transfer Name: ${currencyConfig?.cryptoBnb?.transferName || currencyConfig?.rewarble?.transferName || "BNB"} | Link: ${bnbMethod.copyValue}`}
+                                ? `اسم التحويل: ${bnbMethod.transferName || "BNB"} | الشبكة: ${bnbMethod.network || "BEP20"} | الرابط: ${bnbMethod.copyValue}`
+                                : `Transfer Name: ${bnbMethod.transferName || "BNB"} | Network: ${bnbMethod.network || "BEP20"} | Link: ${bnbMethod.copyValue}`}
                             </p>
                           </div>
                         </div>
@@ -1162,17 +1233,17 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
                   {/* Beneficiary Account Details */}
                   <div className="p-3.5 rounded-xl bg-surface-container-lowest border border-violet-400/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                     <div>
-                      <div className="text-[11px] text-on-surface-variant">
+                      <div className="text-[11px] text-on-surface-variant font-bold">
                         {activeMethod.isFawry
                           ? (lang === "ar" ? "الرقم البنكي الموحد (تطبيق فوري):" : "Fawri Unified Banking ID:")
                           : (lang === "ar" ? "رقم حساب بنك الخرطوم (بنكك):" : "Bankak Account #:")}
                       </div>
                       <div className="text-base font-mono font-bold text-violet-600 dark:text-violet-300 select-all">{activeMethod.copyValue}</div>
-                      <div className="text-xs text-on-surface-variant font-semibold mt-0.5">
-                        {activeMethod.isFawry
-                          ? (lang === "ar" ? "تطبيق فوري - الرقم البنكي الموحد: 51589889" : "Fawri App - Unified ID: 51589889")
-                          : `باسم: ${currencyConfig?.bankak?.accountName || "حسن"}`}
-                      </div>
+                      {activeMethod.accountName ? (
+                        <div className="text-xs text-on-surface-variant font-semibold mt-0.5">
+                          {lang === "ar" ? `اسم صاحب الحساب: ${activeMethod.accountName}` : `Account Holder: ${activeMethod.accountName}`}
+                        </div>
+                      ) : null}
                     </div>
 
                     <button
@@ -1224,8 +1295,8 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
 
               {/* OTHER MANUAL PAYMENT DETAILS CARD */}
               {!activeMethod.isAutomaticPayPal && !activeMethod.isAutomaticBinance && !activeMethod.isBankak && !activeMethod.isFawry && (
-                <div className="p-5 rounded-2xl bg-gradient-to-r from-primary/15 via-surface-container-high to-primary/15 border-2 border-primary/50 shadow-xl space-y-3 animate-in fade-in slide-in-from-top-2">
-                  <div className="flex items-center justify-between">
+                <div className="p-5 rounded-2xl bg-gradient-to-r from-primary/15 via-surface-container-high to-primary/15 border-2 border-primary/50 shadow-xl space-y-4 animate-in fade-in slide-in-from-top-2">
+                  <div className="flex items-center justify-between flex-wrap gap-2">
                     <div className="flex items-center gap-2 font-extrabold text-sm text-primary">
                       <span className="text-xl">{activeMethod.badge}</span>
                       <span>{lang === "ar" ? activeMethod.detailLabelAr : activeMethod.detailLabelEn}</span>
@@ -1241,7 +1312,7 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
                       <span className="material-symbols-outlined text-sm">
                         {copiedId === activeMethod.id ? "check" : "content_copy"}
                       </span>
-                      <span>{copiedId === activeMethod.id ? "تم النسخ" : "نسخ رقم/عنوان التحويل"}</span>
+                      <span>{copiedId === activeMethod.id ? (lang === "ar" ? "تم النسخ" : "Copied") : (lang === "ar" ? "نسخ العنوان / رقم الحساب" : "Copy Address / Account")}</span>
                     </button>
                   </div>
 
@@ -1251,9 +1322,60 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
                     </code>
                   </div>
 
+                  {/* Dynamic Network & Asset Boxes with One-Click Copy */}
+                  {(activeMethod.network || activeMethod.transferName) && (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      {activeMethod.network && (
+                        <div className="p-3 rounded-xl bg-surface-container-lowest border border-outline-variant/30 flex items-center justify-between gap-2">
+                          <div className="min-w-0">
+                            <span className="text-[10px] text-on-surface-variant font-bold block">
+                              {lang === "ar" ? "اسم الشبكة (Network):" : "Network Name:"}
+                            </span>
+                            <span className="text-xs font-mono font-bold text-on-surface truncate block">
+                              {activeMethod.network}
+                            </span>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => handleCopy(activeMethod.network!, `${activeMethod.id}-network`)}
+                            className="px-2 py-1 text-[11px] font-bold rounded-lg bg-surface-container hover:bg-primary/20 text-primary transition-all shrink-0 flex items-center gap-1"
+                          >
+                            <span className="material-symbols-outlined text-xs">
+                              {copiedId === `${activeMethod.id}-network` ? "check" : "content_copy"}
+                            </span>
+                            <span>{copiedId === `${activeMethod.id}-network` ? (lang === "ar" ? "تم" : "Copied") : (lang === "ar" ? "نسخ" : "Copy")}</span>
+                          </button>
+                        </div>
+                      )}
+
+                      {activeMethod.transferName && (
+                        <div className="p-3 rounded-xl bg-surface-container-lowest border border-outline-variant/30 flex items-center justify-between gap-2">
+                          <div className="min-w-0">
+                            <span className="text-[10px] text-on-surface-variant font-bold block">
+                              {lang === "ar" ? "اسم التحويل / العملة (Asset):" : "Transfer / Asset:"}
+                            </span>
+                            <span className="text-xs font-mono font-bold text-on-surface truncate block">
+                              {activeMethod.transferName}
+                            </span>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => handleCopy(activeMethod.transferName!, `${activeMethod.id}-asset`)}
+                            className="px-2 py-1 text-[11px] font-bold rounded-lg bg-surface-container hover:bg-primary/20 text-primary transition-all shrink-0 flex items-center gap-1"
+                          >
+                            <span className="material-symbols-outlined text-xs">
+                              {copiedId === `${activeMethod.id}-asset` ? "check" : "content_copy"}
+                            </span>
+                            <span>{copiedId === `${activeMethod.id}-asset` ? (lang === "ar" ? "تم" : "Copied") : (lang === "ar" ? "نسخ" : "Copy")}</span>
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
                   {(activeMethod.isBnbServices || activeMethod.id === "bnb") && (
                     <div className="p-4 rounded-2xl bg-surface-container-lowest border border-primary/30 space-y-3">
-                      <div className="flex items-center justify-between text-xs font-bold text-primary">
+                      <div className="flex items-center justify-between text-xs font-bold text-primary flex-wrap gap-2">
                         <span className="flex items-center gap-1.5">
                           <span className="material-symbols-outlined text-base">verified</span>
                           <span>
@@ -1263,7 +1385,7 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
                           </span>
                         </span>
                         <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-primary/15 text-primary">
-                          {lang === "ar" ? "اسم التحويل: BNB" : "Transfer: BNB"}
+                          {lang === "ar" ? `اسم التحويل: ${activeMethod.transferName || "BNB"}` : `Transfer: ${activeMethod.transferName || "BNB"}`}
                         </span>
                       </div>
 

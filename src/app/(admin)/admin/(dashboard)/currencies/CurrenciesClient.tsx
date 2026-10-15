@@ -36,6 +36,9 @@ interface CurrencyConfig {
   cryptoBnb: {
     address: string;
     network: string;
+    nameAr?: string;
+    nameEn?: string;
+    transferName?: string;
     instructionsAr: string;
     instructionsEn: string;
     isActive: boolean;
@@ -51,6 +54,18 @@ interface CurrencyConfig {
     email: string;
     isActive: boolean;
   };
+  customMethods?: Array<{
+    id: string;
+    nameAr: string;
+    nameEn?: string;
+    type?: string;
+    accountOrAddress: string;
+    network?: string;
+    transferName?: string;
+    instructionsAr?: string;
+    instructionsEn?: string;
+    isActive: boolean;
+  }>;
   updatedAt?: string;
 }
 
@@ -546,12 +561,14 @@ export default function CurrenciesClient() {
               </div>
             </div>
 
-            {/* BNB Smart Chain */}
+            {/* BNB Smart Chain / Crypto */}
             <div className="p-4 rounded-2xl bg-surface-container-lowest border border-outline-variant/20 space-y-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <span className="material-symbols-outlined text-yellow-400 text-lg">account_balance_wallet</span>
-                  <span className="font-bold text-xs text-on-surface">تحويل BNB (شحن الألعاب والبطاقات و Rewarble)</span>
+                  <span className="font-bold text-xs text-on-surface">
+                    {config.cryptoBnb.nameAr || "تحويل العملات الرقمية (BNB / BEP20)"}
+                  </span>
                 </div>
                 <input
                   type="checkbox"
@@ -579,6 +596,37 @@ export default function CurrenciesClient() {
                   }
                   className="w-full px-3.5 py-2.5 bg-surface-container border border-outline-variant/40 rounded-xl font-mono text-xs text-on-surface text-left dir-ltr"
                 />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-[11px] font-bold text-on-surface-variant mb-1">اسم الشبكة (Network):</label>
+                  <input
+                    type="text"
+                    value={config.cryptoBnb.network || "BNB Smart Chain (BEP20)"}
+                    onChange={(e) =>
+                      setConfig({
+                        ...config,
+                        cryptoBnb: { ...config.cryptoBnb, network: e.target.value }
+                      })
+                    }
+                    className="w-full px-3.5 py-2 bg-surface-container border border-outline-variant/40 rounded-xl font-mono text-xs text-on-surface text-left dir-ltr"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[11px] font-bold text-on-surface-variant mb-1">اسم التحويل / العملة:</label>
+                  <input
+                    type="text"
+                    value={config.cryptoBnb.transferName || "BNB"}
+                    onChange={(e) =>
+                      setConfig({
+                        ...config,
+                        cryptoBnb: { ...config.cryptoBnb, transferName: e.target.value }
+                      })
+                    }
+                    className="w-full px-3.5 py-2 bg-surface-container border border-outline-variant/40 rounded-xl font-mono text-xs text-on-surface text-left dir-ltr"
+                  />
+                </div>
               </div>
             </div>
 

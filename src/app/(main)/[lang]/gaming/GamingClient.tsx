@@ -567,9 +567,20 @@ export default function GamingClient({
   const initialUrlCheckedRef = useRef(false);
   const dismissedBundleRef = useRef<string | null>(null);
 
-  const [bnbPaymentConfig, setBnbPaymentConfig] = useState<{ address: string; transferName: string }>({
+  const [bnbPaymentConfig, setBnbPaymentConfig] = useState<{
+    address: string;
+    transferName: string;
+    network: string;
+    nameAr?: string;
+    nameEn?: string;
+    isActive: boolean;
+  }>({
     address: "0xaCc3ab6f0165B39Cf2F1286ED8A778735Ae8314f",
-    transferName: "BNB"
+    transferName: "BNB",
+    network: "BNB Smart Chain (BEP20)",
+    nameAr: "تحويل العملات الرقمية",
+    nameEn: "Crypto Transfer",
+    isActive: true
   });
 
   useEffect(() => {
@@ -577,12 +588,15 @@ export default function GamingClient({
       .then((res) => res.json())
       .then((data) => {
         if (data?.success && data?.config) {
-          const addr = data.config.cryptoBnb?.address || data.config.rewarble?.address;
-          const tName = data.config.cryptoBnb?.transferName || data.config.rewarble?.transferName;
-          if (addr) {
+          const crypto = data.config.cryptoBnb || data.config.rewarble;
+          if (crypto) {
             setBnbPaymentConfig({
-              address: addr,
-              transferName: tName || "BNB"
+              address: crypto.address || "0xaCc3ab6f0165B39Cf2F1286ED8A778735Ae8314f",
+              transferName: crypto.transferName || "BNB",
+              network: crypto.network || "BNB Smart Chain (BEP20)",
+              nameAr: crypto.nameAr || "تحويل العملات الرقمية",
+              nameEn: crypto.nameEn || "Crypto Transfer",
+              isActive: crypto.isActive !== false
             });
           }
         }
@@ -1783,67 +1797,87 @@ export default function GamingClient({
               </div>
             </div>
 
-            {/* All Sections Dedicated BNB Top-Up Banner */}
-            <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-emerald-500/15 via-surface-container to-teal-500/15 border border-emerald-500/30 flex flex-col lg:flex-row lg:items-center justify-between gap-4 shadow-lg animate-in fade-in slide-in-from-top-2">
-              <div className="flex items-start sm:items-center gap-3">
-                <div className="w-11 h-11 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
-                  <span className="material-symbols-outlined text-2xl">account_balance_wallet</span>
-                </div>
-                <div>
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <h4 className="text-sm font-bold text-on-surface">
-                      {isAr
-                        ? "طريقة الدفع والشحن المعتمدة لكافة الأقسام والخدمات"
-                        : "Approved Top-Up Method for All Sections & Services"}
-                    </h4>
-                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 font-mono font-bold">
-                      BNB / BEP20
-                    </span>
+            {/* All Sections Dedicated Crypto Top-Up Banner */}
+            {bnbPaymentConfig.isActive !== false && (
+              <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-emerald-500/15 via-surface-container to-teal-500/15 border border-emerald-500/30 flex flex-col lg:flex-row lg:items-center justify-between gap-4 shadow-lg animate-in fade-in slide-in-from-top-2">
+                <div className="flex items-start sm:items-center gap-3">
+                  <div className="w-11 h-11 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
+                    <span className="material-symbols-outlined text-2xl">account_balance_wallet</span>
                   </div>
+                  <div>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <h4 className="text-sm font-bold text-on-surface">
+                        {isAr
+                          ? (bnbPaymentConfig.nameAr || "طريقة الدفع والشحن المعتمدة لكافة الأقسام والخدمات")
+                          : (bnbPaymentConfig.nameEn || "Approved Top-Up Method for All Sections & Services")}
+                      </h4>
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 font-mono font-bold">
+                        {bnbPaymentConfig.network}
+                      </span>
+                    </div>
 
-                  <p className="text-xs text-on-surface-variant font-mono select-all mt-1">
-                    {isAr ? `اسم التحويل: ${bnbPaymentConfig.transferName} | الرابط: ` : `Transfer Name: ${bnbPaymentConfig.transferName} | Link: `}
-                    <span className="text-emerald-400 font-bold">{bnbPaymentConfig.address}</span>
-                  </p>
+                    <div className="flex items-center gap-2 flex-wrap text-xs text-on-surface-variant font-mono mt-1">
+                      <span>
+                        {isAr
+                          ? `اسم التحويل: ${bnbPaymentConfig.transferName} | الرابط: `
+                          : `Transfer Name: ${bnbPaymentConfig.transferName} | Link: `}
+                      </span>
+                      <span className="text-emerald-400 font-bold select-all break-all">
+                        {bnbPaymentConfig.address}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          navigator.clipboard.writeText(bnbPaymentConfig.address);
+                          setCopiedNotification(isAr ? "تم نسخ عنوان المحفظة!" : "Wallet address copied!");
+                          setTimeout(() => setCopiedNotification(null), 2500);
+                        }}
+                        className="px-2 py-0.5 rounded bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 font-sans text-[11px] font-bold flex items-center gap-1 transition-all"
+                      >
+                        <span className="material-symbols-outlined text-xs">content_copy</span>
+                        <span>{isAr ? "نسخ" : "Copy"}</span>
+                      </button>
+                    </div>
 
-                  <div className="flex items-center gap-1.5 mt-2.5 flex-wrap text-[11px] text-on-surface-variant">
-                    <span className="text-primary font-bold">{isAr ? "تشمل:" : "Includes:"}</span>
-                    <span className="px-2 py-0.5 rounded-lg bg-surface-container-highest border border-outline-variant/30 flex items-center gap-1">
-                      <span className="material-symbols-outlined text-xs">sports_esports</span>
-                      <span>{isAr ? "شحن الألعاب المباشر" : "In-Game Topups"}</span>
-                    </span>
-                    <span className="px-2 py-0.5 rounded-lg bg-surface-container-highest border border-outline-variant/30 flex items-center gap-1">
-                      <span className="material-symbols-outlined text-xs">store</span>
-                      <span>{isAr ? "متاجر التطبيقات" : "App Stores"}</span>
-                    </span>
-                    <span className="px-2 py-0.5 rounded-lg bg-surface-container-highest border border-outline-variant/30 flex items-center gap-1">
-                      <span className="material-symbols-outlined text-xs">vpn_key</span>
-                      <span>{isAr ? "أكواد الألعاب" : "Game Codes"}</span>
-                    </span>
-                    <span className="px-2 py-0.5 rounded-lg bg-surface-container-highest border border-outline-variant/30 flex items-center gap-1">
-                      <span className="material-symbols-outlined text-xs">subscriptions</span>
-                      <span>{isAr ? "الاشتراكات والترفيه" : "Subscriptions"}</span>
-                    </span>
-                    <span className="px-2 py-0.5 rounded-lg bg-surface-container-highest border border-outline-variant/30 flex items-center gap-1">
-                      <span className="material-symbols-outlined text-xs">sim_card</span>
-                      <span>{isAr ? "شرائح الإنترنت eSIM" : "eSIM"}</span>
-                    </span>
-                    <span className="px-2 py-0.5 rounded-lg bg-surface-container-highest border border-outline-variant/30 flex items-center gap-1">
-                      <span className="material-symbols-outlined text-xs">account_balance_wallet</span>
-                      <span>Rewarble</span>
-                    </span>
+                    <div className="flex items-center gap-1.5 mt-2.5 flex-wrap text-[11px] text-on-surface-variant">
+                      <span className="text-primary font-bold">{isAr ? "تشمل:" : "Includes:"}</span>
+                      <span className="px-2 py-0.5 rounded-lg bg-surface-container-highest border border-outline-variant/30 flex items-center gap-1">
+                        <span className="material-symbols-outlined text-xs">sports_esports</span>
+                        <span>{isAr ? "شحن الألعاب المباشر" : "In-Game Topups"}</span>
+                      </span>
+                      <span className="px-2 py-0.5 rounded-lg bg-surface-container-highest border border-outline-variant/30 flex items-center gap-1">
+                        <span className="material-symbols-outlined text-xs">store</span>
+                        <span>{isAr ? "متاجر التطبيقات" : "App Stores"}</span>
+                      </span>
+                      <span className="px-2 py-0.5 rounded-lg bg-surface-container-highest border border-outline-variant/30 flex items-center gap-1">
+                        <span className="material-symbols-outlined text-xs">vpn_key</span>
+                        <span>{isAr ? "أكواد الألعاب" : "Game Codes"}</span>
+                      </span>
+                      <span className="px-2 py-0.5 rounded-lg bg-surface-container-highest border border-outline-variant/30 flex items-center gap-1">
+                        <span className="material-symbols-outlined text-xs">subscriptions</span>
+                        <span>{isAr ? "الاشتراكات والترفيه" : "Subscriptions"}</span>
+                      </span>
+                      <span className="px-2 py-0.5 rounded-lg bg-surface-container-highest border border-outline-variant/30 flex items-center gap-1">
+                        <span className="material-symbols-outlined text-xs">sim_card</span>
+                        <span>{isAr ? "شرائح الإنترنت eSIM" : "eSIM"}</span>
+                      </span>
+                      <span className="px-2 py-0.5 rounded-lg bg-surface-container-highest border border-outline-variant/30 flex items-center gap-1">
+                        <span className="material-symbols-outlined text-xs">account_balance_wallet</span>
+                        <span>Rewarble</span>
+                      </span>
+                    </div>
                   </div>
                 </div>
+
+                <Link
+                  href={`/${lang}/wallet?method=bnb`}
+                  className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition-all shadow-md shrink-0 active:scale-95"
+                >
+                  <span className="material-symbols-outlined text-base">add_card</span>
+                  <span>{isAr ? `شحن المحفظة عبر ${bnbPaymentConfig.transferName}` : `Top-up Wallet via ${bnbPaymentConfig.transferName}`}</span>
+                </Link>
               </div>
-
-              <Link
-                href={`/${lang}/wallet?method=bnb`}
-                className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition-all shadow-md shrink-0 active:scale-95"
-              >
-                <span className="material-symbols-outlined text-base">add_card</span>
-                <span>{isAr ? "شحن المحفظة عبر BNB" : "Top-up Wallet via BNB"}</span>
-              </Link>
-            </div>
+            )}
 
             {/* Bundles Grid with Rich Visual Cards */}
             {loading ? (
