@@ -41,6 +41,8 @@ interface CurrencyConfig {
   usdToSar: number;
   usdToAed: number;
   bankak?: {
+    nameAr?: string;
+    nameEn?: string;
     accountNumber: string;
     accountName: string;
     instructionsAr: string;
@@ -48,6 +50,8 @@ interface CurrencyConfig {
     isActive: boolean;
   };
   fawry?: {
+    nameAr?: string;
+    nameEn?: string;
     accountNumber: string;
     accountName?: string;
     instructionsAr: string;
@@ -55,12 +59,16 @@ interface CurrencyConfig {
     isActive: boolean;
   };
   vodafone?: {
+    nameAr?: string;
+    nameEn?: string;
     walletNumber: string;
     instructionsAr: string;
     instructionsEn: string;
     isActive: boolean;
   };
   binance: {
+    nameAr?: string;
+    nameEn?: string;
     payId: string;
     instructionsAr: string;
     instructionsEn: string;
@@ -77,6 +85,8 @@ interface CurrencyConfig {
     isActive: boolean;
   };
   rewarble?: {
+    nameAr?: string;
+    nameEn?: string;
     address: string;
     transferName: string;
     instructionsAr: string;
@@ -84,6 +94,8 @@ interface CurrencyConfig {
     isActive: boolean;
   };
   paypal: {
+    nameAr?: string;
+    nameEn?: string;
     email: string;
     isActive: boolean;
   };
@@ -233,8 +245,8 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
   if (currencyConfig?.bankak?.isActive !== false) {
     paymentMethods.push({
       id: "bankak",
-      nameAr: "بنك الخرطوم (بنكك)",
-      nameEn: "Bank of Khartoum (Bankak)",
+      nameAr: currencyConfig?.bankak?.nameAr || "بنك الخرطوم (بنكك)",
+      nameEn: currencyConfig?.bankak?.nameEn || "Bank of Khartoum (Bankak)",
       badge: "SD",
       icon: "account_balance",
       color: "from-violet-600 to-purple-700",
@@ -260,8 +272,8 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
   if (currencyConfig?.fawry?.isActive !== false) {
     paymentMethods.push({
       id: "fawry",
-      nameAr: "فوري - بنك فيصل (الرقم الموحد)",
-      nameEn: "Fawri - Faisal Bank (Unified ID)",
+      nameAr: currencyConfig?.fawry?.nameAr || "فوري - بنك فيصل (الرقم الموحد)",
+      nameEn: currencyConfig?.fawry?.nameEn || "Fawri - Faisal Bank (Unified ID)",
       badge: "FAWRI",
       icon: "account_balance",
       color: "from-purple-700 to-indigo-800",
@@ -287,8 +299,8 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
   if (currencyConfig?.vodafone?.isActive !== false) {
     paymentMethods.push({
       id: "vodafone",
-      nameAr: "فودافون كاش (Vodafone Cash)",
-      nameEn: "Vodafone Cash",
+      nameAr: currencyConfig?.vodafone?.nameAr || "فودافون كاش (Vodafone Cash)",
+      nameEn: currencyConfig?.vodafone?.nameEn || "Vodafone Cash",
       badge: "VF",
       icon: "phone_iphone",
       color: "from-red-600 to-rose-700",
@@ -308,8 +320,8 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
   if (currencyConfig?.binance?.isActive !== false) {
     paymentMethods.push({
       id: "binance",
-      nameAr: "Binance Pay (باينانس فوري تلقائي)",
-      nameEn: "Binance Pay (Instant Auto)",
+      nameAr: currencyConfig?.binance?.nameAr || "Binance Pay (باينانس فوري تلقائي)",
+      nameEn: currencyConfig?.binance?.nameEn || "Binance Pay (Instant Auto)",
       badge: "PAY",
       icon: "currency_exchange",
       color: "from-amber-500 to-yellow-600",
@@ -367,8 +379,8 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
   if (currencyConfig?.paypal?.isActive !== false) {
     paymentMethods.push({
       id: "paypal",
-      nameAr: "باي بال PayPal (تلقائي فوري)",
-      nameEn: "PayPal (Instant Auto)",
+      nameAr: currencyConfig?.paypal?.nameAr || "باي بال PayPal (تلقائي فوري)",
+      nameEn: currencyConfig?.paypal?.nameEn || "PayPal (Instant Auto)",
       badge: "PP",
       icon: "payments",
       color: "from-blue-600 to-indigo-600",

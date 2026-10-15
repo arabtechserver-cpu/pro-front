@@ -25,6 +25,8 @@ interface CustomMethod {
 
 interface PaymentMethodsConfig {
   bankak: {
+    nameAr?: string;
+    nameEn?: string;
     accountNumber: string;
     accountName: string;
     instructionsAr: string;
@@ -32,6 +34,8 @@ interface PaymentMethodsConfig {
     isActive: boolean;
   };
   fawry: {
+    nameAr?: string;
+    nameEn?: string;
     accountNumber: string;
     accountName: string;
     instructionsAr: string;
@@ -39,12 +43,16 @@ interface PaymentMethodsConfig {
     isActive: boolean;
   };
   vodafone: {
+    nameAr?: string;
+    nameEn?: string;
     walletNumber: string;
     instructionsAr: string;
     instructionsEn: string;
     isActive: boolean;
   };
   binance: {
+    nameAr?: string;
+    nameEn?: string;
     payId: string;
     instructionsAr: string;
     instructionsEn: string;
@@ -61,6 +69,8 @@ interface PaymentMethodsConfig {
     isActive: boolean;
   };
   rewarble: {
+    nameAr?: string;
+    nameEn?: string;
     address: string;
     transferName: string;
     instructionsAr: string;
@@ -68,6 +78,8 @@ interface PaymentMethodsConfig {
     isActive: boolean;
   };
   paypal: {
+    nameAr?: string;
+    nameEn?: string;
     email: string;
     isActive: boolean;
   };
@@ -77,6 +89,8 @@ interface PaymentMethodsConfig {
 
 const DEFAULT_PAYMENTS_CONFIG: PaymentMethodsConfig = {
   bankak: {
+    nameAr: "بنك الخرطوم (بنكك - Bankak)",
+    nameEn: "Bank of Khartoum (Bankak)",
     accountNumber: "6302273",
     accountName: "حسن",
     instructionsAr: "حول المبلغ بالجنيه السوداني عبر تطبيق بنكك إلى رقم الحساب ثم ارفع صورة إشعار التحويل للتأكيد الفوري.",
@@ -84,6 +98,8 @@ const DEFAULT_PAYMENTS_CONFIG: PaymentMethodsConfig = {
     isActive: true
   },
   fawry: {
+    nameAr: "فوري - بنك فيصل الإسلامي (Fawri)",
+    nameEn: "Fawri - Faisal Islamic Bank",
     accountNumber: "51589889",
     accountName: "الرقم البنكي الموحد",
     instructionsAr: "حول المبلغ بالجنيه السوداني عبر تطبيق فوري (بنك فيصل الإسلامي) إلى الرقم البنكي الموحد (51589889) ثم ارفع صورة إشعار التحويل للتأكيد الفوري.",
@@ -91,19 +107,23 @@ const DEFAULT_PAYMENTS_CONFIG: PaymentMethodsConfig = {
     isActive: true
   },
   vodafone: {
+    nameAr: "فودافون كاش مصر (Vodafone Cash)",
+    nameEn: "Vodafone Cash Egypt",
     walletNumber: "01097160605",
     instructionsAr: "حول المبلغ إلى رقم المحفظة واكتب الرقم المحول منه وارفق صورة رسالة أو إيصال التحويل.",
     instructionsEn: "Transfer funds to wallet number then attach receipt screenshot.",
     isActive: true
   },
   binance: {
+    nameAr: "باينانس باي (Binance Pay)",
+    nameEn: "Binance Pay",
     payId: "894642115",
-    instructionsAr: "افتح تطبيق باينانس واكتب معرف Binance Pay ID ثم ارفق لقطة الشاشة للتأكيد.",
+    instructionsAr: "افتح تطبيق باينانس واكتب معرف Binance Pay ID ثم ارفع لقطة الشاشة للتأكيد.",
     instructionsEn: "Open Binance App and send funds via Pay ID then attach payment screenshot.",
     isActive: true
   },
   cryptoBnb: {
-    nameAr: "تحويل العملات الرقمية (BNB / BEP20 Smart Chain)",
+    nameAr: "عنوان محفظة الكريبتو (BNB / BEP20 Smart Chain)",
     nameEn: "Crypto Transfer (BNB / BEP20 Smart Chain)",
     address: "0xaCc3ab6f0165B39Cf2F1286ED8A778735Ae8314f",
     network: "BNB Smart Chain (BEP20)",
@@ -113,6 +133,8 @@ const DEFAULT_PAYMENTS_CONFIG: PaymentMethodsConfig = {
     isActive: true
   },
   rewarble: {
+    nameAr: "ريواربل (Rewarble)",
+    nameEn: "Rewarble",
     address: "0xaCc3ab6f0165B39Cf2F1286ED8A778735Ae8314f",
     transferName: "BNB",
     instructionsAr: "طريقة تحويل خاصة بقسم Rewarble: اسم التحويل BNB، قم بالتحويل إلى رابط المحفظة ثم ارفع صورة إشعار التحويل للتأكيد الفوري.",
@@ -120,6 +142,8 @@ const DEFAULT_PAYMENTS_CONFIG: PaymentMethodsConfig = {
     isActive: true
   },
   paypal: {
+    nameAr: "باي بال (PayPal)",
+    nameEn: "PayPal",
     email: "paypal@gsmteam.com",
     isActive: true
   },
@@ -673,31 +697,113 @@ export default function AdminSettingsPage() {
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <h3 className="text-base font-bold text-on-surface">بنك الخرطوم (بنكك - Bankak)</h3>
+                    <h3 className="text-base font-bold text-on-surface">
+                      {payments.bankak.nameAr || "بنك الخرطوم (بنكك - Bankak)"}
+                    </h3>
                     <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-violet-500/20 text-violet-400">SDG</span>
                   </div>
                   <p className="text-xs text-on-surface-variant mt-0.5">التحويل المباشر بالجنيه السوداني عبر تطبيق بنكك</p>
                 </div>
               </div>
 
-              <div className="flex items-center gap-2 p-2 rounded-xl bg-surface border border-outline-variant/30">
-                <input
-                  id="toggle-bankak"
-                  type="checkbox"
-                  checked={payments.bankak.isActive}
-                  onChange={(e) => setPayments({
-                    ...payments,
-                    bankak: { ...payments.bankak, isActive: e.target.checked }
-                  })}
-                  className="w-4 h-4 accent-primary cursor-pointer"
-                />
-                <label htmlFor="toggle-bankak" className="text-xs font-bold text-on-surface cursor-pointer select-none">
-                  {payments.bankak.isActive ? "مفعل للشحن" : "معطل"}
-                </label>
+              <div className="flex items-center gap-2 flex-wrap">
+                {payments.bankak.isActive ? (
+                  <button
+                    type="button"
+                    onClick={() => setPayments({
+                      ...payments,
+                      bankak: { ...payments.bankak, isActive: false }
+                    })}
+                    className="px-3 py-1.5 rounded-xl bg-error/10 text-error hover:bg-error/20 border border-error/30 text-xs font-bold flex items-center gap-1.5 transition-all"
+                    title="حذف وإخفاء طريقة بنكك من واجهة العملاء"
+                  >
+                    <span className="material-symbols-outlined text-sm">visibility_off</span>
+                    <span>حذف / إخفاء الطريقة</span>
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setPayments({
+                      ...payments,
+                      bankak: { ...payments.bankak, isActive: true }
+                    })}
+                    className="px-3 py-1.5 rounded-xl bg-primary/10 text-primary hover:bg-primary/20 border border-primary/30 text-xs font-bold flex items-center gap-1.5 transition-all"
+                    title="استعادة وتفعيل طريقة بنكك"
+                  >
+                    <span className="material-symbols-outlined text-sm">visibility</span>
+                    <span>استعادة وتفعيل</span>
+                  </button>
+                )}
+                <div className="flex items-center gap-2 p-1.5 px-2.5 rounded-xl bg-surface border border-outline-variant/30">
+                  <input
+                    id="toggle-bankak"
+                    type="checkbox"
+                    checked={payments.bankak.isActive}
+                    onChange={(e) => setPayments({
+                      ...payments,
+                      bankak: { ...payments.bankak, isActive: e.target.checked }
+                    })}
+                    className="w-4 h-4 accent-primary cursor-pointer"
+                  />
+                  <label htmlFor="toggle-bankak" className="text-xs font-bold text-on-surface cursor-pointer select-none">
+                    {payments.bankak.isActive ? "مفعل للشحن" : "معطل / محذوف"}
+                  </label>
+                </div>
               </div>
             </div>
 
+            {!payments.bankak.isActive && (
+              <div className="p-3.5 rounded-2xl bg-error/10 border border-error/25 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-error font-medium">
+                <div className="flex items-center gap-2">
+                  <span className="material-symbols-outlined text-base">warning</span>
+                  <span>تم حذف وإخفاء هذه الطريقة من واجهة العملاء، ولن تظهر في خيارات شحن المحفظة.</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setPayments({
+                    ...payments,
+                    bankak: { ...payments.bankak, isActive: true }
+                  })}
+                  className="px-3 py-1 bg-error text-white text-[11px] font-bold rounded-lg hover:bg-error/90 transition-all shrink-0 self-start sm:self-auto"
+                >
+                  استعادة الآن
+                </button>
+              </div>
+            )}
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-bold text-on-surface mb-2">
+                  اسم طريقة الدفع الذي يظهر في الأعلى وللعملاء (Display Name) *
+                </label>
+                <input
+                  type="text"
+                  value={payments.bankak.nameAr || ""}
+                  onChange={(e) => setPayments({
+                    ...payments,
+                    bankak: { ...payments.bankak, nameAr: e.target.value }
+                  })}
+                  placeholder="مثال: بنك الخرطوم (بنكك - Bankak)"
+                  className="w-full bg-surface px-4 py-2.5 rounded-xl border border-outline-variant/50 focus:border-primary outline-none text-xs font-bold text-on-surface"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-on-surface mb-2">
+                  الاسم بالإنجليزية (Display Name EN - اختياري)
+                </label>
+                <input
+                  type="text"
+                  value={payments.bankak.nameEn || ""}
+                  onChange={(e) => setPayments({
+                    ...payments,
+                    bankak: { ...payments.bankak, nameEn: e.target.value }
+                  })}
+                  placeholder="مثال: Bank of Khartoum (Bankak)"
+                  className="w-full bg-surface px-4 py-2.5 rounded-xl border border-outline-variant/50 focus:border-primary outline-none text-xs text-on-surface text-left dir-ltr"
+                />
+              </div>
+
               <div>
                 <label className="block text-xs font-bold text-on-surface mb-2">
                   رقم حساب بنك الخرطوم (Bankak Account Number) *
@@ -768,31 +874,113 @@ export default function AdminSettingsPage() {
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <h3 className="text-base font-bold text-on-surface">فوري - بنك فيصل الإسلامي (Fawri)</h3>
+                    <h3 className="text-base font-bold text-on-surface">
+                      {payments.fawry.nameAr || "فوري - بنك فيصل الإسلامي (Fawri)"}
+                    </h3>
                     <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-purple-500/20 text-purple-400">الرقم الموحد</span>
                   </div>
                   <p className="text-xs text-on-surface-variant mt-0.5">التحويل عبر تطبيق فوري إلى الرقم البنكي الموحد</p>
                 </div>
               </div>
 
-              <div className="flex items-center gap-2 p-2 rounded-xl bg-surface border border-outline-variant/30">
-                <input
-                  id="toggle-fawry"
-                  type="checkbox"
-                  checked={payments.fawry.isActive}
-                  onChange={(e) => setPayments({
-                    ...payments,
-                    fawry: { ...payments.fawry, isActive: e.target.checked }
-                  })}
-                  className="w-4 h-4 accent-primary cursor-pointer"
-                />
-                <label htmlFor="toggle-fawry" className="text-xs font-bold text-on-surface cursor-pointer select-none">
-                  {payments.fawry.isActive ? "مفعل للشحن" : "معطل"}
-                </label>
+              <div className="flex items-center gap-2 flex-wrap">
+                {payments.fawry.isActive ? (
+                  <button
+                    type="button"
+                    onClick={() => setPayments({
+                      ...payments,
+                      fawry: { ...payments.fawry, isActive: false }
+                    })}
+                    className="px-3 py-1.5 rounded-xl bg-error/10 text-error hover:bg-error/20 border border-error/30 text-xs font-bold flex items-center gap-1.5 transition-all"
+                    title="حذف وإخفاء طريقة فوري من واجهة العملاء"
+                  >
+                    <span className="material-symbols-outlined text-sm">visibility_off</span>
+                    <span>حذف / إخفاء الطريقة</span>
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setPayments({
+                      ...payments,
+                      fawry: { ...payments.fawry, isActive: true }
+                    })}
+                    className="px-3 py-1.5 rounded-xl bg-primary/10 text-primary hover:bg-primary/20 border border-primary/30 text-xs font-bold flex items-center gap-1.5 transition-all"
+                    title="استعادة وتفعيل طريقة فوري"
+                  >
+                    <span className="material-symbols-outlined text-sm">visibility</span>
+                    <span>استعادة وتفعيل</span>
+                  </button>
+                )}
+                <div className="flex items-center gap-2 p-1.5 px-2.5 rounded-xl bg-surface border border-outline-variant/30">
+                  <input
+                    id="toggle-fawry"
+                    type="checkbox"
+                    checked={payments.fawry.isActive}
+                    onChange={(e) => setPayments({
+                      ...payments,
+                      fawry: { ...payments.fawry, isActive: e.target.checked }
+                    })}
+                    className="w-4 h-4 accent-primary cursor-pointer"
+                  />
+                  <label htmlFor="toggle-fawry" className="text-xs font-bold text-on-surface cursor-pointer select-none">
+                    {payments.fawry.isActive ? "مفعل للشحن" : "معطل / محذوف"}
+                  </label>
+                </div>
               </div>
             </div>
 
+            {!payments.fawry.isActive && (
+              <div className="p-3.5 rounded-2xl bg-error/10 border border-error/25 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-error font-medium">
+                <div className="flex items-center gap-2">
+                  <span className="material-symbols-outlined text-base">warning</span>
+                  <span>تم حذف وإخفاء هذه الطريقة من واجهة العملاء، ولن تظهر في خيارات شحن المحفظة.</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setPayments({
+                    ...payments,
+                    fawry: { ...payments.fawry, isActive: true }
+                  })}
+                  className="px-3 py-1 bg-error text-white text-[11px] font-bold rounded-lg hover:bg-error/90 transition-all shrink-0 self-start sm:self-auto"
+                >
+                  استعادة الآن
+                </button>
+              </div>
+            )}
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-bold text-on-surface mb-2">
+                  اسم طريقة الدفع الذي يظهر في الأعلى وللعملاء (Display Name) *
+                </label>
+                <input
+                  type="text"
+                  value={payments.fawry.nameAr || ""}
+                  onChange={(e) => setPayments({
+                    ...payments,
+                    fawry: { ...payments.fawry, nameAr: e.target.value }
+                  })}
+                  placeholder="مثال: فوري - بنك فيصل الإسلامي (Fawri)"
+                  className="w-full bg-surface px-4 py-2.5 rounded-xl border border-outline-variant/50 focus:border-primary outline-none text-xs font-bold text-on-surface"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-on-surface mb-2">
+                  الاسم بالإنجليزية (Display Name EN - اختياري)
+                </label>
+                <input
+                  type="text"
+                  value={payments.fawry.nameEn || ""}
+                  onChange={(e) => setPayments({
+                    ...payments,
+                    fawry: { ...payments.fawry, nameEn: e.target.value }
+                  })}
+                  placeholder="مثال: Fawri - Faisal Islamic Bank"
+                  className="w-full bg-surface px-4 py-2.5 rounded-xl border border-outline-variant/50 focus:border-primary outline-none text-xs text-on-surface text-left dir-ltr"
+                />
+              </div>
+
               <div>
                 <label className="block text-xs font-bold text-on-surface mb-2">
                   الرقم البنكي الموحد (Unified Banking ID) *
@@ -863,31 +1051,113 @@ export default function AdminSettingsPage() {
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <h3 className="text-base font-bold text-on-surface">فودافون كاش مصر (Vodafone Cash)</h3>
+                    <h3 className="text-base font-bold text-on-surface">
+                      {payments.vodafone.nameAr || "فودافون كاش مصر (Vodafone Cash)"}
+                    </h3>
                     <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-red-500/20 text-red-400">EGP</span>
                   </div>
                   <p className="text-xs text-on-surface-variant mt-0.5">استقبال التحويلات عبر محفظة فودافون كاش بالجنيه المصري</p>
                 </div>
               </div>
 
-              <div className="flex items-center gap-2 p-2 rounded-xl bg-surface border border-outline-variant/30">
-                <input
-                  id="toggle-vodafone"
-                  type="checkbox"
-                  checked={payments.vodafone.isActive}
-                  onChange={(e) => setPayments({
-                    ...payments,
-                    vodafone: { ...payments.vodafone, isActive: e.target.checked }
-                  })}
-                  className="w-4 h-4 accent-primary cursor-pointer"
-                />
-                <label htmlFor="toggle-vodafone" className="text-xs font-bold text-on-surface cursor-pointer select-none">
-                  {payments.vodafone.isActive ? "مفعل للشحن" : "معطل"}
-                </label>
+              <div className="flex items-center gap-2 flex-wrap">
+                {payments.vodafone.isActive ? (
+                  <button
+                    type="button"
+                    onClick={() => setPayments({
+                      ...payments,
+                      vodafone: { ...payments.vodafone, isActive: false }
+                    })}
+                    className="px-3 py-1.5 rounded-xl bg-error/10 text-error hover:bg-error/20 border border-error/30 text-xs font-bold flex items-center gap-1.5 transition-all"
+                    title="حذف وإخفاء طريقة فودافون كاش من واجهة العملاء"
+                  >
+                    <span className="material-symbols-outlined text-sm">visibility_off</span>
+                    <span>حذف / إخفاء الطريقة</span>
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setPayments({
+                      ...payments,
+                      vodafone: { ...payments.vodafone, isActive: true }
+                    })}
+                    className="px-3 py-1.5 rounded-xl bg-primary/10 text-primary hover:bg-primary/20 border border-primary/30 text-xs font-bold flex items-center gap-1.5 transition-all"
+                    title="استعادة وتفعيل طريقة فودافون كاش"
+                  >
+                    <span className="material-symbols-outlined text-sm">visibility</span>
+                    <span>استعادة وتفعيل</span>
+                  </button>
+                )}
+                <div className="flex items-center gap-2 p-1.5 px-2.5 rounded-xl bg-surface border border-outline-variant/30">
+                  <input
+                    id="toggle-vodafone"
+                    type="checkbox"
+                    checked={payments.vodafone.isActive}
+                    onChange={(e) => setPayments({
+                      ...payments,
+                      vodafone: { ...payments.vodafone, isActive: e.target.checked }
+                    })}
+                    className="w-4 h-4 accent-primary cursor-pointer"
+                  />
+                  <label htmlFor="toggle-vodafone" className="text-xs font-bold text-on-surface cursor-pointer select-none">
+                    {payments.vodafone.isActive ? "مفعل للشحن" : "معطل / محذوف"}
+                  </label>
+                </div>
               </div>
             </div>
 
+            {!payments.vodafone.isActive && (
+              <div className="p-3.5 rounded-2xl bg-error/10 border border-error/25 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-error font-medium">
+                <div className="flex items-center gap-2">
+                  <span className="material-symbols-outlined text-base">warning</span>
+                  <span>تم حذف وإخفاء هذه الطريقة من واجهة العملاء، ولن تظهر في خيارات شحن المحفظة.</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setPayments({
+                    ...payments,
+                    vodafone: { ...payments.vodafone, isActive: true }
+                  })}
+                  className="px-3 py-1 bg-error text-white text-[11px] font-bold rounded-lg hover:bg-error/90 transition-all shrink-0 self-start sm:self-auto"
+                >
+                  استعادة الآن
+                </button>
+              </div>
+            )}
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-bold text-on-surface mb-2">
+                  اسم طريقة الدفع الذي يظهر في الأعلى وللعملاء (Display Name) *
+                </label>
+                <input
+                  type="text"
+                  value={payments.vodafone.nameAr || ""}
+                  onChange={(e) => setPayments({
+                    ...payments,
+                    vodafone: { ...payments.vodafone, nameAr: e.target.value }
+                  })}
+                  placeholder="مثال: فودافون كاش مصر (Vodafone Cash)"
+                  className="w-full bg-surface px-4 py-2.5 rounded-xl border border-outline-variant/50 focus:border-primary outline-none text-xs font-bold text-on-surface"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-on-surface mb-2">
+                  الاسم بالإنجليزية (Display Name EN - اختياري)
+                </label>
+                <input
+                  type="text"
+                  value={payments.vodafone.nameEn || ""}
+                  onChange={(e) => setPayments({
+                    ...payments,
+                    vodafone: { ...payments.vodafone, nameEn: e.target.value }
+                  })}
+                  placeholder="مثال: Vodafone Cash Egypt"
+                  className="w-full bg-surface px-4 py-2.5 rounded-xl border border-outline-variant/50 focus:border-primary outline-none text-xs text-on-surface text-left dir-ltr"
+                />
+              </div>
+
               <div>
                 <label className="block text-xs font-bold text-on-surface mb-2">
                   رقم محفظة فودافون كاش (Wallet Number) *
@@ -942,31 +1212,113 @@ export default function AdminSettingsPage() {
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <h3 className="text-base font-bold text-on-surface">باينانس باي (Binance Pay)</h3>
+                    <h3 className="text-base font-bold text-on-surface">
+                      {payments.binance.nameAr || "باينانس باي (Binance Pay)"}
+                    </h3>
                     <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-400">فوري</span>
                   </div>
                   <p className="text-xs text-on-surface-variant mt-0.5">الدفع السريع ومطابقة التحويل عبر Binance Pay ID</p>
                 </div>
               </div>
 
-              <div className="flex items-center gap-2 p-2 rounded-xl bg-surface border border-outline-variant/30">
-                <input
-                  id="toggle-binance"
-                  type="checkbox"
-                  checked={payments.binance.isActive}
-                  onChange={(e) => setPayments({
-                    ...payments,
-                    binance: { ...payments.binance, isActive: e.target.checked }
-                  })}
-                  className="w-4 h-4 accent-primary cursor-pointer"
-                />
-                <label htmlFor="toggle-binance" className="text-xs font-bold text-on-surface cursor-pointer select-none">
-                  {payments.binance.isActive ? "مفعل للشحن" : "معطل"}
-                </label>
+              <div className="flex items-center gap-2 flex-wrap">
+                {payments.binance.isActive ? (
+                  <button
+                    type="button"
+                    onClick={() => setPayments({
+                      ...payments,
+                      binance: { ...payments.binance, isActive: false }
+                    })}
+                    className="px-3 py-1.5 rounded-xl bg-error/10 text-error hover:bg-error/20 border border-error/30 text-xs font-bold flex items-center gap-1.5 transition-all"
+                    title="حذف وإخفاء طريقة باينانس باي من واجهة العملاء"
+                  >
+                    <span className="material-symbols-outlined text-sm">visibility_off</span>
+                    <span>حذف / إخفاء الطريقة</span>
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setPayments({
+                      ...payments,
+                      binance: { ...payments.binance, isActive: true }
+                    })}
+                    className="px-3 py-1.5 rounded-xl bg-primary/10 text-primary hover:bg-primary/20 border border-primary/30 text-xs font-bold flex items-center gap-1.5 transition-all"
+                    title="استعادة وتفعيل طريقة باينانس باي"
+                  >
+                    <span className="material-symbols-outlined text-sm">visibility</span>
+                    <span>استعادة وتفعيل</span>
+                  </button>
+                )}
+                <div className="flex items-center gap-2 p-1.5 px-2.5 rounded-xl bg-surface border border-outline-variant/30">
+                  <input
+                    id="toggle-binance"
+                    type="checkbox"
+                    checked={payments.binance.isActive}
+                    onChange={(e) => setPayments({
+                      ...payments,
+                      binance: { ...payments.binance, isActive: e.target.checked }
+                    })}
+                    className="w-4 h-4 accent-primary cursor-pointer"
+                  />
+                  <label htmlFor="toggle-binance" className="text-xs font-bold text-on-surface cursor-pointer select-none">
+                    {payments.binance.isActive ? "مفعل للشحن" : "معطل / محذوف"}
+                  </label>
+                </div>
               </div>
             </div>
 
+            {!payments.binance.isActive && (
+              <div className="p-3.5 rounded-2xl bg-error/10 border border-error/25 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-error font-medium">
+                <div className="flex items-center gap-2">
+                  <span className="material-symbols-outlined text-base">warning</span>
+                  <span>تم حذف وإخفاء هذه الطريقة من واجهة العملاء، ولن تظهر في خيارات شحن المحفظة.</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setPayments({
+                    ...payments,
+                    binance: { ...payments.binance, isActive: true }
+                  })}
+                  className="px-3 py-1 bg-error text-white text-[11px] font-bold rounded-lg hover:bg-error/90 transition-all shrink-0 self-start sm:self-auto"
+                >
+                  استعادة الآن
+                </button>
+              </div>
+            )}
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-bold text-on-surface mb-2">
+                  اسم طريقة الدفع الذي يظهر في الأعلى وللعملاء (Display Name) *
+                </label>
+                <input
+                  type="text"
+                  value={payments.binance.nameAr || ""}
+                  onChange={(e) => setPayments({
+                    ...payments,
+                    binance: { ...payments.binance, nameAr: e.target.value }
+                  })}
+                  placeholder="مثال: باينانس باي (Binance Pay)"
+                  className="w-full bg-surface px-4 py-2.5 rounded-xl border border-outline-variant/50 focus:border-primary outline-none text-xs font-bold text-on-surface"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-on-surface mb-2">
+                  الاسم بالإنجليزية (Display Name EN - اختياري)
+                </label>
+                <input
+                  type="text"
+                  value={payments.binance.nameEn || ""}
+                  onChange={(e) => setPayments({
+                    ...payments,
+                    binance: { ...payments.binance, nameEn: e.target.value }
+                  })}
+                  placeholder="مثال: Binance Pay"
+                  className="w-full bg-surface px-4 py-2.5 rounded-xl border border-outline-variant/50 focus:border-primary outline-none text-xs text-on-surface text-left dir-ltr"
+                />
+              </div>
+
               <div>
                 <label className="block text-xs font-bold text-on-surface mb-2">
                   معرف باينانس باي (Binance Pay ID) *
@@ -1034,38 +1386,104 @@ export default function AdminSettingsPage() {
                 </div>
               </div>
 
-              <div className="flex items-center gap-2 p-2 rounded-xl bg-surface border border-outline-variant/30">
-                <input
-                  id="toggle-cryptoBnb"
-                  type="checkbox"
-                  checked={payments.cryptoBnb.isActive}
-                  onChange={(e) => setPayments({
-                    ...payments,
-                    cryptoBnb: { ...payments.cryptoBnb, isActive: e.target.checked }
-                  })}
-                  className="w-4 h-4 accent-primary cursor-pointer"
-                />
-                <label htmlFor="toggle-cryptoBnb" className="text-xs font-bold text-on-surface cursor-pointer select-none">
-                  {payments.cryptoBnb.isActive ? "مفعل للشحن" : "معطل"}
-                </label>
+              <div className="flex items-center gap-2 flex-wrap">
+                {payments.cryptoBnb.isActive ? (
+                  <button
+                    type="button"
+                    onClick={() => setPayments({
+                      ...payments,
+                      cryptoBnb: { ...payments.cryptoBnb, isActive: false }
+                    })}
+                    className="px-3 py-1.5 rounded-xl bg-error/10 text-error hover:bg-error/20 border border-error/30 text-xs font-bold flex items-center gap-1.5 transition-all"
+                    title="حذف وإخفاء طريقة الكريبتو من واجهة العملاء"
+                  >
+                    <span className="material-symbols-outlined text-sm">visibility_off</span>
+                    <span>حذف / إخفاء الطريقة</span>
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setPayments({
+                      ...payments,
+                      cryptoBnb: { ...payments.cryptoBnb, isActive: true }
+                    })}
+                    className="px-3 py-1.5 rounded-xl bg-primary/10 text-primary hover:bg-primary/20 border border-primary/30 text-xs font-bold flex items-center gap-1.5 transition-all"
+                    title="استعادة وتفعيل طريقة الكريبتو"
+                  >
+                    <span className="material-symbols-outlined text-sm">visibility</span>
+                    <span>استعادة وتفعيل</span>
+                  </button>
+                )}
+                <div className="flex items-center gap-2 p-1.5 px-2.5 rounded-xl bg-surface border border-outline-variant/30">
+                  <input
+                    id="toggle-cryptoBnb"
+                    type="checkbox"
+                    checked={payments.cryptoBnb.isActive}
+                    onChange={(e) => setPayments({
+                      ...payments,
+                      cryptoBnb: { ...payments.cryptoBnb, isActive: e.target.checked }
+                    })}
+                    className="w-4 h-4 accent-primary cursor-pointer"
+                  />
+                  <label htmlFor="toggle-cryptoBnb" className="text-xs font-bold text-on-surface cursor-pointer select-none">
+                    {payments.cryptoBnb.isActive ? "مفعل للشحن" : "معطل / محذوف"}
+                  </label>
+                </div>
               </div>
             </div>
 
-            <div className="space-y-4">
-              <div>
-                <label className="block text-xs font-bold text-on-surface mb-2">
-                  اسم طريقة الدفع التي تظهر للعملاء (Display Name)
-                </label>
-                <input
-                  type="text"
-                  value={payments.cryptoBnb.nameAr || ""}
-                  onChange={(e) => setPayments({
+            {!payments.cryptoBnb.isActive && (
+              <div className="p-3.5 rounded-2xl bg-error/10 border border-error/25 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-error font-medium">
+                <div className="flex items-center gap-2">
+                  <span className="material-symbols-outlined text-base">warning</span>
+                  <span>تم حذف وإخفاء هذه الطريقة من واجهة العملاء، ولن تظهر في خيارات شحن المحفظة.</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setPayments({
                     ...payments,
-                    cryptoBnb: { ...payments.cryptoBnb, nameAr: e.target.value }
+                    cryptoBnb: { ...payments.cryptoBnb, isActive: true }
                   })}
-                  placeholder="مثال: تحويل العملات الرقمية (BNB / BEP20 Smart Chain)"
-                  className="w-full bg-surface px-4 py-2.5 rounded-xl border border-outline-variant/50 focus:border-amber-500 outline-none text-xs font-bold text-on-surface"
-                />
+                  className="px-3 py-1 bg-error text-white text-[11px] font-bold rounded-lg hover:bg-error/90 transition-all shrink-0 self-start sm:self-auto"
+                >
+                  استعادة الآن
+                </button>
+              </div>
+            )}
+
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-on-surface mb-2">
+                    اسم طريقة الدفع الذي يظهر في الأعلى وللعملاء (Display Name) *
+                  </label>
+                  <input
+                    type="text"
+                    value={payments.cryptoBnb.nameAr || ""}
+                    onChange={(e) => setPayments({
+                      ...payments,
+                      cryptoBnb: { ...payments.cryptoBnb, nameAr: e.target.value }
+                    })}
+                    placeholder="مثال: عنوان محفظة الكريبتو (BNB / BEP20 Smart Chain)"
+                    className="w-full bg-surface px-4 py-2.5 rounded-xl border border-outline-variant/50 focus:border-amber-500 outline-none text-xs font-bold text-on-surface"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-on-surface mb-2">
+                    الاسم بالإنجليزية (Display Name EN - اختياري)
+                  </label>
+                  <input
+                    type="text"
+                    value={payments.cryptoBnb.nameEn || ""}
+                    onChange={(e) => setPayments({
+                      ...payments,
+                      cryptoBnb: { ...payments.cryptoBnb, nameEn: e.target.value }
+                    })}
+                    placeholder="مثال: Crypto Transfer (BNB / BEP20 Smart Chain)"
+                    className="w-full bg-surface px-4 py-2.5 rounded-xl border border-outline-variant/50 focus:border-amber-500 outline-none text-xs text-on-surface text-left dir-ltr"
+                  />
+                </div>
               </div>
 
               <div>
@@ -1181,7 +1599,7 @@ export default function AdminSettingsPage() {
                   </span>
                 </div>
                 <div className="text-xs font-bold text-on-surface">
-                  {payments.cryptoBnb.nameAr || "تحويل العملات الرقمية (BNB / BEP20 Smart Chain)"}
+                  {payments.cryptoBnb.nameAr || "عنوان محفظة الكريبتو (BNB / BEP20 Smart Chain)"}
                 </div>
                 <div className="p-2.5 rounded-xl bg-surface-container font-mono text-xs font-bold text-amber-400 dir-ltr text-left break-all select-all flex items-center justify-between gap-2">
                   <span>{payments.cryptoBnb.address || "0x..."}</span>
@@ -1220,31 +1638,113 @@ export default function AdminSettingsPage() {
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <h3 className="text-base font-bold text-on-surface">ريواربل (Rewarble)</h3>
+                    <h3 className="text-base font-bold text-on-surface">
+                      {payments.rewarble.nameAr || "ريواربل (Rewarble)"}
+                    </h3>
                     <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-500/20 text-indigo-400">قسائم</span>
                   </div>
                   <p className="text-xs text-on-surface-variant mt-0.5">عنوان التحويل المخصص لقسم قسائم وبطاقات Rewarble</p>
                 </div>
               </div>
 
-              <div className="flex items-center gap-2 p-2 rounded-xl bg-surface border border-outline-variant/30">
-                <input
-                  id="toggle-rewarble"
-                  type="checkbox"
-                  checked={payments.rewarble.isActive}
-                  onChange={(e) => setPayments({
-                    ...payments,
-                    rewarble: { ...payments.rewarble, isActive: e.target.checked }
-                  })}
-                  className="w-4 h-4 accent-primary cursor-pointer"
-                />
-                <label htmlFor="toggle-rewarble" className="text-xs font-bold text-on-surface cursor-pointer select-none">
-                  {payments.rewarble.isActive ? "مفعل للشحن" : "معطل"}
-                </label>
+              <div className="flex items-center gap-2 flex-wrap">
+                {payments.rewarble.isActive ? (
+                  <button
+                    type="button"
+                    onClick={() => setPayments({
+                      ...payments,
+                      rewarble: { ...payments.rewarble, isActive: false }
+                    })}
+                    className="px-3 py-1.5 rounded-xl bg-error/10 text-error hover:bg-error/20 border border-error/30 text-xs font-bold flex items-center gap-1.5 transition-all"
+                    title="حذف وإخفاء طريقة ريواربل من واجهة العملاء"
+                  >
+                    <span className="material-symbols-outlined text-sm">visibility_off</span>
+                    <span>حذف / إخفاء الطريقة</span>
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setPayments({
+                      ...payments,
+                      rewarble: { ...payments.rewarble, isActive: true }
+                    })}
+                    className="px-3 py-1.5 rounded-xl bg-primary/10 text-primary hover:bg-primary/20 border border-primary/30 text-xs font-bold flex items-center gap-1.5 transition-all"
+                    title="استعادة وتفعيل طريقة ريواربل"
+                  >
+                    <span className="material-symbols-outlined text-sm">visibility</span>
+                    <span>استعادة وتفعيل</span>
+                  </button>
+                )}
+                <div className="flex items-center gap-2 p-1.5 px-2.5 rounded-xl bg-surface border border-outline-variant/30">
+                  <input
+                    id="toggle-rewarble"
+                    type="checkbox"
+                    checked={payments.rewarble.isActive}
+                    onChange={(e) => setPayments({
+                      ...payments,
+                      rewarble: { ...payments.rewarble, isActive: e.target.checked }
+                    })}
+                    className="w-4 h-4 accent-primary cursor-pointer"
+                  />
+                  <label htmlFor="toggle-rewarble" className="text-xs font-bold text-on-surface cursor-pointer select-none">
+                    {payments.rewarble.isActive ? "مفعل للشحن" : "معطل / محذوف"}
+                  </label>
+                </div>
               </div>
             </div>
 
+            {!payments.rewarble.isActive && (
+              <div className="p-3.5 rounded-2xl bg-error/10 border border-error/25 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-error font-medium">
+                <div className="flex items-center gap-2">
+                  <span className="material-symbols-outlined text-base">warning</span>
+                  <span>تم حذف وإخفاء هذه الطريقة من واجهة العملاء، ولن تظهر في خيارات شحن المحفظة.</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setPayments({
+                    ...payments,
+                    rewarble: { ...payments.rewarble, isActive: true }
+                  })}
+                  className="px-3 py-1 bg-error text-white text-[11px] font-bold rounded-lg hover:bg-error/90 transition-all shrink-0 self-start sm:self-auto"
+                >
+                  استعادة الآن
+                </button>
+              </div>
+            )}
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-bold text-on-surface mb-2">
+                  اسم طريقة الدفع الذي يظهر في الأعلى وللعملاء (Display Name) *
+                </label>
+                <input
+                  type="text"
+                  value={payments.rewarble.nameAr || ""}
+                  onChange={(e) => setPayments({
+                    ...payments,
+                    rewarble: { ...payments.rewarble, nameAr: e.target.value }
+                  })}
+                  placeholder="مثال: ريواربل (Rewarble)"
+                  className="w-full bg-surface px-4 py-2.5 rounded-xl border border-outline-variant/50 focus:border-primary outline-none text-xs font-bold text-on-surface"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-on-surface mb-2">
+                  الاسم بالإنجليزية (Display Name EN - اختياري)
+                </label>
+                <input
+                  type="text"
+                  value={payments.rewarble.nameEn || ""}
+                  onChange={(e) => setPayments({
+                    ...payments,
+                    rewarble: { ...payments.rewarble, nameEn: e.target.value }
+                  })}
+                  placeholder="مثال: Rewarble"
+                  className="w-full bg-surface px-4 py-2.5 rounded-xl border border-outline-variant/50 focus:border-primary outline-none text-xs text-on-surface text-left dir-ltr"
+                />
+              </div>
+
               <div>
                 <label className="block text-xs font-bold text-on-surface mb-2">عنوان محفظة Rewarble *</label>
                 <div className="relative">
@@ -1308,55 +1808,139 @@ export default function AdminSettingsPage() {
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <h3 className="text-base font-bold text-on-surface">باي بال (PayPal)</h3>
+                    <h3 className="text-base font-bold text-on-surface">
+                      {payments.paypal.nameAr || "باي بال (PayPal)"}
+                    </h3>
                     <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-500/20 text-blue-400">بوابة دفع</span>
                   </div>
                   <p className="text-xs text-on-surface-variant mt-0.5">الدفع الآلي المباشر عبر بطاقات الائتمان ومحفظة PayPal</p>
                 </div>
               </div>
 
-              <div className="flex items-center gap-2 p-2 rounded-xl bg-surface border border-outline-variant/30">
-                <input
-                  id="toggle-paypal"
-                  type="checkbox"
-                  checked={payments.paypal.isActive}
-                  onChange={(e) => setPayments({
-                    ...payments,
-                    paypal: { ...payments.paypal, isActive: e.target.checked }
-                  })}
-                  className="w-4 h-4 accent-primary cursor-pointer"
-                />
-                <label htmlFor="toggle-paypal" className="text-xs font-bold text-on-surface cursor-pointer select-none">
-                  {payments.paypal.isActive ? "مفعل للشحن" : "معطل"}
-                </label>
+              <div className="flex items-center gap-2 flex-wrap">
+                {payments.paypal.isActive ? (
+                  <button
+                    type="button"
+                    onClick={() => setPayments({
+                      ...payments,
+                      paypal: { ...payments.paypal, isActive: false }
+                    })}
+                    className="px-3 py-1.5 rounded-xl bg-error/10 text-error hover:bg-error/20 border border-error/30 text-xs font-bold flex items-center gap-1.5 transition-all"
+                    title="حذف وإخفاء طريقة باي بال من واجهة العملاء"
+                  >
+                    <span className="material-symbols-outlined text-sm">visibility_off</span>
+                    <span>حذف / إخفاء الطريقة</span>
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setPayments({
+                      ...payments,
+                      paypal: { ...payments.paypal, isActive: true }
+                    })}
+                    className="px-3 py-1.5 rounded-xl bg-primary/10 text-primary hover:bg-primary/20 border border-primary/30 text-xs font-bold flex items-center gap-1.5 transition-all"
+                    title="استعادة وتفعيل طريقة باي بال"
+                  >
+                    <span className="material-symbols-outlined text-sm">visibility</span>
+                    <span>استعادة وتفعيل</span>
+                  </button>
+                )}
+                <div className="flex items-center gap-2 p-1.5 px-2.5 rounded-xl bg-surface border border-outline-variant/30">
+                  <input
+                    id="toggle-paypal"
+                    type="checkbox"
+                    checked={payments.paypal.isActive}
+                    onChange={(e) => setPayments({
+                      ...payments,
+                      paypal: { ...payments.paypal, isActive: e.target.checked }
+                    })}
+                    className="w-4 h-4 accent-primary cursor-pointer"
+                  />
+                  <label htmlFor="toggle-paypal" className="text-xs font-bold text-on-surface cursor-pointer select-none">
+                    {payments.paypal.isActive ? "مفعل للشحن" : "معطل / محذوف"}
+                  </label>
+                </div>
               </div>
             </div>
 
-            <div>
-              <label className="block text-xs font-bold text-on-surface mb-2">
-                بريد حساب PayPal الإلكتروني (PayPal Email) *
-              </label>
-              <div className="relative max-w-md">
-                <input
-                  type="email"
-                  value={payments.paypal.email}
-                  onChange={(e) => setPayments({
-                    ...payments,
-                    paypal: { ...payments.paypal, email: e.target.value }
-                  })}
-                  placeholder="paypal@example.com"
-                  className="w-full bg-surface px-4 py-3 rounded-xl border border-outline-variant/50 focus:border-primary outline-none font-mono text-xs font-bold text-on-surface text-left dir-ltr"
-                />
+            {!payments.paypal.isActive && (
+              <div className="p-3.5 rounded-2xl bg-error/10 border border-error/25 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-error font-medium">
+                <div className="flex items-center gap-2">
+                  <span className="material-symbols-outlined text-base">warning</span>
+                  <span>تم حذف وإخفاء هذه الطريقة من واجهة العملاء، ولن تظهر في خيارات شحن المحفظة.</span>
+                </div>
                 <button
                   type="button"
-                  onClick={() => handleCopy(payments.paypal.email, "paypal-email")}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 px-2.5 py-1 text-[11px] font-bold rounded-lg bg-surface-container text-primary hover:bg-primary hover:text-on-primary transition-all flex items-center gap-1"
+                  onClick={() => setPayments({
+                    ...payments,
+                    paypal: { ...payments.paypal, isActive: true }
+                  })}
+                  className="px-3 py-1 bg-error text-white text-[11px] font-bold rounded-lg hover:bg-error/90 transition-all shrink-0 self-start sm:self-auto"
                 >
-                  <span className="material-symbols-outlined text-sm">
-                    {copiedKey === "paypal-email" ? "check" : "content_copy"}
-                  </span>
-                  <span>{copiedKey === "paypal-email" ? "تم" : "نسخ"}</span>
+                  استعادة الآن
                 </button>
+              </div>
+            )}
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-bold text-on-surface mb-2">
+                  اسم طريقة الدفع الذي يظهر في الأعلى وللعملاء (Display Name) *
+                </label>
+                <input
+                  type="text"
+                  value={payments.paypal.nameAr || ""}
+                  onChange={(e) => setPayments({
+                    ...payments,
+                    paypal: { ...payments.paypal, nameAr: e.target.value }
+                  })}
+                  placeholder="مثال: باي بال (PayPal)"
+                  className="w-full bg-surface px-4 py-2.5 rounded-xl border border-outline-variant/50 focus:border-primary outline-none text-xs font-bold text-on-surface"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-on-surface mb-2">
+                  الاسم بالإنجليزية (Display Name EN - اختياري)
+                </label>
+                <input
+                  type="text"
+                  value={payments.paypal.nameEn || ""}
+                  onChange={(e) => setPayments({
+                    ...payments,
+                    paypal: { ...payments.paypal, nameEn: e.target.value }
+                  })}
+                  placeholder="مثال: PayPal"
+                  className="w-full bg-surface px-4 py-2.5 rounded-xl border border-outline-variant/50 focus:border-primary outline-none text-xs text-on-surface text-left dir-ltr"
+                />
+              </div>
+
+              <div className="md:col-span-2">
+                <label className="block text-xs font-bold text-on-surface mb-2">
+                  بريد حساب PayPal الإلكتروني (PayPal Email) *
+                </label>
+                <div className="relative max-w-md">
+                  <input
+                    type="email"
+                    value={payments.paypal.email}
+                    onChange={(e) => setPayments({
+                      ...payments,
+                      paypal: { ...payments.paypal, email: e.target.value }
+                    })}
+                    placeholder="paypal@example.com"
+                    className="w-full bg-surface px-4 py-3 rounded-xl border border-outline-variant/50 focus:border-primary outline-none font-mono text-xs font-bold text-on-surface text-left dir-ltr"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => handleCopy(payments.paypal.email, "paypal-email")}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 px-2.5 py-1 text-[11px] font-bold rounded-lg bg-surface-container text-primary hover:bg-primary hover:text-on-primary transition-all flex items-center gap-1"
+                  >
+                    <span className="material-symbols-outlined text-sm">
+                      {copiedKey === "paypal-email" ? "check" : "content_copy"}
+                    </span>
+                    <span>{copiedKey === "paypal-email" ? "تم" : "نسخ"}</span>
+                  </button>
+                </div>
               </div>
             </div>
           </div>

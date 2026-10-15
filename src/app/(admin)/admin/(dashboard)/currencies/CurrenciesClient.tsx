@@ -8,6 +8,8 @@ interface CurrencyConfig {
   usdToSar: number;
   usdToAed: number;
   bankak: {
+    nameAr?: string;
+    nameEn?: string;
     accountNumber: string;
     accountName: string;
     instructionsAr: string;
@@ -15,12 +17,16 @@ interface CurrencyConfig {
     isActive: boolean;
   };
   vodafone: {
+    nameAr?: string;
+    nameEn?: string;
     walletNumber: string;
     instructionsAr: string;
     instructionsEn: string;
     isActive: boolean;
   };
   fawry?: {
+    nameAr?: string;
+    nameEn?: string;
     accountNumber: string;
     accountName?: string;
     instructionsAr: string;
@@ -28,6 +34,8 @@ interface CurrencyConfig {
     isActive: boolean;
   };
   binance: {
+    nameAr?: string;
+    nameEn?: string;
     payId: string;
     instructionsAr: string;
     instructionsEn: string;
@@ -44,6 +52,8 @@ interface CurrencyConfig {
     isActive: boolean;
   };
   rewarble?: {
+    nameAr?: string;
+    nameEn?: string;
     address: string;
     transferName: string;
     instructionsAr: string;
@@ -51,6 +61,8 @@ interface CurrencyConfig {
     isActive: boolean;
   };
   paypal: {
+    nameAr?: string;
+    nameEn?: string;
     email: string;
     isActive: boolean;
   };
