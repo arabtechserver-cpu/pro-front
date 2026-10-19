@@ -103,3 +103,33 @@ export async function updatePaymentSettingsAction(payload: any) {
     return { success: false, error: "تعذر حفظ إعدادات طرق الدفع" };
   }
 }
+
+export async function getAutoDispatchSettingsAction() {
+  const token = (await cookies()).get("admin_token")?.value;
+  if (!token) return { success: false, error: "غير مصرح لك" };
+
+  try {
+    const data = await fetchFromBackend("/api/settings/auto-dispatch", {
+      method: "GET"
+    });
+    return data;
+  } catch (error) {
+    console.error("Failed to fetch auto-dispatch settings:", error);
+    return { success: false, error: "تعذر تحميل إعدادات الإرسال التلقائي" };
+  }
+}
+
+export async function updateAutoDispatchSettingsAction(payload: any) {
+  const token = (await cookies()).get("admin_token")?.value;
+  if (!token) return { success: false, error: "غير مصرح لك" };
+
+  try {
+    return await fetchFromBackend("/api/settings/auto-dispatch", {
+      method: "POST",
+      body: JSON.stringify(payload)
+    });
+  } catch (error) {
+    console.error("Failed to save auto-dispatch settings:", error);
+    return { success: false, error: "تعذر حفظ إعدادات الإرسال التلقائي" };
+  }
+}

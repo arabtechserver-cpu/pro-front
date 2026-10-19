@@ -6,9 +6,31 @@ import {
   getAdminProfile,
   updateAdminCredentials,
   getPaymentSettingsAction,
-  updatePaymentSettingsAction
+  updatePaymentSettingsAction,
+  getAutoDispatchSettingsAction,
+  updateAutoDispatchSettingsAction
 } from "./actions";
 import { isServerActionMismatchError } from "@/lib/server-action-utils";
+
+interface AutoDispatchConfig {
+  enabled: boolean;
+  scheduleMode: "always" | "scheduled";
+  startTime: string;
+  endTime: string;
+  timezone: string;
+  includeApiOrders: boolean;
+  includeWebOrders: boolean;
+  notifyOnFailure: boolean;
+  updatedAt?: string;
+  updatedBy?: string;
+}
+
+interface AutoDispatchStatus {
+  isActiveNow: boolean;
+  currentSudanTime: string;
+  currentSudanDate: string;
+  reason: string;
+}
 
 interface CustomMethod {
   id: string;
@@ -152,7 +174,30 @@ const DEFAULT_PAYMENTS_CONFIG: PaymentMethodsConfig = {
 
 export default function AdminSettingsPage() {
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<"payments" | "account" | "telegram">("payments");
+  const [activeTab, setActiveTab] = useState<"payments" | "auto_dispatch" | "account" | "telegram">("payments");
+
+  // Auto-Dispatch State
+  const [dispatchConfig, setDispatchConfig] = useState<AutoDispatchConfig>({
+    enabled: false,
+    scheduleMode: "always",
+    startTime: "09:00",
+    endTime: "23:00",
+    timezone: "Africa/Khartoum",
+    includeApiOrders: true,
+    includeWebOrders: true,
+    notifyOnFailure: true
+  });
+  const [dispatchStatus, setDispatchStatus] = useState<AutoDispatchStatus>({
+    isActiveNow: false,
+    currentSudanTime: "--:--",
+    currentSudanDate: "----/--/--",
+    reason: "جاري التحميل..."
+  });
+  const [dispatchLoading, setDispatchLoading] = useState(false);
+  const [dispatchSuccess, setDispatchSuccess] = useState("");
+  const [dispatchError, setDispatchError] = useState("");
+  const [dispatchSecurityPassword, setDispatchSecurityPassword] = useState("");
+  const [liveSudanTime, setLiveSudanTime] = useState("");
 
   // Account State
   const [username, setUsername] = useState("");
@@ -277,11 +322,121 @@ export default function AdminSettingsPage() {
         console.error("Error loading telegram IDs:", err);
       }
 
+      // Load Auto-Dispatch Settings
+      try {
+        const res = await fetch("/api/settings/auto-dispatch", { credentials: "include" });
+        if (res.ok) {
+          const data = await res.json();
+          if (data.config) {
+            setDispatchConfig(prev => ({ ...prev, ...data.config }));
+          }
+          if (data.status) {
+            setDispatchStatus(data.status);
+          }
+        } else {
+          const serverActionData = await getAutoDispatchSettingsAction();
+          if (serverActionData?.success && serverActionData.config) {
+            setDispatchConfig(prev => ({ ...prev, ...serverActionData.config }));
+            if (serverActionData.status) {
+              setDispatchStatus(serverActionData.status);
+            }
+          }
+        }
+      } catch (err) {
+        console.error("Error loading auto dispatch settings:", err);
+      }
+
       setIsPageLoading(false);
     }
 
     loadData();
   }, [router]);
+
+  useEffect(() => {
+    const updateTime = () => {
+      try {
+        const parts = new Intl.DateTimeFormat("en-GB", {
+          timeZone: "Africa/Khartoum",
+          hourCycle: "h23",
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit"
+        }).format(new Date());
+        setLiveSudanTime(parts);
+      } catch {
+        setLiveSudanTime("");
+      }
+    };
+    updateTime();
+    const interval = setInterval(updateTime, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const handleSaveDispatch = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    setDispatchLoading(true);
+    setDispatchSuccess("");
+    setDispatchError("");
+
+    try {
+      const adminToken = typeof window !== "undefined"
+        ? (localStorage.getItem("admin_token") || localStorage.getItem("adminToken"))
+        : null;
+
+      const payload = {
+        currentPassword: dispatchSecurityPassword.trim() || undefined,
+        ...dispatchConfig
+      };
+
+      let saveOk = false;
+      let returnedData: any = null;
+
+      const res = await fetch("/api/settings/auto-dispatch", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(adminToken ? { Authorization: `Bearer ${adminToken}` } : {})
+        },
+        credentials: "include",
+        body: JSON.stringify(payload)
+      });
+
+      if (res.ok) {
+        returnedData = await res.json();
+        saveOk = returnedData.success;
+      } else {
+        const errJson = await res.json().catch(() => ({}));
+        if (res.status === 400 || res.status === 401 || res.status === 403) {
+          setDispatchError(errJson.error || "فشل التحقق لحفظ إعدادات الإرسال");
+          setDispatchLoading(false);
+          return;
+        }
+        const serverActionData = await updateAutoDispatchSettingsAction(payload);
+        if (serverActionData?.success) {
+          saveOk = true;
+          returnedData = serverActionData;
+        } else {
+          setDispatchError(serverActionData?.error || errJson.error || "حدث خطأ أثناء حفظ الإعدادات");
+        }
+      }
+
+      if (saveOk && returnedData) {
+        if (returnedData.config) {
+          setDispatchConfig(prev => ({ ...prev, ...returnedData.config }));
+        }
+        if (returnedData.status) {
+          setDispatchStatus(returnedData.status);
+        }
+        setDispatchSuccess(returnedData.message || "تم حفظ وتحديث إعدادات الإرسال التلقائي للمزود بنجاح");
+        setTimeout(() => setDispatchSuccess(""), 4000);
+      }
+    } catch (err: any) {
+      console.error("Error saving auto-dispatch:", err);
+      setDispatchError("تعذر الاتصال بالسيرفر لحفظ الإعدادات");
+    } finally {
+      setDispatchLoading(false);
+    }
+  };
 
   const handleCopy = (text: string, key: string) => {
     if (!text) return;
@@ -603,6 +758,20 @@ export default function AdminSettingsPage() {
             <span>{paymentsLoading ? "جاري الحفظ..." : "حفظ التعديلات"}</span>
           </button>
         )}
+
+        {activeTab === "auto_dispatch" && (
+          <button
+            type="button"
+            onClick={() => handleSaveDispatch()}
+            disabled={dispatchLoading}
+            className="px-6 py-3 bg-primary text-on-primary font-bold text-xs rounded-2xl hover:bg-primary/90 transition-all shadow-lg hover:shadow-primary/20 flex items-center justify-center gap-2 disabled:opacity-50 active:scale-95 shrink-0"
+          >
+            <span className="material-symbols-outlined text-lg">
+              {dispatchLoading ? "sync" : "save"}
+            </span>
+            <span>{dispatchLoading ? "جاري الحفظ..." : "حفظ إعدادات الإرسال"}</span>
+          </button>
+        )}
       </div>
 
       {/* Tabs Navigation */}
@@ -622,6 +791,30 @@ export default function AdminSettingsPage() {
             activeTab === "payments" ? "bg-white/20 text-white" : "bg-primary/10 text-primary"
           }`}>
             {activeCount} مفعل
+          </span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveTab("auto_dispatch")}
+          className={`flex-1 min-w-[200px] flex items-center justify-center gap-2.5 py-3 px-4 rounded-xl text-xs font-bold transition-all ${
+            activeTab === "auto_dispatch"
+              ? "bg-primary text-on-primary shadow-md font-black"
+              : "text-on-surface-variant hover:text-on-surface hover:bg-surface"
+          }`}
+        >
+          <span className="material-symbols-outlined text-lg">bolt</span>
+          <span>الإرسال التلقائي للمزود</span>
+          <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+            activeTab === "auto_dispatch"
+              ? "bg-white/20 text-white"
+              : dispatchConfig.enabled
+                ? dispatchStatus.isActiveNow
+                  ? "bg-emerald-500/10 text-emerald-500"
+                  : "bg-amber-500/10 text-amber-500"
+                : "bg-white/5 text-on-surface-variant"
+          }`}>
+            {dispatchConfig.enabled ? (dispatchStatus.isActiveNow ? "نشط الآن" : "مجدول") : "معطل"}
           </span>
         </button>
 
@@ -2510,6 +2703,385 @@ export default function AdminSettingsPage() {
               <span className="material-symbols-outlined text-xl">save</span>
               <span>{telegramLoading ? "جاري الحفظ..." : "حفظ معرفات تليجرام"}</span>
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* TAB 4: AUTO DISPATCH TO PROVIDER */}
+      {activeTab === "auto_dispatch" && (
+        <div className="space-y-6">
+          {/* Main Card Header */}
+          <div className="bg-surface-container rounded-3xl border border-outline-variant/30 p-6 sm:p-8 shadow-sm">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-outline-variant/20">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center text-primary shadow-inner">
+                  <span className="material-symbols-outlined text-2xl">bolt</span>
+                </div>
+                <div>
+                  <h2 className="text-xl sm:text-2xl font-bold text-on-surface">الإرسال التلقائي للطلبات إلى المزود</h2>
+                  <p className="text-xs sm:text-sm text-on-surface-variant mt-0.5">
+                    إرسال طلبات العملاء فورياً إلى سيرفر المزود المربوط دون الحاجة لتدخل يدوي من لوحة التحكم
+                  </p>
+                </div>
+              </div>
+
+              {/* Status Badge */}
+              <div className={`px-4 py-2 rounded-2xl border flex items-center gap-2 self-start sm:self-auto ${
+                dispatchConfig.enabled
+                  ? dispatchStatus.isActiveNow
+                    ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400"
+                    : "bg-amber-500/10 border-amber-500/30 text-amber-400"
+                  : "bg-surface-variant/30 border-outline-variant/30 text-on-surface-variant"
+              }`}>
+                <span className={`w-2.5 h-2.5 rounded-full ${
+                  dispatchConfig.enabled
+                    ? dispatchStatus.isActiveNow
+                      ? "bg-emerald-400 animate-pulse"
+                      : "bg-amber-400"
+                    : "bg-on-surface-variant/50"
+                }`}></span>
+                <span className="text-xs font-bold">
+                  {dispatchConfig.enabled
+                    ? (dispatchStatus.isActiveNow ? "النظام نشط ويرسل الطلبات تلقائياً" : "مجدول خارج ساعات العمل")
+                    : "النظام معطل حالياً"}
+                </span>
+              </div>
+            </div>
+
+            {/* Live Sudan Time & Status Widget */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+              <div className="p-5 rounded-2xl bg-surface border border-outline-variant/30 flex items-center justify-between">
+                <div>
+                  <div className="flex items-center gap-2 text-xs font-bold text-on-surface-variant mb-1">
+                    <span className="material-symbols-outlined text-base text-primary">schedule</span>
+                    <span>توقيت السودان الفعلي (Africa/Khartoum)</span>
+                  </div>
+                  <div className="text-2xl sm:text-3xl font-black font-mono text-primary tracking-wider">
+                    {liveSudanTime || dispatchStatus.currentSudanTime || "--:--"}
+                  </div>
+                  <div className="text-[11px] text-on-surface-variant mt-1">
+                    توقيت معتمد UTC+2 ثابت طوال العام
+                  </div>
+                </div>
+                <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
+                  <span className="material-symbols-outlined text-2xl">public</span>
+                </div>
+              </div>
+
+              <div className="p-5 rounded-2xl bg-surface border border-outline-variant/30 flex flex-col justify-between">
+                <div className="flex items-center gap-2 text-xs font-bold text-on-surface-variant mb-1">
+                  <span className="material-symbols-outlined text-base text-amber-500">info</span>
+                  <span>حالة المعالجة الحالية</span>
+                </div>
+                <div className="text-xs sm:text-sm font-bold text-on-surface line-clamp-2">
+                  {dispatchStatus.reason || "جاري تحديث الحالة..."}
+                </div>
+                <div className="text-[11px] text-on-surface-variant mt-2">
+                  {dispatchConfig.scheduleMode === "always"
+                    ? "نمط العمل: تغطية شاملة على مدار 24 ساعة"
+                    : `نمط العمل: نافذة مجدولة من ${dispatchConfig.startTime} حتى ${dispatchConfig.endTime}`}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Master Toggle Card */}
+          <div className="bg-surface-container rounded-3xl border border-outline-variant/30 p-6 sm:p-8 shadow-sm">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <h3 className="text-base sm:text-lg font-bold text-on-surface">مفتاح تفعيل الإرسال التلقائي للمزود</h3>
+                <p className="text-xs sm:text-sm text-on-surface-variant mt-1">
+                  عند تفعيل هذا الخيار، يتم إرسال أي طلب جديد للمزود المربوط مباشرة وبأمان بعد خصم رصيد العميل
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setDispatchConfig(prev => ({ ...prev, enabled: !prev.enabled }))}
+                className={`relative inline-flex h-9 w-16 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                  dispatchConfig.enabled ? "bg-primary" : "bg-surface-variant"
+                }`}
+                role="switch"
+                aria-checked={dispatchConfig.enabled}
+              >
+                <span
+                  className={`pointer-events-none inline-block h-8 w-8 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out ${
+                    dispatchConfig.enabled ? "-translate-x-7" : "translate-x-0"
+                  }`}
+                />
+              </button>
+            </div>
+          </div>
+
+          {/* Operating Hours & Scheduling Card */}
+          <div className="bg-surface-container rounded-3xl border border-outline-variant/30 p-6 sm:p-8 shadow-sm space-y-6">
+            <div>
+              <h3 className="text-base sm:text-lg font-bold text-on-surface">جدول ساعات العمل (بتوقيت السودان)</h3>
+              <p className="text-xs sm:text-sm text-on-surface-variant mt-1">
+                حدد ما إذا كنت ترغب في تشغيل الإرسال التلقائي طوال اليوم أو حصره في ساعات محددة يومياً بتوقيت السودان
+              </p>
+            </div>
+
+            {/* Mode Radios */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div
+                onClick={() => setDispatchConfig(prev => ({ ...prev, scheduleMode: "always" }))}
+                className={`p-5 rounded-2xl border cursor-pointer transition-all ${
+                  dispatchConfig.scheduleMode === "always"
+                    ? "bg-primary/10 border-primary text-on-surface shadow-md"
+                    : "bg-surface border-outline-variant/30 text-on-surface-variant hover:border-outline-variant"
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <span className={`material-symbols-outlined text-xl ${
+                    dispatchConfig.scheduleMode === "always" ? "text-primary" : "text-on-surface-variant"
+                  }`}>
+                    {dispatchConfig.scheduleMode === "always" ? "radio_button_checked" : "radio_button_unchecked"}
+                  </span>
+                  <div>
+                    <h4 className="font-bold text-sm text-on-surface">على مدار 24 ساعة (دائماً)</h4>
+                    <p className="text-xs text-on-surface-variant mt-0.5">
+                      يتم إرسال أي طلب جديد للمزود فوراً في أي وقت دون التقيد بمواعيد
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div
+                onClick={() => setDispatchConfig(prev => ({ ...prev, scheduleMode: "scheduled" }))}
+                className={`p-5 rounded-2xl border cursor-pointer transition-all ${
+                  dispatchConfig.scheduleMode === "scheduled"
+                    ? "bg-primary/10 border-primary text-on-surface shadow-md"
+                    : "bg-surface border-outline-variant/30 text-on-surface-variant hover:border-outline-variant"
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <span className={`material-symbols-outlined text-xl ${
+                    dispatchConfig.scheduleMode === "scheduled" ? "text-primary" : "text-on-surface-variant"
+                  }`}>
+                    {dispatchConfig.scheduleMode === "scheduled" ? "radio_button_checked" : "radio_button_unchecked"}
+                  </span>
+                  <div>
+                    <h4 className="font-bold text-sm text-on-surface">تحديد نافذة ساعات العمل اليومية</h4>
+                    <p className="text-xs text-on-surface-variant mt-0.5">
+                      تفعيل الإرسال فقط بين ساعة بدء وساعة انتهاء محددتين بتوقيت السودان
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Scheduled Window Settings */}
+            {dispatchConfig.scheduleMode === "scheduled" && (
+              <div className="p-6 rounded-2xl bg-surface border border-outline-variant/40 space-y-5">
+                <div className="flex items-center gap-2 text-xs font-bold text-primary">
+                  <span className="material-symbols-outlined text-base">tune</span>
+                  <span>تحديد نافذة التوقيت (بتوقيت السودان - نظام 24 ساعة)</span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-bold text-on-surface-variant mb-1.5">
+                      وقت بدء الإرسال التلقائي (من الساعة)
+                    </label>
+                    <input
+                      type="time"
+                      value={dispatchConfig.startTime}
+                      onChange={(e) => setDispatchConfig(prev => ({ ...prev, startTime: e.target.value }))}
+                      className="w-full bg-surface-container px-4 py-3 rounded-xl border border-outline-variant/50 focus:border-primary outline-none text-sm font-mono font-bold text-on-surface"
+                      dir="ltr"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-on-surface-variant mb-1.5">
+                      وقت انتهاء الإرسال التلقائي (حتى الساعة)
+                    </label>
+                    <input
+                      type="time"
+                      value={dispatchConfig.endTime}
+                      onChange={(e) => setDispatchConfig(prev => ({ ...prev, endTime: e.target.value }))}
+                      className="w-full bg-surface-container px-4 py-3 rounded-xl border border-outline-variant/50 focus:border-primary outline-none text-sm font-mono font-bold text-on-surface"
+                      dir="ltr"
+                    />
+                  </div>
+                </div>
+
+                {/* Quick Presets */}
+                <div>
+                  <div className="text-[11px] font-bold text-on-surface-variant mb-2">إعدادات سريعة جاهزة:</div>
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setDispatchConfig(prev => ({ ...prev, startTime: "09:00", endTime: "23:00" }))}
+                      className="px-3 py-1.5 rounded-xl bg-surface-container text-xs font-bold text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high border border-outline-variant/30 transition-all"
+                    >
+                      فترة رسمية (09:00 ص - 11:00 م)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setDispatchConfig(prev => ({ ...prev, startTime: "08:00", endTime: "20:00" }))}
+                      className="px-3 py-1.5 rounded-xl bg-surface-container text-xs font-bold text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high border border-outline-variant/30 transition-all"
+                    >
+                      فترة النهار (08:00 ص - 08:00 م)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setDispatchConfig(prev => ({ ...prev, startTime: "14:00", endTime: "02:00" }))}
+                      className="px-3 py-1.5 rounded-xl bg-surface-container text-xs font-bold text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high border border-outline-variant/30 transition-all"
+                    >
+                      فترة مسائية وليلية (02:00 م - 02:00 ص)
+                    </button>
+                  </div>
+                </div>
+
+                <div className="p-3.5 rounded-xl bg-surface-variant/30 border border-outline-variant/20 flex items-start gap-2.5">
+                  <span className="material-symbols-outlined text-amber-500 text-lg mt-0.5">lightbulb</span>
+                  <p className="text-xs text-on-surface-variant leading-relaxed">
+                    ملاحظة: يدعم النظام الفترات الممتدة بعد منتصف الليل تلقائياً (مثل: من 10:00 م حتى 06:00 ص). عند وصول أي طلب خارج النافذة المحددة، يُحفظ الطلب بحالة (قيد الانتظار) لمراجعته يدوياً.
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Operations Scope Card */}
+          <div className="bg-surface-container rounded-3xl border border-outline-variant/30 p-6 sm:p-8 shadow-sm space-y-4">
+            <div>
+              <h3 className="text-base sm:text-lg font-bold text-on-surface">نطاق العمليات والتنبيهات</h3>
+              <p className="text-xs sm:text-sm text-on-surface-variant mt-1">
+                تحديد مصادر الطلبات المشمولة بالإرسال التلقائي وخيارات الإشعارات
+              </p>
+            </div>
+
+            <div className="space-y-3 pt-2">
+              <label className="flex items-center justify-between p-4 rounded-2xl bg-surface border border-outline-variant/30 cursor-pointer hover:bg-surface/80 transition-colors">
+                <div className="flex items-center gap-3">
+                  <span className="material-symbols-outlined text-primary text-xl">shopping_bag</span>
+                  <div>
+                    <div className="text-xs sm:text-sm font-bold text-on-surface">طلبات متجر الموقع (Web Store)</div>
+                    <div className="text-[11px] text-on-surface-variant">الطلبات الواردة مباشرة من عملاء المتجر عبر الواجهة</div>
+                  </div>
+                </div>
+                <input
+                  type="checkbox"
+                  checked={dispatchConfig.includeWebOrders}
+                  onChange={(e) => setDispatchConfig(prev => ({ ...prev, includeWebOrders: e.target.checked }))}
+                  className="w-5 h-5 accent-primary cursor-pointer"
+                />
+              </label>
+
+              <label className="flex items-center justify-between p-4 rounded-2xl bg-surface border border-outline-variant/30 cursor-pointer hover:bg-surface/80 transition-colors">
+                <div className="flex items-center gap-3">
+                  <span className="material-symbols-outlined text-primary text-xl">api</span>
+                  <div>
+                    <div className="text-xs sm:text-sm font-bold text-on-surface">طلبات موزعي API الخارجي (External API)</div>
+                    <div className="text-[11px] text-on-surface-variant">الطلبات الواردة من المواقع المربوطة وموزعي الـ Dhru API</div>
+                  </div>
+                </div>
+                <input
+                  type="checkbox"
+                  checked={dispatchConfig.includeApiOrders}
+                  onChange={(e) => setDispatchConfig(prev => ({ ...prev, includeApiOrders: e.target.checked }))}
+                  className="w-5 h-5 accent-primary cursor-pointer"
+                />
+              </label>
+
+              <label className="flex items-center justify-between p-4 rounded-2xl bg-surface border border-outline-variant/30 cursor-pointer hover:bg-surface/80 transition-colors">
+                <div className="flex items-center gap-3">
+                  <span className="material-symbols-outlined text-primary text-xl">notifications_active</span>
+                  <div>
+                    <div className="text-xs sm:text-sm font-bold text-on-surface">إشعار فوري عبر تليجرام عند تعذر الإرسال أو نفاد رصيد المزود</div>
+                    <div className="text-[11px] text-on-surface-variant">تنبيه الإدارة فوراً إذا رفض المزود الطلب لعدم وجود رصيد كافٍ</div>
+                  </div>
+                </div>
+                <input
+                  type="checkbox"
+                  checked={dispatchConfig.notifyOnFailure}
+                  onChange={(e) => setDispatchConfig(prev => ({ ...prev, notifyOnFailure: e.target.checked }))}
+                  className="w-5 h-5 accent-primary cursor-pointer"
+                />
+              </label>
+            </div>
+          </div>
+
+          {/* Safety & Protection Protocols Notice */}
+          <div className="bg-surface-container rounded-3xl border border-outline-variant/30 p-6 sm:p-8 shadow-sm">
+            <div className="flex items-center gap-2 text-sm font-bold text-on-surface mb-3">
+              <span className="material-symbols-outlined text-primary text-lg">verified_user</span>
+              <span>بروتوكولات الأمان والحماية المطبقة في النظام</span>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs text-on-surface-variant">
+              <div className="p-4 rounded-2xl bg-surface border border-outline-variant/30">
+                <div className="font-bold text-on-surface mb-1 flex items-center gap-1.5">
+                  <span className="material-symbols-outlined text-sm text-primary">lock</span>
+                  <span>قفل الإرسال الآمن (Atomic Lock)</span>
+                </div>
+                يتم قفل الطلب بحالة خاصة تمنع منعاً باتاً تكرار إرساله للمزود أو حدوث خصم مزدوج.
+              </div>
+
+              <div className="p-4 rounded-2xl bg-surface border border-outline-variant/30">
+                <div className="font-bold text-on-surface mb-1 flex items-center gap-1.5">
+                  <span className="material-symbols-outlined text-sm text-amber-500">restore</span>
+                  <span>التراجع التلقائي (Safe Rollback)</span>
+                </div>
+                في حال رفض المزود أو نفاد الرصيد، يظل الطلب محفوظاً بحالة (قيد الانتظار) للمراجعة اليدوية دون فقدانه.
+              </div>
+
+              <div className="p-4 rounded-2xl bg-surface border border-outline-variant/30">
+                <div className="font-bold text-on-surface mb-1 flex items-center gap-1.5">
+                  <span className="material-symbols-outlined text-sm text-blue-500">timeline</span>
+                  <span>سجل التدقيق الزمني (Audit Events)</span>
+                </div>
+                توثيق كامل لكل محاولة إرسال ورقم المرجع في سجل أحداث الطلب الشفاف.
+              </div>
+            </div>
+          </div>
+
+          {/* Save Action Card */}
+          <div className="bg-surface-container rounded-3xl border border-outline-variant/30 p-6 sm:p-8 shadow-sm">
+            {dispatchError && (
+              <div className="p-4 rounded-2xl bg-error/10 border border-error/20 text-error flex items-center gap-2 text-xs font-bold mb-4">
+                <span className="material-symbols-outlined text-base">error</span>
+                <span>{dispatchError}</span>
+              </div>
+            )}
+
+            {dispatchSuccess && (
+              <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center gap-2 text-xs font-bold mb-4">
+                <span className="material-symbols-outlined text-base">check_circle</span>
+                <span>{dispatchSuccess}</span>
+              </div>
+            )}
+
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="max-w-md">
+                <label className="block text-xs font-bold text-on-surface-variant mb-1">
+                  تأكيد كلمة المرور الحالية (اختياري للتحقق الأمني)
+                </label>
+                <input
+                  type="password"
+                  value={dispatchSecurityPassword}
+                  onChange={(e) => setDispatchSecurityPassword(e.target.value)}
+                  placeholder="كلمة مرور الإدارة الحالية"
+                  className="w-full bg-surface px-4 py-2.5 rounded-xl border border-outline-variant/50 focus:border-primary outline-none text-xs text-on-surface"
+                  dir="ltr"
+                />
+              </div>
+
+              <button
+                type="button"
+                onClick={() => handleSaveDispatch()}
+                disabled={dispatchLoading}
+                className="px-8 py-3.5 bg-primary text-on-primary font-bold text-xs rounded-2xl hover:bg-primary/90 transition-all shadow-lg hover:shadow-primary/20 flex items-center justify-center gap-2 disabled:opacity-50 active:scale-95 shrink-0"
+              >
+                <span className="material-symbols-outlined text-lg">
+                  {dispatchLoading ? "sync" : "save"}
+                </span>
+                <span>{dispatchLoading ? "جاري الحفظ والتطبيق..." : "حفظ وتفعيل إعدادات الإرسال"}</span>
+              </button>
+            </div>
           </div>
         </div>
       )}
