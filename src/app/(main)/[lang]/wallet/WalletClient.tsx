@@ -97,6 +97,7 @@ interface CurrencyConfig {
     nameAr?: string;
     nameEn?: string;
     email: string;
+    clientId?: string;
     isActive: boolean;
   };
   customMethods?: Array<{
@@ -139,6 +140,9 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
   const [errorMessage, setErrorMessage] = useState<string>("");
 
   const [currencyConfig, setCurrencyConfig] = useState<CurrencyConfig | null>(null);
+  const [paypalClientId, setPaypalClientId] = useState<string>(
+    process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || ""
+  );
   const [isVerifyingPayPal, setIsVerifyingPayPal] = useState<boolean>(false);
   const [isVerifyingBinance, setIsVerifyingBinance] = useState<boolean>(false);
   const [binanceModalData, setBinanceModalData] = useState<{
@@ -161,6 +165,9 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
       const data = await res.json();
       if (res.ok && data.success && data.config) {
         setCurrencyConfig(data.config);
+        if (data.config.paypal?.clientId) {
+          setPaypalClientId(data.config.paypal.clientId);
+        }
       }
     } catch (err) {
       console.error("Failed to fetch currencies in wallet:", err);
@@ -169,6 +176,19 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
 
   useEffect(() => {
     fetchCurrencies();
+  }, []);
+
+  useEffect(() => {
+    if (!paypalClientId) {
+      fetch("/api/wallet/paypal/client-id")
+        .then((res) => res.json())
+        .then((data) => {
+          if (data?.success && data?.clientId) {
+            setPaypalClientId(data.clientId);
+          }
+        })
+        .catch(() => {});
+    }
   }, []);
 
   useEffect(() => {
@@ -1604,10 +1624,10 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
                   </div>
 
                   <div className="w-full relative z-10">
-                    {PAYPAL_CLIENT_ID ? (
+                    {(paypalClientId || currencyConfig?.paypal?.clientId || PAYPAL_CLIENT_ID) ? (
                       <PayPalScriptProvider
                         options={{
-                          clientId: PAYPAL_CLIENT_ID,
+                          clientId: (paypalClientId || currencyConfig?.paypal?.clientId || PAYPAL_CLIENT_ID).trim(),
                           currency: "USD",
                           intent: "capture"
                         }}
