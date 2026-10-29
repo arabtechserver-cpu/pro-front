@@ -6,11 +6,24 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Locale } from "@/i18n/config";
-import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
+import { PayPalScriptProvider, PayPalButtons, usePayPalScriptReducer, DISPATCH_ACTION } from "@paypal/react-paypal-js";
 import { cleanHtmlToText } from "@/utils/cleanHtml";
+import { fetchPayPalClientId } from "@/lib/paypal-config";
 
-const DEFAULT_PAYPAL_CLIENT_ID = "BAAbEQaWk1wH9kFIGVcnl3bBqttl4pQAzD_bnhnYtI25cmXaUTI-M78p7c7nS7gm7tkA9K8OJs-rViTBrw";
-const PAYPAL_CLIENT_ID = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || DEFAULT_PAYPAL_CLIENT_ID;
+function PayPalLoadingStatus({ lang }: { lang: Locale }) {
+  const [{ isPending, isRejected, options }, dispatch] = usePayPalScriptReducer();
+  if (isRejected) {
+    return (
+      <div role="alert" className="p-4 text-center text-sm text-amber-300 space-y-2">
+        <p>{lang === "ar" ? "تعذر تحميل زر PayPal. تحقق من الاتصال وحاول مجدداً." : "Could not load the PayPal button. Check your connection and try again."}</p>
+        <button type="button" className="underline" onClick={() => dispatch({ type: DISPATCH_ACTION.RESET_OPTIONS, value: options })}>
+          {lang === "ar" ? "إعادة المحاولة" : "Try again"}
+        </button>
+      </div>
+    );
+  }
+  return isPending ? <p role="status" className="p-4 text-center text-sm text-slate-300">{lang === "ar" ? "جاري تحميل زر PayPal..." : "Loading PayPal button..."}</p> : null;
+}
 
 interface PaymentMethod {
   id: string;
@@ -141,7 +154,10 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
   const [errorMessage, setErrorMessage] = useState<string>("");
 
   const [currencyConfig, setCurrencyConfig] = useState<CurrencyConfig | null>(null);
-  const [paypalClientId, setPaypalClientId] = useState<string>(PAYPAL_CLIENT_ID);
+  const [paypalClientId, setPaypalClientId] = useState<string>("");
+  const [isLoadingPayPalConfig, setIsLoadingPayPalConfig] = useState(true);
+  const [paypalConfigError, setPaypalConfigError] = useState(false);
+  const [paypalConfigAttempt, setPaypalConfigAttempt] = useState(0);
   const [isVerifyingPayPal, setIsVerifyingPayPal] = useState<boolean>(false);
   const [isVerifyingBinance, setIsVerifyingBinance] = useState<boolean>(false);
   const [binanceModalData, setBinanceModalData] = useState<{
@@ -164,9 +180,6 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
       const data = await res.json();
       if (res.ok && data.success && data.config) {
         setCurrencyConfig(data.config);
-        if (data.config.paypal?.clientId) {
-          setPaypalClientId(data.config.paypal.clientId);
-        }
       }
     } catch (err) {
       console.error("Failed to fetch currencies in wallet:", err);
@@ -178,17 +191,22 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
   }, []);
 
   useEffect(() => {
-    if (!paypalClientId) {
-      fetch("/api/wallet/paypal/client-id")
-        .then((res) => res.json())
-        .then((data) => {
-          if (data?.success && data?.clientId) {
-            setPaypalClientId(data.clientId);
-          }
-        })
-        .catch(() => {});
-    }
-  }, []);
+    const controller = new AbortController();
+    setIsLoadingPayPalConfig(true);
+    setPaypalConfigError(false);
+    setPaypalClientId("");
+    fetchPayPalClientId(controller.signal)
+      .then((clientId) => {
+        if (!controller.signal.aborted) setPaypalClientId(clientId);
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) setPaypalConfigError(true);
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setIsLoadingPayPalConfig(false);
+      });
+    return () => controller.abort();
+  }, [paypalConfigAttempt]);
 
   useEffect(() => {
     const saved = localStorage.getItem("user_session");
@@ -1623,14 +1641,27 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
                   </div>
 
                   <div className="w-full relative z-10">
-                    {(paypalClientId || currencyConfig?.paypal?.clientId || PAYPAL_CLIENT_ID) ? (
+                    {isLoadingPayPalConfig ? (
+                      <p role="status" className="p-4 text-center text-sm text-slate-300">
+                        {lang === "ar" ? "جاري تجهيز الدفع عبر PayPal..." : "Preparing PayPal checkout..."}
+                      </p>
+                    ) : paypalConfigError ? (
+                      <div role="alert" className="p-4 text-center text-sm text-amber-300 space-y-2">
+                        <p>{lang === "ar" ? "تعذر الاتصال بخدمة PayPal. حاول مجدداً بعد قليل." : "Could not connect to the PayPal service. Please try again shortly."}</p>
+                        <button type="button" className="underline" onClick={() => setPaypalConfigAttempt((attempt) => attempt + 1)}>
+                          {lang === "ar" ? "إعادة المحاولة" : "Try again"}
+                        </button>
+                      </div>
+                    ) : paypalClientId ? (
                       <PayPalScriptProvider
+                        key={paypalClientId}
                         options={{
-                          clientId: (paypalClientId || currencyConfig?.paypal?.clientId || PAYPAL_CLIENT_ID).trim(),
+                          clientId: paypalClientId,
                           currency: "USD",
                           intent: "capture"
                         }}
                       >
+                        <PayPalLoadingStatus lang={lang} />
                         <PayPalButtons
                           key={`paypal-btn-${depositAmount || "10"}`}
                           disabled={!depositAmount || parseFloat(depositAmount) < 1.0 || isLoading || isVerifyingPayPal}
@@ -1684,7 +1715,7 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
                     ) : (
                       <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs text-center font-medium">
                         {lang === "ar"
-                          ? "بوابة PayPal غير مهيأة حالياً. يرجى اختيار وسيلة دفع أخرى أو ضبط مفتاح PayPal."
+                          ? "خدمة PayPal غير متاحة حالياً. يرجى التواصل مع الدعم أو اختيار وسيلة دفع أخرى."
                           : "PayPal gateway is currently not configured. Please choose another payment method."}
                       </div>
                     )}
