@@ -1,4 +1,4 @@
-﻿import Link from "next/link";
+import Link from "next/link";
 import { getDictionary } from "@/i18n/get-dictionary";
 import { Locale } from "@/i18n/config";
 import PricingClient from "./PricingClient";
@@ -17,7 +17,7 @@ async function fetchPricingServices(): Promise<any[]> {
   for (const base of backendCandidates) {
     try {
       const res = await fetch(`${base}/api/dhru/services?view=pricing`, {
-        next: { revalidate: 60 },
+        cache: "no-store",
         signal: AbortSignal.timeout(1500)
       });
       if (res.ok) {
