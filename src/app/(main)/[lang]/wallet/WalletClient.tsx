@@ -9,7 +9,8 @@ import { Locale } from "@/i18n/config";
 import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
 import { cleanHtmlToText } from "@/utils/cleanHtml";
 
-const PAYPAL_CLIENT_ID = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || "";
+const DEFAULT_PAYPAL_CLIENT_ID = "BAAbEQaWk1wH9kFIGVcnl3bBqttl4pQAzD_bnhnYtI25cmXaUTI-M78p7c7nS7gm7tkA9K8OJs-rViTBrw";
+const PAYPAL_CLIENT_ID = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || DEFAULT_PAYPAL_CLIENT_ID;
 
 interface PaymentMethod {
   id: string;
@@ -140,9 +141,7 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
   const [errorMessage, setErrorMessage] = useState<string>("");
 
   const [currencyConfig, setCurrencyConfig] = useState<CurrencyConfig | null>(null);
-  const [paypalClientId, setPaypalClientId] = useState<string>(
-    process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || ""
-  );
+  const [paypalClientId, setPaypalClientId] = useState<string>(PAYPAL_CLIENT_ID);
   const [isVerifyingPayPal, setIsVerifyingPayPal] = useState<boolean>(false);
   const [isVerifyingBinance, setIsVerifyingBinance] = useState<boolean>(false);
   const [binanceModalData, setBinanceModalData] = useState<{
