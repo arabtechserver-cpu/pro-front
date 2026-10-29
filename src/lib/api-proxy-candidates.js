@@ -11,7 +11,7 @@ function isLocalhost(url) {
 
 function getBackendCandidates(cachedBackendUrl, internalApiUrl, allowLocal = false) {
   const configuredUrl = internalApiUrl && (allowLocal || !isLocalhost(internalApiUrl)) ? internalApiUrl : null;
-  return [cachedBackendUrl, configuredUrl, ...knownBackendUrls].filter(
+  return [configuredUrl, cachedBackendUrl, ...knownBackendUrls].filter(
     (url, index, all) => Boolean(url) && all.indexOf(url) === index
   );
 }
