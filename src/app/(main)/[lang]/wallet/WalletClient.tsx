@@ -1708,7 +1708,7 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
                             }
                           }}
                           onError={() => {
-                            setErrorMessage(lang === "ar" ? "حدث خطأ أثناء الاتصال ببوابة PayPal" : "Error connecting to PayPal");
+                            setErrorMessage((previous) => previous || (lang === "ar" ? "حدث خطأ أثناء الاتصال ببوابة PayPal" : "Error connecting to PayPal"));
                           }}
                         />
                       </PayPalScriptProvider>
