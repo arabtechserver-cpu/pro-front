@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
@@ -6,7 +6,7 @@ import Script from "next/script";
 import { Locale } from "@/i18n/config";
 import CloudflareTurnstile, { resetTurnstile } from "@/components/CloudflareTurnstile";
 
-const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || "540676912586-vifo9ogu2gjud3d00efv1khd9r7tcajb.apps.googleusercontent.com";
+const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || "";
 
 export default function LoginClient({ lang, dict }: { lang: Locale; dict: any }) {
   const [email, setEmail] = useState("");
@@ -176,7 +176,7 @@ export default function LoginClient({ lang, dict }: { lang: Locale; dict: any })
       const res = await fetch("/api/auth/send-otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: forgotEmail, type: "forgot_password" })
+        body: JSON.stringify({ email: forgotEmail, type: "forgot_password", "cf-turnstile-response": turnstileToken })
       });
 
       const data = await res.json().catch(() => ({}));

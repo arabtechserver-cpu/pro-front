@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useMemo, useEffect, useCallback } from "react";
 import { securePassword } from '@/lib/secure-password';
@@ -8,7 +8,7 @@ import { Locale } from "@/i18n/config";
 import TermsModal from "@/components/TermsModal";
 import CloudflareTurnstile, { resetTurnstile } from "@/components/CloudflareTurnstile";
 
-const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || "540676912586-vifo9ogu2gjud3d00efv1khd9r7tcajb.apps.googleusercontent.com";
+const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || "";
 
 interface Country {
   code: string;
@@ -438,7 +438,7 @@ export default function RegisterClient({ lang, dict }: { lang: Locale; dict: any
           password,
           phone: formattedPhone,
           country: selectedCountry.code,
-          "cf-turnstile-response": turnstileToken || "cf-turnstile-client-fallback"
+          "cf-turnstile-response": turnstileToken
         })
       });
 

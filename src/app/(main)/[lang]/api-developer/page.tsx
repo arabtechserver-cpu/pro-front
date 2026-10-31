@@ -620,6 +620,18 @@ export default function ApiDeveloperPage(props: { params: Promise<{ lang: string
                     </div>
                     <p className="text-[11px] font-sans text-on-surface-variant">{lang === "ar" ? "يعيد الشجرة المتفرعة كاملة بطلب واحد مع كاش فائق السرعة." : "Returns entire branched catalog tree in a single cached call."}</p>
                   </div>
+
+                  <div className="p-3 rounded-xl bg-primary/10 border border-primary/30 space-y-1">
+                    <div className="flex items-center justify-between">
+                      <span className="font-bold text-primary">GET /api/v1/provider/catalog</span>
+                      <span className="text-[10px] text-primary font-sans font-medium">{lang === "ar" ? "الكتالوج الشامل مع الحقول (الأقسام -> الخدمات -> الحقول والباقات)" : "Comprehensive Catalog with Fields"}</span>
+                    </div>
+                    <p className="text-[11px] font-sans text-on-surface-variant">
+                      {lang === "ar" 
+                        ? "يعيد بطلب واحد جميع الأقسام، وتحتها الخدمات مع حقول الإدخال المطلوبة (customFields و requiredFields) والباقات والأسعار. يدعم تصفية القسم (?section=topups) أو الحقول فقط (?fieldsOnly=true)."
+                        : "Returns all sections, services with their required input fields (customFields & requiredFields), packages and prices in a single call. Supports ?section=topups and ?fieldsOnly=true."}
+                    </p>
+                  </div>
                 </div>
               </div>
 
