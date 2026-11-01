@@ -1,4 +1,5 @@
 "use client";
+import { fetchPricingCatalog } from '../../../../lib/pricing-catalog';
 
 import { useState, useEffect, useMemo, useRef, useDeferredValue } from "react";
 import { categoryMatchesFilter, createInitialCollapsedGroups, sortDisplayGroups } from "../../../../lib/pricing-groups";
@@ -171,6 +172,7 @@ export default function PricingClient({
   const [services, setServices] = useState<any>(hasInitialData ? initialServices : null);
   const [loading, setLoading] = useState(!hasInitialData);
   const [error, setError] = useState<string | null>(null);
+  const [reloadCount, setReloadCount] = useState(0);
   const [userSession, setUserSession] = useState<any>(null);
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -223,22 +225,28 @@ export default function PricingClient({
   }, [searchParams]);
 
   useEffect(() => {
+    if (hasInitialData) return;
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 35000);
+    let mounted = true;
     async function fetchServices() {
+      setLoading(true);
+      setError(null);
       try {
-        const res = await fetch("/api/dhru/services?view=pricing");
-        if (!res.ok) throw new Error("Failed to fetch");
-        const data = await res.json();
-        setServices(data);
+        const data = await fetchPricingCatalog(controller.signal);
+        if (mounted) setServices(data);
       } catch (err: any) {
-        if (!hasInitialData) setError(err.message);
+        if (mounted) setError(lang === 'ar'
+          ? 'تعذر تحميل قائمة الخدمات حالياً. يرجى إعادة المحاولة بعد قليل.'
+          : 'The service list could not be loaded. Please try again shortly.');
       } finally {
-        setLoading(false);
+        clearTimeout(timeout);
+        if (mounted) setLoading(false);
       }
     }
-    if (!hasInitialData) {
-      fetchServices();
-    }
-  }, [hasInitialData]);
+    fetchServices();
+    return () => { mounted = false; clearTimeout(timeout); controller.abort(); };
+  }, [hasInitialData, reloadCount, lang]);
 
   // Reset visibleGroupCount whenever filters change
   useEffect(() => {
@@ -479,8 +487,11 @@ export default function PricingClient({
 
   if (error) {
     return (
-      <div className="p-4 bg-error/10 text-error rounded-xl border border-error/20 flex items-center gap-2 font-medium">
-        {error}
+      <div role="alert" className="p-4 bg-error/10 text-error rounded-xl border border-error/20 flex flex-wrap items-center gap-3 font-medium">
+        <p>{error}</p>
+        <button type="button" onClick={() => setReloadCount(count => count + 1)} className="px-4 py-2 border rounded-lg">
+          {lang === 'ar' ? 'إعادة المحاولة' : 'Try again'}
+        </button>
       </div>
     );
   }

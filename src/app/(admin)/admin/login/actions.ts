@@ -1,6 +1,8 @@
 "use server";
 
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
+import { getBackendCandidates } from "@/lib/api-proxy-candidates";
+import { admitProxyRequest } from "@/lib/proxy-stream";
 
 const candidateUrls = [
   process.env.INTERNAL_API_URL,
@@ -160,5 +162,64 @@ export async function resendAdminOtpAction(challengeToken: string) {
 
 export async function logoutAdmin() {
   const cookieStore = await cookies();
-  cookieStore.delete("admin_token");
+  const token = cookieStore.get("admin_token")?.value;
+  if (!token) {
+    cookieStore.delete("admin_token");
+    return { success: true as const, revoked: false };
+  }
+
+  const failure = {
+    success: false as const,
+    message: "تعذر تأكيد إبطال الجلسة على الخادم. لم يتم تسجيل الخروج؛ يرجى إعادة المحاولة.",
+  };
+  const signal = AbortSignal.timeout(10000);
+  let release: (() => void) | undefined;
+  try {
+    const incomingHeaders = await headers();
+    // Never forward a user_token or caller-supplied Authorization in place of the admin session.
+    const forwardHeaders = new Headers({
+      "Content-Type": "application/json",
+      authorization: `Bearer ${token}`,
+      cookie: `admin_token=${encodeURIComponent(token)}`,
+    });
+    for (const name of [
+      "origin", "referer", "sec-fetch-site", "user-agent",
+      "x-forwarded-for", "x-forwarded-proto", "x-forwarded-host",
+      "x-client-local-ip", "x-local-ip", "x-device-fingerprint", "x-admin-device-token",
+    ]) {
+      const value = incomingHeaders.get(name);
+      if (value) forwardHeaders.set(name, value);
+    }
+    const deviceToken = cookieStore.get("admin_device_token")?.value || incomingHeaders.get("x-device-token");
+    if (deviceToken) forwardHeaders.set("x-device-token", deviceToken);
+
+    const [apiUrl] = getBackendCandidates(null, process.env.INTERNAL_API_URL ||
+      (process.platform === "win32" ? "http://127.0.0.1:5000" : undefined), true);
+    release = await admitProxyRequest(false, signal);
+    // A mutation is sent once; a timeout/ambiguous response must not trigger a retry.
+    const response = await fetch(`${apiUrl.replace(/\/+$/, "")}/api/auth/logout`, {
+      method: "POST",
+      headers: forwardHeaders,
+      body: "{}",
+      cache: "no-store",
+      redirect: "error",
+      signal,
+    });
+    if (!response.ok && response.status !== 401) {
+      await response.body?.cancel();
+      return failure;
+    }
+    const data = await response.json();
+    const revoked = response.ok && data?.success === true;
+    // Only the explicit backend contract distinguishes invalid sessions from auth outages.
+    const alreadyInvalid = response.status === 401 && data?.code === "INVALID_SESSION";
+    if ((!revoked && !alreadyInvalid) || signal.aborted) return failure;
+
+    cookieStore.delete("admin_token");
+    return { success: true as const, revoked };
+  } catch {
+    return failure;
+  } finally {
+    release?.();
+  }
 }

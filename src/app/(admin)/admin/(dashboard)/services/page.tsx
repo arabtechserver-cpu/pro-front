@@ -66,12 +66,21 @@ interface EditCustomField {
 
   const fetchServices = async () => {
     setLoading(true);
+    setError(null);
     try {
       const res = await fetch("/api/dhru/services?all=true", {
         headers: { "Cache-Control": "no-cache" }
       });
       if (!res.ok) {
-        throw new Error("Failed to fetch services");
+        const body = await res.json().catch(() => ({}));
+        const message = res.status === 401
+          ? 'انتهت جلسة الإدارة؛ يرجى تسجيل الدخول مجدداً.'
+          : res.status === 403
+            ? 'غير مسموح بتحميل الخدمات من هذا الحساب أو عنوان الشبكة.'
+            : res.status === 502 || res.status === 504
+              ? 'تعذر الوصول لخادم الخدمات أو انتهت مهلة الطلب. أعد المحاولة بعد قليل.'
+              : body.error || 'تعذر تحميل الخدمات.';
+        throw new Error(`${message} (${res.status})`);
       }
       const data = await res.json();
       setCategories(Array.isArray(data) ? data : []);

@@ -36,7 +36,7 @@ test('aborting a stalled upload cancels its source and releases the reader', asy
 });
 test('proxy queues excess work instead of rejecting when RSS rises; releases are idempotent', async () => {
   const { admitProxyRequest } = load('proxy-stream', { process: { memoryUsage: () => ({ rss: 500 * 1024 * 1024 }) } });
-  const slots = await Promise.all(Array.from({ length: 16 }, () => admitProxyRequest(false)));
+  const slots = await Promise.all(Array.from({ length: 64 }, () => admitProxyRequest(false)));
   let started = 0;
   const queued = admitProxyRequest(false).then(release => { started++; return release; });
   await Promise.resolve(); assert.equal(started, 0);

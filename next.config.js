@@ -15,6 +15,9 @@ const nextConfig = {
     },
   },
   images: {
+    dangerouslyAllowSVG: false,
+    dangerouslyAllowLocalIP: false,
+    maximumRedirects: 0,
     maximumResponseBody: 10 * 1024 * 1024,
     formats: ['image/avif', 'image/webp'],
     remotePatterns: [

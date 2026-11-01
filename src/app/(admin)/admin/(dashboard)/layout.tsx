@@ -37,6 +37,7 @@ export default function AdminLayout({
   const pathname = usePathname();
   const router = useRouter();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [logoutError, setLogoutError] = useState("");
   const [isIpRestricted, setIsIpRestricted] = useState(false);
   const [blockedIp, setBlockedIp] = useState("");
   const [blockedReason, setBlockedReason] = useState("");
@@ -100,19 +101,29 @@ export default function AdminLayout({
   }, []);
 
   const handleLogout = async () => {
+    if (isLoggingOut) return;
     if (confirm("هل أنت متأكد من تسجيل الخروج من لوحة الإدارة؟")) {
       setIsLoggingOut(true);
+      setLogoutError("");
       try {
-        await logoutAdmin();
-        if (typeof window !== "undefined") {
+        const result = await logoutAdmin();
+        if (!result.success) {
+          setLogoutError(result.message || "تعذر تأكيد إبطال الجلسة. يرجى إعادة المحاولة.");
+          return;
+        }
+        try {
           localStorage.removeItem("admin_token");
           sessionStorage.removeItem("admin_token");
           document.cookie = "admin_token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+        } catch {
+          // Restricted browser storage must not block an already-confirmed logout.
         }
         window.location.href = "/admin/login";
       } catch (err) {
         console.error("Logout error:", err);
-        window.location.href = "/admin/login";
+        setLogoutError("تعذر تأكيد إبطال الجلسة. يرجى إعادة المحاولة.");
+      } finally {
+        setIsLoggingOut(false);
       }
     }
   };
@@ -214,6 +225,7 @@ export default function AdminLayout({
         </header>
 
         <div className="p-6 md:p-8 max-w-7xl mx-auto w-full">
+          {logoutError && <p role="alert" className="mb-4 rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-400">{logoutError}</p>}
           {children}
         </div>
       </main>

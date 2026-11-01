@@ -10,19 +10,30 @@ interface Props {
 
 export default function DashboardAccessRestricted({ currentIp, reason }: Props) {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [logoutError, setLogoutError] = useState("");
 
   const handleLogout = async () => {
+    if (isLoggingOut) return;
     setIsLoggingOut(true);
+    setLogoutError("");
     try {
-      await logoutAdmin();
-      if (typeof window !== "undefined") {
+      const result = await logoutAdmin();
+      if (!result.success) {
+        setLogoutError(result.message || "تعذر تأكيد إبطال الجلسة. يرجى إعادة المحاولة.");
+        return;
+      }
+      try {
         localStorage.removeItem("admin_token");
         sessionStorage.removeItem("admin_token");
         document.cookie = "admin_token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+      } catch {
+        // Restricted browser storage must not block an already-confirmed logout.
       }
       window.location.href = "/admin/login";
     } catch {
-      window.location.href = "/admin/login";
+      setLogoutError("تعذر تأكيد إبطال الجلسة. يرجى إعادة المحاولة.");
+    } finally {
+      setIsLoggingOut(false);
     }
   };
 
@@ -68,6 +79,7 @@ export default function DashboardAccessRestricted({ currentIp, reason }: Props) 
 
         {/* Actions */}
         <div className="space-y-3">
+          {logoutError && <p role="alert" className="rounded-xl border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-400">{logoutError}</p>}
           <button
             type="button"
             onClick={handleLogout}

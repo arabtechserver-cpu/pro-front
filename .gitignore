@@ -8,3 +8,5 @@ kling_*.mp4
 *-orig.mp4
 public/videos/*-orig.mp4
 
+security*.log
+audit*.json

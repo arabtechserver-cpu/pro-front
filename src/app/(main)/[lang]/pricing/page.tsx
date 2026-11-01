@@ -3,33 +3,14 @@ import { getDictionary } from "@/i18n/get-dictionary";
 import { Locale } from "@/i18n/config";
 import PricingClient from "./PricingClient";
 import { Metadata } from "next";
+import { cache } from "react";
+import { readPublicPricingCatalog } from "@/lib/pricing-catalog.server";
 
-async function fetchPricingServices(): Promise<any[]> {
-  const backendCandidates = [
-    process.env.INTERNAL_API_URL,
-    "http://pro-b-i0r2xu:5000",
-    "http://backend:5000",
-    "http://pro-back:5000",
-    "http://127.0.0.1:5000",
-    "http://localhost:5000"
-  ].filter(Boolean);
+// Cache hits must not accidentally make the rendered route indefinitely static.
+export const dynamic = "force-dynamic";
 
-  for (const base of backendCandidates) {
-    try {
-      const res = await fetch(`${base}/api/dhru/services?view=pricing`, {
-        next: { revalidate: 120 },
-        signal: AbortSignal.timeout(8000)
-      });
-      if (res.ok) {
-        const data = await res.json();
-        if (Array.isArray(data)) return data;
-      }
-    } catch {
-      // try next candidate
-    }
-  }
-  return [];
-}
+// Also share failures/over-cap results between metadata and the page in one render.
+const fetchPricingServices = cache(() => readPublicPricingCatalog().catch(() => []));
 
 export async function generateMetadata(
   props: {

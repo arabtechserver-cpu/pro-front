@@ -5,6 +5,10 @@ export async function authProxyBudget(
   request: NextRequest,
   handler: (body: any, signal: AbortSignal) => Promise<NextResponse>
 ) {
+  const origin = request.headers.get('origin');
+  if ((origin && origin !== request.nextUrl.origin) || request.headers.get('sec-fetch-site') === 'cross-site') {
+    return NextResponse.json({ success: false, message: 'Untrusted request origin' }, { status: 403 });
+  }
   const signal = AbortSignal.timeout(29000);
   let release: () => void;
   try { release = await admitProxyRequest(false, signal); }
