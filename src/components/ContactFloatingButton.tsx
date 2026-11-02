@@ -1,6 +1,7 @@
 ﻿"use client";
 
 import { usePathname } from "next/navigation";
+import { facebookUrl } from "@/lib/social-links";
 import { useState, useRef } from "react";
 
 interface SocialLink {
@@ -95,9 +96,9 @@ const SOCIAL_LINKS: SocialLink[] = [
     id: "fb",
     titleAr: "صفحة الفيسبوك الرسمية",
     titleEn: "Official Facebook Page",
-    descAr: "ARABTECHSERVEROnline",
-    descEn: "ARABTECHSERVEROnline",
-    url: "https://www.facebook.com/ARABTECHSERVEROnline",
+    descAr: "صفحتنا على فيسبوك",
+    descEn: "Our Facebook page",
+    url: facebookUrl,
     color: "#1877F2",
     bg: "linear-gradient(135deg, #1877F2 0%, #0056b3 100%)",
     icon: (

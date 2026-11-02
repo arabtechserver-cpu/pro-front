@@ -3,6 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { facebookUrl } from "@/lib/social-links";
 
 interface FooterProps {
   dict?: any;
@@ -255,7 +256,7 @@ export default function Footer({ dict, lang = "ar" }: FooterProps) {
 
               {/* Facebook */}
               <a
-                href="https://www.facebook.com/ARABTECHSERVEROnline"
+                href={facebookUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-8 h-8 rounded-lg bg-white dark:bg-[#08172b] border border-slate-200 dark:border-cyan-500/20 hover:border-cyan-500 text-cyan-600 dark:text-cyan-400 flex items-center justify-center shadow-sm transition-all"

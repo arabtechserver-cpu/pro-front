@@ -14,3 +14,7 @@
 .chatDialog form button{color:rgb(var(--brand-on-primary));background:rgb(var(--brand-primary))}
 @media(max-width:760px){.dock{top:auto;bottom:calc(12px + env(safe-area-inset-bottom));left:12px;transform:none;flex-direction:row;gap:6px;border-radius:40px;padding:7px 9px;box-shadow:0 5px 24px #001f1229}.dock .social{width:31px;height:31px;border-radius:50%;font-size:19px}.divider{width:1px;height:22px;margin:0 1px}.aiLaunch{width:42px;height:34px;border-radius:22px;flex-direction:row;gap:2px}.aiLaunch svg{width:18px}.aiLaunch span{font-size:8px}.toTop{right:13px;bottom:calc(16px + env(safe-area-inset-bottom));width:34px;height:34px;border-radius:50%}.chatDialog{inset-inline:10px;left:10px;bottom:calc(10px + env(safe-area-inset-bottom));width:auto;max-width:none;height:min(650px,85dvh);border-radius:16px}}
 @media(prefers-reduced-motion:reduce){.dock a{transition:none}}
+.dock .social,.aiLaunch,.toTop{touch-action:manipulation;transition:transform .2s,box-shadow .2s,background .2s}
+.dock :is(a,button):active,.toTop:active{transform:scale(.91);transition-duration:80ms}
+@media(hover:hover) and (pointer:fine){.aiLaunch:hover,.toTop:hover{transform:translateY(-2px);box-shadow:0 5px 15px #40713d30}}
+@media(prefers-reduced-motion:reduce){.dock :is(a,button),.toTop{transition:none}}

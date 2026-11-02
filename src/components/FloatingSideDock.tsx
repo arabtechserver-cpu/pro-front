@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Bot, ArrowUp } from "lucide-react";
+import { facebookUrl } from "@/lib/social-links";
 import styles from "./SupportTools.module.css";
 
 export default function FloatingSideDock({ lang = "ar" }: { lang?: string }) {
@@ -15,7 +16,7 @@ export default function FloatingSideDock({ lang = "ar" }: { lang?: string }) {
   const channels = [
     { name: ar ? "دعم واتساب الفوري" : "WhatsApp support", href: "https://wa.me/16728972935", icon: "fa-whatsapp", style: styles.whatsapp },
     { name: ar ? "قناة تيليجرام الرسمية" : "Telegram channel", href: "https://t.me/arabtechserveronline", icon: "fa-telegram", style: styles.telegram },
-    { name: ar ? "صفحة الفيسبوك" : "Facebook page", href: "https://www.facebook.com/ARABTECHSERVEROnline", icon: "fa-facebook-f", style: styles.facebook },
+    { name: ar ? "صفحة الفيسبوك" : "Facebook page", href: facebookUrl, icon: "fa-facebook-f", style: styles.facebook },
   ];
   return <>
     <aside className={styles.dock} aria-label={ar ? "قنوات التواصل السريع" : "Quick contact channels"}>

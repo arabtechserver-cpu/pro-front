@@ -94,3 +94,49 @@
 .gameTabs a{position:relative;display:flex;align-items:center;justify-content:center;align-self:stretch;min-width:100px;font-size:12px;padding:0 8px;text-align:center;line-height:1.4}
 .gameTabs a:hover{color:rgb(var(--brand-primary))}
 @media(max-width:760px){.gameTabs{height:50px}.gameTabs a{flex:1;min-width:0;font-size:9px;padding:0 3px}.home{padding-bottom:72px}}
+
+/* Motion stays on transforms/opacity, with no scroll-driven React updates. */
+.motionRoot{position:relative}
+.scrollProgress{position:fixed;inset:0 0 auto;height:3px;z-index:80;pointer-events:none;background:linear-gradient(90deg,#3caa75,#d3fc59);transform:scaleX(0);transform-origin:left center}
+.motionRoot [data-reveal]{transition:opacity .65s cubic-bezier(.22,1,.36,1),translate .65s cubic-bezier(.22,1,.36,1),transform .2s,border-color .2s,box-shadow .2s}
+.motionRoot [data-entered=false]{opacity:0;translate:0 24px}
+.motionRoot [data-entered=true]{opacity:1;translate:0 0;transition-delay:var(--reveal-delay,0ms),var(--reveal-delay,0ms),0ms,0ms,0ms}
+.serviceCard:nth-child(3n+2){--reveal-delay:65ms}.serviceCard:nth-child(3n){--reveal-delay:130ms}
+.heroCopy{animation:copyArrival .65s cubic-bezier(.22,1,.36,1) both}
+.sidePromos>.promo{animation:panelArrival .75s cubic-bezier(.22,1,.36,1) both}
+.sidePromos>.promo:nth-child(2){animation-delay:.12s}
+.remoteHeroImage{animation:phoneFloat 6s ease-in-out infinite;animation-play-state:paused}
+.hero[data-in-view=true] .remoteHeroImage{animation-play-state:running}
+.promo .productArt,.digitalArt>img{transition:transform .5s cubic-bezier(.22,1,.36,1)}
+.toolTable tbody tr{animation:rowArrival .3s ease-out both}
+.home :is(.limeButton,.greenButton,.telegram,.login,.register,.quickLink,.theme,.slideArrow,.filters button,.gameTabs a,.step,.paymentBadge){transition:transform .2s cubic-bezier(.22,1,.36,1),background-color .2s,border-color .2s,box-shadow .2s;touch-action:manipulation}
+.home :is(.limeButton,.greenButton,.telegram,.login,.register){position:relative;overflow:hidden;isolation:isolate}
+.home :is(.limeButton,.greenButton,.telegram,.login,.register)::after{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 25%,#ffffff38 50%,transparent 75%);transform:translateX(-150%) skewX(-15deg);pointer-events:none}
+.limeButton svg,.greenButton svg,.serviceCard svg,.step svg{transition:transform .25s cubic-bezier(.22,1,.36,1)}
+.nav>a{position:relative;padding-block:5px;transition:color .2s}
+.nav>a::after{content:"";position:absolute;inset-inline:0;bottom:0;height:2px;border-radius:3px;background:currentColor;transform:scaleX(0);transform-origin:center;transition:transform .2s}
+.nav>a[aria-current=page]::after{transform:scaleX(1)}
+@media(hover:hover) and (pointer:fine){
+  .home :is(.limeButton,.greenButton,.telegram,.login,.register):hover{transform:translateY(-2px);box-shadow:0 7px 16px #073d2c25}
+  .home :is(.limeButton,.greenButton,.telegram,.login,.register):hover::after{transform:translateX(150%) skewX(-15deg);transition:transform .65s ease}
+  .home :is(.limeButton,.greenButton):hover svg{transform:translateX(-3px)}
+  .serviceCard:hover{transform:translateY(-4px);box-shadow:0 9px 22px #073d2c12}
+  .serviceCard:hover .serviceIcon{transform:rotate(-7deg) scale(1.08)}
+  .step:hover{transform:translateY(-3px)}.step:hover svg{transform:translateY(-3px)}
+  .promo:hover .productArt{transform:translateY(-5px) rotate(-2deg)}
+  .gaming:hover .digitalArt>img{transform:translateY(-4px) rotate(-2deg)}
+  .quickLink:hover,.paymentBadge:hover{transform:translateY(-2px);border-color:#88aa44}
+  .nav>a:hover::after{transform:scaleX(1)}
+}
+.home :is(.limeButton,.greenButton,.telegram,.login,.register,.quickLink,.theme,.slideArrow,.filters button,.gameTabs a,.step,.serviceCard,.paymentBadge):active{transform:translateY(1px) scale(.97);transition-duration:80ms}
+.home :is(.limeButton,.greenButton,.telegram,.login,.register):active::after{transform:translateX(0);transition:none}
+@keyframes copyArrival{from{opacity:0;translate:0 15px}to{opacity:1;translate:0 0}}
+@keyframes panelArrival{from{opacity:0;translate:0 18px}to{opacity:1;translate:0 0}}
+@keyframes rowArrival{from{opacity:.3;translate:0 5px}to{opacity:1;translate:0 0}}
+@keyframes phoneFloat{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-7px) rotate(-.6deg)}}
+@media(prefers-reduced-motion:reduce){
+  .scrollProgress{display:none}
+  .motionRoot [data-reveal]{opacity:1!important;translate:0 0!important}
+  .home *,.home *::before,.home *::after{animation:none!important;transition:none!important}
+  .remoteHeroImage{transform:none}
+}
