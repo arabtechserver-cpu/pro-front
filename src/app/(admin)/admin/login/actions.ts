@@ -29,7 +29,7 @@ export async function loginAdmin(username: string, password: string, turnstileTo
         body: JSON.stringify({
           email: username,
           password,
-          "cf-turnstile-response": turnstileToken || "cf-turnstile-client-fallback",
+          "cf-turnstile-response": turnstileToken,
           deviceToken
         }),
         cache: "no-store"

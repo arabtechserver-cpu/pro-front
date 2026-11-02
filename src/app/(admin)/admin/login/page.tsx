@@ -92,6 +92,10 @@ export default function AdminLogin() {
     e.preventDefault();
     setError("");
     setInfoMessage("");
+    if (!turnstileToken) {
+      setError("يرجى إكمال التحقق الأمني قبل تسجيل الدخول.");
+      return;
+    }
     setLoading(true);
 
     try {
@@ -110,7 +114,7 @@ export default function AdminLogin() {
         body: JSON.stringify({
           username,
           password,
-          "cf-turnstile-response": turnstileToken || "cf-turnstile-client-fallback",
+          "cf-turnstile-response": turnstileToken,
           deviceToken: devToken,
           localIp: clientLocal,
           deviceFingerprint: devFp
@@ -395,13 +399,13 @@ export default function AdminLogin() {
               <CloudflareTurnstile
                 onVerify={(token) => setTurnstileToken(token)}
                 onExpire={() => setTurnstileToken("")}
-                onError={() => setTurnstileToken("cf-turnstile-client-fallback")}
+                onError={() => setTurnstileToken("")}
               />
 
               <button
                 type="submit"
-                disabled={loading}
-                className="w-full btn-primary py-3 rounded-xl flex items-center justify-center gap-2 mt-8 text-lg font-bold shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all hover:-translate-y-1"
+                disabled={loading || !turnstileToken}
+                className="w-full btn-primary py-3 rounded-xl flex items-center justify-center gap-2 mt-8 text-lg font-bold shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? (
                   <span className="w-6 h-6 border-2 border-on-primary border-t-transparent rounded-full animate-spin"></span>

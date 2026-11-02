@@ -7,7 +7,7 @@ function load(name, extras = {}) {
   const module = { exports: {} };
   vm.runInNewContext(ts.transpileModule(fs.readFileSync(`src/lib/${name}.ts`, 'utf8'), {
     compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 }
-  }).outputText, { module, exports: module.exports, require: name => load(name.replace('./', '')), setTimeout, clearTimeout, Request, Response, Headers, ReadableStream, Uint8Array, AbortSignal, TextDecoder, crypto: require('node:crypto').webcrypto, process: { memoryUsage: () => ({ rss: 100 * 1024 * 1024 }) }, ...extras });
+  }).outputText, { module, exports: module.exports, require: name => name === 'next/server' ? { NextResponse: Response } : load(name.replace('./', ''), extras), setTimeout, clearTimeout, Request, Response, Headers, URL, ReadableStream, Uint8Array, AbortSignal, TextDecoder, crypto: require('node:crypto').webcrypto, ...extras, process: { memoryUsage: () => ({ rss: 100 * 1024 * 1024 }), env: {}, ...extras.process } });
   return module.exports;
 }
 test('proxy forwards chunks and releases admission exactly once at end or cancellation', async () => {
@@ -61,4 +61,88 @@ test('password generator uses secure browser entropy and rejects biased byte ran
   let calls = 0;
   const { securePassword } = load('secure-password', { crypto: { getRandomValues(bytes) { calls++; bytes.fill(calls === 1 ? 255 : 0); return bytes; } } });
   assert.equal(securePassword(), 'a'.repeat(16)); assert.equal(calls, 2);
+});
+
+function authRequest(url, headers = {}) {
+  return Object.assign(new Request(url, { method: 'POST', headers, body: '{"username":"admin"}' }), { nextUrl: new URL(url) });
+}
+
+test('auth budget accepts public HTTPS site origins behind an internal reverse proxy', async () => {
+  const { authProxyBudget } = load('auth-proxy-budget', { process: { env: { NODE_ENV: 'production' } } });
+  for (const origin of [
+    'https://borai.store', 'https://www.borai.store',
+    'https://arabtechproserver.tech', 'https://www.arabtechproserver.tech',
+  ]) {
+    let calls = 0;
+    const response = await authProxyBudget(authRequest('http://127.0.0.1:3000/api/admin/login', {
+      origin, 'sec-fetch-site': 'same-origin', 'x-forwarded-proto': 'https', 'x-forwarded-host': new URL(origin).host,
+    }), async (body, signal) => {
+      calls++;
+      assert.equal(body.username, 'admin');
+      assert.equal(signal.aborted, false);
+      return Response.json({ success: true });
+    });
+    assert.equal(response.status, 200, origin);
+    assert.equal(calls, 1);
+  }
+});
+
+test('auth budget supports explicitly configured public origins without trusting forwarded hosts', async () => {
+  const { authProxyBudget } = load('auth-proxy-budget', { process: { env: {
+    NODE_ENV: 'production', NEXT_PUBLIC_SITE_URL: 'https://site.test', FRONTEND_URL: 'https://portal.test/', ADDITIONAL_ALLOWED_ORIGINS: 'https://admin.test, https://preview.test:8443',
+  } } });
+  for (const origin of ['https://site.test', 'https://portal.test', 'https://admin.test', 'https://preview.test:8443']) {
+    const response = await authProxyBudget(authRequest('http://localhost:3000/api/admin/login', {
+      origin, 'sec-fetch-site': 'same-origin',
+    }), async () => Response.json({ success: true }));
+    assert.equal(response.status, 200, origin);
+  }
+});
+
+test('auth budget rejects foreign, opaque and malformed origins before reading or admitting a login', async () => {
+  const { authProxyBudget } = load('auth-proxy-budget', { process: { env: { NODE_ENV: 'production' } } });
+  for (const origin of [
+    'https://attacker.test', 'https://borai.store.attacker.test', 'http://borai.store',
+    'https://borai.store:8443', 'https://borai.store/admin', 'https://user@borai.store', 'null',
+    'https://borai.store https://attacker.test',
+  ]) {
+    let calls = 0;
+    const request = authRequest('http://127.0.0.1:3000/api/admin/login', {
+      origin, 'sec-fetch-site': 'same-origin', 'x-forwarded-host': origin.replace(/^https?:\/\//, ''), 'x-forwarded-proto': 'https',
+    });
+    const response = await authProxyBudget(request, async () => { calls++; return Response.json({ success: true }); });
+    assert.equal(response.status, 403, origin);
+    assert.equal((await response.json()).message, 'Untrusted request origin');
+    assert.equal(calls, 0);
+    assert.equal(request.bodyUsed, false);
+  }
+  const crossSite = await authProxyBudget(authRequest('https://borai.store/api/admin/login', {
+    origin: 'https://borai.store', 'sec-fetch-site': 'cross-site',
+  }), async () => { throw new Error('Cross-site requests must not reach authentication'); });
+  assert.equal(crossSite.status, 403);
+});
+
+test('auth budget preserves direct same-origin and originless non-browser requests', async () => {
+  const { authProxyBudget } = load('auth-proxy-budget');
+  for (const headers of [{ origin: 'http://localhost:3000', 'sec-fetch-site': 'same-origin' }, {}]) {
+    const response = await authProxyBudget(authRequest('http://localhost:3000/api/admin/login', headers), async () => Response.json({ success: true }));
+    assert.equal(response.status, 200);
+  }
+  const response = await authProxyBudget(authRequest('http://localhost:3000/api/admin/login', {
+    'sec-fetch-site': 'cross-site',
+  }), async () => { throw new Error('Originless cross-site requests must not reach authentication'); });
+  assert.equal(response.status, 403);
+});
+
+test('auth budget never authorizes insecure or malformed production origin configuration', async () => {
+  for (const value of [
+    'http://unsafe.test', 'https://user@unsafe.test', 'https://unsafe.test/path',
+    'https://unsafe.test?query=1', 'https://unsafe.test#fragment', 'not-a-url',
+  ]) {
+    const { authProxyBudget } = load('auth-proxy-budget', { process: { env: { NODE_ENV: 'production', FRONTEND_URL: value } } });
+    const response = await authProxyBudget(authRequest('http://127.0.0.1:3000/api/admin/login', {
+      origin: value.startsWith('http:') ? 'http://unsafe.test' : 'https://unsafe.test',
+    }), async () => { throw new Error('Invalid configuration must not authorize login'); });
+    assert.equal(response.status, 403, value);
+  }
 });

@@ -116,6 +116,10 @@ export default function LoginClient({ lang, dict }: { lang: Locale; dict: any })
       setErrorMessage(lang === "ar" ? "الرجاء إدخال كلمة المرور!" : "Please enter your password!");
       return;
     }
+    if (!turnstileToken) {
+      setErrorMessage(lang === "ar" ? "يرجى إكمال التحقق الأمني قبل تسجيل الدخول." : "Please complete the security check before signing in.");
+      return;
+    }
 
     setIsLoading(true);
 
@@ -126,7 +130,7 @@ export default function LoginClient({ lang, dict }: { lang: Locale; dict: any })
         body: JSON.stringify({
           email,
           password,
-          "cf-turnstile-response": turnstileToken || "cf-turnstile-client-fallback"
+          "cf-turnstile-response": turnstileToken
         })
       });
 
@@ -220,7 +224,7 @@ export default function LoginClient({ lang, dict }: { lang: Locale; dict: any })
           email: forgotEmail,
           otp: forgotOtp.trim(),
           newPassword: forgotNewPassword.trim(),
-          "cf-turnstile-response": turnstileToken || "cf-turnstile-client-fallback"
+          "cf-turnstile-response": turnstileToken
         })
       });
 
@@ -394,12 +398,12 @@ export default function LoginClient({ lang, dict }: { lang: Locale; dict: any })
           <CloudflareTurnstile 
             onVerify={(token) => setTurnstileToken(token)}
             onExpire={() => setTurnstileToken("")}
-            onError={() => setTurnstileToken("cf-turnstile-client-fallback")}
+            onError={() => setTurnstileToken("")}
           />
 
           <button 
             type="submit" 
-            disabled={isLoading}
+            disabled={isLoading || !turnstileToken}
             className="w-full mt-4 bg-primary-container text-on-primary-container py-3.5 rounded-lg font-bold uppercase tracking-wider hover:bg-primary transition-all glow-primary shadow-[0_0_15px_rgba(124,58,237,0.2)] active:scale-[0.98] flex items-center justify-center gap-2 disabled:opacity-50"
           >
             {isLoading ? (

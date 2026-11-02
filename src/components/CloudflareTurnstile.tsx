@@ -51,8 +51,7 @@ export default function CloudflareTurnstile({
   const widgetIdRef = useRef<string | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [hasError, setHasError] = useState(false);
-  const [hasFallback, setHasFallback] = useState(false);
-  const isResolvedRef = useRef(false);
+  const [retryCount, setRetryCount] = useState(0);
 
   // Store latest callbacks in refs to prevent unnecessary re-renders when parent states change
   const onVerifyRef = useRef(onVerify);
@@ -63,47 +62,63 @@ export default function CloudflareTurnstile({
     onVerifyRef.current = onVerify;
     onExpireRef.current = onExpire;
     onErrorRef.current = onError;
-    if (isTurnstileDisabled) {
-      onVerify("turnstile-disabled");
-    }
   });
 
-  if (isTurnstileDisabled) {
-    return null;
-  }
-
-  const [retryCount, setRetryCount] = useState(0);
+  useEffect(() => {
+    if (isTurnstileDisabled) {
+      onVerifyRef.current("turnstile-disabled");
+    }
+  }, [isTurnstileDisabled]);
 
   // Listen for programmatic reset events (e.g. on submit failure)
   useEffect(() => {
+    if (isTurnstileDisabled) return;
     const handleGlobalReset = () => {
-      isResolvedRef.current = false;
+      setHasError(false);
+      setIsLoaded(false);
+      onVerifyRef.current("");
       if (widgetIdRef.current && window.turnstile) {
         try {
           window.turnstile.reset(widgetIdRef.current);
+          return;
         } catch (err) {
           console.warn("[Cloudflare Turnstile] Global reset notice:", err);
         }
       }
-      onVerifyRef.current?.("");
+      setRetryCount(prev => prev + 1);
     };
 
     window.addEventListener("reset-turnstile", handleGlobalReset);
     return () => {
       window.removeEventListener("reset-turnstile", handleGlobalReset);
     };
-  }, []);
+  }, [isTurnstileDisabled]);
 
   useEffect(() => {
+    if (isTurnstileDisabled) return;
+    onVerifyRef.current("");
+    setIsLoaded(false);
+    setHasError(false);
     let isMounted = true;
-    let fallbackTimeoutId: NodeJS.Timeout | null = null;
+    let scriptTimeoutId: ReturnType<typeof setTimeout> | null = null;
+    let script: HTMLScriptElement | null = null;
     const scriptId = "cf-turnstile-script";
 
-    const clearFallbackTimeout = () => {
-      if (fallbackTimeoutId) {
-        clearTimeout(fallbackTimeoutId);
-        fallbackTimeoutId = null;
+    const clearScriptTimeout = () => {
+      if (scriptTimeoutId !== null) {
+        clearTimeout(scriptTimeoutId);
+        scriptTimeoutId = null;
       }
+    };
+
+    const reportError = (error: unknown) => {
+      if (!isMounted) return true;
+      clearScriptTimeout();
+      setIsLoaded(true);
+      setHasError(true);
+      onVerifyRef.current("");
+      onErrorRef.current?.(error);
+      return true;
     };
 
     const renderWidget = () => {
@@ -111,94 +126,79 @@ export default function CloudflareTurnstile({
         return;
       }
 
-      // Safety timeout: if browser blocks or hangs Turnstile (e.g. WebGPU bug, adblocker, sandbox), fallback gracefully
-      fallbackTimeoutId = setTimeout(() => {
-        if (!isMounted || isResolvedRef.current) return;
-        console.warn("[Cloudflare Turnstile] Challenge timeout (WebGPU/Adblocker notice) - engaging client fallback");
-        isResolvedRef.current = true;
-        setIsLoaded(true);
-        setHasFallback(true);
-        onVerifyRef.current?.("cf-turnstile-client-fallback");
-      }, 4000);
-
       try {
         const widgetId = window.turnstile.render(containerRef.current, {
           sitekey: TURNSTILE_SITE_KEY,
           theme,
           size,
+          retry: "never",
+          "refresh-expired": "manual",
+          "refresh-timeout": "manual",
           callback: (token: string) => {
             if (!isMounted) return;
-            clearFallbackTimeout();
-            isResolvedRef.current = true;
             setIsLoaded(true);
             setHasError(false);
-            setHasFallback(false);
-            onVerifyRef.current?.(token);
+            onVerifyRef.current(token);
           },
           "expired-callback": () => {
             if (!isMounted) return;
-            isResolvedRef.current = false;
+            setIsLoaded(false);
+            setHasError(false);
             onExpireRef.current?.();
-            onVerifyRef.current?.("");
+            onVerifyRef.current("");
             // Auto reset on expiry so user gets a fresh token seamlessly
             if (widgetIdRef.current && window.turnstile) {
               try {
                 window.turnstile.reset(widgetIdRef.current);
-              } catch {}
+              } catch (error) { reportError(error); }
             }
           },
-          "error-callback": (err: any) => {
-            if (!isMounted) return;
-            clearFallbackTimeout();
-            console.warn("[Cloudflare Turnstile] Widget notice:", err);
-            isResolvedRef.current = true;
-            setIsLoaded(true);
-            setHasError(true);
-            onErrorRef.current?.(err);
-            onVerifyRef.current?.("cf-turnstile-client-fallback");
-          }
+          "error-callback": reportError,
+          "timeout-callback": () => reportError("challenge-timeout"),
+          "unsupported-callback": () => reportError("unsupported-browser"),
         });
 
         widgetIdRef.current = widgetId;
       } catch (e) {
-        if (!isMounted) return;
-        clearFallbackTimeout();
-        console.warn("[Cloudflare Turnstile] Init note:", e);
-        isResolvedRef.current = true;
-        setIsLoaded(true);
-        setHasError(true);
-        onVerifyRef.current?.("cf-turnstile-client-fallback");
+        reportError(e);
       }
     };
 
-    let script = document.getElementById(scriptId) as HTMLScriptElement;
+    const handleScriptError = () => {
+      if (!isMounted) return;
+      script?.remove();
+      reportError("script-load-error");
+    };
+    const handleScriptLoad = () => {
+      clearScriptTimeout();
+      if (window.turnstile) renderWidget();
+      else handleScriptError();
+    };
 
-    if (!script) {
-      script = document.createElement("script");
-      script.id = scriptId;
-      script.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
-      script.async = true;
-      script.defer = true;
-      script.onload = () => {
-        renderWidget();
-      };
-      script.onerror = () => {
-        if (!isMounted) return;
-        clearFallbackTimeout();
-        setIsLoaded(true);
-        setHasError(true);
-        onVerifyRef.current?.("cf-turnstile-client-fallback");
-      };
-      document.head.appendChild(script);
-    } else if (window.turnstile) {
+    if (window.turnstile) {
       renderWidget();
     } else {
-      script.addEventListener("load", renderWidget, { once: true });
+      script = document.getElementById(scriptId) as HTMLScriptElement | null;
+      const isNewScript = !script;
+      if (!script) {
+        script = document.createElement("script");
+        script.id = scriptId;
+        script.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
+        script.async = true;
+        script.defer = true;
+      }
+      script.addEventListener("load", handleScriptLoad);
+      script.addEventListener("error", handleScriptError);
+      // A blocked SDK remains a failed check, never a fabricated verification token.
+      scriptTimeoutId = setTimeout(handleScriptError, 15000);
+      if (isNewScript) document.head.appendChild(script);
     }
 
     return () => {
       isMounted = false;
-      clearFallbackTimeout();
+      clearScriptTimeout();
+      script?.removeEventListener("load", handleScriptLoad);
+      script?.removeEventListener("error", handleScriptError);
       if (widgetIdRef.current && window.turnstile) {
         try {
           window.turnstile.remove(widgetIdRef.current);
@@ -206,10 +206,10 @@ export default function CloudflareTurnstile({
         widgetIdRef.current = null;
       }
     };
-  }, [theme, size, retryCount]);
+  }, [theme, size, retryCount, isTurnstileDisabled]);
 
   const handleRetry = () => {
-    isResolvedRef.current = false;
+    onVerifyRef.current("");
     if (widgetIdRef.current && window.turnstile) {
       try {
         window.turnstile.remove(widgetIdRef.current);
@@ -217,24 +217,25 @@ export default function CloudflareTurnstile({
       widgetIdRef.current = null;
     }
     setHasError(false);
-    setHasFallback(false);
     setIsLoaded(false);
     setRetryCount(prev => prev + 1);
   };
 
+  if (isTurnstileDisabled) return null;
+
   return (
     <div className={`flex flex-col items-center justify-center my-3 min-h-[50px] ${className}`}>
       <div ref={containerRef} className="rounded-xl overflow-hidden shadow-sm" />
-      {!isLoaded && !hasError && !hasFallback && (
+      {!isLoaded && !hasError && (
         <div className="flex items-center gap-2 text-xs text-on-surface-variant/70 animate-pulse py-1">
           <span className="w-3.5 h-3.5 border-2 border-primary border-t-transparent rounded-full animate-spin"></span>
           <span>حماية متقدمة عبر Cloudflare</span>
         </div>
       )}
-      {(hasError || hasFallback) && (
-        <div className="flex items-center gap-2 text-[11px] text-violet-400/90 bg-violet-500/10 px-3 py-1.5 rounded-full border border-violet-500/20">
-          <span className="material-symbols-outlined text-xs text-violet-400">verified_user</span>
-          <span>الاتصال محمي عبر Cloudflare WAF</span>
+      {hasError && (
+        <div role="alert" className="flex flex-wrap items-center justify-center gap-2 text-[11px] text-error bg-error/10 px-3 py-1.5 rounded-xl border border-error/20">
+          <span className="material-symbols-outlined text-xs">error</span>
+          <span>تعذر إكمال التحقق الأمني. أعد المحاولة أو عطّل مانع الإعلانات.</span>
           <button
             type="button"
             onClick={handleRetry}

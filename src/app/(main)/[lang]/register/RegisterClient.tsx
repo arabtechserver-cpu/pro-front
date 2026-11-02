@@ -419,6 +419,10 @@ export default function RegisterClient({ lang, dict }: { lang: Locale; dict: any
       setErrorMessage(lang === "ar" ? "الرجاء الموافقة على شروط الخدمة وسياسة الخصوصية!" : "Please agree to Terms of Service and Privacy Policy!");
       return;
     }
+    if (!turnstileToken) {
+      setErrorMessage(lang === "ar" ? "يرجى إكمال التحقق الأمني قبل إنشاء الحساب." : "Please complete the security check before creating an account.");
+      return;
+    }
 
     setIsLoading(true);
 
@@ -850,7 +854,7 @@ export default function RegisterClient({ lang, dict }: { lang: Locale; dict: any
             <CloudflareTurnstile 
               onVerify={(token) => setTurnstileToken(token)}
               onExpire={() => setTurnstileToken("")}
-              onError={() => setTurnstileToken("cf-turnstile-client-fallback")}
+              onError={() => setTurnstileToken("")}
             />
           </div>
 
@@ -858,7 +862,7 @@ export default function RegisterClient({ lang, dict }: { lang: Locale; dict: any
           <div className="col-span-1 md:col-span-2">
             <button 
               type="submit" 
-              disabled={isLoading}
+              disabled={isLoading || !turnstileToken}
               className="w-full bg-primary-container text-on-primary-container py-4 rounded-lg font-bold text-lg hover:bg-primary transition-all glow-primary shadow-[0_0_15px_rgba(124,58,237,0.2)] active:scale-[0.99] flex items-center justify-center gap-2 disabled:opacity-50"
             >
               {isLoading ? (

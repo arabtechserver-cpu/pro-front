@@ -6,7 +6,27 @@ export async function authProxyBudget(
   handler: (body: any, signal: AbortSignal) => Promise<NextResponse>
 ) {
   const origin = request.headers.get('origin');
-  if ((origin && origin !== request.nextUrl.origin) || request.headers.get('sec-fetch-site') === 'cross-site') {
+  // Standalone Next.js uses an internal URL behind ingress; only configured public origins may override it.
+  const trustedOrigins = new Set([
+    request.nextUrl.origin,
+    'https://arabtechproserver.tech', 'https://www.arabtechproserver.tech',
+    'https://borai.store', 'https://www.borai.store',
+  ]);
+  for (const value of [
+    process.env.NEXT_PUBLIC_SITE_URL,
+    ...(process.env.FRONTEND_URL || '').split(','),
+    ...(process.env.ADDITIONAL_ALLOWED_ORIGINS || '').split(','),
+  ]) {
+    if (!value?.trim()) continue;
+    try {
+      const url = new URL(value.trim());
+      if ((url.protocol === 'https:' || (process.env.NODE_ENV !== 'production' && url.protocol === 'http:')) &&
+          !url.username && !url.password && url.pathname === '/' && !url.search && !url.hash) {
+        trustedOrigins.add(url.origin);
+      }
+    } catch { /* Invalid origin configuration never broadens access. */ }
+  }
+  if ((origin && !trustedOrigins.has(origin)) || request.headers.get('sec-fetch-site') === 'cross-site') {
     return NextResponse.json({ success: false, message: 'Untrusted request origin' }, { status: 403 });
   }
   const signal = AbortSignal.timeout(29000);
