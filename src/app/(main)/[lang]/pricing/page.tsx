@@ -1,3 +1,4 @@
+import { getBrandShareImage } from "@/lib/brand";
 import Link from "next/link";
 import { getDictionary } from "@/i18n/get-dictionary";
 import { Locale } from "@/i18n/config";
@@ -5,6 +6,7 @@ import PricingClient from "./PricingClient";
 import { Metadata } from "next";
 import { cache } from "react";
 import { readPublicPricingCatalog } from "@/lib/pricing-catalog.server";
+import { createPricingView } from "@/lib/pricing-view";
 
 // Cache hits must not accidentally make the rendered route indefinitely static.
 export const dynamic = "force-dynamic";
@@ -82,28 +84,15 @@ export async function generateMetadata(
       description,
       url: currentUrl,
       siteName: isAr ? "عرب تك برو سيرفر (عرب تك برو سيرفر) - Arab Tech Pro Server" : "Arab Tech Pro Server",
-      images: [
-        {
-          url: "https://arabtechproserver.tech/main-logo.png",
-          width: 512,
-          height: 512,
-          alt: "Arab Tech Pro Server Logo",
-        },
-        {
-          url: "https://arabtechproserver.tech/images/og-image.png",
-          width: 1200,
-          height: 630,
-          alt: "Arab Tech Pro Server",
-        },
-      ],
+      images: [{ url: getBrandShareImage(params.lang), width: 1200, height: 630, alt: "Arab Tech Pro Server — Software & Remote Services" }],
       locale: isAr ? "ar_AR" : "en_US",
       type: "website",
     },
     twitter: {
-      card: "summary",
+      card: "summary_large_image",
       title,
       description,
-      images: ["https://arabtechproserver.tech/main-logo.png"],
+      images: [getBrandShareImage(params.lang)],
     },
   };
 }
@@ -127,7 +116,7 @@ export default async function Pricing(props: { params: Promise<{ lang: Locale }>
       </div>
 
       {/* Pricing Client List (Includes Search and Filters) */}
-      <PricingClient lang={params.lang} dict={dict} initialServices={initialServices} />
+      <PricingClient lang={params.lang} dict={dict} initialServices={createPricingView(initialServices)} />
     </div>
   );
 }

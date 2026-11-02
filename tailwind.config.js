@@ -1,3 +1,11 @@
+const defaultColors = require("tailwindcss/colors");
+const themedRamp = (family, token) => Object.fromEntries(
+  Object.entries(defaultColors[family]).map(([shade, value]) => {
+    const hex = value.replace("#", "");
+    const rgb = [0, 2, 4].map(index => parseInt(hex.slice(index, index + 2), 16)).join(" ");
+    return [shade, `rgb(var(--${token}-${shade}, ${rgb}) / <alpha-value>)`];
+  })
+);
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   darkMode: "class",
@@ -9,6 +17,15 @@ module.exports = {
   theme: {
     extend: {
       colors: {
+        blue: themedRamp("blue", "brand"),
+        cyan: themedRamp("cyan", "brand"),
+        sky: themedRamp("sky", "brand"),
+        indigo: themedRamp("indigo", "brand"),
+        violet: themedRamp("violet", "brand"),
+        purple: themedRamp("purple", "brand"),
+        slate: themedRamp("slate", "neutral"),
+        gray: themedRamp("gray", "neutral"),
+        zinc: themedRamp("zinc", "neutral"),
         /* Adaptive surface & background palette */
         "surface-container-lowest": "rgb(var(--surface-container-lowest) / <alpha-value>)",
         "surface-container-low":    "rgb(var(--surface-container-low) / <alpha-value>)",
@@ -19,7 +36,7 @@ module.exports = {
         "surface":                  "rgb(var(--surface) / <alpha-value>)",
         "surface-bright":           "rgb(var(--surface-bright) / <alpha-value>)",
         "surface-variant":          "rgb(var(--surface-variant) / <alpha-value>)",
-        "surface-tint":             "#2563eb",
+        "surface-tint":             "rgb(var(--brand-primary, 37 99 235) / <alpha-value>)",
         "background":               "rgb(var(--background) / <alpha-value>)",
         "on-background":            "rgb(var(--on-background) / <alpha-value>)",
         "on-surface":               "rgb(var(--on-surface) / <alpha-value>)",
@@ -28,22 +45,22 @@ module.exports = {
         "inverse-on-surface":       "rgb(var(--inverse-on-surface) / <alpha-value>)",
 
         /* Primary: Royal Tech Blue */
-        "primary":                  "#2563eb",
-        "primary-container":        "#1d4ed8",
+        "primary":                  "rgb(var(--brand-primary, 37 99 235) / <alpha-value>)",
+        "primary-container":        "rgb(var(--brand-primary-container, 29 78 216) / <alpha-value>)",
         "primary-fixed":            "#93c5fd",
         "primary-fixed-dim":        "#3b82f6",
-        "on-primary":               "#ffffff",
-        "on-primary-container":     "#eff6ff",
+        "on-primary":               "rgb(var(--brand-on-primary, 255 255 255) / <alpha-value>)",
+        "on-primary-container":     "rgb(var(--brand-on-primary, 239 246 255) / <alpha-value>)",
         "on-primary-fixed":         "#1e3a8a",
         "on-primary-fixed-variant": "#1d4ed8",
         "inverse-primary":          "#1d4ed8",
 
         /* Secondary: Refined Sky / Tech Cyan */
-        "secondary":                "#0ea5e9",
-        "secondary-container":      "#0284c7",
+        "secondary":                "rgb(var(--brand-secondary, 14 165 233) / <alpha-value>)",
+        "secondary-container":      "rgb(var(--brand-secondary-container, 2 132 199) / <alpha-value>)",
         "secondary-fixed":          "#bae6fd",
         "secondary-fixed-dim":      "#38bdf8",
-        "on-secondary":             "#ffffff",
+        "on-secondary":             "rgb(var(--brand-on-secondary, 255 255 255) / <alpha-value>)",
         "on-secondary-container":   "#f0f9ff",
         "on-secondary-fixed":       "#0c4a6e",
         "on-secondary-fixed-variant":"#0369a1",

@@ -75,7 +75,7 @@ export default async function TutorialsPage(props: { params: Promise<{ lang: Loc
   const standaloneVideos = allVideos.filter(v => !v.seriesId);
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 dark:bg-[#0F0F1A] dark:text-white py-16 font-sans" dir={isAr ? 'rtl' : 'ltr'}>
+    <div className="min-h-screen bg-slate-50 text-slate-900 dark:bg-surface-container-lowest dark:text-white py-16 font-sans" dir={isAr ? 'rtl' : 'ltr'}>
       <div className="container mx-auto px-4 max-w-7xl space-y-16">
         
         {/* Header Hero Section */}
@@ -90,7 +90,7 @@ export default async function TutorialsPage(props: { params: Promise<{ lang: Loc
           <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-slate-900 dark:text-white mb-5 leading-tight">
             {isAr ? 'شروحات وكورسات احترافية' : 'Master Software Tutorials'}
           </h1>
-          <p className="text-base sm:text-lg text-slate-600 dark:text-gray-300 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-base sm:text-lg text-slate-600 dark:text-on-surface max-w-2xl mx-auto leading-relaxed">
             {isAr 
               ? 'تعلّم كيفية استخدام خدماتنا وتخطي الحمايات والبرمجة وفك الشفرات خطوة بخطوة مع كورسات شاملة وفيديوهات عملية.' 
               : 'Learn how to use our tools, unlock devices, and repair software step-by-step with comprehensive courses and practical videos.'}
@@ -100,7 +100,7 @@ export default async function TutorialsPage(props: { params: Promise<{ lang: Loc
         {/* ================= SECTION 1: COURSES & SERIES ================= */}
         {seriesList.length > 0 && (
           <section className="space-y-8">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200 dark:border-gray-800">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200 dark:border-outline-variant">
               <div>
                 <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white flex items-center gap-3">
                   <span className="w-10 h-10 rounded-2xl bg-indigo-500/20 text-indigo-400 flex items-center justify-center">
@@ -108,12 +108,12 @@ export default async function TutorialsPage(props: { params: Promise<{ lang: Loc
                   </span>
                   <span>{isAr ? 'الكورسات والسلاسل التدريبية' : 'Training Courses & Series'}</span>
                 </h2>
-                <p className="text-xs sm:text-sm text-slate-500 dark:text-gray-400 mt-1">
+                <p className="text-xs sm:text-sm text-slate-500 dark:text-on-surface-variant mt-1">
                   {isAr ? 'دورات متكاملة مرتبة حسب المراحل التعليمية مع تطبيقات عملية.' : 'Full comprehensive courses organized step-by-step with hands-on practice.'}
                 </p>
               </div>
 
-              <span className="text-xs font-bold text-slate-600 dark:text-gray-400 bg-white dark:bg-[#1A1A2E] px-4 py-2 rounded-xl border border-slate-200 dark:border-gray-800 shadow-sm self-start sm:self-auto">
+              <span className="text-xs font-bold text-slate-600 dark:text-on-surface-variant bg-white dark:bg-surface-container px-4 py-2 rounded-xl border border-slate-200 dark:border-outline-variant shadow-sm self-start sm:self-auto">
                 {seriesList.length} {isAr ? 'كورسات متوفرة' : 'Courses Available'}
               </span>
             </div>
@@ -131,9 +131,9 @@ export default async function TutorialsPage(props: { params: Promise<{ lang: Loc
                     key={series.id}
                     className="group"
                   >
-                    <div className="bg-white dark:bg-[#1A1A2E] rounded-3xl overflow-hidden border border-slate-200 dark:border-gray-800/80 hover:border-indigo-500/50 transition-all duration-300 shadow-md hover:shadow-2xl hover:shadow-indigo-500/20 h-full flex flex-col hover:-translate-y-1.5">
+                    <div className="bg-white dark:bg-surface-container rounded-3xl overflow-hidden border border-slate-200 dark:border-outline-variant/80 hover:border-indigo-500/50 transition-all duration-300 shadow-md hover:shadow-2xl hover:shadow-indigo-500/20 h-full flex flex-col hover:-translate-y-1.5">
                       {/* Poster Container */}
-                      <div className="relative aspect-video bg-black/60 overflow-hidden border-b border-gray-800/60">
+                      <div className="relative aspect-video bg-black/60 overflow-hidden border-b border-outline-variant/60">
                         {series.thumbnail ? (
                           <img
                             src={series.thumbnail}
@@ -170,14 +170,14 @@ export default async function TutorialsPage(props: { params: Promise<{ lang: Loc
                           <h3 className="text-xl font-bold mb-2 text-slate-900 dark:text-white group-hover:text-indigo-500 dark:group-hover:text-indigo-400 transition-colors line-clamp-1">
                             {title}
                           </h3>
-                          <p className="text-slate-600 dark:text-gray-400 text-xs sm:text-sm line-clamp-2 leading-relaxed">
+                          <p className="text-slate-600 dark:text-on-surface-variant text-xs sm:text-sm line-clamp-2 leading-relaxed">
                             {desc || (isAr ? 'شاهد تفاصيل هذا الكورس ومنهج الدروس المتاحة.' : 'View course details and complete curriculum.')}
                           </p>
                         </div>
 
                         {/* Footer Meta & Action */}
-                        <div className="pt-4 border-t border-slate-100 dark:border-gray-800/80 flex items-center justify-between">
-                          <span className="text-xs text-slate-500 dark:text-gray-500 flex items-center gap-1">
+                        <div className="pt-4 border-t border-slate-100 dark:border-outline-variant/80 flex items-center justify-between">
+                          <span className="text-xs text-slate-500 dark:text-on-surface-variant flex items-center gap-1">
                             <span className="material-symbols-outlined text-sm text-violet-500 dark:text-violet-400">check_circle</span>
                             {freeCount > 0 ? (isAr ? `${freeCount} دروس مجانية` : `${freeCount} Free Previews`) : (isAr ? 'كورس شامل' : 'Full Course')}
                           </span>
@@ -198,7 +198,7 @@ export default async function TutorialsPage(props: { params: Promise<{ lang: Loc
 
         {/* ================= SECTION 2: STANDALONE TUTORIALS & LESSONS ================= */}
         <section className="space-y-8">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200 dark:border-gray-800">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200 dark:border-outline-variant">
             <div>
               <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white flex items-center gap-3">
                 <span className="w-10 h-10 rounded-2xl bg-purple-500/20 text-purple-500 dark:text-purple-400 flex items-center justify-center">
@@ -206,21 +206,21 @@ export default async function TutorialsPage(props: { params: Promise<{ lang: Loc
                 </span>
                 <span>{isAr ? 'جميع الدروس والشروحات الفردية' : 'All Tutorials & Lessons'}</span>
               </h2>
-              <p className="text-xs sm:text-sm text-slate-500 dark:text-gray-400 mt-1">
+              <p className="text-xs sm:text-sm text-slate-500 dark:text-on-surface-variant mt-1">
                 {isAr ? 'فيديوهات وشروحات سريعة لحل مشكلات واستخدام أدوات محددة.' : 'Fast practical videos and tutorials for specific tools and procedures.'}
               </p>
             </div>
 
-            <span className="text-xs font-bold text-slate-600 dark:text-gray-400 bg-white dark:bg-[#1A1A2E] px-4 py-2 rounded-xl border border-slate-200 dark:border-gray-800 shadow-sm self-start sm:self-auto">
+            <span className="text-xs font-bold text-slate-600 dark:text-on-surface-variant bg-white dark:bg-surface-container px-4 py-2 rounded-xl border border-slate-200 dark:border-outline-variant shadow-sm self-start sm:self-auto">
               {allVideos.length} {isAr ? 'فيديوهات' : 'Videos'}
             </span>
           </div>
 
           {allVideos.length === 0 ? (
-            <div className="bg-white dark:bg-[#1A1A2E] border border-slate-200 dark:border-gray-800 rounded-3xl p-16 text-center text-slate-600 dark:text-gray-400 shadow-sm space-y-3">
-              <span className="material-symbols-outlined text-5xl text-slate-400 dark:text-gray-600">smart_display</span>
+            <div className="bg-white dark:bg-surface-container border border-slate-200 dark:border-outline-variant rounded-3xl p-16 text-center text-slate-600 dark:text-on-surface-variant shadow-sm space-y-3">
+              <span className="material-symbols-outlined text-5xl text-slate-400 dark:text-on-surface-variant">smart_display</span>
               <p className="font-bold text-base text-slate-900 dark:text-white">{isAr ? 'لا توجد شروحات أو كورسات منشورة حالياً.' : 'No tutorials available yet.'}</p>
-              <p className="text-xs text-slate-500 dark:text-gray-500">{isAr ? 'يرجى متابعة الصفحة باستمرار لإضافة جديد الشروحات قريباً.' : 'Please check back soon for newly published videos.'}</p>
+              <p className="text-xs text-slate-500 dark:text-on-surface-variant">{isAr ? 'يرجى متابعة الصفحة باستمرار لإضافة جديد الشروحات قريباً.' : 'Please check back soon for newly published videos.'}</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -234,9 +234,9 @@ export default async function TutorialsPage(props: { params: Promise<{ lang: Loc
                     key={video.id}
                     className="group"
                   >
-                    <div className="bg-white dark:bg-[#1A1A2E] rounded-3xl overflow-hidden border border-slate-200 dark:border-gray-800/80 hover:border-purple-500/50 transition-all duration-300 shadow-md hover:shadow-2xl hover:shadow-purple-500/20 h-full flex flex-col hover:-translate-y-1.5">
+                    <div className="bg-white dark:bg-surface-container rounded-3xl overflow-hidden border border-slate-200 dark:border-outline-variant/80 hover:border-purple-500/50 transition-all duration-300 shadow-md hover:shadow-2xl hover:shadow-purple-500/20 h-full flex flex-col hover:-translate-y-1.5">
                       {/* Video Thumbnail */}
-                      <div className="relative aspect-video bg-black/60 overflow-hidden border-b border-slate-100 dark:border-gray-800/60">
+                      <div className="relative aspect-video bg-black/60 overflow-hidden border-b border-slate-100 dark:border-outline-variant/60">
                         {video.thumbnail ? (
                           <img
                             src={video.thumbnail}
@@ -281,13 +281,13 @@ export default async function TutorialsPage(props: { params: Promise<{ lang: Loc
                             {videoTitle}
                           </h3>
                           {videoDesc && (
-                            <p className="text-slate-600 dark:text-gray-400 text-xs line-clamp-2 leading-relaxed">
+                            <p className="text-slate-600 dark:text-on-surface-variant text-xs line-clamp-2 leading-relaxed">
                               {videoDesc}
                             </p>
                           )}
                         </div>
 
-                        <div className="pt-3 border-t border-slate-100 dark:border-gray-800/80 flex items-center justify-between text-xs text-slate-500 dark:text-gray-500">
+                        <div className="pt-3 border-t border-slate-100 dark:border-outline-variant/80 flex items-center justify-between text-xs text-slate-500 dark:text-on-surface-variant">
                           <span className="flex items-center gap-1">
                             <span className="material-symbols-outlined text-sm">schedule</span>
                             {new Date(video.createdAt).toLocaleDateString(isAr ? 'ar-EG' : 'en-US')}

@@ -1,6 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  // The desktop preview uses the loopback IP as well as localhost.
+  allowedDevOrigins: ['127.0.0.1'],
+  // Keep the development badge from covering the mobile AI/contact controls.
+  devIndicators: { position: 'bottom-right' },
   output: 'standalone',
   compress: true,
   poweredByHeader: false,

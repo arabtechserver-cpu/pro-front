@@ -1,3 +1,4 @@
+import { brandAssets } from "@/lib/brand";
 ﻿import type { Metadata } from "next";
 import { Inter, Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google";
 import "../../globals.css";
@@ -12,11 +13,11 @@ export const metadata: Metadata = {
   description: "Admin Management Portal",
   icons: {
     icon: [
-      { url: '/favicon.ico', sizes: 'any' },
-      { url: '/images/logo_en.png', type: 'image/png' },
+      { url: brandAssets.favicon, sizes: 'any' },
+      { url: brandAssets.icon48, sizes: '48x48', type: 'image/png' },
     ],
-    shortcut: '/favicon.ico',
-    apple: '/images/logo_en.png',
+    shortcut: brandAssets.favicon,
+    apple: brandAssets.appleIcon,
   },
 };
 

@@ -3,7 +3,9 @@
 import { userApiFetch } from "@/lib/user-api-fetch";
 import { getFoxreloadNoteFields } from "@/lib/purchase-service-fields";
 
-import { useState, useEffect, useMemo, useRef, useCallback } from "react";
+import { useState, useEffect, useMemo, useRef, useCallback, useDeferredValue } from "react";
+import { getCatalogPage } from "@/lib/service-list-window";
+import CatalogPager from "@/components/CatalogPager";
 import Link from "next/link";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 
@@ -102,7 +104,6 @@ const SECTION_TABS = [
   { id: "appStores", labelAr: "متاجر التطبيقات", labelEn: "App Stores", icon: "store" },
   { id: "gameCurrency", labelAr: "أكواد الألعاب", labelEn: "Game Codes", icon: "vpn_key" },
   { id: "subscriptions", labelAr: "الاشتراكات والترفيه", labelEn: "Subscriptions", icon: "subscriptions" },
-  { id: "esim", labelAr: "شرائح الإنترنت eSIM", labelEn: "eSIM", icon: "sim_card" },
   { id: "rewarble", labelAr: "Rewarble", labelEn: "Rewarble", icon: "account_balance_wallet" },
 ];
 
@@ -533,6 +534,8 @@ export default function GamingClient({
 
   const [catalog, setCatalog] = useState<CatalogResponse | null>(null);
   const [loading, setLoading] = useState(true);
+  const [catalogError, setCatalogError] = useState(false);
+  const [catalogReloadCount, setCatalogReloadCount] = useState(0);
   const [activeSection, setActiveSection] = useState<string>("popular");
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -566,6 +569,12 @@ export default function GamingClient({
 
   const initialUrlCheckedRef = useRef(false);
   const dismissedBundleRef = useRef<string | null>(null);
+  const productsRequestRef = useRef<AbortController | null>(null);
+  const [productPage, setProductPage] = useState(1);
+  const [regionPage, setRegionPage] = useState(1);
+  const deferredSearch = useDeferredValue(searchQuery);
+  const deferredCountrySearch = useDeferredValue(countrySearch);
+  const deferredPackageSearch = useDeferredValue(packageSearch);
 
   const [bnbPaymentConfig, setBnbPaymentConfig] = useState<{
     address: string;
@@ -645,28 +654,35 @@ export default function GamingClient({
     }
   }, []);
 
-  const fetchCatalog = async () => {
-    setLoading(true);
-    try {
-      const res = await fetch("/api/foxreload/catalog");
-      const data = await res.json();
-      if (res.ok && data.sections) {
-        setCatalog(data);
-      }
-    } catch {
-      console.error("Failed to load FoxReload catalog");
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
+    const controller = new AbortController();
+    let mounted = true;
+    const timeout = setTimeout(() => controller.abort(), 20000);
+    async function fetchCatalog() {
+      setLoading(true);
+      setCatalogError(false);
+      try {
+        const res = await fetch("/api/foxreload/catalog", { signal: controller.signal });
+        const data = await res.json();
+        if (!res.ok || !data.sections) throw new Error("CATALOG_UNAVAILABLE");
+        if (mounted && !controller.signal.aborted) setCatalog(data);
+      } catch {
+        if (mounted) setCatalogError(true);
+      } finally {
+        clearTimeout(timeout);
+        if (mounted) setLoading(false);
+      }
+    }
     fetchCatalog();
-  }, []);
+    return () => { mounted = false; clearTimeout(timeout); controller.abort(); productsRequestRef.current?.abort(); };
+  }, [catalogReloadCount]);
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [activeSection, searchQuery]);
+  }, [activeSection, deferredSearch]);
+
+  useEffect(() => { setProductPage(1); }, [regionProducts, deferredPackageSearch]);
+  useEffect(() => { setRegionPage(1); }, [selectedBundle, deferredCountrySearch]);
 
   const convertPrice = (priceUsd: number) => {
     const info = CURRENCY_RATES[currentCurrency] || CURRENCY_RATES.USD;
@@ -772,7 +788,7 @@ export default function GamingClient({
   const currentBundles = useMemo(() => {
     if (!catalog?.sections) return [];
 
-    const q = searchQuery.trim().toLowerCase();
+    const q = deferredSearch.trim().toLowerCase();
     if (q) {
       return allBundlesList.filter((b) => {
         if (b.isHidden) return false;
@@ -791,7 +807,7 @@ export default function GamingClient({
       if (b.inStockCount <= 0 && (!b.regions || b.regions.length === 0)) return false;
       return true;
     });
-  }, [catalog, activeSection, searchQuery, allBundlesList, getBundlesForTab]);
+  }, [catalog, activeSection, deferredSearch, allBundlesList, getBundlesForTab]);
 
   const totalItems = currentBundles.length;
   const totalPages = Math.max(1, Math.ceil(totalItems / ITEMS_PER_PAGE));
@@ -802,11 +818,17 @@ export default function GamingClient({
   }, [currentBundles, currentPage]);
 
   const loadRegionProducts = async (regionId: string) => {
+    productsRequestRef.current?.abort();
+    const controller = new AbortController();
+    productsRequestRef.current = controller;
     setLoadingRegionProducts(true);
+    setRegionProducts([]);
+    setProductPage(1);
     setErrorMessage(null);
     try {
-      const res = await fetch(`/api/foxreload/category/${encodeURIComponent(regionId)}/products`);
+      const res = await fetch(`/api/foxreload/category/${encodeURIComponent(regionId)}/products`, { signal: AbortSignal.any([controller.signal, AbortSignal.timeout(20000)]) });
       const data = await res.json();
+      if (controller.signal.aborted) return;
       if (res.ok && Array.isArray(data.products)) {
         setRegionProducts(data.products);
         setSelectedProduct(null);
@@ -817,12 +839,13 @@ export default function GamingClient({
         setIsPurchaseModalOpen(false);
       }
     } catch {
+      if (controller.signal.aborted) return;
       setErrorMessage(isAr ? "تعذر جلب باقات هذه المنطقة حالياً" : "Failed to load packages for this region");
       setRegionProducts([]);
       setSelectedProduct(null);
       setIsPurchaseModalOpen(false);
     } finally {
-      setLoadingRegionProducts(false);
+      if (!controller.signal.aborted) setLoadingRegionProducts(false);
     }
   };
 
@@ -877,6 +900,8 @@ export default function GamingClient({
   };
 
   const handleCloseBundle = () => {
+    productsRequestRef.current?.abort();
+    setLoadingRegionProducts(false);
     if (selectedBundle) {
       dismissedBundleRef.current = selectedBundle.name.toLowerCase();
     } else {
@@ -889,11 +914,12 @@ export default function GamingClient({
     setRegionProducts([]);
     setFieldInputs({});
     setErrorMessage(null);
-    router.replace(pathname, { scroll: false });
     window.history.replaceState({}, "", pathname);
   };
 
   const handleTabClick = (tabId: string) => {
+    productsRequestRef.current?.abort();
+    setLoadingRegionProducts(false);
     dismissedBundleRef.current = "dismissed";
     setActiveSection(tabId);
     setSearchQuery("");
@@ -917,8 +943,6 @@ export default function GamingClient({
   };
 
   useEffect(() => {
-    if (!catalog || allBundlesList.length === 0) return;
-
     let rawParam =
       searchParams.get("section") ||
       searchParams.get("bundle") ||
@@ -928,8 +952,6 @@ export default function GamingClient({
     if (!rawParam && !initialUrlCheckedRef.current && initialSectionParam) {
       rawParam = initialSectionParam;
     }
-    initialUrlCheckedRef.current = true;
-
     if (!rawParam) {
       if (selectedBundle && dismissedBundleRef.current) {
         setSelectedBundle(null);
@@ -954,6 +976,7 @@ export default function GamingClient({
       TAB_ALIAS_MAP[target.replace(/-/g, " ")];
 
     if (matchedTab) {
+      initialUrlCheckedRef.current = true;
       setActiveSection(matchedTab);
       setSelectedBundle(null);
       return;
@@ -968,6 +991,9 @@ export default function GamingClient({
     ) {
       return;
     }
+
+    if (!catalog || allBundlesList.length === 0) return;
+    initialUrlCheckedRef.current = true;
 
     const exactMatch = allBundlesList.find(
       (b) => b.name.trim().toLowerCase() === target || b.slug.trim().toLowerCase() === target
@@ -1117,17 +1143,20 @@ export default function GamingClient({
 
   const filteredRegions = useMemo(() => {
     if (!selectedBundle?.regions) return [];
-    if (!countrySearch.trim()) return selectedBundle.regions;
-    const q = countrySearch.toLowerCase();
+    if (!deferredCountrySearch.trim()) return selectedBundle.regions;
+    const q = deferredCountrySearch.toLowerCase();
     return selectedBundle.regions.filter((r) => r.name.toLowerCase().includes(q));
-  }, [selectedBundle, countrySearch]);
+  }, [selectedBundle, deferredCountrySearch]);
 
   const filteredProducts = useMemo(() => {
     if (!regionProducts) return [];
-    if (!packageSearch.trim()) return regionProducts;
-    const q = packageSearch.toLowerCase();
+    if (!deferredPackageSearch.trim()) return regionProducts;
+    const q = deferredPackageSearch.toLowerCase();
     return regionProducts.filter((p) => p.name.toLowerCase().includes(q));
-  }, [regionProducts, packageSearch]);
+  }, [regionProducts, deferredPackageSearch]);
+
+  const productWindow = getCatalogPage(filteredProducts, productPage, 24);
+  const regionWindow = getCatalogPage(filteredRegions, regionPage, 48);
 
   const selectedVisual = useMemo(() => {
     return getServiceVisual(selectedBundle);
@@ -1299,7 +1328,7 @@ export default function GamingClient({
                 </div>
 
                 <div className="flex flex-wrap gap-2 max-h-52 overflow-y-auto p-1">
-                  {filteredRegions.map((region) => {
+                  {(regionWindow.items as FoxreloadRegion[]).map((region) => {
                     const isSelected = selectedRegion?.id === region.id;
                     const flag = getCountryFlag(region.name);
                     return (
@@ -1341,6 +1370,8 @@ export default function GamingClient({
                 </div>
               </div>
             )}
+
+            <CatalogPager page={regionWindow.page} pageCount={regionWindow.pageCount} onPageChange={setRegionPage} lang={lang} label={isAr ? "صفحات الدول" : "Country pages"} />
 
             {/* Services & Packages Section Header */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-surface-container/50 p-4 sm:p-5 rounded-3xl border border-outline-variant/30">
@@ -1400,7 +1431,7 @@ export default function GamingClient({
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5">
-                {filteredProducts.map((prod) => {
+                {(productWindow.items as CatalogItem[]).map((prod) => {
                   const prodImage = prod.imagePath || prod.thumbnailPath;
                   return (
                     <div
@@ -1488,6 +1519,8 @@ export default function GamingClient({
             )}
 
             {/* DEDICATED PURCHASE & DATA ENTRY MODAL (صفحة/نافذة إدخال البيانات والشراء) */}
+            {!loadingRegionProducts && <CatalogPager page={productWindow.page} pageCount={productWindow.pageCount} onPageChange={setProductPage} lang={lang} label={isAr ? "صفحات الباقات" : "Package pages"} />}
+
             {isPurchaseModalOpen && selectedProduct && (
               <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto animate-in fade-in duration-200">
                 <div className="bg-surface-container-high border border-outline-variant/40 rounded-3xl p-6 sm:p-7 max-w-lg w-full space-y-5 shadow-2xl relative animate-in zoom-in-95 my-8">
@@ -1756,6 +1789,10 @@ export default function GamingClient({
                   </button>
                 );
               })}
+              <Link href={`/${lang}/pricing?category=server`} className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-outline-variant bg-surface-container text-on-surface font-bold text-xs hover:border-primary">
+                <span className="material-symbols-outlined text-primary">code</span>
+                {isAr ? "السوفت وير والتفعيلات" : "Software & activations"}
+              </Link>
             </div>
 
             {/* Search Bar & Header */}
@@ -1858,10 +1895,6 @@ export default function GamingClient({
                         <span>{isAr ? "الاشتراكات والترفيه" : "Subscriptions"}</span>
                       </span>
                       <span className="px-2 py-0.5 rounded-lg bg-surface-container-highest border border-outline-variant/30 flex items-center gap-1">
-                        <span className="material-symbols-outlined text-xs">sim_card</span>
-                        <span>{isAr ? "شرائح الإنترنت eSIM" : "eSIM"}</span>
-                      </span>
-                      <span className="px-2 py-0.5 rounded-lg bg-surface-container-highest border border-outline-variant/30 flex items-center gap-1">
                         <span className="material-symbols-outlined text-xs">account_balance_wallet</span>
                         <span>Rewarble</span>
                       </span>
@@ -1886,6 +1919,11 @@ export default function GamingClient({
                 <span className="text-on-surface-variant font-medium text-sm">
                   {isAr ? "جاري تحميل أحدث الخدمات والباقات من السيرفر..." : "Loading games and services..."}
                 </span>
+              </div>
+            ) : catalogError ? (
+              <div role="alert" className="p-8 text-center text-on-surface-variant space-y-4">
+                <p>{isAr ? "تعذر تحميل الخدمات حالياً. حاول مرة أخرى." : "Services could not be loaded. Please try again."}</p>
+                <button type="button" onClick={() => setCatalogReloadCount(count => count + 1)} className="rounded-xl bg-primary px-4 py-2 text-on-primary">{isAr ? "إعادة المحاولة" : "Retry"}</button>
               </div>
             ) : paginatedBundles.length === 0 ? (
               <div className="py-20 text-center space-y-3 bg-surface-container/30 rounded-3xl border border-outline-variant/30 p-8">

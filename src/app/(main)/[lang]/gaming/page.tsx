@@ -1,3 +1,4 @@
+import { brandAssets, brandOrigin, getBrandShareImage } from "@/lib/brand";
 import { Metadata } from "next";
 import Link from "next/link";
 import { Locale, i18n } from "@/i18n/config";
@@ -26,29 +27,38 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
     section = section.replace(/^%20/, "").trim();
   }
 
-  const title = section
+  const sectionLabels: Record<string, [string, string]> = {
+    topups: ["شحن الألعاب", "Game top-ups"],
+    appstores: ["بطاقات المتاجر", "Store cards"],
+    "app-stores": ["بطاقات المتاجر", "Store cards"],
+    subscriptions: ["الاشتراكات الرقمية", "Digital subscriptions"],
+    gamecurrency: ["أكواد الألعاب", "Game codes"],
+    rewarble: ["بطاقات Rewarble", "Rewarble vouchers"],
+    popular: ["الأكثر شعبية", "Popular services"],
+  };
+  const sectionLabel = section ? sectionLabels[section.toLowerCase()]?.[isAr ? 0 : 1] || section : undefined;
+
+  const title = sectionLabel
     ? isAr
-      ? `باقات وشحن ${section} فوري ومباشر بالـ ID | عرب تك برو سيرفر`
-      : `${section} Instant Player ID Top-Up & Gift Cards | Arab Tech Pro Server`
+      ? `${sectionLabel} | عرب تك برو سيرفر`
+      : `${sectionLabel} | Arab Tech Pro Server`
     : isAr
     ? "شحن ألعاب فوري وبطاقات رقمية واشتراكات بالجملة | عرب تك برو سيرفر"
     : "Instant Gaming Top-Ups, Digital Gift Cards & Vouchers | Arab Tech Pro Server";
 
-  const description = section
+  const description = sectionLabel
     ? isAr
-      ? `أسعار وعروض شحن ${section}: تسليم فوري وتلقائي 24/7 عبر رصيد المحفظة بسيرفر عرب تك برو بأفضل أسعار الجملة المعتمدة للوكلاء والموزعين ومحلات الألعاب.`
-      : `Live packages and wholesale rates for ${section}: instant 24/7 delivery and automated fulfillment on Arab Tech Pro Server for gamers and retailers.`
+      ? `تصفح أسعار وخدمات ${sectionLabel} عبر محفظتك في عرب تك برو سيرفر، مع خيارات للأفراد والوكلاء وأصحاب المتاجر.`
+      : `Browse ${sectionLabel} packages and rates on Arab Tech Pro Server for individuals, resellers and retailers.`
     : isAr
-    ? "سيرفر عرب تك برو الرسمي لشحن الألعاب والبطاقات الرقمية: شحن فوري بالآيدي لألعاب ببجي وفري فاير وروبلوكس وفالورانت وكول أوف ديوتي، شراء بطاقات جوجل بلاي، آيتونز، بلايستيشن، إكس بوكس، واشتراكات تيليجرام وشاهد وشرائح eSIM الدولية بأفضل أسعار الجملة."
-    : "Official digital gaming and voucher store: instant player ID top-ups for PUBG, Free Fire, Roblox, Valorant, COD, gift cards for Google Play, iTunes, PlayStation, Steam, Telegram Premium and travel eSIMs at wholesale rates.";
+    ? "سيرفر عرب تك برو لشحن الألعاب والبطاقات الرقمية: ألعاب ببجي وفري فاير وروبلوكس وفالورانت وكول أوف ديوتي، بطاقات جوجل بلاي، آيتونز، بلايستيشن، إكس بوكس، واشتراكات تيليجرام وشاهد بأسعار الجملة."
+    : "Digital gaming and voucher store: player ID top-ups for PUBG, Free Fire, Roblox, Valorant, COD, gift cards for Google Play, iTunes, PlayStation, Steam and digital subscriptions at wholesale rates.";
 
   const currentUrl = `https://arabtechproserver.tech/${params.lang}/gaming${
     section ? `?section=${encodeURIComponent(section)}` : ""
   }`;
 
-  const shareImg = isAr
-    ? "https://arabtechproserver.tech/images/og_share_ar.png"
-    : "https://arabtechproserver.tech/images/og_share_en.png";
+  const shareImg = getBrandShareImage(params.lang);
 
   const keywords = isAr
     ? [
@@ -68,8 +78,6 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
         "بطاقات ستيم تركي",
         "اشتراك تيليجرام بريميوم رخيص",
         "اشتراك شاهد VIP رياضي",
-        "شرائح الكترونية دولية eSIM",
-        "باقات نت للسفر eSIM",
         "Rewarble قسائم",
         "شحن العاب جملة للوكلاء",
         "سيرفر شحن العاب فوري",
@@ -94,8 +102,6 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
         "Xbox Live Gift Cards",
         "Telegram Premium Subscription",
         "Shahid VIP Subscription",
-        "International Travel eSIM Data",
-        "Global eSIM Data Packages",
         "Rewarble Vouchers",
         "Wholesale Game Codes",
         "Instant Gaming Reseller Server",
@@ -183,7 +189,7 @@ export default async function GamingPage(props: Props) {
         },
         {
           q: "ما هي الألعاب والبطاقات الرقمية المدعومة للشحن المباشر؟",
-          a: "نوفر شحناً مباشراً لأشهر الألعاب العالمية مثل ببجي موبايل (PUBG UC)، فري فاير (Free Fire Diamonds)، فالورانت، روبلوكس (Robux)، كول أوف ديوتي، وبطاقات المتاجر الرسمية مثل جوجل بلاي، آبل آيتونز، بلايستيشن ستور، إكس بوكس، ستيم، واشتراكات تيليجرام بريميوم وشاهد VIP، وشرائح eSIM الدولية لأكثر من 150 دولة.",
+          a: "نوفر شحناً مباشراً لأشهر الألعاب العالمية مثل ببجي موبايل (PUBG UC)، فري فاير (Free Fire Diamonds)، فالورانت، روبلوكس (Robux)، كول أوف ديوتي، وبطاقات المتاجر مثل جوجل بلاي، آبل آيتونز، بلايستيشن ستور، إكس بوكس، ستيم، واشتراكات تيليجرام بريميوم وشاهد VIP.",
         },
         {
           q: "هل تتوفر أسعار جملة مخصصة للوكلاء والموزعين وأصحاب المتاجر؟",
@@ -209,7 +215,7 @@ export default async function GamingPage(props: Props) {
         },
         {
           q: "Which games, digital cards, and subscriptions are supported?",
-          a: "We support direct player ID top-ups for PUBG Mobile, Free Fire, Valorant, Roblox, and Call of Duty, alongside official digital gift cards for Google Play, Apple iTunes, PlayStation Network, Xbox, Steam, Telegram Premium, Shahid VIP subscriptions, and travel eSIM data across 150+ countries.",
+          a: "We support direct player ID top-ups for PUBG Mobile, Free Fire, Valorant, Roblox, and Call of Duty, alongside digital gift cards for Google Play, Apple iTunes, PlayStation Network, Xbox, Steam, Telegram Premium and Shahid VIP subscriptions.",
         },
         {
           q: "Are wholesale prices available for resellers, retailers, and store owners?",
@@ -249,8 +255,8 @@ export default async function GamingPage(props: Props) {
         "url": `https://arabtechproserver.tech/${params.lang}/gaming`,
         "name": isAr ? "شحن الألعاب والبطاقات الرقمية والاشتراكات" : "Gaming Top-Ups, Digital Cards & Subscriptions",
         "description": isAr
-          ? "منصة متكاملة لشحن الألعاب المباشر، بطاقات المتاجر والهدايا، والاشتراكات الترفيهية وشرائح الإنترنت eSIM بأفضل أسعار الجملة."
-          : "Comprehensive portal for instant in-game top-ups, digital gift vouchers, subscriptions and global eSIMs.",
+          ? "منصة لشحن الألعاب المباشر، بطاقات المتاجر والهدايا، والاشتراكات الترفيهية بأسعار الجملة."
+          : "Portal for in-game top-ups, digital gift vouchers and subscriptions.",
         "inLanguage": isAr ? "ar" : "en",
         "isPartOf": {
           "@id": "https://arabtechproserver.tech/#website",
@@ -282,10 +288,8 @@ export default async function GamingPage(props: Props) {
         "@id": "https://arabtechproserver.tech/#store",
         "name": isAr ? "عرب تك برو سيرفر - متجر الخدمات الرقمية والألعاب" : "Arab Tech Pro Server - Digital Gaming Store",
         "url": `https://arabtechproserver.tech/${params.lang}/gaming`,
-        "logo": "https://arabtechproserver.tech/images/logo.png",
-        "image": isAr
-          ? "https://arabtechproserver.tech/images/og_share_ar.png"
-          : "https://arabtechproserver.tech/images/og_share_en.png",
+        "logo": `${brandOrigin}${brandAssets.organizationLogo}`,
+        "image": getBrandShareImage(params.lang),
         "description": isAr
           ? "متجر إلكتروني معتمد لتسليم أكواد الألعاب والشحن الفوري والاشتراكات بأسعار الجملة المعتمدة 24/7."
           : "Authorized digital store providing automated in-game top-up and voucher delivery at wholesale rates 24/7.",
@@ -334,10 +338,10 @@ export default async function GamingPage(props: Props) {
             },
             {
               "@type": "OfferCatalog",
-              "name": isAr ? "شرائح الإنترنت الدولية eSIM" : "Global Travel eSIMs",
+              "name": isAr ? "السوفت وير والتفعيلات" : "Software & activations",
               "description": isAr
-                ? "باقات إنترنت دولية سريعة تغطي أكثر من 150 دولة حول العالم"
-                : "High-speed travel internet packages across 150+ countries",
+                ? "تراخيص أدوات صيانة الهواتف والتفعيلات وأرصدة السيرفرات"
+                : "Phone software tool licenses, activations and server credits",
             },
             {
               "@type": "OfferCatalog",
@@ -399,8 +403,8 @@ export default async function GamingPage(props: Props) {
             </h2>
             <p className="text-sm text-on-surface-variant max-w-4xl leading-relaxed">
               {isAr
-                ? "يقدم سيرفر عرب تك برو منصة رائدة ومتكاملة لتوفير خدمات شحن الألعاب المباشرة وتسليم البطاقات الرقمية الأصلية واشتراكات الترفيه وشرائح الإنترنت الدولية eSIM. نوفر حلولاً مؤتمتة تلبي احتياجات اللاعبين الأفراد وأصحاب المتاجر والموزعين بأسعار الجملة المعتمدة وتسليم فوري 24/7 عبر رصيد المحفظة."
-                : "Arab Tech Pro Server delivers an automated, enterprise-grade platform for instant in-game player ID top-ups, genuine digital gift vouchers, streaming subscriptions, and global travel eSIMs. Built to serve individual gamers and wholesale distributors alike with competitive margins and 24/7 automated delivery."}
+                ? "يقدم سيرفر عرب تك برو خدمات شحن الألعاب والبطاقات الرقمية واشتراكات الترفيه، مع قسم مخصص للسوفت وير والتفعيلات. تصفح الخدمات والباقات المناسبة للأفراد وأصحاب المتاجر والموزعين عبر محفظتك."
+                : "Arab Tech Pro Server offers game top-ups, digital cards and entertainment subscriptions, with a dedicated software and activations catalog. Browse packages for individuals, retailers and resellers using your wallet."}
             </p>
           </header>
 
@@ -539,21 +543,21 @@ export default async function GamingPage(props: Props) {
             </Link>
 
             <Link
-              href={`/${params.lang}/gaming?section=esim`}
+              href={`/${params.lang}/pricing?category=server`}
               className="p-5 rounded-2xl bg-surface-container/50 hover:bg-surface-container border border-outline-variant/30 transition-all block group"
             >
               <div className="flex items-center gap-3 mb-2">
                 <span className="material-symbols-outlined text-primary text-2xl group-hover:scale-110 transition-transform">
-                  sim_card
+                  code
                 </span>
                 <h3 className="font-bold text-sm text-on-surface group-hover:text-primary transition-colors">
-                  {isAr ? "شرائح الإنترنت الدولية eSIM" : "Global Travel eSIM Data"}
+                  {isAr ? "السوفت وير والتفعيلات" : "Software & activations"}
                 </h3>
               </div>
               <p className="text-xs text-on-surface-variant leading-relaxed">
                 {isAr
-                  ? "باقات إنترنت تجوال سريعة تغطي أكثر من 150 دولة لتوفير اتصال سريع أثناء السفر بدون تبديل شريحة."
-                  : "High-speed roaming data packages across 150+ countries for seamless connectivity without physical SIM swaps."}
+                  ? "تصفح تراخيص أدوات صيانة الهواتف والتفعيلات وأرصدة السيرفرات."
+                  : "Browse phone software tool licenses, activations and server credits."}
               </p>
             </Link>
 

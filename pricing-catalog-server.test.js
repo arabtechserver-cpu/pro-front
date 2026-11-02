@@ -8,6 +8,10 @@ const compile = file => ts.transpileModule(fs.readFileSync(file, 'utf8'), {
   compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022, jsx: ts.JsxEmit.ReactJSX }
 }).outputText;
 const cacheSource = compile('./src/lib/pricing-catalog.server.ts');
+const brandModule = { exports: {} };
+vm.runInNewContext(compile('./src/lib/brand.ts'), { module: brandModule, exports: brandModule.exports });
+const pricingViewModule = { exports: {} };
+vm.runInNewContext(compile('./src/lib/pricing-view.ts'), { module: pricingViewModule, exports: pricingViewModule.exports });
 
 function load(fetch, { now = Date.now, timeout = ms => AbortSignal.timeout(ms) } = {}) {
   const module = { exports: {} };
@@ -184,6 +188,8 @@ test('page and metadata use the same React-memoized loader, including its failur
           if (fail) throw new Error('unavailable');
           return catalog;
         } };
+        if (name === '@/lib/brand') return brandModule.exports;
+        if (name === '@/lib/pricing-view') return pricingViewModule.exports;
         if (name === '@/i18n/get-dictionary') return { getDictionary: async () => ({ pricing: { title: '', subtitle: '' } }) };
         if (name === './PricingClient') return { default: 'PricingClient', __esModule: true };
         throw new Error(`Unexpected import: ${name}`);
@@ -198,7 +204,8 @@ test('page and metadata use the same React-memoized loader, including its failur
     assert.equal(module.exports.dynamic, 'force-dynamic');
     assert.equal(client.props.initialServices.length, fail ? 0 : 1);
     if (!fail) {
-      assert.equal(client.props.initialServices, catalog);
+      assert.equal(client.props.initialServices[0].services[0].id, 'full');
+      assert.notEqual(client.props.initialServices, catalog, 'only catalog display fields cross the RSC boundary');
       assert.equal(metadata.title, 'Group (1 Services)');
     }
   }

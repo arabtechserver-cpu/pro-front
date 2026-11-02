@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
+import BrandLogo from "@/components/BrandLogo";
 import Script from "next/script";
 import { Locale } from "@/i18n/config";
 import CloudflareTurnstile, { resetTurnstile } from "@/components/CloudflareTurnstile";
@@ -262,11 +263,7 @@ export default function LoginClient({ lang, dict }: { lang: Locale; dict: any })
         <div className="relative z-10 flex flex-col items-center mb-8">
           <Link href={`/${lang}`} className="relative group mb-4 flex items-center justify-center" aria-label="Home">
             <div className="absolute -inset-2 bg-gradient-to-r from-white/20 via-primary/30 to-white/20 rounded-full blur-xl opacity-80 group-hover:opacity-100 transition-all pointer-events-none"></div>
-            <img 
-              src={lang === "ar" ? "/images/logo_ar.png" : "/images/logo_en.png"} 
-              alt="Logo" 
-              className="relative z-10 h-12 sm:h-14 w-auto max-w-[260px] object-contain transition-transform group-hover:scale-105 drop-shadow-[0_0_15px_rgba(255,255,255,0.35)]" 
-            />
+            <BrandLogo lang={lang} size="auth" />
           </Link>
           <h1 className="font-display-lg-mobile text-2xl font-bold text-on-surface">{dict.login.title}</h1>
           <p className="text-on-surface-variant text-sm mt-1">{dict.login.subtitle}</p>

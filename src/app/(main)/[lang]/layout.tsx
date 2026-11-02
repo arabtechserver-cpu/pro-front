@@ -1,15 +1,13 @@
+import { brandAssets, brandOrigin, getBrandShareImage } from "@/lib/brand";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Cairo, Inter, Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google";
 import "../../globals.css";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
+import "../../site-theme.css";
 import { getDictionary } from "@/i18n/get-dictionary";
 import { Locale, i18n } from "@/i18n/config";
-import ClientWidgets from "@/components/ClientWidgets";
-import ArabCountriesMarquee from "@/components/ArabCountriesMarquee";
-import ArabSolidarityModal from "@/components/ArabSolidarityModal";
 import { ThemeProvider } from "@/context/ThemeContext";
+import MainSiteShell from "@/components/MainSiteShell";
 
 const cairo = Cairo({
   subsets: ["arabic", "latin"],
@@ -28,11 +26,11 @@ export async function generateMetadata(props: { params: Promise<{ lang: string }
   }
   const isAr = params.lang === "ar";
   const siteTitle = isAr
-    ? "عرب تك برو سيرفر | منصة فك شفرات وتفعيل الهواتف"
-    : "Arab Tech Pro Server | GSM & Remote Unlock Services";
+    ? "عرب تك برو سيرفر | سوفت وير الهواتف والخدمات عن بُعد"
+    : "Arab Tech Pro Server | Phone Software & Remote Services";
   const siteDesc = isAr
-    ? "منصة عرب تك برو سيرفر لفك شفرات الهواتف، تخطي حسابات آيكلود وFRP، وتفعيل البوكسات والدونجل وسيرفرات IMEI بأسعار الجملة المعتمدة."
-    : "Arab Tech Pro Server: Professional phone unlocking, iCloud and FRP bypass, box and dongle activations, and high-speed IMEI server services.";
+    ? "منصة عرب تك برو سيرفر لخدمات سوفت وير الهواتف، التفعيل وفك الشبكات عن بُعد، تراخيص أدوات الصيانة وأرصدة السيرفرات."
+    : "Arab Tech Pro Server: phone software, remote activation and network unlocking, repair-tool licenses and server credits.";
 
   return {
     title: {
@@ -90,9 +88,7 @@ export async function generateMetadata(props: { params: Promise<{ lang: string }
       siteName: isAr ? "عرب تك برو سيرفر (عرب تك برو سيرفر) - Arab Tech Pro Server" : "Arab Tech Pro Server",
       images: [
         {
-          url: isAr
-            ? "https://arabtechproserver.tech/images/og_share_ar.png"
-            : "https://arabtechproserver.tech/images/og_share_en.png",
+          url: getBrandShareImage(params.lang),
           width: 1200,
           height: 630,
           alt: isAr ? "عرب تك برو سيرفر - عرب تك برو سيرفر" : "Arab Tech Pro Server Logo",
@@ -108,9 +104,7 @@ export async function generateMetadata(props: { params: Promise<{ lang: string }
       site: "@ARABTECHSUPPURT2",
       creator: "@ARABTECHSUPPURT2",
       images: [
-        isAr
-          ? "https://arabtechproserver.tech/images/og_share_ar.png"
-          : "https://arabtechproserver.tech/images/og_share_en.png",
+        getBrandShareImage(params.lang),
       ],
     },
     alternates: {
@@ -123,11 +117,11 @@ export async function generateMetadata(props: { params: Promise<{ lang: string }
     },
     icons: {
       icon: [
-        { url: "/favicon.ico", sizes: "any" },
-        { url: "/images/icon-48.png", sizes: "48x48", type: "image/png" },
+        { url: brandAssets.favicon, sizes: "any" },
+        { url: brandAssets.icon48, sizes: "48x48", type: "image/png" },
       ],
-      shortcut: "/favicon.ico",
-      apple: "/images/apple-touch-icon.png",
+      shortcut: brandAssets.favicon,
+      apple: brandAssets.appleIcon,
     },
     verification: {
       google: "N34n3oI-P5elZmLFHgFqp_BK93EijixhnIHEj_2oGnI",
@@ -199,7 +193,8 @@ export default async function RootLayout(
       "Arab Tech Pro Server"
     ],
     "url": "https://arabtechproserver.tech",
-    "logo": "https://arabtechproserver.tech/images/logo_en.png",
+    "logo": { "@type": "ImageObject", "url": `${brandOrigin}${brandAssets.organizationLogo}`, "width": 512, "height": 512 },
+    "image": getBrandShareImage(lang),
     "sameAs": [
       "https://t.me/ARABTECHSUPPURT2",
       "https://t.me/arabtechserveronline"
@@ -286,14 +281,6 @@ export default async function RootLayout(
           type="font/woff2"
           crossOrigin="anonymous"
         />
-        {/* Explicit Meta tags for WhatsApp, Telegram, Facebook & Twitter link previews */}
-        <meta property="og:image" content={isAr ? "https://arabtechproserver.tech/images/og_share_ar.png" : "https://arabtechproserver.tech/images/og_share_en.png"} />
-        <meta property="og:image:secure_url" content={isAr ? "https://arabtechproserver.tech/images/og_share_ar.png" : "https://arabtechproserver.tech/images/og_share_en.png"} />
-        <meta property="og:image:type" content="image/png" />
-        <meta property="og:image:width" content="1200" />
-        <meta property="og:image:height" content="630" />
-        <meta property="og:image:alt" content="Arab Tech Pro Server Logo" />
-        <meta name="twitter:image" content={isAr ? "https://arabtechproserver.tech/images/og_share_ar.png" : "https://arabtechproserver.tech/images/og_share_en.png"} />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdWebsite) }}
@@ -315,19 +302,7 @@ export default async function RootLayout(
         className={`${cairo.variable} ${inter.variable} ${jakarta.variable} ${jetbrains.variable} font-sans bg-[#f8fafc] text-slate-900 dark:bg-[#0b0f17] dark:text-slate-100 subpixel-antialiased min-h-screen flex flex-col relative`}
       >
         <ThemeProvider>
-          {/* Client Enhancement Widgets (Lazy loaded, non-blocking) */}
-          <ClientWidgets lang={lang} />
-
-          {/* Full Arab Solidarity Announcement Modal */}
-          <ArabSolidarityModal lang={lang} />
-
-          <Navbar lang={lang} dict={dict.nav} />
-          
-          <main className="flex-grow w-full pt-16 sm:pt-20 pb-12 overflow-x-clip bg-transparent">
-            {children}
-          </main>
-
-          <Footer lang={lang} dict={dict.footer} />
+          <MainSiteShell lang={lang} dict={dict}>{children}</MainSiteShell>
         </ThemeProvider>
       </body>
     </html>

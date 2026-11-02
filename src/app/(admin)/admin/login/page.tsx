@@ -1,5 +1,7 @@
 "use client";
 
+import BrandLogo from "@/components/BrandLogo";
+
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { loginAdmin, verifyAdminOtpAction, resendAdminOtpAction } from "./actions";
@@ -331,9 +333,7 @@ export default function AdminLogin() {
         {step === "login" ? (
           <>
             <div className="text-center mb-8 relative z-10">
-              <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-primary/20 shadow-[0_0_15px_rgba(124,58,237,0.2)]">
-                <span className="material-symbols-outlined text-3xl text-primary glow-cyan">shield_person</span>
-              </div>
+              <div className="mx-auto mb-4 max-w-[286px]"><BrandLogo lang="ar" size="auth" /></div>
               <h1 className="text-3xl font-display font-bold text-on-surface mb-2">لوحة الإدارة</h1>
               <p className="text-on-surface-variant">قم بتسجيل الدخول للوصول إلى التحكم</p>
             </div>

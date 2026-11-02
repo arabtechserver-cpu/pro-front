@@ -1,3 +1,4 @@
+import { getBrandShareImage } from "@/lib/brand";
 import { getDictionary } from "@/i18n/get-dictionary";
 import { Locale } from "@/i18n/config";
 import Link from "next/link";
@@ -49,13 +50,13 @@ export async function generateMetadata(props: Props, parent: ResolvingMetadata):
       title: title,
       description: description,
       type: "article",
-      images: post.imageUrl ? [{ url: post.imageUrl }] : [],
+      images: post.imageUrl ? [{ url: post.imageUrl }] : [{ url: getBrandShareImage(params.lang), width: 1200, height: 630 }],
     },
     twitter: {
       card: "summary_large_image",
       title: title,
       description: description,
-      images: post.imageUrl ? [post.imageUrl] : [],
+      images: post.imageUrl ? [post.imageUrl] : [getBrandShareImage(params.lang)],
     },
   };
 }

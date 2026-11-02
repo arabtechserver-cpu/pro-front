@@ -1,0 +1,16 @@
+.logo{display:flex;align-items:center;gap:7px;min-width:0;width:100%;color:rgb(var(--on-surface,19 44 37));line-height:1.25;text-align:start}
+.mark{display:block;width:63px;height:63px;flex-shrink:0;object-fit:contain}
+.wordmark{display:block;min-width:0;flex:1}
+.name{display:block;font-family:var(--font-cairo),Arial,sans-serif;font-size:14px;font-weight:900;white-space:nowrap;letter-spacing:-.45px}
+.english .name{font-family:var(--font-inter),Arial,sans-serif;font-size:12px;letter-spacing:.2px;line-height:1.2}
+.server{display:block;font-size:11px;letter-spacing:3.2px;margin-top:2px}
+.tagline{display:block;margin-top:5px;font-size:8px;color:rgb(var(--on-surface-variant,102 120 110));white-space:nowrap;font-weight:600}
+.english .tagline{font-family:var(--font-inter),Arial,sans-serif;font-size:6.5px;letter-spacing:.1px}
+.auth{width:286px;max-width:100%;gap:11px}
+.auth .mark{width:86px;height:86px}
+.auth .name{font-size:19px}
+.auth .tagline{font-size:10px}
+.auth.english .name{font-size:16px}
+.auth.english .server{font-size:14px}
+.auth.english .tagline{font-size:8px}
+@media(max-width:760px){.mark{width:46px;height:46px}.logo{gap:5px}.name{font-size:10px;letter-spacing:-.35px}.tagline{font-size:6px;margin-top:4px}.english .name{font-size:8.5px}.english .server{font-size:8px;letter-spacing:2px}.english .tagline{font-size:4.6px}.auth .mark{width:75px;height:75px}.auth .name{font-size:17px}.auth .tagline{font-size:9px}.auth.english .name{font-size:14px}.auth.english .tagline{font-size:7px}}

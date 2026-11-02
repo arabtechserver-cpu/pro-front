@@ -1,0 +1,152 @@
+/* One visual system for every public page, including account and checkout screens. */
+.site-theme {
+  --brand-primary: 7 65 47;
+  --brand-primary-container: 9 80 58;
+  --brand-on-primary: 255 255 255;
+  --brand-secondary: 41 103 68;
+  --brand-secondary-container: 28 82 54;
+  --brand-on-secondary: 255 255 255;
+  --brand-50: 244 248 228;
+  --brand-100: 232 242 197;
+  --brand-200: 213 232 148;
+  --brand-300: 164 201 83;
+  --brand-400: 112 154 44;
+  --brand-500: 59 116 54;
+  --brand-600: 7 81 59;
+  --brand-700: 7 65 47;
+  --brand-800: 6 53 40;
+  --brand-900: 5 42 33;
+  --brand-950: 3 29 21;
+  --neutral-50: 249 250 245;
+  --neutral-100: 241 244 235;
+  --neutral-200: 225 232 218;
+  --neutral-300: 200 213 194;
+  --neutral-400: 142 161 142;
+  --neutral-500: 105 126 110;
+  --neutral-600: 73 101 83;
+  --neutral-700: 45 75 58;
+  --neutral-800: 26 52 39;
+  --neutral-900: 11 32 23;
+  --neutral-950: 6 22 16;
+  --background: 245 244 239;
+  --surface: 253 253 251;
+  --surface-dim: 239 240 232;
+  --surface-bright: 255 255 253;
+  --surface-variant: 243 245 237;
+  --surface-container-lowest: 255 255 253;
+  --surface-container-low: 249 249 243;
+  --surface-container: 253 253 251;
+  --surface-container-high: 239 243 231;
+  --surface-container-highest: 227 234 215;
+  --on-background: 19 44 37;
+  --on-surface: 19 44 37;
+  --on-surface-variant: 102 120 110;
+  --outline: 142 167 148;
+  --outline-variant: 204 216 201;
+  --color-bg: #f5f4ef;
+  --color-surface: #fdfdfb;
+  --color-surface-2: #f1f4eb;
+  --color-surface-3: #e3ead7;
+  --color-text: #132c25;
+  --color-text-muted: #66786e;
+  --color-primary: #07412f;
+  --color-primary-bright: #155b3f;
+  --color-primary-dim: #063528;
+  --color-cyan: #527d31;
+  --color-cyan-bright: #76a13d;
+  --color-border: #dce3d5;
+  --action-bg: #07412f;
+  --action-text: #fff;
+  color-scheme: light;
+}
+
+.dark .site-theme {
+  --brand-primary: 211 252 89;
+  --brand-primary-container: 184 223 67;
+  --brand-on-primary: 22 41 6;
+  --brand-secondary: 173 220 101;
+  --brand-secondary-container: 122 168 64;
+  --brand-on-secondary: 17 35 13;
+  --brand-50: 246 253 225;
+  --brand-100: 235 251 184;
+  --brand-200: 223 250 132;
+  --brand-300: 211 252 89;
+  --brand-400: 190 229 92;
+  --brand-500: 94 133 40;
+  --brand-600: 43 103 61;
+  --brand-700: 23 79 49;
+  --brand-800: 14 58 37;
+  --brand-900: 9 41 28;
+  --brand-950: 6 27 18;
+  --background: 6 22 16;
+  --surface: 10 29 23;
+  --surface-dim: 5 19 14;
+  --surface-bright: 26 55 39;
+  --surface-variant: 16 37 27;
+  --surface-container-lowest: 6 22 16;
+  --surface-container-low: 8 26 19;
+  --surface-container: 10 29 23;
+  --surface-container-high: 17 43 31;
+  --surface-container-highest: 27 57 41;
+  --on-background: 244 245 242;
+  --on-surface: 244 245 242;
+  --on-surface-variant: 167 185 173;
+  --outline: 78 110 89;
+  --outline-variant: 56 89 69;
+  --color-bg: #061610;
+  --color-surface: #0a1d17;
+  --color-surface-2: #112b1f;
+  --color-surface-3: #1b3929;
+  --color-text: #f4f5f2;
+  --color-text-muted: #a7b9ad;
+  --color-primary: #d3fc59;
+  --color-primary-bright: #e0ff89;
+  --color-primary-dim: #b8df43;
+  --color-cyan: #addc65;
+  --color-cyan-bright: #d3fc59;
+  --color-border: #24483d;
+  --action-bg: #d3fc59;
+  --action-text: #162906;
+  color-scheme: dark;
+}
+
+.site-theme :is(.glass-card, .glass-panel, .glass-card-cyan, .lamp-card, .card-spotlight, .curved-cockpit, .convex-card) {
+  background: rgb(var(--surface-container)) !important;
+  border: 1px solid rgb(var(--outline-variant) / .8) !important;
+  border-radius: 12px;
+  box-shadow: 0 3px 15px #06211306 !important;
+  backdrop-filter: none !important;
+}
+.site-theme :is(.glass-card, .glass-card-cyan, .lamp-card):hover {
+  background: rgb(var(--surface-container)) !important;
+  border-color: rgb(var(--brand-primary) / .55) !important;
+  box-shadow: 0 5px 18px #06211312 !important;
+}
+.site-theme :is(.btn-primary, .btn-royal, .btn-purple-glow, .btn-cyan-glow) {
+  background: var(--action-bg) !important;
+  color: var(--action-text) !important;
+  border: 1px solid rgb(var(--brand-primary) / .5) !important;
+  border-radius: 8px;
+  box-shadow: none !important;
+  text-shadow: none;
+}
+.site-theme :is(.btn-primary, .btn-royal, .btn-purple-glow, .btn-cyan-glow):hover {
+  background: rgb(var(--brand-primary-container)) !important;
+  box-shadow: 0 3px 10px #06211316 !important;
+}
+.site-theme :is(.btn-secondary, .btn-dark-pill) {
+  background: rgb(var(--surface-container)) !important;
+  color: rgb(var(--on-surface)) !important;
+  border: 1px solid rgb(var(--outline-variant)) !important;
+  border-radius: 8px;
+  box-shadow: none !important;
+}
+.site-theme :is(.glow-primary, .glow-cyan, .glow-purple, .glow-pink) { box-shadow: none; text-shadow: none; }
+.site-theme .text-gradient-purple-cyan { background-image: linear-gradient(110deg, rgb(var(--brand-primary)), rgb(var(--brand-secondary))); }
+.site-theme :is(.bg-gradient-purple, .bg-gradient-purple-cyan) { background: rgb(var(--surface-container-high)); }
+.site-theme :is(.badge-purple, .badge-cyan) { background: rgb(var(--brand-primary) / .1); border-color: rgb(var(--brand-primary) / .3); color: rgb(var(--brand-primary)); }
+.site-theme :is(input, select, textarea) { accent-color: rgb(var(--brand-primary)); }
+.site-theme :is(h1, h2, h3, h4, p, label, th, td)[class~="text-white"] { color: rgb(var(--on-surface)); }
+.site-theme .cyber-container { max-width: 1260px; padding-inline: 0; }
+.site-theme :is(.text-gradient-gold) { text-shadow: none; }
+@media (prefers-reduced-motion: reduce) { .site-theme *, .site-theme *::before, .site-theme *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; } }

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import BrandLogo from "@/components/BrandLogo";
 import { usePathname, useRouter } from "next/navigation";
 import { logoutAdmin } from "../login/actions";
 import DashboardAccessRestricted from "@/components/admin/DashboardAccessRestricted";
@@ -138,8 +139,7 @@ export default function AdminLayout({
       <aside className="w-full md:w-64 bg-surface-container border-l border-outline-variant/30 flex-shrink-0 flex flex-col">
         <div className="p-5 border-b border-outline-variant/30 flex items-center justify-between">
           <Link href="/admin" className="text-lg font-display font-bold text-primary flex items-center gap-2">
-            <span className="material-symbols-outlined text-primary text-2xl">admin_panel_settings</span>
-            <span>لوحة الإدارة</span>
+            <span className="block w-[190px]"><BrandLogo lang="ar" /><span className="block text-xs mt-2">لوحة الإدارة</span></span>
           </Link>
           <span className="flex h-2.5 w-2.5 relative">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-violet-400 opacity-75"></span>

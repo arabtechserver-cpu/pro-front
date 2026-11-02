@@ -1,3 +1,4 @@
+import { getBrandShareImage } from "@/lib/brand";
 ﻿import { getDictionary } from "@/i18n/get-dictionary";
 import { Locale } from "@/i18n/config";
 import PurchaseClient from "./PurchaseClient";
@@ -57,7 +58,7 @@ export async function generateMetadata(props: Props, parent: ResolvingMetadata):
           siteName: "Arab Tech Pro Server",
           images: [
             {
-              url: "https://arabtechproserver.tech/images/og-image.png",
+              url: getBrandShareImage(params.lang),
               width: 1200,
               height: 630,
               alt: serviceName,
@@ -70,7 +71,7 @@ export async function generateMetadata(props: Props, parent: ResolvingMetadata):
           card: "summary_large_image",
           title,
           description,
-          images: ["https://arabtechproserver.tech/images/og-image.png"],
+          images: [getBrandShareImage(params.lang)],
         },
       };
     }
@@ -92,7 +93,7 @@ export async function generateMetadata(props: Props, parent: ResolvingMetadata):
       url: `https://arabtechproserver.tech/${params.lang}/purchase`,
       images: [
         {
-          url: "https://arabtechproserver.tech/images/og-image.png",
+          url: getBrandShareImage(params.lang),
           width: 1200,
           height: 630,
           alt: "Arab Tech Pro Server",
@@ -104,7 +105,7 @@ export async function generateMetadata(props: Props, parent: ResolvingMetadata):
       card: "summary_large_image",
       title: defaultTitle,
       description: defaultDesc,
-      images: ["https://arabtechproserver.tech/images/og-image.png"],
+      images: [getBrandShareImage(params.lang)],
     },
   };
 }

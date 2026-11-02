@@ -61,20 +61,20 @@ export default async function SeriesDetailPage(
   const freePreviewsCount = videos.filter(v => v.isFreePreview).length;
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 dark:bg-[#0F0F1A] dark:text-white pt-24 pb-20 font-sans" dir={isAr ? 'rtl' : 'ltr'}>
+    <div className="min-h-screen bg-slate-50 text-slate-900 dark:bg-surface-container-lowest dark:text-white pt-24 pb-20 font-sans" dir={isAr ? 'rtl' : 'ltr'}>
       <div className="container mx-auto px-4 max-w-6xl">
         {/* Breadcrumb Navigation */}
-        <div className="mb-6 flex items-center gap-2 text-xs md:text-sm text-slate-500 dark:text-gray-400">
+        <div className="mb-6 flex items-center gap-2 text-xs md:text-sm text-slate-500 dark:text-on-surface-variant">
           <Link href={`/${params.lang}/academy`} className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors flex items-center gap-1">
             <span className="material-symbols-outlined text-sm">school</span>
             <span>{isAr ? 'الأكاديمية والكورسات' : 'Academy & Courses'}</span>
           </Link>
-          <span className="material-symbols-outlined text-sm rtl:rotate-180 text-slate-400 dark:text-gray-600">chevron_right</span>
-          <span className="text-slate-800 dark:text-gray-200 font-bold truncate max-w-md">{title}</span>
+          <span className="material-symbols-outlined text-sm rtl:rotate-180 text-slate-400 dark:text-on-surface-variant">chevron_right</span>
+          <span className="text-slate-800 dark:text-on-surface font-bold truncate max-w-md">{title}</span>
         </div>
 
         {/* Hero Course Header Card */}
-        <div className="bg-white dark:bg-[#1A1A2E] border border-slate-200 dark:border-gray-800 rounded-3xl overflow-hidden shadow-xl mb-12">
+        <div className="bg-white dark:bg-surface-container border border-slate-200 dark:border-outline-variant rounded-3xl overflow-hidden shadow-xl mb-12">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 p-6 md:p-10 items-center">
             {/* Course Info */}
             <div className="lg:col-span-7 space-y-6">
@@ -94,26 +94,26 @@ export default async function SeriesDetailPage(
               </h1>
 
               {description && (
-                <p className="text-slate-600 dark:text-gray-300 text-sm sm:text-base leading-relaxed">
+                <p className="text-slate-600 dark:text-on-surface text-sm sm:text-base leading-relaxed">
                   {description}
                 </p>
               )}
 
               {/* Course Meta Stats */}
-              <div className="grid grid-cols-3 gap-3 pt-4 border-t border-slate-100 dark:border-gray-800/80 max-w-lg">
-                <div className="bg-slate-100 dark:bg-[#151525] p-3 rounded-2xl border border-slate-200 dark:border-gray-800 text-center">
+              <div className="grid grid-cols-3 gap-3 pt-4 border-t border-slate-100 dark:border-outline-variant/80 max-w-lg">
+                <div className="bg-slate-100 dark:bg-surface-container-low p-3 rounded-2xl border border-slate-200 dark:border-outline-variant text-center">
                   <span className="block text-xl font-bold text-indigo-600 dark:text-indigo-400">{videos.length}</span>
-                  <span className="text-[11px] text-slate-500 dark:text-gray-400">{isAr ? 'إجمالي الدروس' : 'Total Lessons'}</span>
+                  <span className="text-[11px] text-slate-500 dark:text-on-surface-variant">{isAr ? 'إجمالي الدروس' : 'Total Lessons'}</span>
                 </div>
 
-                <div className="bg-slate-100 dark:bg-[#151525] p-3 rounded-2xl border border-slate-200 dark:border-gray-800 text-center">
+                <div className="bg-slate-100 dark:bg-surface-container-low p-3 rounded-2xl border border-slate-200 dark:border-outline-variant text-center">
                   <span className="block text-xl font-bold text-violet-600 dark:text-violet-400">{freePreviewsCount}</span>
-                  <span className="text-[11px] text-slate-500 dark:text-gray-400">{isAr ? 'معاينة مجانية' : 'Free Previews'}</span>
+                  <span className="text-[11px] text-slate-500 dark:text-on-surface-variant">{isAr ? 'معاينة مجانية' : 'Free Previews'}</span>
                 </div>
 
-                <div className="bg-slate-100 dark:bg-[#151525] p-3 rounded-2xl border border-slate-200 dark:border-gray-800 text-center">
+                <div className="bg-slate-100 dark:bg-surface-container-low p-3 rounded-2xl border border-slate-200 dark:border-outline-variant text-center">
                   <span className="block text-xl font-bold text-purple-600 dark:text-purple-400">HD</span>
-                  <span className="text-[11px] text-slate-500 dark:text-gray-400">{isAr ? 'جودة عالية' : 'HD Video'}</span>
+                  <span className="text-[11px] text-slate-500 dark:text-on-surface-variant">{isAr ? 'جودة عالية' : 'HD Video'}</span>
                 </div>
               </div>
 
@@ -143,7 +143,7 @@ export default async function SeriesDetailPage(
 
             {/* Course Poster Preview */}
             <div className="lg:col-span-5">
-              <div className="relative aspect-video rounded-2xl overflow-hidden bg-black/60 border border-gray-700/60 shadow-xl group">
+              <div className="relative aspect-video rounded-2xl overflow-hidden bg-black/60 border border-outline-variant/60 shadow-xl group">
                 {series.thumbnail ? (
                   <img
                     src={series.thumbnail}
@@ -172,26 +172,26 @@ export default async function SeriesDetailPage(
 
         {/* Course Curriculum Section */}
         <div className="space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200 dark:border-gray-800">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200 dark:border-outline-variant">
             <div>
               <h2 className="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-3">
                 <span className="material-symbols-outlined text-indigo-600 dark:text-indigo-400">format_list_numbered</span>
                 <span>{isAr ? 'منهج ومحتوى الكورس' : 'Course Curriculum'}</span>
               </h2>
-              <p className="text-xs text-slate-500 dark:text-gray-400 mt-1">
+              <p className="text-xs text-slate-500 dark:text-on-surface-variant mt-1">
                 {isAr
                   ? 'جميع الدروس والفيديوهات التعليمية المتاحة في هذه السلسلة مرتبة خطوة بخطوة.'
                   : 'All lessons and video tutorials in this series organized step-by-step.'}
               </p>
             </div>
-            <span className="text-xs text-slate-600 dark:text-gray-400 font-bold bg-white dark:bg-[#1A1A2E] px-4 py-2 rounded-xl border border-slate-200 dark:border-gray-800 shadow-sm">
+            <span className="text-xs text-slate-600 dark:text-on-surface-variant font-bold bg-white dark:bg-surface-container px-4 py-2 rounded-xl border border-slate-200 dark:border-outline-variant shadow-sm">
               {videos.length} {isAr ? 'دروس متوفرة' : 'Lessons Available'}
             </span>
           </div>
 
           {videos.length === 0 ? (
-            <div className="bg-white dark:bg-[#1A1A2E] border border-slate-200 dark:border-gray-800 rounded-3xl p-12 text-center text-slate-600 dark:text-gray-400 shadow-sm">
-              <span className="material-symbols-outlined text-5xl text-slate-400 dark:text-gray-600 mb-3">movie</span>
+            <div className="bg-white dark:bg-surface-container border border-slate-200 dark:border-outline-variant rounded-3xl p-12 text-center text-slate-600 dark:text-on-surface-variant shadow-sm">
+              <span className="material-symbols-outlined text-5xl text-slate-400 dark:text-on-surface-variant mb-3">movie</span>
               <p className="font-bold text-slate-900 dark:text-white">{isAr ? 'جاري رفع وتجهيز دروس هذا الكورس قريباً.' : 'Course lessons are being prepared soon.'}</p>
             </div>
           ) : (
@@ -204,20 +204,20 @@ export default async function SeriesDetailPage(
                 return (
                   <div
                     key={video.id}
-                    className="bg-white dark:bg-[#1A1A2E] hover:bg-slate-50 dark:hover:bg-[#22223D] border border-slate-200 dark:border-gray-800/80 hover:border-indigo-500/40 p-4 sm:p-5 rounded-2xl transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4 group shadow-sm"
+                    className="bg-white dark:bg-surface-container hover:bg-slate-50 dark:hover:bg-surface-container-highest border border-slate-200 dark:border-outline-variant/80 hover:border-indigo-500/40 p-4 sm:p-5 rounded-2xl transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4 group shadow-sm"
                   >
                     <div className="flex items-start gap-4">
                       {/* Lesson Number */}
-                      <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-[#151525] border border-slate-200 dark:border-gray-800 flex items-center justify-center font-bold text-sm text-indigo-600 dark:text-indigo-400 shrink-0">
+                      <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-surface-container-low border border-slate-200 dark:border-outline-variant flex items-center justify-center font-bold text-sm text-indigo-600 dark:text-indigo-400 shrink-0">
                         {video.orderIndex || index + 1}
                       </div>
 
                       {/* Video Thumbnail */}
-                      <div className="relative w-20 h-14 sm:w-24 sm:h-16 rounded-xl overflow-hidden bg-black/50 border border-slate-200 dark:border-gray-800 shrink-0 flex items-center justify-center">
+                      <div className="relative w-20 h-14 sm:w-24 sm:h-16 rounded-xl overflow-hidden bg-black/50 border border-slate-200 dark:border-outline-variant shrink-0 flex items-center justify-center">
                         {video.thumbnail ? (
                           <img src={video.thumbnail} alt="" className="w-full h-full object-cover" />
                         ) : (
-                          <span className="material-symbols-outlined text-2xl text-slate-400 dark:text-gray-600">smart_display</span>
+                          <span className="material-symbols-outlined text-2xl text-slate-400 dark:text-on-surface-variant">smart_display</span>
                         )}
                         {isFree ? (
                           <div className="absolute inset-0 bg-black/40 group-hover:bg-indigo-600/30 transition-all flex items-center justify-center">
@@ -242,7 +242,7 @@ export default async function SeriesDetailPage(
                         </div>
 
                         {videoDesc && (
-                          <p className="text-xs text-slate-500 dark:text-gray-400 line-clamp-2 leading-relaxed">
+                          <p className="text-xs text-slate-500 dark:text-on-surface-variant line-clamp-2 leading-relaxed">
                             {videoDesc}
                           </p>
                         )}

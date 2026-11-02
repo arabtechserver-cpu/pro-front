@@ -3,9 +3,10 @@ function categoryMatchesFilter(categoryName, filter) {
   return String(categoryName || "").toLowerCase().includes(filter);
 }
 
+const groupCollator = new Intl.Collator("en", { sensitivity: "base" });
 function sortDisplayGroups(groups) {
   return [...groups].sort((first, second) =>
-    first.groupName.localeCompare(second.groupName, "en", { sensitivity: "base" })
+    groupCollator.compare(first.groupName, second.groupName)
   );
 }
 

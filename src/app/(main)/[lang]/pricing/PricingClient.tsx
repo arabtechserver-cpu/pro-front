@@ -1,10 +1,12 @@
 "use client";
 import { fetchPricingCatalog } from '../../../../lib/pricing-catalog';
 
-import { useState, useEffect, useMemo, useRef, useDeferredValue } from "react";
+import { useState, useEffect, useMemo, useDeferredValue, memo } from "react";
+import { getCatalogPage } from "@/lib/service-list-window";
+import CatalogPager from "@/components/CatalogPager";
 import { categoryMatchesFilter, createInitialCollapsedGroups, sortDisplayGroups } from "../../../../lib/pricing-groups";
 import Link from "next/link";
-import { useSearchParams, useRouter, usePathname } from "next/navigation";
+import { useSearchParams, usePathname } from "next/navigation";
 import { stripEmojis } from "@/utils/cleanHtml";
 
 function getServicePriceInfo(service: any) {
@@ -65,10 +67,10 @@ function RenderPriceBadge({ service, lang, discountPercent = 0 }: { service: any
   );
 }
 
-function ServicesListRenderer({ servicesList, lang, dict, discountPercent = 0 }: { servicesList: any[], lang: string, dict: any, discountPercent?: number }) {
-  const [limit, setLimit] = useState(40);
-  const displayedServices = servicesList.length > 50 ? servicesList.slice(0, limit) : servicesList;
-  const hasMore = servicesList.length > displayedServices.length;
+const ServicesListRenderer = memo(function ServicesListRenderer({ servicesList, lang, dict, discountPercent = 0 }: { servicesList: any[], lang: string, dict: any, discountPercent?: number }) {
+  const [page, setPage] = useState(1);
+  const servicePage = getCatalogPage(servicesList, page, 20);
+  const displayedServices = servicePage.items;
 
   return (
     <div className="w-full">
@@ -88,6 +90,7 @@ function ServicesListRenderer({ servicesList, lang, dict, discountPercent = 0 }:
                 <RenderPriceBadge service={service} lang={lang} discountPercent={discountPercent} />
               </div>
               <Link 
+                prefetch={false}
                 href={`/${lang}/purchase?serviceId=${service.id}`}
                 className="btn-primary py-2 px-4 text-xs rounded-xl inline-flex items-center gap-1 shadow-md hover:scale-105 transition-transform"
               >
@@ -124,6 +127,7 @@ function ServicesListRenderer({ servicesList, lang, dict, discountPercent = 0 }:
                 </td>
                 <td className="py-4 px-6 text-center">
                   <Link 
+                    prefetch={false}
                     href={`/${lang}/purchase?serviceId=${service.id}`} 
                     className="btn-primary py-2 px-5 text-sm rounded-xl inline-flex items-center gap-1 shadow-md hover:scale-105 transition-transform"
                   >
@@ -137,21 +141,10 @@ function ServicesListRenderer({ servicesList, lang, dict, discountPercent = 0 }:
         </table>
       </div>
 
-      {/* Show more inside huge group if needed */}
-      {hasMore && (
-        <div className="p-4 bg-surface-container/30 border-t border-outline-variant/20 flex justify-center">
-          <button
-            onClick={() => setLimit(prev => prev + 50)}
-            className="bg-surface-container-high hover:bg-surface-container-highest text-primary border border-primary/30 px-5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5"
-          >
-            <span>{lang === 'ar' ? `عرض بقية الخدمات في هذا القسم (+${servicesList.length - displayedServices.length})` : `Show remaining services in this group (+${servicesList.length - displayedServices.length})`}</span>
-            <span className="material-symbols-outlined text-sm">expand_more</span>
-          </button>
-        </div>
-      )}
+      <CatalogPager page={servicePage.page} pageCount={servicePage.pageCount} onPageChange={setPage} lang={lang} label={lang === "ar" ? "صفحات خدمات القسم" : "Group service pages"} />
     </div>
   );
-}
+});
 
 interface DisplayGroup {
   categoryName: string;
@@ -183,12 +176,9 @@ export default function PricingClient({
   const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>({});
   const [copiedGroup, setCopiedGroup] = useState<string | null>(null);
 
-  // Lazy / Infinite scroll state for groups:
-  const [visibleGroupCount, setVisibleGroupCount] = useState(15);
-  const sentinelRef = useRef<HTMLDivElement | null>(null);
+  const [groupPage, setGroupPage] = useState(1);
 
   const searchParams = useSearchParams();
-  const router = useRouter();
   const pathname = usePathname();
 
   // Load user session from local storage
@@ -248,9 +238,9 @@ export default function PricingClient({
     return () => { mounted = false; clearTimeout(timeout); controller.abort(); };
   }, [hasInitialData, reloadCount, lang]);
 
-  // Reset visibleGroupCount whenever filters change
+  // Search covers the whole catalog; pagination only bounds mounted elements.
   useEffect(() => {
-    setVisibleGroupCount(15);
+    setGroupPage(1);
   }, [deferredSearch, selectedCategory]);
 
   const openSingleSection = (groupName: string) => {
@@ -350,9 +340,8 @@ export default function PricingClient({
   }, [allDisplayGroups]);
 
   // Sliced groups to render in DOM
-  const visibleGroups = useMemo(() => {
-    return allDisplayGroups.slice(0, visibleGroupCount);
-  }, [allDisplayGroups, visibleGroupCount]);
+  const groupWindow = useMemo(() => getCatalogPage(allDisplayGroups, groupPage, 12), [allDisplayGroups, groupPage]);
+  const visibleGroups = groupWindow.items as DisplayGroup[];
 
   // Group visible items by category for rendering headers
   const visibleCategorySections = useMemo(() => {
@@ -368,24 +357,6 @@ export default function PricingClient({
     });
     return Array.from(map.values());
   }, [visibleGroups]);
-
-  // Infinite Scroll Trigger with IntersectionObserver
-  useEffect(() => {
-    if (!sentinelRef.current) return;
-    if (visibleGroupCount >= allDisplayGroups.length) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting) {
-          setVisibleGroupCount(prev => Math.min(prev + 15, allDisplayGroups.length));
-        }
-      },
-      { rootMargin: "400px" } // Preload 400px ahead so scrolling is instantaneous
-    );
-
-    observer.observe(sentinelRef.current);
-    return () => observer.disconnect();
-  }, [visibleGroupCount, allDisplayGroups.length]);
 
   // Standalone Single Section Data with Smart Resilient Match
   const singleSectionData = useMemo(() => {
@@ -588,7 +559,7 @@ export default function PricingClient({
                 </div>
               </div>
             ) : (
-              <ServicesListRenderer servicesList={singleSectionData.servicesList} lang={lang} dict={dict} discountPercent={discountPercent} />
+              <ServicesListRenderer key={activeSection} servicesList={singleSectionData.servicesList} lang={lang} dict={dict} discountPercent={discountPercent} />
             )}
           </div>
         </div>
@@ -696,7 +667,7 @@ export default function PricingClient({
             </span>
             {visibleGroups.length < allDisplayGroups.length && (
               <span className="text-primary font-mono text-[11px]">
-                {lang === 'ar' ? "يتم تحميل المزيد تلقائياً عند التمرير ↓" : "Auto-loading on scroll ↓"}
+                {lang === 'ar' ? `صفحة ${groupWindow.page} / ${groupWindow.pageCount}` : `Page ${groupWindow.page} / ${groupWindow.pageCount}`}
               </span>
             )}
           </div>
@@ -723,7 +694,7 @@ export default function PricingClient({
                   : 'cast';
 
               return (
-                <div key={catIdx} className="space-y-6 animate-in fade-in duration-300">
+                <div key={categorySection.categoryName} className="space-y-6 animate-in fade-in duration-300">
                   <h2 className="text-2xl font-bold text-primary mb-4 flex items-center gap-2 border-b border-outline-variant/20 pb-3">
                     <span className="material-symbols-outlined">{iconName}</span>
                     {categorySection.categoryName}
@@ -736,7 +707,7 @@ export default function PricingClient({
 
                     return (
                       <div 
-                        key={idx} 
+                        key={groupName}
                         className="glass-card rounded-2xl overflow-hidden shadow-xl border border-outline-variant/30 hover:border-primary/50 transition-all duration-300 group/card"
                       >
                         {/* Category Section Header */}
@@ -793,7 +764,7 @@ export default function PricingClient({
                         {/* Services Body */}
                         {!isCollapsed && (
                           <div className="animate-in fade-in duration-300">
-                            <ServicesListRenderer servicesList={groupServicesList} lang={lang} dict={dict} discountPercent={discountPercent} />
+                            <ServicesListRenderer key={`${groupName}:${deferredSearch}`} servicesList={groupServicesList} lang={lang} dict={dict} discountPercent={discountPercent} />
                           </div>
                         )}
                       </div>
@@ -804,21 +775,7 @@ export default function PricingClient({
             })
           )}
 
-          {/* Infinite Scroll Sentinel & Loader */}
-          {visibleGroups.length < allDisplayGroups.length && (
-            <div ref={sentinelRef} className="py-8 flex flex-col items-center justify-center gap-2 text-on-surface-variant">
-              <span className="material-symbols-outlined animate-spin text-3xl text-primary">sync</span>
-              <span className="text-xs font-semibold">
-                {lang === 'ar' ? 'جاري تحميل المزيد من الأقسام والخدمات...' : 'Loading more services on scroll...'}
-              </span>
-              <button
-                onClick={() => setVisibleGroupCount(allDisplayGroups.length)}
-                className="mt-2 text-xs text-primary underline hover:text-primary/80 font-medium"
-              >
-                {lang === 'ar' ? 'عرض كافة الأقسام دفعة واحدة' : 'Load all sections at once'}
-              </button>
-            </div>
-          )}
+          <CatalogPager page={groupWindow.page} pageCount={groupWindow.pageCount} onPageChange={setGroupPage} lang={lang} label={lang === "ar" ? "صفحات أقسام الخدمات" : "Service group pages"} />
         </>
       )}
     </div>
