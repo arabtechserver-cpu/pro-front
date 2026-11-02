@@ -88,6 +88,9 @@
 @media(max-width:760px){.remoteHero h1{font-size:28px}.remoteHeroImage{width:68%;left:-7%;bottom:-2%;max-height:65%}.remoteHero .heroCopy p{font-size:11px;max-width:100%;margin-bottom:20px}.remoteHero{min-height:335px}}
 
 .brand{width:210px}.footerBrand .brand{width:210px}@media(max-width:760px){.header .brand{width:145px}.footerBrand .brand{width:210px}}
+.footerPhone{display:inline-flex;align-items:center;gap:8px;min-height:36px;margin-top:12px;padding:6px 10px;border:1px solid var(--line);border-radius:8px;background:var(--panel);font-family:var(--font-inter),Arial,sans-serif;font-size:12px;font-weight:600;white-space:nowrap;transition:border-color .2s,transform .2s}
+.footerPhone:hover{border-color:#88aa44;transform:translateY(-1px)}
+.footerPhone:active{transform:scale(.97)}
 
 .header .brand{width:210px}@media(max-width:760px){.header .brand{width:145px}}
 
