@@ -7,6 +7,7 @@ import ToolMark from "./ToolMark";
 import { Gift, Percent, ShoppingBag } from "lucide-react";
 import styles from "./StorefrontHome.module.css";
 import useHomeMotion from "./useHomeMotion";
+import DigitalServices from "./DigitalServices";
 
 export default function StorefrontHome({ lang }: { lang: "ar" | "en" }) {
   const ar = lang === "ar";
@@ -71,6 +72,8 @@ export default function StorefrontHome({ lang }: { lang: "ar" | "en" }) {
         <div data-reveal className={styles.sectionHeading}><h2>{t("كل خدمة، في مكانها.", "Every service, in its place.")}</h2><Link href={`${base}/pricing`}>{t("استعرض الأقسام", "Browse categories")}<Arrow size={17} /></Link></div>
         <div className={styles.serviceGrid}>{services.map(service => <Link key={service.title} href={url(service.href)} data-reveal className={styles.serviceCard}><service.icon className={styles.serviceIcon} size={30} strokeWidth={1.6} /><div><h3>{service.title}</h3><p>{service.desc}</p></div><Arrow size={19} /></Link>)}</div>
       </section>
+
+      <DigitalServices lang={lang} />
 
       <section data-reveal className={styles.popular} aria-labelledby="popular-heading">
         <div className={styles.popularHeading}><div><h2 id="popular-heading">{t("الأكثر طلباً اليوم", "Most popular today")}</h2><p>{t("وصول أسرع للخدمات التي تحتاجها", "Faster access to the services you need")}</p></div><div className={styles.filters} role="group" aria-label={t("تصفية الخدمات", "Filter services")}>{[["all", t("الكل", "All")], ["licenses", t("التراخيص", "Licenses")], ["credits", t("الأرصدة", "Credits")]].map(([key, label]) => <button key={key} aria-pressed={filter === key} className={filter === key ? styles.activeFilter : ""} onClick={() => setFilter(key)}>{label}</button>)}</div></div>

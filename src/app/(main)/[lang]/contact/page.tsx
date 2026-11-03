@@ -1,10 +1,15 @@
 ﻿import Link from "next/link";
 import { getDictionary } from "@/i18n/get-dictionary";
 import { Locale } from "@/i18n/config";
+import { digitalServices } from "@/lib/digital-services";
+import { MessageCircle } from "lucide-react";
 
-export default async function Contact(props: { params: Promise<{ lang: Locale }> }) {
+export default async function Contact(props: { params: Promise<{ lang: Locale }>; searchParams?: Promise<{ service?: string | string[] }> }) {
   const params = await props.params;
   const dict = await getDictionary(params.lang);
+  const query = await props.searchParams;
+  const service = digitalServices.find(item => item.id === query?.service);
+  const message = service ? (params.lang === "ar" ? `مرحباً، أرغب في الاستفسار عن خدمة: ${service.name.ar}` : `Hello, I would like to ask about: ${service.name.en}`) : "";
 
   return (
     <div className="flex flex-col gap-12 pb-12">
@@ -17,6 +22,11 @@ export default async function Contact(props: { params: Promise<{ lang: Locale }>
           {dict.contact.subtitle}
         </p>
       </div>
+
+      {service && <section aria-label={params.lang === "ar" ? "الخدمة المطلوبة" : "Requested service"} className="rounded-2xl border border-outline-variant bg-surface-container p-5 sm:p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5">
+        <div><p className="text-xs text-on-surface-variant mb-1">{params.lang === "ar" ? "استفسارك عن" : "Your enquiry"}</p><h2 className="text-xl font-bold text-on-surface mb-2">{service.name[params.lang]}</h2><p className="text-sm text-on-surface-variant max-w-xl">{service.description[params.lang]}</p></div>
+        <a href={`https://wa.me/16728972935?text=${encodeURIComponent(message)}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3 text-on-primary text-sm font-bold shrink-0"><MessageCircle size={19} aria-hidden="true" />{params.lang === "ar" ? "اسأل عن الخدمة على واتساب" : "Ask about this service on WhatsApp"}</a>
+      </section>}
 
       <h2 className="sr-only">{params.lang === "ar" ? "قنوات الدعم الفني المباشر" : "Direct Support Channels"}</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
