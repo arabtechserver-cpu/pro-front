@@ -44,8 +44,9 @@ export default function CloudflareTurnstile({
   size = "normal"
 }: CloudflareTurnstileProps) {
   const isTurnstileDisabled =
-    process.env.NEXT_PUBLIC_DISABLE_TURNSTILE === "true" ||
-    process.env.NEXT_PUBLIC_DISABLE_CLOUDFLARE === "true";
+    process.env.NODE_ENV === "development" &&
+    (process.env.NEXT_PUBLIC_DISABLE_TURNSTILE === "true" ||
+      process.env.NEXT_PUBLIC_DISABLE_CLOUDFLARE === "true");
 
   const containerRef = useRef<HTMLDivElement | null>(null);
   const widgetIdRef = useRef<string | null>(null);

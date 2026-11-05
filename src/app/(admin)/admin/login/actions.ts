@@ -5,11 +5,9 @@ import { getBackendCandidates } from "@/lib/api-proxy-candidates";
 import { admitProxyRequest } from "@/lib/proxy-stream";
 
 const candidateUrls = [
-  process.env.INTERNAL_API_URL,
-  process.env.NEXT_PUBLIC_API_URL,
+  ...getBackendCandidates(null, process.env.INTERNAL_API_URL, process.platform === "win32"),
   "http://127.0.0.1:5000",
   "http://localhost:5000",
-  "https://arabtechproserver.tech"
 ].filter(Boolean) as string[];
 
 export async function loginAdmin(username: string, password: string, turnstileToken?: string) {

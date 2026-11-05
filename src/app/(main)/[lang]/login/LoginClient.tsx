@@ -189,11 +189,17 @@ export default function LoginClient({ lang, dict }: { lang: Locale; dict: any })
       if (res.ok && data.success) {
         setForgotStep("otp_verify");
         setForgotSuccess(lang === "ar" ? `تم إرسال كود تفعيل كلمة المرور إلى: ${forgotEmail}` : `OTP sent to: ${forgotEmail}`);
+        setTurnstileToken("");
+        resetTurnstile();
       } else {
         setForgotError(data.error || data.message || "فشل إرسال كود التفعيل");
+        setTurnstileToken("");
+        resetTurnstile();
       }
     } catch {
       setForgotError("حدث خطأ أثناء الاتصال بالسيرفر");
+      setTurnstileToken("");
+      resetTurnstile();
     } finally {
       setForgotLoading(false);
     }
@@ -474,10 +480,16 @@ export default function LoginClient({ lang, dict }: { lang: Locale; dict: any })
                   />
                 </div>
 
+                <CloudflareTurnstile
+                  onVerify={(token) => setTurnstileToken(token)}
+                  onExpire={() => setTurnstileToken("")}
+                  onError={() => setTurnstileToken("")}
+                />
+
                 <div className="pt-2 flex gap-3">
                   <button
                     type="submit"
-                    disabled={forgotLoading || !forgotEmail.trim()}
+                    disabled={forgotLoading || !forgotEmail.trim() || !turnstileToken}
                     className="flex-1 py-3 rounded-xl bg-primary text-on-primary font-bold text-xs hover:bg-primary-container transition-all flex items-center justify-center gap-2 disabled:opacity-50"
                   >
                     {forgotLoading ? (
@@ -545,10 +557,16 @@ export default function LoginClient({ lang, dict }: { lang: Locale; dict: any })
                   </div>
                 </div>
 
+                <CloudflareTurnstile
+                  onVerify={(token) => setTurnstileToken(token)}
+                  onExpire={() => setTurnstileToken("")}
+                  onError={() => setTurnstileToken("")}
+                />
+
                 <div className="pt-2 flex gap-3">
                   <button
                     type="submit"
-                    disabled={forgotLoading || !forgotOtp.trim() || !forgotNewPassword.trim()}
+                    disabled={forgotLoading || !forgotOtp.trim() || !forgotNewPassword.trim() || !turnstileToken}
                     className="flex-1 py-3 rounded-xl bg-violet-500 hover:bg-violet-600 text-black font-bold text-xs transition-all flex items-center justify-center gap-2 disabled:opacity-50"
                   >
                     {forgotLoading ? (

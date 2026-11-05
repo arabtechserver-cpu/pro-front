@@ -18,6 +18,7 @@ import { isBackendConnectionFailure } from '../../../lib/api-proxy-errors';
 
 // Cache the working backend URL after first successful connection
 let cachedBackendUrl: string | null = null;
+let lastUnavailableLogAt = 0;
 
 async function proxyRequest(
   request: NextRequest,
@@ -164,8 +165,8 @@ async function handler(
       lastError = err;
       if (baseUrl === cachedBackendUrl && isBackendConnectionFailure(err)) cachedConnectionFailed = true;
       if (signal.aborted) break;
-      const msg = err instanceof Error ? err.message : String(err);
-      if (!msg.includes('ECONNREFUSED') && !msg.includes('ENOTFOUND')) {
+      if (!isBackendConnectionFailure(err)) {
+        const msg = err instanceof Error ? err.message : String(err);
         console.warn(`[API Proxy] ${baseUrl} failed: ${msg}`);
       }
     }
@@ -177,8 +178,15 @@ async function handler(
     cachedBackendUrl = null;
   }
 
-  if (signal.aborted) console.warn(`[API Proxy] Request deadline exceeded for /api/${path}; timeout alone does not mark the backend down`);
-  else console.error(`[API Proxy] Backend request failed for /api/${path}`);
+  if (signal.aborted) {
+    console.warn(`[API Proxy] Request deadline exceeded for /api/${path}; timeout alone does not mark the backend down`);
+  } else {
+    const now = Date.now();
+    if (now - lastUnavailableLogAt > 5000) {
+      lastUnavailableLogAt = now;
+      console.error(`[API Proxy] Backend temporarily unreachable for /api/${path} (tried ${targets.length} internal candidate(s))`);
+    }
+  }
   release();
   return NextResponse.json(
     {

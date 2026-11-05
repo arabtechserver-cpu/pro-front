@@ -1,26 +1,38 @@
 import { getBrandShareImage } from "@/lib/brand";
-﻿import { getDictionary } from "@/i18n/get-dictionary";
+import { getDictionary } from "@/i18n/get-dictionary";
 import { Locale } from "@/i18n/config";
 import PurchaseClient from "./PurchaseClient";
 import { Metadata, ResolvingMetadata } from "next";
+import { getBackendCandidates } from "@/lib/api-proxy-candidates";
 
 type Props = {
   params: Promise<{ lang: Locale }>;
   searchParams: Promise<{ serviceId?: string }>;
 };
 
-// Function to fetch single service for dynamic SEO Metadata
+let cachedServiceApiUrl: string | null = null;
+
+// Function to fetch single service for dynamic SEO Metadata via internal backend candidates
 async function getServiceDetails(serviceId: string) {
-  try {
-    const apiUrl = process.env.INTERNAL_API_URL || process.env.NEXT_PUBLIC_API_URL || "https://arabtechproserver.tech";
-    const res = await fetch(`${apiUrl}/api/dhru/services/${serviceId}`, {
-      cache: "no-store",
-    });
-    if (!res.ok) return null;
-    return await res.json();
-  } catch (error) {
-    return null;
+  const candidates = getBackendCandidates(
+    cachedServiceApiUrl,
+    process.env.INTERNAL_API_URL,
+    process.platform === "win32"
+  );
+  for (const apiUrl of candidates) {
+    try {
+      const res = await fetch(`${apiUrl}/api/dhru/services/${encodeURIComponent(serviceId)}`, {
+        cache: "no-store",
+        signal: AbortSignal.timeout(3500),
+      });
+      if (!res.ok) continue;
+      cachedServiceApiUrl = apiUrl;
+      return await res.json();
+    } catch {
+      if (cachedServiceApiUrl === apiUrl) cachedServiceApiUrl = null;
+    }
   }
+  return null;
 }
 
 export async function generateMetadata(props: Props, parent: ResolvingMetadata): Promise<Metadata> {

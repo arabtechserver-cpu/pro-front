@@ -1,4 +1,5 @@
 import { MetadataRoute } from "next";
+import { readPublicPricingCatalog } from "@/lib/pricing-catalog.server";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = "https://arabtechproserver.tech";
@@ -37,32 +38,28 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }
   }
 
-  // 3. Dynamic Services from API for Google Indexing
+  // 3. Dynamic Services from cached internal catalog for Google Indexing
   try {
-    const apiUrl = process.env.INTERNAL_API_URL || process.env.NEXT_PUBLIC_API_URL || "https://arabtechproserver.tech";
-    const res = await fetch(`${apiUrl}/api/dhru/services?view=pricing`, { cache: "no-store" });
-    if (res.ok) {
-      const categories = await res.json();
-      if (Array.isArray(categories)) {
-        for (const cat of categories) {
-          if (Array.isArray(cat.services)) {
-            for (const srv of cat.services) {
-              if (srv.id && srv.isActive !== false) {
-                for (const locale of locales) {
-                  sitemapEntries.push({
-                    url: `${baseUrl}/${locale}/purchase?serviceId=${encodeURIComponent(srv.id)}`,
-                    lastModified: new Date(),
-                    changeFrequency: "weekly",
-                    priority: 0.8,
-                  });
-                }
+    const categories = await readPublicPricingCatalog();
+    if (Array.isArray(categories)) {
+      for (const cat of categories) {
+        if (Array.isArray(cat.services)) {
+          for (const srv of cat.services) {
+            if (srv.id && srv.isActive !== false) {
+              for (const locale of locales) {
+                sitemapEntries.push({
+                  url: `${baseUrl}/${locale}/purchase?serviceId=${encodeURIComponent(srv.id)}`,
+                  lastModified: new Date(),
+                  changeFrequency: "weekly",
+                  priority: 0.8,
+                });
               }
             }
           }
         }
       }
     }
-  } catch (err) {
+  } catch {
     // If backend is unreachable during build, fallback gracefully to static routes
   }
 
