@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getBackendCandidates } from "../../../lib/api-proxy-candidates";
 import { streamRequestBody, forwardBody, admitProxyRequest } from '../../../lib/proxy-stream';
 import { isBackendConnectionFailure } from '../../../lib/api-proxy-errors';
+import { apiRateLimiter } from '../../../lib/api-rate-limiter';
 
 /**
  * Smart catch-all API proxy with working URL caching.
@@ -19,6 +20,22 @@ import { isBackendConnectionFailure } from '../../../lib/api-proxy-errors';
 // Cache the working backend URL after first successful connection
 let cachedBackendUrl: string | null = null;
 let lastUnavailableLogAt = 0;
+
+function extractClientIp(request: NextRequest): string {
+  const cfIp = request.headers.get('cf-connecting-ip');
+  if (cfIp?.trim()) return cfIp.trim();
+
+  const realIp = request.headers.get('x-real-ip');
+  if (realIp?.trim()) return realIp.trim();
+
+  const forwarded = request.headers.get('x-forwarded-for');
+  if (forwarded) {
+    const first = forwarded.split(',')[0]?.trim();
+    if (first) return first;
+  }
+
+  return (request as any).ip || '127.0.0.1';
+}
 
 async function proxyRequest(
   request: NextRequest,
@@ -57,6 +74,7 @@ async function proxyRequest(
     'x-forwarded-for',
     'x-forwarded-proto',
     'x-forwarded-host',
+    'cf-connecting-ip',
     'cf-ipcountry',
     'cf-ray',
     'cf-visitor',
@@ -65,6 +83,8 @@ async function proxyRequest(
     'x-admin-device-token',
     'x-client-local-ip',
     'x-local-ip',
+    'x-real-ip',
+    'true-client-ip',
     'x-device-fingerprint',
     'x-api-key',
     'x-username',
@@ -76,6 +96,17 @@ async function proxyRequest(
     const val = request.headers.get(h);
     if (val) forwardHeaders.set(h, val);
   });
+
+  const clientIp = extractClientIp(request);
+  if (!forwardHeaders.has('x-real-ip')) forwardHeaders.set('x-real-ip', clientIp);
+  if (!forwardHeaders.has('x-forwarded-for')) {
+    forwardHeaders.set('x-forwarded-for', clientIp);
+  } else {
+    const existing = forwardHeaders.get('x-forwarded-for');
+    if (existing && !existing.includes(clientIp)) {
+      forwardHeaders.set('x-forwarded-for', `${existing}, ${clientIp}`);
+    }
+  }
 
   const init: RequestInit & { duplex?: 'half' } = {
     method: request.method,
@@ -123,6 +154,24 @@ async function handler(
   const targets = isIdempotent ? candidates : candidates.slice(0, 1);
 
   const heavy = !isIdempotent && (/^(upload|transactions|backup|providers|api-providers)(\/|$)/.test(path) || Number(request.headers.get('content-length')) > 1024 * 1024 || (request.body !== null && !request.headers.has('content-length')));
+
+  const clientIp = extractClientIp(request);
+  const rateLimitCheck = apiRateLimiter.check(clientIp, heavy);
+  if (!rateLimitCheck.allowed) {
+    return NextResponse.json(
+      {
+        error: 'Too many requests. Please slow down and retry shortly.',
+        code: 'RATE_LIMITED',
+      },
+      {
+        status: 429,
+        headers: {
+          'Retry-After': String(rateLimitCheck.retryAfter),
+        },
+      }
+    );
+  }
+
   let release: () => void;
   try { release = await admitProxyRequest(heavy, signal); }
   catch { return NextResponse.json({ error: 'Request queue timed out or is full. Please retry shortly.' }, { status: signal.aborted ? 504 : 503, headers: { 'Retry-After': '2' } }); }
