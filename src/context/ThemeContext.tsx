@@ -12,8 +12,14 @@ interface ThemeContextType {
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
-export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>("light");
+export function ThemeProvider({
+  children,
+  defaultTheme = "dark",
+}: {
+  children: React.ReactNode;
+  defaultTheme?: Theme;
+}) {
+  const [theme, setThemeState] = useState<Theme>(defaultTheme);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -26,15 +32,19 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         setThemeState("light");
         document.documentElement.classList.remove("dark");
       } else {
-        // Default to light mode if no saved preference
-        setThemeState("light");
-        document.documentElement.classList.remove("dark");
+        const initial = document.documentElement.classList.contains("dark") ? "dark" : defaultTheme;
+        setThemeState(initial);
+        if (initial === "dark") {
+          document.documentElement.classList.add("dark");
+        } else {
+          document.documentElement.classList.remove("dark");
+        }
       }
     } catch {
       // Fallback in case localStorage is restricted
     }
     setMounted(true);
-  }, []);
+  }, [defaultTheme]);
 
   const setTheme = (newTheme: Theme) => {
     setThemeState(newTheme);

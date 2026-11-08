@@ -60,7 +60,10 @@
   color-scheme: light;
 }
 
-.dark .site-theme {
+.dark .site-theme,
+.dark.site-theme,
+html.dark .site-theme,
+html.dark.site-theme {
   --brand-primary: 211 252 89;
   --brand-primary-container: 184 223 67;
   --brand-on-primary: 22 41 6;

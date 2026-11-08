@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { Cairo, Inter, Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google";
 import "../../globals.css";
 import "../../site-theme.css";
+import { ThemeProvider } from "@/context/ThemeContext";
 
 const cairo = Cairo({
   subsets: ["arabic", "latin"],
@@ -34,8 +35,13 @@ export default function AdminRootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="ar" dir="rtl" className="dark site-theme" style={{ backgroundColor: "#061610", colorScheme: "dark" }}>
+    <html lang="ar" dir="rtl" className="dark site-theme" suppressHydrationWarning>
       <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem('app_theme');if(t==='light'){document.documentElement.classList.remove('dark')}else{document.documentElement.classList.add('dark')}}catch(e){}})();`,
+          }}
+        />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
@@ -47,10 +53,11 @@ export default function AdminRootLayout({
         />
       </head>
       <body
-        className={`${cairo.variable} ${inter.variable} ${jakarta.variable} ${jetbrains.variable} font-sans bg-background text-on-surface antialiased`}
-        style={{ backgroundColor: "#061610", colorScheme: "dark" }}
+        className={`${cairo.variable} ${inter.variable} ${jakarta.variable} ${jetbrains.variable} font-sans bg-background text-on-surface antialiased transition-colors duration-200`}
       >
-        {children}
+        <ThemeProvider defaultTheme="dark">
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );

@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import BrandLogo from "@/components/BrandLogo";
+import ThemeToggle from "@/components/ThemeToggle";
 import { usePathname, useRouter } from "next/navigation";
 import { logoutAdmin } from "../login/actions";
 import DashboardAccessRestricted from "@/components/admin/DashboardAccessRestricted";
@@ -203,6 +204,8 @@ export default function AdminLayout({
           </div>
 
           <div className="flex items-center gap-3">
+            <ThemeToggle lang="ar" />
+
             <Link
               href="/admin/login"
               className="text-xs font-semibold text-on-surface-variant hover:text-primary transition-colors flex items-center gap-1 bg-surface-container px-3 py-1.5 rounded-lg border border-outline-variant/30"
