@@ -7,7 +7,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { shouldShowDefaultImeiField, getProviderCustomFields, isProviderQuantityField as isQuantityField, supportsProviderQuantity, isPrimaryTargetCustomField, getProviderFieldOptionChoices } from "../../../../lib/purchase-service-fields";
 import { cleanHtmlToText, stripEmojis } from "@/utils/cleanHtml";
-import { parseServiceInfo } from "@/lib/service-info";
+import { parseServiceInfo, cleanDisplayTitle, isDownloadLink, getDomainName } from "@/lib/service-info";
 
 function renderFormattedNotes(text: string) {
   if (!text) return null;
@@ -1187,7 +1187,7 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
                                 className="inline-flex items-center gap-1.5 text-xs text-primary font-bold hover:underline"
                               >
                                 <span className="material-symbols-outlined text-sm">open_in_new</span>
-                                <span>{topInfo.linkTitle || (lang === 'ar' ? 'فتح الرابط المباشر للخدمة' : 'Open Service Link')}</span>
+                                <span>{cleanDisplayTitle(topInfo.linkTitle, topInfo.link, lang)}</span>
                               </a>
                             )}
                           </div>
@@ -1462,17 +1462,19 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
                     if (!serviceInfo.notes && !serviceInfo.link) return null;
 
                     return (
-                      <div className="space-y-3 p-5 rounded-2xl bg-surface-container-high/40 border border-primary/25">
+                      <div className="space-y-4 p-5 rounded-2xl bg-surface-container-high/40 border border-primary/25">
                         <div className="flex items-center justify-between gap-2">
                           <div className="flex items-center gap-2 text-xs font-bold text-primary">
-                            <span className="material-symbols-outlined text-base">description</span>
+                            <span className="material-symbols-outlined text-base">
+                              {serviceInfo.notes ? 'description' : 'link'}
+                            </span>
                             <span>
-                              {lang === 'ar'
-                                ? 'ملاحظات وتعليمات هامة حول الخدمة:'
-                                : 'Important Service Instructions & Details:'}
+                              {serviceInfo.notes
+                                ? (lang === 'ar' ? 'ملاحظات وتعليمات هامة حول الخدمة:' : 'Important Service Instructions & Details:')
+                                : (lang === 'ar' ? 'رابط وملحقات الخدمة:' : 'Service Link & Attachments:')}
                             </span>
                           </div>
-                          {serviceInfo.link && (
+                          {serviceInfo.link && serviceInfo.notes && (
                             <span className="text-[11px] font-semibold text-secondary flex items-center gap-1">
                               <span className="material-symbols-outlined text-xs">link</span>
                               <span>{lang === 'ar' ? 'رابط مرفق' : 'Attached Link'}</span>
@@ -1487,16 +1489,30 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
                         )}
 
                         {serviceInfo.link && (
-                          <div className="pt-0.5">
+                          <div className="pt-2 flex justify-center w-full">
                             <a
                               href={serviceInfo.link}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-primary text-on-primary text-xs font-bold shadow-md shadow-primary/20 hover:shadow-primary/40 hover:opacity-95 transition-all"
+                              className="w-full sm:w-auto min-w-[220px] max-w-full flex items-center justify-center gap-3 px-5 py-3 rounded-xl bg-surface-container-lowest/90 hover:bg-surface-container-lowest border border-primary/40 hover:border-primary/80 text-on-surface shadow-sm hover:shadow-md transition-all group overflow-hidden"
                             >
-                              <span className="material-symbols-outlined text-sm">open_in_new</span>
-                              <span>
-                                {serviceInfo.linkTitle || (lang === 'ar' ? 'فتح الرابط المباشر للخدمة' : 'Open Service Link')}
+                              <span className="w-8 h-8 rounded-lg bg-primary/15 border border-primary/25 flex items-center justify-center shrink-0 text-primary group-hover:scale-110 transition-transform">
+                                <span className="material-symbols-outlined text-lg">
+                                  {isDownloadLink(serviceInfo.link) ? 'download' : 'link'}
+                                </span>
+                              </span>
+                              <div className="flex flex-col items-center justify-center min-w-0 flex-1 sm:flex-initial text-center px-1">
+                                <span className="text-xs font-bold text-primary group-hover:underline truncate max-w-full">
+                                  {cleanDisplayTitle(serviceInfo.linkTitle, serviceInfo.link, lang)}
+                                </span>
+                                {getDomainName(serviceInfo.link) && (
+                                  <span className="text-[10px] text-on-surface-variant/75 font-mono dir-ltr truncate max-w-full mt-0.5">
+                                    {getDomainName(serviceInfo.link)}
+                                  </span>
+                                )}
+                              </div>
+                              <span className="material-symbols-outlined text-sm text-primary/70 shrink-0">
+                                open_in_new
                               </span>
                             </a>
                           </div>

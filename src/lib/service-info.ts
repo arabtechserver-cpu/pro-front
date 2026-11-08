@@ -80,3 +80,45 @@ export function formatServiceInfo(notes: string, link: string, linkTitle?: strin
 
   return cleanNotes;
 }
+
+export function isDownloadLink(link: string): boolean {
+  if (!link) return false;
+  const lower = link.toLowerCase();
+  return Boolean(
+    lower.includes('mediafire.com') ||
+    lower.includes('mega.nz') ||
+    lower.includes('drive.google.com') ||
+    lower.includes('dropbox.com') ||
+    lower.match(/\.(rar|zip|7z|exe|apk|dmg|tar|gz|bin|iso)(\?.*)?$/i)
+  );
+}
+
+export function cleanDisplayTitle(title: string | undefined, link: string, lang: string = 'ar'): string {
+  if (title && title.trim()) {
+    const t = title.trim();
+    if (!t.match(/^https?:\/\//i)) {
+      return t;
+    }
+  }
+
+  if (isDownloadLink(link)) {
+    return lang === 'ar' ? 'تحميل ملف الأداة / البرنامج' : 'Download Tool / File';
+  }
+
+  const lower = link.toLowerCase();
+  if (lower.includes('youtube.com') || lower.includes('youtu.be')) {
+    return lang === 'ar' ? 'مشاهدة فيديو الشرح' : 'Watch Tutorial Video';
+  }
+
+  return lang === 'ar' ? 'فتح الرابط المباشر للخدمة' : 'Open Service Link';
+}
+
+export function getDomainName(link: string): string {
+  if (!link) return '';
+  try {
+    const parsed = new URL(link.startsWith('http') ? link : `https://${link}`);
+    return parsed.hostname.replace(/^www\./, '');
+  } catch {
+    return '';
+  }
+}
