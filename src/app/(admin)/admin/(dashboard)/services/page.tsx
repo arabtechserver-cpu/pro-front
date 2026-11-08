@@ -3,6 +3,7 @@
 import { useState, useDeferredValue, useEffect, useMemo, useRef, useCallback } from "react";
 import { getServiceRequiredFields } from "../providers/ProvidersClient";
 import { takeInitialGroups } from "../../../../../lib/service-list-window";
+import { parseServiceInfo, formatServiceInfo } from "@/lib/service-info";
 import AddBundleModal from "./AddBundleModal";
 
 export default function ServicesPage() {
@@ -24,6 +25,9 @@ export default function ServicesPage() {
   const [editCredit, setEditCredit] = useState<number>(0);
   const [editMargin, setEditMargin] = useState<number>(0);
   const [editIsActive, setEditIsActive] = useState<boolean>(true);
+  const [editNotes, setEditNotes] = useState<string>("");
+  const [editLink, setEditLink] = useState<string>("");
+  const [editLinkTitle, setEditLinkTitle] = useState<string>("");
 interface EditCustomField {
   id?: string;
   field_id?: string;
@@ -294,6 +298,12 @@ interface EditCustomField {
     setEditCredit(Number(service.credit) || 0);
     setEditMargin(Number(service.margin) || 0);
     setEditIsActive(service.isActive !== false);
+
+    const parsedInfo = parseServiceInfo(service.info);
+    setEditNotes(parsedInfo.notes);
+    setEditLink(parsedInfo.link);
+    setEditLinkTitle(parsedInfo.linkTitle || "");
+
     // تحليل الحقول المخصصة الحالية للخدمة
     try {
       if (service.requiresCustom) {
@@ -373,6 +383,8 @@ interface EditCustomField {
         requiresCustom = fieldsList.length > 0 ? JSON.stringify(fieldsList) : null;
       }
 
+      const infoPayload = formatServiceInfo(editNotes, editLink, editLinkTitle);
+
       const res = await fetch("/api/dhru/services/update", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -382,7 +394,8 @@ interface EditCustomField {
           credit: editCredit,
           margin: editMargin,
           isActive: editIsActive,
-          requiresCustom
+          requiresCustom,
+          info: infoPayload
         })
       });
 
@@ -401,7 +414,8 @@ interface EditCustomField {
                 price: finalCalculated,
                 finalPrice: finalCalculated,
                 isActive: editIsActive,
-                requiresCustom
+                requiresCustom,
+                info: infoPayload
               } : s
             )
           }))
@@ -587,6 +601,57 @@ interface EditCustomField {
                 <div className="flex justify-between text-sm text-primary font-bold pt-2 border-t border-outline-variant/20">
                   <span>السعر الإجمالي النهائي للعميل:</span>
                   <span className="font-mono text-lg font-bold">${((Number(editCredit) || 0) + (Number(editMargin) || 0)).toFixed(2)} USD</span>
+                </div>
+              </div>
+
+              {/* ── قسم تعليمات وروابط الخدمة ── */}
+              <div className="bg-surface-container-low border border-outline-variant/30 rounded-2xl p-4 space-y-3.5">
+                <div className="flex items-center gap-2 text-xs font-bold text-primary">
+                  <span className="material-symbols-outlined text-base">link</span>
+                  <span>تعليمات وروابط الخدمة (تظهر للعميل في صفحة الشراء):</span>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-on-surface-variant mb-1.5">
+                    ملاحظات وإرشادات توضيحية للعميل
+                  </label>
+                  <textarea
+                    rows={3}
+                    value={editNotes}
+                    onChange={(e) => setEditNotes(e.target.value)}
+                    placeholder="أدخل أي ملاحظات، شروط، أو خطوات يحتاجها العميل قبل إتمام الطلب..."
+                    className="w-full px-3.5 py-2.5 bg-surface border border-outline-variant/50 rounded-xl focus:border-primary outline-none text-xs text-on-surface transition-all leading-relaxed"
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-bold text-on-surface-variant mb-1.5 flex items-center justify-between">
+                      <span>رابط مباشر للخدمة</span>
+                      <span className="text-[10px] text-on-surface-variant/70 font-normal">(أداة / موقع / شرح)</span>
+                    </label>
+                    <input
+                      type="url"
+                      value={editLink}
+                      onChange={(e) => setEditLink(e.target.value)}
+                      placeholder="https://example.com/download"
+                      className="w-full px-3.5 py-2.5 bg-surface border border-outline-variant/50 rounded-xl focus:border-primary outline-none text-xs text-on-surface transition-all font-mono dir-ltr"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-on-surface-variant mb-1.5 flex items-center justify-between">
+                      <span>نص زر الرابط</span>
+                      <span className="text-[10px] text-on-surface-variant/70 font-normal">(اختياري)</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={editLinkTitle}
+                      onChange={(e) => setEditLinkTitle(e.target.value)}
+                      placeholder="مثال: تحميل الأداة الرسمية"
+                      className="w-full px-3.5 py-2.5 bg-surface border border-outline-variant/50 rounded-xl focus:border-primary outline-none text-xs text-on-surface transition-all"
+                    />
+                  </div>
                 </div>
               </div>
 

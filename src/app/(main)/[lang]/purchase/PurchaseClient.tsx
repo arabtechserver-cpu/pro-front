@@ -7,6 +7,31 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { shouldShowDefaultImeiField, getProviderCustomFields, isProviderQuantityField as isQuantityField, supportsProviderQuantity, isPrimaryTargetCustomField, getProviderFieldOptionChoices } from "../../../../lib/purchase-service-fields";
 import { cleanHtmlToText, stripEmojis } from "@/utils/cleanHtml";
+import { parseServiceInfo } from "@/lib/service-info";
+
+function renderFormattedNotes(text: string) {
+  if (!text) return null;
+  const urlRegex = /(https?:\/\/[^\s<>"']+)/g;
+  const parts = text.split(urlRegex);
+
+  return parts.map((part, index) => {
+    if (part.match(urlRegex)) {
+      return (
+        <a
+          key={index}
+          href={part}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-primary underline font-mono dir-ltr break-all hover:opacity-80 inline-flex items-center gap-0.5 mx-0.5 font-bold"
+        >
+          <span>{part}</span>
+          <span className="material-symbols-outlined text-[13px]">open_in_new</span>
+        </a>
+      );
+    }
+    return <span key={index}>{part}</span>;
+  });
+}
 
 function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
   const searchParams = useSearchParams();
@@ -1149,11 +1174,25 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
                           {showServiceInfo ? 'expand_less' : 'expand_more'}
                         </span>
                       </button>
-                      {showServiceInfo && (
-                        <div className="mt-2.5 p-3 rounded-xl bg-surface-container-lowest border border-outline-variant/30 text-xs text-on-surface-variant leading-relaxed max-h-56 overflow-y-auto whitespace-pre-wrap block">
-                          {cleanHtmlToText(selectedService.info)}
-                        </div>
-                      )}
+                      {showServiceInfo && (() => {
+                        const topInfo = parseServiceInfo(selectedService.info);
+                        return (
+                          <div className="mt-2.5 p-3 rounded-xl bg-surface-container-lowest border border-outline-variant/30 text-xs text-on-surface-variant leading-relaxed max-h-56 overflow-y-auto whitespace-pre-wrap block space-y-2">
+                            {topInfo.notes && <div>{renderFormattedNotes(topInfo.notes)}</div>}
+                            {topInfo.link && (
+                              <a
+                                href={topInfo.link}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1.5 text-xs text-primary font-bold hover:underline"
+                              >
+                                <span className="material-symbols-outlined text-sm">open_in_new</span>
+                                <span>{topInfo.linkTitle || (lang === 'ar' ? 'فتح الرابط المباشر للخدمة' : 'Open Service Link')}</span>
+                              </a>
+                            )}
+                          </div>
+                        );
+                      })()}
                     </div>
                   )}
                 </div>
@@ -1416,6 +1455,55 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
                       />
                     </div>
                   )}
+
+                  {/* ── قسم روابط وتعليمات الخدمة للعميل (يظهر مباشرة تحت الحقول) ── */}
+                  {(() => {
+                    const serviceInfo = parseServiceInfo(selectedService?.info);
+                    if (!serviceInfo.notes && !serviceInfo.link) return null;
+
+                    return (
+                      <div className="space-y-3 p-5 rounded-2xl bg-surface-container-high/40 border border-primary/25">
+                        <div className="flex items-center justify-between gap-2">
+                          <div className="flex items-center gap-2 text-xs font-bold text-primary">
+                            <span className="material-symbols-outlined text-base">description</span>
+                            <span>
+                              {lang === 'ar'
+                                ? 'ملاحظات وتعليمات هامة حول الخدمة:'
+                                : 'Important Service Instructions & Details:'}
+                            </span>
+                          </div>
+                          {serviceInfo.link && (
+                            <span className="text-[11px] font-semibold text-secondary flex items-center gap-1">
+                              <span className="material-symbols-outlined text-xs">link</span>
+                              <span>{lang === 'ar' ? 'رابط مرفق' : 'Attached Link'}</span>
+                            </span>
+                          )}
+                        </div>
+
+                        {serviceInfo.notes && (
+                          <div className="text-xs text-on-surface/90 leading-relaxed whitespace-pre-wrap font-sans bg-surface-container-lowest/70 p-3.5 rounded-xl border border-outline-variant/30">
+                            {renderFormattedNotes(serviceInfo.notes)}
+                          </div>
+                        )}
+
+                        {serviceInfo.link && (
+                          <div className="pt-0.5">
+                            <a
+                              href={serviceInfo.link}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-primary text-on-primary text-xs font-bold shadow-md shadow-primary/20 hover:shadow-primary/40 hover:opacity-95 transition-all"
+                            >
+                              <span className="material-symbols-outlined text-sm">open_in_new</span>
+                              <span>
+                                {serviceInfo.linkTitle || (lang === 'ar' ? 'فتح الرابط المباشر للخدمة' : 'Open Service Link')}
+                              </span>
+                            </a>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })()}
                 </div>
               );
             })()}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { formatServiceInfo } from "@/lib/service-info";
 
 interface FieldItem {
   label: string;
@@ -17,6 +18,7 @@ interface ServiceItem {
   margin: number;
   time: string;
   info: string;
+  link?: string;
   isActive: boolean;
   fields: FieldItem[];
 }
@@ -47,6 +49,7 @@ export default function AddBundleModal({
       margin: 0,
       time: "1-24 Hours",
       info: "",
+      link: "",
       isActive: true,
       fields: []
     }
@@ -67,6 +70,7 @@ export default function AddBundleModal({
         margin: 0,
         time: "1-24 Hours",
         info: "",
+        link: "",
         isActive: true,
         fields: []
       }
@@ -178,7 +182,7 @@ export default function AddBundleModal({
         credit: parseFloat(String(s.credit)) || 0,
         margin: parseFloat(String(s.margin)) || 0,
         time: s.time.trim() || "1-24 Hours",
-        info: s.info.trim() || undefined,
+        info: formatServiceInfo(s.info, s.link || '') || undefined,
         isActive: s.isActive,
         fields: s.fields.map((f) => ({
           label: f.label.trim() || f.fieldname,
@@ -474,19 +478,35 @@ export default function AddBundleModal({
                       </div>
                     </div>
 
-                    <div>
-                      <label className="block text-[11px] font-bold text-on-surface-variant mb-1">
-                        وصف أو تعليمات الخدمة (اختياري)
-                      </label>
-                      <input
-                        type="text"
-                        placeholder="مثال: يرجى كتابة المعرف والتأكد من فتح الحساب"
-                        value={service.info}
-                        onChange={(e) =>
-                          handleServiceChange(service.id, "info", e.target.value)
-                        }
-                        className="w-full px-3 py-2 bg-surface border border-outline-variant/40 rounded-xl text-xs outline-none focus:border-primary"
-                      />
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                      <div>
+                        <label className="block text-[11px] font-bold text-on-surface-variant mb-1">
+                          وصف أو تعليمات الخدمة (اختياري)
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="مثال: يرجى كتابة المعرف والتأكد من فتح الحساب"
+                          value={service.info}
+                          onChange={(e) =>
+                            handleServiceChange(service.id, "info", e.target.value)
+                          }
+                          className="w-full px-3 py-2 bg-surface border border-outline-variant/40 rounded-xl text-xs outline-none focus:border-primary"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[11px] font-bold text-on-surface-variant mb-1">
+                          رابط مباشر للخدمة (اختياري)
+                        </label>
+                        <input
+                          type="url"
+                          placeholder="https://example.com/download"
+                          value={service.link || ""}
+                          onChange={(e) =>
+                            handleServiceChange(service.id, "link", e.target.value)
+                          }
+                          className="w-full px-3 py-2 bg-surface border border-outline-variant/40 rounded-xl text-xs outline-none focus:border-primary font-mono dir-ltr"
+                        />
+                      </div>
                     </div>
 
                     {/* Custom Fields Sub-section for this Service */}
