@@ -824,17 +824,32 @@ export default function OrdersClient() {
                         <div className="flex items-center justify-center gap-1.5 flex-wrap">
                           {/* Send to Provider (Dhru) */}
                           {order.status === "pending" && (
-                            <button
-                              onClick={() => handleDispatchProvider(order)}
-                              disabled={isDispatching}
-                              className="px-2.5 py-1.5 rounded-xl bg-gradient-to-r from-primary to-secondary text-on-primary text-[11px] font-bold transition-all shadow hover:shadow-primary/30 flex items-center gap-1 disabled:opacity-50"
-                              title="إرسال الطلب آلياً إلى سيرفر المزود"
-                            >
-                              <span className={`material-symbols-outlined text-xs ${isDispatching ? "animate-spin" : ""}`}>
-                                {isDispatching ? "refresh" : "send"}
-                              </span>
-                              <span>إرسال للمزود</span>
-                            </button>
+                            <>
+                              <button
+                                onClick={() => handleDispatchProvider(order)}
+                                disabled={isDispatching}
+                                className="px-2.5 py-1.5 rounded-xl bg-gradient-to-r from-primary to-secondary text-on-primary text-[11px] font-bold transition-all shadow hover:shadow-primary/30 flex items-center gap-1 disabled:opacity-50"
+                                title="إرسال الطلب آلياً إلى سيرفر المزود"
+                              >
+                                <span className={`material-symbols-outlined text-xs ${isDispatching ? "animate-spin" : ""}`}>
+                                  {isDispatching ? "refresh" : "send"}
+                                </span>
+                                <span>إرسال للمزود</span>
+                              </button>
+
+                              {/* Quick Edit IMEI / Target Input */}
+                              <button
+                                onClick={() => {
+                                  setSelectedOrder(order);
+                                  setEditedTargetInput(order.targetInput || "");
+                                  setIsEditingFields(true);
+                                }}
+                                className="p-1.5 rounded-xl bg-surface-container-high hover:bg-surface-container-highest text-on-surface-variant hover:text-primary border border-outline-variant/30 transition-all flex items-center justify-center"
+                                title="تعديل رقم الـ IMEI أو البيانات قبل الإرسال"
+                              >
+                                <span className="material-symbols-outlined text-xs">edit</span>
+                              </button>
+                            </>
                           )}
 
                           {/* Manual Complete with Code */}
@@ -1423,30 +1438,31 @@ export default function OrdersClient() {
                   </div>
 
                   {/* Edit Fields Row */}
-                  <div className="bg-[#f8f9fa] px-4 py-2 border-t border-slate-200">
+                  <div className="bg-surface-container/50 px-4 py-3 border-t border-outline-variant/30">
                     {isEditingFields ? (
-                      <div className="space-y-2 py-2">
-                        <label className="block text-xs font-bold text-slate-700">تعديل بيانات الحقول:</label>
+                      <div className="space-y-2.5 py-1">
+                        <label className="block text-xs font-bold text-on-surface">تعديل بيانات وحقول الطلب (IMEI / SN / البيانات):</label>
                         <input
                           type="text"
                           value={editedTargetInput}
                           onChange={(e) => setEditedTargetInput(e.target.value)}
-                          className="w-full px-3 py-2 bg-white border border-blue-500 rounded-lg font-mono text-xs text-slate-900 outline-none shadow-sm"
-                          placeholder="أدخل القيمة الجديدة"
+                          className="w-full px-3.5 py-2.5 bg-surface-container-lowest border border-outline-variant/50 focus:border-primary focus:ring-1 focus:ring-primary/40 rounded-xl font-mono text-xs text-on-surface outline-none transition-all shadow-inner"
+                          placeholder="أدخل رقم الـ IMEI الجديد أو البيانات الصحيحة..."
                         />
                         <div className="flex gap-2 justify-end pt-1">
                           <button
                             type="button"
                             disabled={isSavingFields}
                             onClick={handleSaveEditedFields}
-                            className="px-3 py-1.5 rounded-lg bg-blue-600 text-white font-bold text-xs flex items-center gap-1 shadow-sm hover:bg-blue-700 transition-colors"
+                            className="px-4 py-2 rounded-xl bg-primary text-on-primary font-bold text-xs flex items-center gap-1.5 shadow-sm hover:bg-primary/90 transition-all disabled:opacity-50"
                           >
-                            {isSavingFields ? "جاري الحفظ..." : "حفظ التعديل"}
+                            <span className="material-symbols-outlined text-xs">check</span>
+                            <span>{isSavingFields ? "جاري الحفظ..." : "حفظ التعديل"}</span>
                           </button>
                           <button
                             type="button"
                             onClick={() => setIsEditingFields(false)}
-                            className="px-3 py-1.5 rounded-lg bg-slate-200 text-slate-700 font-bold text-xs hover:bg-slate-300 transition-colors"
+                            className="px-4 py-2 rounded-xl bg-surface-container-high text-on-surface-variant hover:text-on-surface font-bold text-xs transition-all"
                           >
                             إلغاء
                           </button>
@@ -1459,10 +1475,10 @@ export default function OrdersClient() {
                           setEditedTargetInput(selectedOrder.targetInput || "");
                           setIsEditingFields(true);
                         }}
-                        className="text-xs font-medium text-slate-700 hover:text-blue-600 flex items-center gap-1.5 py-1 transition-colors"
+                        className="text-xs font-bold text-primary hover:text-primary/80 flex items-center gap-1.5 py-1 transition-colors"
                       >
-                        <span className="material-symbols-outlined text-sm">edit</span>
-                        <span>Edit Fields</span>
+                        <span className="material-symbols-outlined text-sm">edit_note</span>
+                        <span>تعديل بيانات وحقول الطلب (IMEI / Serial)</span>
                       </button>
                     )}
                   </div>
