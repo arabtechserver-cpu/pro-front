@@ -33,6 +33,7 @@ export default function AdminLogin() {
   const [showRecoveryPin, setShowRecoveryPin] = useState(false);
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [newUsername, setNewUsername] = useState("admin");
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [recoveryChallengeToken, setRecoveryChallengeToken] = useState("");
   const [recoveryOtp, setRecoveryOtp] = useState("");
@@ -350,7 +351,6 @@ export default function AdminLogin() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           recoveryPin: recoveryPin.trim(),
-          username: username.trim(),
           turnstileToken
         })
       });
@@ -358,6 +358,13 @@ export default function AdminLogin() {
       const data = await res.json().catch(() => ({}));
       if (res.ok && data.success) {
         setRecoveryChallengeToken(data.challengeToken || "");
+        if (data.currentUsername) {
+          setNewUsername(data.currentUsername);
+        } else if (username.trim()) {
+          setNewUsername(username.trim());
+        } else {
+          setNewUsername("admin");
+        }
         setStep("forgot_otp");
         setRecoveryCountdown(300);
         setInfoMessage(data.message || "تم إرسال كود التحقق بنجاح إلى حساب تيليجرام الخاص بالإدارة");
@@ -387,6 +394,11 @@ export default function AdminLogin() {
       return;
     }
 
+    if (!newUsername || newUsername.trim().length < 3) {
+      setError("يجب ألا يقل اسم المستخدم الجديد عن 3 أحرف.");
+      return;
+    }
+
     if (!newPassword || newPassword.length < 8) {
       setError("يجب ألا تقل كلمة المرور الجديدة عن 8 أحرف.");
       return;
@@ -405,14 +417,17 @@ export default function AdminLogin() {
         body: JSON.stringify({
           challengeToken: recoveryChallengeToken,
           otp: recoveryOtp.trim(),
+          newUsername: newUsername.trim(),
           newPassword
         })
       });
 
       const data = await res.json().catch(() => ({}));
       if (res.ok && data.success) {
-        setInfoMessage(data.message || "تم تحديث كلمة المرور بنجاح! يمكنك الآن تسجيل الدخول.");
+        setInfoMessage(data.message || "تم تحديث بيانات دخول الإدارة بنجاح! يمكنك الآن تسجيل الدخول.");
         setError("");
+        const finalUser = data.updatedUsername || newUsername.trim();
+        setUsername(finalUser);
         setStep("login");
         setPassword("");
         setRecoveryPin("");
@@ -425,7 +440,7 @@ export default function AdminLogin() {
         setError(data.message || "رمز التحقق غير صحيح أو انتهت صلاحيته.");
       }
     } catch {
-      setError("حدث خطأ أثناء تحديث كلمة المرور.");
+      setError("حدث خطأ أثناء تحديث بيانات الدخول.");
     } finally {
       setLoading(false);
     }
@@ -675,9 +690,9 @@ export default function AdminLogin() {
               <div className="w-16 h-16 bg-amber-500/10 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-amber-500/20 shadow-[0_0_15px_rgba(245,158,11,0.2)]">
                 <span className="material-symbols-outlined text-3xl text-amber-400">lock_reset</span>
               </div>
-              <h1 className="text-2xl font-display font-bold text-on-surface mb-2">استعادة كلمة المرور</h1>
+              <h1 className="text-2xl font-display font-bold text-on-surface mb-2">استعادة حساب الإدارة</h1>
               <p className="text-sm text-on-surface-variant leading-relaxed">
-                أدخل رمز الأمان السري للإدارة لإرسال كود تحقق مؤكد إلى حساب تيليجرام
+                أدخل رمز الأمان السري (Master Recovery PIN) لإرسال كود تحقق مؤكد إلى حساب تيليجرام
               </p>
             </div>
 
@@ -689,17 +704,6 @@ export default function AdminLogin() {
 
             <form onSubmit={handleRequestRecovery} className="space-y-5 relative z-10" dir="rtl">
               <div>
-                <label className="block text-sm font-medium text-on-surface-variant mb-2">اسم المستخدم أو البريد (اختياري)</label>
-                <input
-                  type="text"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  className="w-full px-4 py-3 bg-surface-container border border-outline-variant/50 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none text-on-surface transition-all text-right"
-                  placeholder="admin (اتركه فارغاً للافتراضي)"
-                />
-              </div>
-
-              <div>
                 <label className="block text-sm font-medium text-on-surface-variant mb-2">رمز الأمان السري (Master Recovery PIN)</label>
                 <div className="relative">
                   <input
@@ -708,7 +712,7 @@ export default function AdminLogin() {
                     onChange={(e) => setRecoveryPin(e.target.value)}
                     className="w-full pl-12 pr-4 py-3 bg-surface-container border border-outline-variant/50 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none text-on-surface transition-all text-right font-mono"
                     required
-                    placeholder="أدخل رمز الأمان المكون من 8 أرقام"
+                    placeholder="أدخل رمز الأمان السري للإدارة"
                   />
                   <button
                     type="button"
@@ -759,9 +763,9 @@ export default function AdminLogin() {
               <div className="w-16 h-16 bg-sky-500/10 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-sky-500/20 shadow-[0_0_15px_rgba(14,165,233,0.2)]">
                 <span className="material-symbols-outlined text-3xl text-sky-400">vpn_key</span>
               </div>
-              <h1 className="text-2xl font-display font-bold text-on-surface mb-2">تعيين كلمة المرور الجديدة</h1>
+              <h1 className="text-2xl font-display font-bold text-on-surface mb-2">تعيين بيانات الدخول الجديدة</h1>
               <p className="text-sm text-on-surface-variant leading-relaxed">
-                أدخل رمز التحقق (OTP) المستلم في تيليجرام ثم اكتب كلمة المرور الجديدة
+                أدخل كود التحقق من تيليجرام ثم حدد اسم المستخدم وكلمة المرور الجديدة للإدارة
               </p>
             </div>
 
@@ -799,7 +803,22 @@ export default function AdminLogin() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-on-surface-variant mb-1.5">كلمة المرور الجديدة</label>
+                <label className="block text-sm font-medium text-on-surface-variant mb-1.5">اسم المستخدم للإدارة (Username)</label>
+                <input
+                  type="text"
+                  value={newUsername}
+                  onChange={(e) => setNewUsername(e.target.value)}
+                  className="w-full px-4 py-3 bg-surface-container border border-outline-variant/50 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none text-on-surface transition-all text-left font-mono"
+                  required
+                  minLength={3}
+                  maxLength={30}
+                  placeholder="admin"
+                  dir="ltr"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-on-surface-variant mb-1.5">كلمة المرور الجديدة (Password)</label>
                 <div className="relative">
                   <input
                     type={showNewPassword ? "text" : "password"}
@@ -824,27 +843,29 @@ export default function AdminLogin() {
 
               <div>
                 <label className="block text-sm font-medium text-on-surface-variant mb-1.5">تأكيد كلمة المرور الجديدة</label>
-                <input
-                  type={showNewPassword ? "text" : "password"}
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="w-full px-4 py-3 bg-surface-container border border-outline-variant/50 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none text-on-surface transition-all text-right"
-                  required
-                  minLength={8}
-                  placeholder="أعد إدخال كلمة المرور"
-                />
+                <div className="relative">
+                  <input
+                    type={showNewPassword ? "text" : "password"}
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    className="w-full pl-12 pr-4 py-3 bg-surface-container border border-outline-variant/50 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none text-on-surface transition-all text-right"
+                    required
+                    minLength={8}
+                    placeholder="أعد إدخال كلمة المرور"
+                  />
+                </div>
               </div>
 
               <button
                 type="submit"
-                disabled={loading || recoveryOtp.length < 6 || !newPassword || !confirmPassword}
+                disabled={loading || recoveryOtp.length < 6 || !newUsername.trim() || !newPassword || !confirmPassword}
                 className="w-full btn-primary py-3 rounded-xl flex items-center justify-center gap-2 mt-4 text-lg font-bold shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? (
                   <span className="w-6 h-6 border-2 border-on-primary border-t-transparent rounded-full animate-spin"></span>
                 ) : (
                   <>
-                    تحديث كلمة المرور والدخول <span className="material-symbols-outlined">check_circle</span>
+                    تحديث بيانات الدخول وتسجيل الدخول <span className="material-symbols-outlined">check_circle</span>
                   </>
                 )}
               </button>

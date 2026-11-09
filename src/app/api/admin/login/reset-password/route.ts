@@ -5,7 +5,7 @@ import { getBackendCandidates } from '../../../../../lib/api-proxy-candidates';
 export async function POST(request: NextRequest) {
   return authProxyBudget(request, async (body, signal) => {
     try {
-      const { challengeToken, otp, newPassword } = body;
+      const { challengeToken, otp, newPassword, newUsername } = body;
 
       if (!challengeToken || !otp || !newPassword) {
         return NextResponse.json(
@@ -37,7 +37,8 @@ export async function POST(request: NextRequest) {
             body: JSON.stringify({
               challengeToken,
               otp,
-              newPassword
+              newPassword,
+              newUsername
             }),
             cache: "no-store",
             signal
@@ -47,7 +48,8 @@ export async function POST(request: NextRequest) {
           if (res.ok && data.success) {
             return NextResponse.json({
               success: true,
-              message: data.message || "تم تغيير كلمة مرور الإدارة بنجاح!"
+              updatedUsername: data.updatedUsername,
+              message: data.message || "تم تغيير بيانات دخول الإدارة بنجاح!"
             });
           } else {
             const msg = data.error || data.message || "فشل التحقق من الرمز أو تحديث كلمة المرور";

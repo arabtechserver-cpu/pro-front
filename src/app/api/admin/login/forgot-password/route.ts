@@ -49,6 +49,7 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({
               success: true,
               challengeToken: data.challengeToken,
+              currentUsername: data.currentUsername || "",
               message: data.message || "تم إرسال رمز التحقق إلى حساب تيليجرام الخاص بالإدارة"
             });
           } else {
