@@ -11,7 +11,7 @@ import CloudflareTurnstile, { resetTurnstile } from "@/components/CloudflareTurn
 import { getOrCreateDeviceToken, getDeviceFingerprint, getLocalIpViaWebRTC } from "@/utils/deviceUtils";
 
 export default function AdminLogin() {
-  const [step, setStep] = useState<"login" | "otp">("login");
+  const [step, setStep] = useState<"login" | "otp" | "forgot_pin" | "forgot_otp">("login");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -27,6 +27,17 @@ export default function AdminLogin() {
   const [resending, setResending] = useState(false);
   const [blockedIp, setBlockedIp] = useState("");
   const [copiedIp, setCopiedIp] = useState(false);
+
+  // Master PIN Password Recovery states
+  const [recoveryPin, setRecoveryPin] = useState("");
+  const [showRecoveryPin, setShowRecoveryPin] = useState(false);
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [recoveryChallengeToken, setRecoveryChallengeToken] = useState("");
+  const [recoveryOtp, setRecoveryOtp] = useState("");
+  const [recoveryCountdown, setRecoveryCountdown] = useState(300);
+
   const otpInputRef = useRef<HTMLInputElement>(null);
   const deviceTokenRef = useRef<string>("");
   const fingerprintRef = useRef<string>("");
@@ -311,9 +322,122 @@ export default function AdminLogin() {
     }
   };
 
+  useEffect(() => {
+    if (step !== "forgot_otp") return;
+    const timer = setInterval(() => {
+      setRecoveryCountdown((prev) => (prev > 0 ? prev - 1 : 0));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [step]);
+
+  const handleRequestRecovery = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setInfoMessage("");
+    if (!turnstileToken) {
+      setError("يرجى إكمال التحقق الأمني أولاً.");
+      return;
+    }
+    if (!recoveryPin.trim()) {
+      setError("يرجى إدخال رمز الأمان السري.");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const res = await fetch("/api/admin/login/forgot-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          recoveryPin: recoveryPin.trim(),
+          username: username.trim(),
+          turnstileToken
+        })
+      });
+
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && data.success) {
+        setRecoveryChallengeToken(data.challengeToken || "");
+        setStep("forgot_otp");
+        setRecoveryCountdown(300);
+        setInfoMessage(data.message || "تم إرسال كود التحقق بنجاح إلى حساب تيليجرام الخاص بالإدارة");
+        setTurnstileToken("");
+        resetTurnstile();
+      } else {
+        setError(data.message || "رمز الأمان السري غير صحيح");
+        setTurnstileToken("");
+        resetTurnstile();
+      }
+    } catch {
+      setError("حدث خطأ أثناء الاتصال بالخادم، يرجى المحاولة لاحقاً.");
+      setTurnstileToken("");
+      resetTurnstile();
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleConfirmRecovery = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setInfoMessage("");
+
+    if (!recoveryOtp || recoveryOtp.length < 6) {
+      setError("يرجى إدخال رمز التحقق المكون من 6 أرقام.");
+      return;
+    }
+
+    if (!newPassword || newPassword.length < 8) {
+      setError("يجب ألا تقل كلمة المرور الجديدة عن 8 أحرف.");
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      setError("كلمتا المرور غير متطابقتين.");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const res = await fetch("/api/admin/login/reset-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          challengeToken: recoveryChallengeToken,
+          otp: recoveryOtp.trim(),
+          newPassword
+        })
+      });
+
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && data.success) {
+        setInfoMessage(data.message || "تم تحديث كلمة المرور بنجاح! يمكنك الآن تسجيل الدخول.");
+        setError("");
+        setStep("login");
+        setPassword("");
+        setRecoveryPin("");
+        setRecoveryOtp("");
+        setNewPassword("");
+        setConfirmPassword("");
+        setTurnstileToken("");
+        resetTurnstile();
+      } else {
+        setError(data.message || "رمز التحقق غير صحيح أو انتهت صلاحيته.");
+      }
+    } catch {
+      setError("حدث خطأ أثناء تحديث كلمة المرور.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleBackToLogin = () => {
     setStep("login");
     setOtp("");
+    setRecoveryOtp("");
+    setRecoveryPin("");
+    setNewPassword("");
+    setConfirmPassword("");
     setError("");
     setInfoMessage("");
     setTurnstileToken("");
@@ -341,6 +465,12 @@ export default function AdminLogin() {
               <h1 className="text-3xl font-display font-bold text-on-surface mb-2">لوحة الإدارة</h1>
               <p className="text-on-surface-variant">قم بتسجيل الدخول للوصول إلى التحكم</p>
             </div>
+
+            {infoMessage && (
+              <div className="bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 px-4 py-3 rounded-xl mb-5 text-sm relative z-10 text-center font-medium">
+                {infoMessage}
+              </div>
+            )}
 
             {error && (
               <div className="bg-error/10 border border-error/20 text-error px-4 py-3.5 rounded-xl mb-6 text-sm relative z-10 text-center font-medium">
@@ -400,6 +530,22 @@ export default function AdminLogin() {
                 </div>
               </div>
 
+              <div className="flex justify-end pt-0.5">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setError("");
+                    setInfoMessage("");
+                    setStep("forgot_pin");
+                    setTurnstileToken("");
+                    resetTurnstile();
+                  }}
+                  className="text-xs font-bold text-primary/90 hover:text-primary transition-colors hover:underline"
+                >
+                  نسيت كلمة المرور؟
+                </button>
+              </div>
+
               <CloudflareTurnstile
                 onVerify={(token) => setTurnstileToken(token)}
                 onExpire={() => setTurnstileToken("")}
@@ -421,7 +567,7 @@ export default function AdminLogin() {
               </button>
             </form>
           </>
-        ) : (
+        ) : step === "otp" ? (
           <>
             <div className="text-center mb-6 relative z-10">
               <div className="w-16 h-16 bg-sky-500/10 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-sky-500/20 shadow-[0_0_15px_rgba(14,165,233,0.2)]">
@@ -519,6 +665,197 @@ export default function AdminLogin() {
                   className="text-on-surface-variant hover:text-on-surface hover:underline transition-colors cursor-pointer"
                 >
                   تغيير الحساب
+                </button>
+              </div>
+            </form>
+          </>
+        ) : step === "forgot_pin" ? (
+          <>
+            <div className="text-center mb-6 relative z-10">
+              <div className="w-16 h-16 bg-amber-500/10 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-amber-500/20 shadow-[0_0_15px_rgba(245,158,11,0.2)]">
+                <span className="material-symbols-outlined text-3xl text-amber-400">lock_reset</span>
+              </div>
+              <h1 className="text-2xl font-display font-bold text-on-surface mb-2">استعادة كلمة المرور</h1>
+              <p className="text-sm text-on-surface-variant leading-relaxed">
+                أدخل رمز الأمان السري للإدارة لإرسال كود تحقق مؤكد إلى حساب تيليجرام
+              </p>
+            </div>
+
+            {error && (
+              <div className="bg-error/10 border border-error/20 text-error px-4 py-3 rounded-xl mb-5 text-sm relative z-10 text-center font-medium">
+                {error}
+              </div>
+            )}
+
+            <form onSubmit={handleRequestRecovery} className="space-y-5 relative z-10" dir="rtl">
+              <div>
+                <label className="block text-sm font-medium text-on-surface-variant mb-2">اسم المستخدم أو البريد (اختياري)</label>
+                <input
+                  type="text"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  className="w-full px-4 py-3 bg-surface-container border border-outline-variant/50 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none text-on-surface transition-all text-right"
+                  placeholder="admin (اتركه فارغاً للافتراضي)"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-on-surface-variant mb-2">رمز الأمان السري (Master Recovery PIN)</label>
+                <div className="relative">
+                  <input
+                    type={showRecoveryPin ? "text" : "password"}
+                    value={recoveryPin}
+                    onChange={(e) => setRecoveryPin(e.target.value)}
+                    className="w-full pl-12 pr-4 py-3 bg-surface-container border border-outline-variant/50 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none text-on-surface transition-all text-right font-mono"
+                    required
+                    placeholder="أدخل رمز الأمان المكون من 8 أرقام"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowRecoveryPin(!showRecoveryPin)}
+                    className="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-primary transition-colors flex items-center justify-center p-2"
+                  >
+                    <span className="material-symbols-outlined text-[20px]">
+                      {showRecoveryPin ? "visibility_off" : "visibility"}
+                    </span>
+                  </button>
+                </div>
+              </div>
+
+              <CloudflareTurnstile
+                onVerify={(token) => setTurnstileToken(token)}
+                onExpire={() => setTurnstileToken("")}
+                onError={() => setTurnstileToken("")}
+              />
+
+              <button
+                type="submit"
+                disabled={loading || !turnstileToken || !recoveryPin.trim()}
+                className="w-full btn-primary py-3 rounded-xl flex items-center justify-center gap-2 mt-6 text-lg font-bold shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {loading ? (
+                  <span className="w-6 h-6 border-2 border-on-primary border-t-transparent rounded-full animate-spin"></span>
+                ) : (
+                  <>
+                    إرسال كود التحقق لتيليجرام <span className="material-symbols-outlined">send</span>
+                  </>
+                )}
+              </button>
+
+              <div className="text-center pt-2">
+                <button
+                  type="button"
+                  onClick={handleBackToLogin}
+                  className="text-xs text-on-surface-variant hover:text-on-surface hover:underline transition-colors cursor-pointer"
+                >
+                  العودة لتسجيل الدخول
+                </button>
+              </div>
+            </form>
+          </>
+        ) : (
+          <>
+            <div className="text-center mb-6 relative z-10">
+              <div className="w-16 h-16 bg-sky-500/10 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-sky-500/20 shadow-[0_0_15px_rgba(14,165,233,0.2)]">
+                <span className="material-symbols-outlined text-3xl text-sky-400">vpn_key</span>
+              </div>
+              <h1 className="text-2xl font-display font-bold text-on-surface mb-2">تعيين كلمة المرور الجديدة</h1>
+              <p className="text-sm text-on-surface-variant leading-relaxed">
+                أدخل رمز التحقق (OTP) المستلم في تيليجرام ثم اكتب كلمة المرور الجديدة
+              </p>
+            </div>
+
+            {infoMessage && (
+              <div className="bg-sky-500/10 border border-sky-500/30 text-sky-300 px-4 py-3 rounded-xl mb-5 text-sm relative z-10 text-center font-medium">
+                {infoMessage}
+              </div>
+            )}
+
+            {error && (
+              <div className="bg-error/10 border border-error/20 text-error px-4 py-3.5 rounded-xl mb-5 text-sm relative z-10 text-center font-medium">
+                {error}
+              </div>
+            )}
+
+            <form onSubmit={handleConfirmRecovery} className="space-y-4 relative z-10" dir="rtl">
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="text-sm font-medium text-on-surface-variant">كود التحقق من تيليجرام</label>
+                  <span className={`text-xs font-mono font-medium ${recoveryCountdown < 60 ? "text-error" : "text-on-surface-variant"}`}>
+                    صلاحية الرمز: {formatTime(recoveryCountdown)}
+                  </span>
+                </div>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  maxLength={6}
+                  value={recoveryOtp}
+                  onChange={(e) => setRecoveryOtp(e.target.value.replace(/\D/g, ""))}
+                  placeholder="000000"
+                  className="w-full px-4 py-3 bg-surface-container border border-outline-variant/50 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none text-on-surface text-center font-mono text-2xl tracking-[0.35em] transition-all"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-on-surface-variant mb-1.5">كلمة المرور الجديدة</label>
+                <div className="relative">
+                  <input
+                    type={showNewPassword ? "text" : "password"}
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    className="w-full pl-12 pr-4 py-3 bg-surface-container border border-outline-variant/50 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none text-on-surface transition-all text-right"
+                    required
+                    minLength={8}
+                    placeholder="8 أحرف على الأقل"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowNewPassword(!showNewPassword)}
+                    className="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-primary transition-colors flex items-center justify-center p-2"
+                  >
+                    <span className="material-symbols-outlined text-[20px]">
+                      {showNewPassword ? "visibility_off" : "visibility"}
+                    </span>
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-on-surface-variant mb-1.5">تأكيد كلمة المرور الجديدة</label>
+                <input
+                  type={showNewPassword ? "text" : "password"}
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="w-full px-4 py-3 bg-surface-container border border-outline-variant/50 rounded-xl focus:border-primary focus:ring-1 focus:ring-primary outline-none text-on-surface transition-all text-right"
+                  required
+                  minLength={8}
+                  placeholder="أعد إدخال كلمة المرور"
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={loading || recoveryOtp.length < 6 || !newPassword || !confirmPassword}
+                className="w-full btn-primary py-3 rounded-xl flex items-center justify-center gap-2 mt-4 text-lg font-bold shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {loading ? (
+                  <span className="w-6 h-6 border-2 border-on-primary border-t-transparent rounded-full animate-spin"></span>
+                ) : (
+                  <>
+                    تحديث كلمة المرور والدخول <span className="material-symbols-outlined">check_circle</span>
+                  </>
+                )}
+              </button>
+
+              <div className="text-center pt-2">
+                <button
+                  type="button"
+                  onClick={handleBackToLogin}
+                  className="text-xs text-on-surface-variant hover:text-on-surface hover:underline transition-colors cursor-pointer"
+                >
+                  العودة لتسجيل الدخول
                 </button>
               </div>
             </form>
