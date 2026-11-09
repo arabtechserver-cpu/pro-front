@@ -28,7 +28,10 @@ export default function CustomerLogsClient() {
     setIsLoading(true);
     try {
       if (activeTab === "orders") {
-        const res = await fetch("/api/orders");
+        const res = await fetch("/api/orders?all=true&limit=250", {
+          headers: { "x-admin-request": "true", "Cache-Control": "no-cache" },
+          credentials: "include"
+        });
         const data = await res.json();
         if (res.ok && data.success) {
           setOrders(data.orders || []);
@@ -36,7 +39,10 @@ export default function CustomerLogsClient() {
           setOrders(data);
         }
       } else {
-        const res = await fetch("/api/transactions");
+        const res = await fetch("/api/transactions?all=true&limit=50", {
+          headers: { "x-admin-request": "true", "Cache-Control": "no-cache" },
+          credentials: "include"
+        });
         const data = await res.json();
         if (res.ok && data.success) {
           setWalletLogs(data.transactions || []);

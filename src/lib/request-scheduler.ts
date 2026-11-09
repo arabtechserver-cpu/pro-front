@@ -31,10 +31,15 @@ export class RequestScheduler {
   private reserve(heavy: boolean): () => void {
     this.active++; if (heavy) this.heavyActive++;
     let released = false;
-    return () => {
+    const release = () => {
       if (released) return;
-      released = true; this.active--; if (heavy) this.heavyActive--; this.drain();
+      released = true;
+      clearTimeout(safetyTimer);
+      this.active--; if (heavy) this.heavyActive--; this.drain();
     };
+    const safetyTimer = setTimeout(release, 30000);
+    (safetyTimer as any).unref?.();
+    return release;
   }
   private drain() {
     while (this.active < this.concurrency) {

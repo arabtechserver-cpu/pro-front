@@ -212,6 +212,7 @@ function loadCaller(file, logout, storageBlocked = false) {
       if (name === 'next/navigation') return { usePathname: () => '/admin', useRouter: () => ({}) };
       if (name === 'next/link') return { default: 'a', __esModule: true };
       if (name === '@/components/BrandLogo') return { default: 'brand-logo', __esModule: true };
+      if (name === '@/components/ThemeToggle') return { ThemeToggle: 'theme-toggle', default: 'theme-toggle', __esModule: true };
       if (name === '@/components/admin/DashboardAccessRestricted') return { default: 'restricted', __esModule: true };
       throw new Error(`Unexpected import: ${name}`);
     }

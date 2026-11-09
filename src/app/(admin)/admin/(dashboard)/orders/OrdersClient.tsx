@@ -117,8 +117,8 @@ export default function OrdersClient() {
     setTimeout(() => setToastMessage(null), 4000);
   };
 
-  const fetchOrders = async () => {
-    setLoading(true);
+  const fetchOrders = async (silent = false) => {
+    if (!silent) setLoading(true);
     try {
       const adminToken = typeof window !== "undefined"
         ? (localStorage.getItem("admin_token") || localStorage.getItem("adminToken"))
@@ -126,13 +126,14 @@ export default function OrdersClient() {
       const res = await fetch("/api/orders?all=true", {
         headers: {
           "Cache-Control": "no-cache",
+          "x-admin-request": "true",
           ...(adminToken ? { Authorization: `Bearer ${adminToken}` } : {})
         },
         credentials: "include"
       });
 
       if (!res.ok) {
-        setOrders([]);
+        if (!silent) setOrders([]);
         return;
       }
 
@@ -141,7 +142,7 @@ export default function OrdersClient() {
       try {
         data = JSON.parse(text);
       } catch {
-        setOrders([]);
+        if (!silent) setOrders([]);
         return;
       }
 
@@ -149,18 +150,24 @@ export default function OrdersClient() {
         setOrders(data.orders || []);
       } else if (Array.isArray(data)) {
         setOrders(data);
-      } else {
+      } else if (!silent) {
         setOrders([]);
       }
     } catch (err) {
       console.error("Failed to fetch orders:", err);
     } finally {
-      setLoading(false);
+      if (!silent) setLoading(false);
     }
   };
 
   useEffect(() => {
     fetchOrders();
+    const interval = setInterval(() => {
+      if (typeof document !== "undefined" && document.visibilityState === "visible") {
+        fetchOrders(true);
+      }
+    }, 20000);
+    return () => clearInterval(interval);
   }, []);
 
   useEffect(() => {
@@ -511,7 +518,7 @@ export default function OrdersClient() {
 
         <div className="flex items-center gap-3">
           <button
-            onClick={fetchOrders}
+            onClick={() => fetchOrders(false)}
             className="px-4 py-2.5 rounded-xl bg-surface-container-high border border-outline-variant/30 hover:border-primary/50 text-xs font-bold text-on-surface flex items-center gap-2 transition-all shadow-sm active:scale-95"
           >
             <span className={`material-symbols-outlined text-sm text-primary ${loading ? "animate-spin" : ""}`}>

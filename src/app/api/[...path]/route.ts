@@ -70,6 +70,7 @@ async function proxyRequest(
     'idempotency-key',
     'x-idempotency-key',
     'x-admin-token',
+    'x-admin-request',
     'x-user-token',
     'x-forwarded-for',
     'x-forwarded-proto',
@@ -143,6 +144,11 @@ async function handler(
   }
 
   const candidates = getBackendCandidates(cachedBackendUrl, process.env.INTERNAL_API_URL, process.platform === 'win32');
+  if (cachedBackendUrl && candidates[0] !== cachedBackendUrl) {
+    const idx = candidates.indexOf(cachedBackendUrl);
+    if (idx > 0) candidates.splice(idx, 1);
+    candidates.unshift(cachedBackendUrl);
+  }
   if (process.platform === 'win32') {
     if (!cachedBackendUrl && !process.env.INTERNAL_API_URL && !candidates.includes('http://127.0.0.1:5000')) {
       candidates.unshift('http://127.0.0.1:5000');

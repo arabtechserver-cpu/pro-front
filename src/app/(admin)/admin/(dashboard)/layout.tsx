@@ -74,8 +74,27 @@ export default function AdminLayout({
     checkAccess();
 
     const originalFetch = window.fetch;
-    window.fetch = async (...args) => {
-      const response = await originalFetch(...args);
+    window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
+      const urlStr = typeof input === "string" ? input : input instanceof URL ? input.toString() : input.url;
+      let nextInit = init;
+      if (urlStr.startsWith("/api/")) {
+        const headers = new Headers(init?.headers);
+        headers.set("x-admin-request", "true");
+        try {
+          const adminTok = localStorage.getItem("admin_token") || localStorage.getItem("adminToken");
+          const userTok = localStorage.getItem("user_token") || localStorage.getItem("token");
+          const currentAuth = headers.get("Authorization") || headers.get("authorization");
+          if (currentAuth && userTok && currentAuth.includes(userTok) && userTok !== adminTok) {
+            if (adminTok) {
+              headers.set("Authorization", `Bearer ${adminTok}`);
+            } else {
+              headers.delete("Authorization");
+            }
+          }
+        } catch {}
+        nextInit = { ...init, headers, credentials: init?.credentials || "include" };
+      }
+      const response = await originalFetch(input, nextInit);
       if (response.status === 401) {
         if (typeof window !== "undefined" && !window.location.pathname.includes("/admin/login")) {
           window.location.href = "/admin/login";

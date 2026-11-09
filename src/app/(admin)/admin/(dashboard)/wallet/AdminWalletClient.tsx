@@ -56,16 +56,18 @@ export default function AdminWalletClient() {
     } catch {}
   };
 
-  const fetchTransactions = useCallback(async ({ reset = true, cursor = null }: { reset?: boolean; cursor?: string | null } = {}) => {
+  const fetchTransactions = useCallback(async ({ reset = true, cursor = null, silent = false }: { reset?: boolean; cursor?: string | null; silent?: boolean } = {}) => {
     if (!reset && (resetLoadingRef.current || loadingMoreRef.current)) return;
 
     const requestId = ++requestSequenceRef.current;
     if (reset) {
       resetLoadingRef.current = true;
       loadingMoreRef.current = false;
-      setIsLoading(true);
-      setHasMore(false);
-      setNextCursor(null);
+      if (!silent) {
+        setIsLoading(true);
+        setHasMore(false);
+        setNextCursor(null);
+      }
     } else {
       loadingMoreRef.current = true;
       setIsLoadingMore(true);
@@ -78,7 +80,13 @@ export default function AdminWalletClient() {
         search: deferredSearchQuery,
         cursor: reset ? null : cursor
       });
-      const res = await fetch(url);
+      const res = await fetch(url, {
+        headers: {
+          "x-admin-request": "true",
+          "Cache-Control": "no-cache"
+        },
+        credentials: "include"
+      });
       const data = await res.json();
       if (requestId !== requestSequenceRef.current) return;
 
@@ -107,6 +115,12 @@ export default function AdminWalletClient() {
 
   useEffect(() => {
     fetchTransactions({ reset: true });
+    const interval = setInterval(() => {
+      if (typeof document !== "undefined" && document.visibilityState === "visible" && !loadingMoreRef.current) {
+        fetchTransactions({ reset: true, silent: true });
+      }
+    }, 15000);
+    return () => clearInterval(interval);
   }, [fetchTransactions]);
 
   // Approve Transaction & Credit Balance in DB

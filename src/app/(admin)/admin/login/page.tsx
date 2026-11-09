@@ -149,6 +149,15 @@ export default function AdminLogin() {
           return;
         }
 
+        try {
+          if (apiData.token) {
+            localStorage.setItem("admin_token", apiData.token);
+            localStorage.setItem("adminToken", apiData.token);
+          } else {
+            localStorage.removeItem("admin_token");
+            localStorage.removeItem("adminToken");
+          }
+        } catch {}
         window.location.href = "/admin";
         return;
       }
@@ -186,6 +195,15 @@ export default function AdminLogin() {
           setLoading(false);
           return;
         }
+        try {
+          if (apiData.token) {
+            localStorage.setItem("admin_token", apiData.token);
+            localStorage.setItem("adminToken", apiData.token);
+          } else {
+            localStorage.removeItem("admin_token");
+            localStorage.removeItem("adminToken");
+          }
+        } catch {}
         window.location.href = "/admin";
         return;
       } else {
@@ -241,6 +259,15 @@ export default function AdminLogin() {
       const apiData = await apiRes.json().catch(() => ({}));
 
       if (apiRes.ok && apiData.success) {
+        try {
+          if (apiData.token) {
+            localStorage.setItem("admin_token", apiData.token);
+            localStorage.setItem("adminToken", apiData.token);
+          } else {
+            localStorage.removeItem("admin_token");
+            localStorage.removeItem("adminToken");
+          }
+        } catch {}
         window.location.href = "/admin";
         return;
       }
@@ -265,6 +292,15 @@ export default function AdminLogin() {
 
       const result = await verifyAdminOtpAction(challengeToken, otp.trim());
       if (result.success) {
+        try {
+          if (apiData.token) {
+            localStorage.setItem("admin_token", apiData.token);
+            localStorage.setItem("adminToken", apiData.token);
+          } else {
+            localStorage.removeItem("admin_token");
+            localStorage.removeItem("adminToken");
+          }
+        } catch {}
         window.location.href = "/admin";
         return;
       } else {
