@@ -400,8 +400,8 @@ export default function OrdersClient() {
     }
   };
 
-  const handleSaveEditedFields = async () => {
-    if (!selectedOrder) return;
+  const handleSaveEditedFields = async (): Promise<any | null> => {
+    if (!selectedOrder) return null;
     setIsSavingFields(true);
     try {
       const adminToken = typeof window !== "undefined"
@@ -423,17 +423,22 @@ export default function OrdersClient() {
       const data = await res.json();
       if (res.ok && data.success) {
         showToast("تم تحديث بيانات وحقول الطلب بنجاح!");
-        setSelectedOrder({
+        const updated = {
           ...selectedOrder,
-          targetInput: editedTargetInput
-        });
+          targetInput: editedTargetInput,
+          ...(data.order || {})
+        };
+        setSelectedOrder(updated);
         setIsEditingFields(false);
         fetchOrders();
+        return updated;
       } else {
         showToast(data.error || "فشل حفظ التعديل", "error");
+        return null;
       }
     } catch {
       showToast("تعذر الاتصال بالسيرفر", "error");
+      return null;
     } finally {
       setIsSavingFields(false);
     }
@@ -844,10 +849,11 @@ export default function OrdersClient() {
                                   setEditedTargetInput(order.targetInput || "");
                                   setIsEditingFields(true);
                                 }}
-                                className="p-1.5 rounded-xl bg-surface-container-high hover:bg-surface-container-highest text-on-surface-variant hover:text-primary border border-outline-variant/30 transition-all flex items-center justify-center"
+                                className="px-2.5 py-1.5 rounded-xl bg-surface-container-high hover:bg-surface-container-highest text-on-surface-variant hover:text-primary border border-outline-variant/30 transition-all flex items-center gap-1 text-[11px] font-bold"
                                 title="تعديل رقم الـ IMEI أو البيانات قبل الإرسال"
                               >
                                 <span className="material-symbols-outlined text-xs">edit</span>
+                                <span>تعديل</span>
                               </button>
                             </>
                           )}
@@ -1449,16 +1455,32 @@ export default function OrdersClient() {
                           className="w-full px-3.5 py-2.5 bg-surface-container-lowest border border-outline-variant/50 focus:border-primary focus:ring-1 focus:ring-primary/40 rounded-xl font-mono text-xs text-on-surface outline-none transition-all shadow-inner"
                           placeholder="أدخل رقم الـ IMEI الجديد أو البيانات الصحيحة..."
                         />
-                        <div className="flex gap-2 justify-end pt-1">
+                        <div className="flex gap-2 justify-end pt-1 flex-wrap">
                           <button
                             type="button"
                             disabled={isSavingFields}
-                            onClick={handleSaveEditedFields}
+                            onClick={() => handleSaveEditedFields()}
                             className="px-4 py-2 rounded-xl bg-primary text-on-primary font-bold text-xs flex items-center gap-1.5 shadow-sm hover:bg-primary/90 transition-all disabled:opacity-50"
                           >
                             <span className="material-symbols-outlined text-xs">check</span>
                             <span>{isSavingFields ? "جاري الحفظ..." : "حفظ التعديل"}</span>
                           </button>
+                          {selectedOrder.status === "pending" && (
+                            <button
+                              type="button"
+                              disabled={isSavingFields || Boolean(dispatchingOrderId)}
+                              onClick={async () => {
+                                const saved = await handleSaveEditedFields();
+                                if (saved) {
+                                  handleDispatchProvider(saved);
+                                }
+                              }}
+                              className="px-4 py-2 rounded-xl bg-secondary text-on-secondary font-bold text-xs flex items-center gap-1.5 shadow-sm hover:opacity-90 transition-all disabled:opacity-50"
+                            >
+                              <span className="material-symbols-outlined text-xs">send</span>
+                              <span>حفظ وإرسال للمزود الآن</span>
+                            </button>
+                          )}
                           <button
                             type="button"
                             onClick={() => setIsEditingFields(false)}

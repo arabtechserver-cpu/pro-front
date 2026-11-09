@@ -49,12 +49,17 @@ export function parseServiceInfo(raw: string | null | undefined): ParsedServiceI
   }
 
   // Fallback: detect direct URL embedded in plain text
-  const urlPattern = /(https?:\/\/[^\s<>"']+)/i;
+  const urlPattern = /(https?:\/\/[^\s<>"']+|\/\/[^\s<>"']+|www\.[^\s<>"']+)/i;
   const match = str.match(urlPattern);
 
   if (match) {
-    const link = match[1].trim();
-    const notes = str.replace(link, '').trim();
+    let link = match[1].trim();
+    if (link.startsWith('//')) {
+      link = 'https:' + link;
+    } else if (link.startsWith('www.')) {
+      link = 'https://' + link;
+    }
+    const notes = str.replace(match[0], '').trim();
     return { notes, link, linkTitle: '' };
   }
 
@@ -96,7 +101,19 @@ export function isDownloadLink(link: string): boolean {
 export function cleanDisplayTitle(title: string | undefined, link: string, lang: string = 'ar'): string {
   if (title && title.trim()) {
     const t = title.trim();
-    if (!t.match(/^https?:\/\//i)) {
+    const isUrlLike =
+      t.startsWith('http://') ||
+      t.startsWith('https://') ||
+      t.startsWith('//') ||
+      t.startsWith('www.') ||
+      t.includes('mediafire.com') ||
+      t.includes('mega.nz') ||
+      t.includes('drive.google.com') ||
+      t.includes('dropbox.com') ||
+      t.includes('/file/') ||
+      /\.(rar|zip|7z|exe|apk|dmg|tar|gz|bin|iso)(\?.*)?$/i.test(t);
+
+    if (!isUrlLike) {
       return t;
     }
   }
@@ -105,7 +122,7 @@ export function cleanDisplayTitle(title: string | undefined, link: string, lang:
     return lang === 'ar' ? 'تحميل ملف الأداة / البرنامج' : 'Download Tool / File';
   }
 
-  const lower = link.toLowerCase();
+  const lower = (link || '').toLowerCase();
   if (lower.includes('youtube.com') || lower.includes('youtu.be')) {
     return lang === 'ar' ? 'مشاهدة فيديو الشرح' : 'Watch Tutorial Video';
   }

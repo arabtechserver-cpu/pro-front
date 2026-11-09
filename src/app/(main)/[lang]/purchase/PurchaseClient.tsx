@@ -11,15 +11,16 @@ import { parseServiceInfo, cleanDisplayTitle, isDownloadLink, getDomainName } fr
 
 function renderFormattedNotes(text: string) {
   if (!text) return null;
-  const urlRegex = /(https?:\/\/[^\s<>"']+)/g;
+  const urlRegex = /((?:https?:\/\/|\/\/|www\.)[^\s<>"']+)/gi;
   const parts = text.split(urlRegex);
 
   return parts.map((part, index) => {
     if (part.match(urlRegex)) {
+      const href = part.startsWith('//') ? `https:${part}` : part.startsWith('http') ? part : `https://${part}`;
       return (
         <a
           key={index}
-          href={part}
+          href={href}
           target="_blank"
           rel="noopener noreferrer"
           className="text-primary underline font-mono dir-ltr break-all hover:opacity-80 inline-flex items-center gap-0.5 mx-0.5 font-bold"
@@ -1462,7 +1463,7 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
                     if (!serviceInfo.notes && !serviceInfo.link) return null;
 
                     return (
-                      <div className="space-y-4 p-5 rounded-2xl bg-surface-container-high/40 border border-primary/25">
+                      <div className="space-y-4 p-5 rounded-2xl bg-surface-container-high/40 border border-primary/25 overflow-hidden">
                         <div className="flex items-center justify-between gap-2">
                           <div className="flex items-center gap-2 text-xs font-bold text-primary">
                             <span className="material-symbols-outlined text-base">
@@ -1483,7 +1484,7 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
                         </div>
 
                         {serviceInfo.notes && (
-                          <div className="text-xs text-on-surface/90 leading-relaxed whitespace-pre-wrap font-sans bg-surface-container-lowest/70 p-3.5 rounded-xl border border-outline-variant/30">
+                          <div className="text-xs text-on-surface/90 leading-relaxed whitespace-pre-wrap font-sans bg-surface-container-lowest/70 p-3.5 rounded-xl border border-outline-variant/30 overflow-hidden break-words">
                             {renderFormattedNotes(serviceInfo.notes)}
                           </div>
                         )}
@@ -1491,28 +1492,31 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
                         {serviceInfo.link && (
                           <div className="pt-2 flex justify-center w-full">
                             <a
-                              href={serviceInfo.link}
+                              href={serviceInfo.link.startsWith('//') ? `https:${serviceInfo.link}` : serviceInfo.link.startsWith('http') ? serviceInfo.link : `https://${serviceInfo.link}`}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="w-full sm:w-auto min-w-[220px] max-w-full flex items-center justify-center gap-3 px-5 py-3 rounded-xl bg-surface-container-lowest/90 hover:bg-surface-container-lowest border border-primary/40 hover:border-primary/80 text-on-surface shadow-sm hover:shadow-md transition-all group overflow-hidden"
+                              className="w-full sm:w-auto min-w-[220px] max-w-full flex items-center justify-between gap-3 px-5 py-3 rounded-2xl bg-surface-container-lowest/80 hover:bg-surface-container-lowest border border-primary/30 hover:border-primary/60 text-on-surface shadow-sm hover:shadow-md transition-all group overflow-hidden"
                             >
-                              <span className="w-8 h-8 rounded-lg bg-primary/15 border border-primary/25 flex items-center justify-center shrink-0 text-primary group-hover:scale-110 transition-transform">
-                                <span className="material-symbols-outlined text-lg">
-                                  {isDownloadLink(serviceInfo.link) ? 'download' : 'link'}
-                                </span>
-                              </span>
-                              <div className="flex flex-col items-center justify-center min-w-0 flex-1 sm:flex-initial text-center px-1">
-                                <span className="text-xs font-bold text-primary group-hover:underline truncate max-w-full">
-                                  {cleanDisplayTitle(serviceInfo.linkTitle, serviceInfo.link, lang)}
-                                </span>
-                                {getDomainName(serviceInfo.link) && (
-                                  <span className="text-[10px] text-on-surface-variant/75 font-mono dir-ltr truncate max-w-full mt-0.5">
-                                    {getDomainName(serviceInfo.link)}
+                              <div className="flex items-center gap-3 min-w-0 flex-1">
+                                <span className="w-8 h-8 rounded-xl bg-primary/15 border border-primary/25 flex items-center justify-center shrink-0 text-primary group-hover:scale-105 transition-transform">
+                                  <span className="material-symbols-outlined text-lg">
+                                    {isDownloadLink(serviceInfo.link) ? 'download' : 'link'}
                                   </span>
-                                )}
+                                </span>
+                                <div className="flex flex-col min-w-0 text-start">
+                                  <span className="text-xs font-bold text-on-surface group-hover:text-primary transition-colors truncate">
+                                    {cleanDisplayTitle(serviceInfo.linkTitle, serviceInfo.link, lang)}
+                                  </span>
+                                  {getDomainName(serviceInfo.link) && (
+                                    <span className="text-[10px] text-on-surface-variant/75 font-mono dir-ltr truncate">
+                                      {getDomainName(serviceInfo.link)}
+                                    </span>
+                                  )}
+                                </div>
                               </div>
-                              <span className="material-symbols-outlined text-sm text-primary/70 shrink-0">
-                                open_in_new
+                              <span className="shrink-0 px-2 py-1 rounded-lg bg-surface-container-high border border-outline-variant/30 text-[11px] font-bold text-primary flex items-center gap-1 group-hover:bg-primary group-hover:text-on-primary transition-all">
+                                <span>{lang === 'ar' ? 'فتح الرابط' : 'Open'}</span>
+                                <span className="material-symbols-outlined text-xs">arrow_forward</span>
                               </span>
                             </a>
                           </div>
