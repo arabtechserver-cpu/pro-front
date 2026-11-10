@@ -1104,46 +1104,30 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
 
                 {/* BYBIT PAY & DEPOSIT MODAL */}
         {bybitModalData && (
-          <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200">
-            <div className="bg-surface-container-lowest border border-outline-variant/40 rounded-3xl p-6 sm:p-8 max-w-lg w-full shadow-2xl space-y-5 text-center relative overflow-hidden max-h-[90vh] overflow-y-auto">
-              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary to-secondary text-on-primary flex items-center justify-center text-2xl mx-auto shadow-lg shadow-primary/25">
+          <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200">
+            <div className="bg-surface-container-lowest border border-outline-variant/40 rounded-3xl p-5 sm:p-8 max-w-lg w-full shadow-2xl space-y-4 text-center relative overflow-hidden max-h-[90vh] overflow-y-auto">
+              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br from-primary to-secondary text-on-primary flex items-center justify-center text-2xl mx-auto shadow-lg shadow-primary/25">
                 <span className="material-symbols-outlined">account_balance_wallet</span>
               </div>
 
               <div className="space-y-1">
-                <h3 className="text-xl font-bold text-on-surface">
+                <h3 className="text-lg sm:text-xl font-bold text-on-surface">
                   {lang === "ar" ? "بوابة الإيداع الفوري - باي بيت (Bybit)" : "Bybit Instant Deposit"}
                 </h3>
-                <p className="text-xs text-on-surface-variant font-mono">
+                <p className="text-xs text-on-surface-variant font-mono truncate">
                   {lang === "ar" ? "رقم الطلب:" : "Order Ref:"} {bybitModalData.orderId}
                 </p>
-                <div className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary font-mono font-bold text-sm border border-primary/20">
+                <div className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary font-mono font-bold text-xs sm:text-sm border border-primary/20">
                   {lang === "ar" ? "المبلغ المطلوب:" : "Required:"} ${bybitModalData.amount.toFixed(2)} USDT
                 </div>
               </div>
 
-              <div className="p-4 rounded-2xl bg-surface-container-high/60 border border-outline-variant/30 space-y-3">
-                <div className="text-xs font-bold text-on-surface">
-                  {selectedBybitNetwork === "UID"
-                    ? (lang === "ar" ? "معرف Bybit UID للتحويل الداخلي المجاني:" : "Bybit UID for Zero-Fee Transfer:")
-                    : (lang === "ar" ? `عنوان المحفظة (${selectedBybitNetwork}):` : `Deposit Address (${selectedBybitNetwork}):`)}
-                </div>
-
-                {selectedBybitNetwork !== "UID" && (
-                  <div className="flex justify-center py-2">
-                    <div className="p-2 bg-white rounded-2xl shadow-md border border-outline-variant/20 inline-block">
-                      <img
-                        src={`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(bybitModalData.recipientAddress)}`}
-                        alt="Deposit QR Code"
-                        className="w-36 h-36 rounded-xl"
-                      />
-                    </div>
-                  </div>
-                )}
-
-                <div className="p-3 rounded-xl bg-surface-container-lowest border border-outline-variant/40 flex items-center justify-between gap-2">
-                  <span className="text-xs font-mono font-bold text-primary select-all truncate dir-ltr">
-                    {selectedBybitNetwork === "UID" ? bybitModalData.bybitUid : bybitModalData.recipientAddress}
+              <div className="p-3.5 sm:p-4 rounded-2xl bg-surface-container-high/60 border border-outline-variant/30 space-y-3 w-full overflow-hidden text-start">
+                <div className="flex items-center justify-between gap-2 flex-wrap">
+                  <span className="text-xs font-bold text-on-surface">
+                    {selectedBybitNetwork === "UID"
+                      ? (lang === "ar" ? "معرف Bybit UID للتحويل الداخلي المجاني:" : "Bybit UID for Zero-Fee Transfer:")
+                      : (lang === "ar" ? `عنوان المحفظة (${selectedBybitNetwork}):` : `Deposit Address (${selectedBybitNetwork}):`)}
                   </span>
                   <button
                     type="button"
@@ -1155,12 +1139,30 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
                     <span className="material-symbols-outlined text-xs">
                       {copiedId === "modal-bybit-copy" ? "check" : "content_copy"}
                     </span>
-                    <span>{copiedId === "modal-bybit-copy" ? (lang === "ar" ? "تم" : "Copied") : (lang === "ar" ? "نسخ" : "Copy")}</span>
+                    <span>{copiedId === "modal-bybit-copy" ? (lang === "ar" ? "تم" : "Copied") : (lang === "ar" ? "نسخ العنوان" : "Copy")}</span>
                   </button>
+                </div>
+
+                {selectedBybitNetwork !== "UID" && (
+                  <div className="flex justify-center py-1 sm:py-2">
+                    <div className="p-2 bg-white rounded-2xl shadow-md border border-outline-variant/20 inline-block">
+                      <img
+                        src={`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(bybitModalData.recipientAddress)}`}
+                        alt="Deposit QR Code"
+                        className="w-32 h-32 sm:w-36 sm:h-36 rounded-xl"
+                      />
+                    </div>
+                  </div>
+                )}
+
+                <div className="p-2.5 sm:p-3 rounded-xl bg-surface-container-lowest border border-outline-variant/40 w-full overflow-hidden">
+                  <code className="text-xs sm:text-sm font-mono font-bold text-primary select-all break-all dir-ltr text-left block w-full leading-relaxed">
+                    {selectedBybitNetwork === "UID" ? bybitModalData.bybitUid : bybitModalData.recipientAddress}
+                  </code>
                 </div>
               </div>
 
-              <ol className="text-xs text-on-surface-variant text-start space-y-1.5 list-decimal list-inside bg-surface-container p-3.5 rounded-xl border border-outline-variant/30">
+              <ol className="text-xs text-on-surface-variant text-start space-y-1.5 list-decimal list-inside bg-surface-container p-3 sm:p-3.5 rounded-xl border border-outline-variant/30 leading-relaxed">
                 <li>
                   {lang === "ar"
                     ? `أرسل بالضبط $${bybitModalData.amount.toFixed(2)} USDT إلى العنوان أو المعرف أعلاه.`
@@ -1178,7 +1180,7 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
                 </li>
               </ol>
 
-              <div className="space-y-2 text-start">
+              <div className="space-y-1.5 text-start">
                 <label className="text-xs font-bold text-on-surface block">
                   {lang === "ar" ? "هاش المعاملة (TxID / Hash) من Bybit:" : "Transaction Hash (TxID / Hash):"}
                 </label>
@@ -1187,7 +1189,7 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
                   value={bybitTxIdInput}
                   onChange={(e) => setBybitTxIdInput(e.target.value)}
                   placeholder={lang === "ar" ? "الصق هاش المعاملة هنا (TxID)..." : "Paste TxID / Hash here..."}
-                  className="w-full px-4 py-3 bg-surface-container border border-outline-variant/40 rounded-xl font-mono text-xs font-bold text-on-surface outline-none focus:border-primary focus:ring-1 focus:ring-primary"
+                  className="w-full px-3.5 py-2.5 sm:py-3 bg-surface-container border border-outline-variant/40 rounded-xl font-mono text-xs font-bold text-on-surface outline-none focus:border-primary focus:ring-1 focus:ring-primary"
                 />
               </div>
 
@@ -1195,7 +1197,7 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
                 type="button"
                 onClick={() => handleBybitVerifyDeposit(bybitModalData.orderId)}
                 disabled={isVerifyingBybit || !bybitTxIdInput.trim()}
-                className="w-full bg-gradient-to-r from-primary to-secondary text-on-primary py-3.5 px-4 rounded-xl font-bold text-sm hover:shadow-xl hover:shadow-primary/30 transition-all flex items-center justify-center gap-2 shadow-md disabled:opacity-50 active:scale-95"
+                className="w-full bg-gradient-to-r from-primary to-secondary text-on-primary py-3.5 px-4 rounded-xl font-bold text-xs sm:text-sm hover:shadow-xl hover:shadow-primary/30 transition-all flex items-center justify-center gap-2 shadow-md disabled:opacity-50 active:scale-95"
               >
                 {isVerifyingBybit ? (
                   <>
@@ -1616,11 +1618,11 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
 
               {/* BYBIT PAY & DEPOSIT INSTANT PAYMENT CARD */}
               {activeMethod.isAutomaticBybit && (
-                <div className="p-5 sm:p-6 rounded-2xl bg-gradient-to-br from-primary/10 via-surface-container-high to-secondary/10 border border-outline-variant/40 shadow-xl space-y-4 animate-in fade-in slide-in-from-top-2">
+                <div className="p-3.5 sm:p-6 rounded-2xl bg-gradient-to-br from-primary/10 via-surface-container-high to-secondary/10 border border-outline-variant/40 shadow-xl space-y-4 animate-in fade-in slide-in-from-top-2 overflow-hidden w-full">
                   <div className="flex items-center justify-between flex-wrap gap-2 pb-3 border-b border-outline-variant/20">
-                    <div className="flex items-center gap-2.5 font-bold text-sm text-on-surface">
-                      <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                      <span className="text-xs font-mono font-bold px-2 py-0.5 rounded bg-primary/15 text-primary border border-primary/20">
+                    <div className="flex items-center gap-2.5 font-bold text-xs sm:text-sm text-on-surface">
+                      <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shrink-0"></span>
+                      <span className="text-xs font-mono font-bold px-2 py-0.5 rounded bg-primary/15 text-primary border border-primary/20 shrink-0">
                         BYBIT
                       </span>
                       <span>{lang === "ar" ? "بوابة شحن Bybit الفورية (تأكيد آلي مباشر)" : "Bybit Instant Deposit Gateway"}</span>
@@ -1632,11 +1634,11 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
                   </div>
 
                   {/* Network Selector Tabs */}
-                  <div className="space-y-2">
+                  <div className="space-y-2 w-full">
                     <label className="text-xs font-bold text-on-surface block">
                       {lang === "ar" ? "اختر شبكة التحويل أو التحويل الداخلي:" : "Select Network or Bybit Internal UID:"}
                     </label>
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 sm:gap-2 w-full">
                       {[
                         { key: "TRX", label: "TRC20 (ترون)" },
                         { key: "BSC", label: "BEP20 (بينانس)" },
@@ -1653,13 +1655,13 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
                             key={net.key}
                             type="button"
                             onClick={() => setSelectedBybitNetwork(net.key)}
-                            className={`p-2.5 rounded-xl text-xs font-bold transition-all border text-center ${
+                            className={`p-2 sm:p-2.5 rounded-xl transition-all border text-center ${
                               isNetSelected
                                 ? "bg-primary text-on-primary border-primary shadow-md font-extrabold ring-1 ring-primary/30"
                                 : "bg-surface-container-lowest border-outline-variant/40 text-on-surface-variant hover:border-primary/40 hover:text-on-surface"
                             }`}
                           >
-                            <div className="leading-tight">{net.label}</div>
+                            <div className="leading-tight text-[11px] sm:text-xs font-bold truncate">{net.label}</div>
                             <div className="text-[10px] font-mono opacity-70 mt-0.5">{net.key}</div>
                           </button>
                         );
@@ -1683,39 +1685,40 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
                     const isInternal = selectedBybitNetwork === "UID";
 
                     return (
-                      <div className="p-4 rounded-xl bg-surface-container-lowest border border-outline-variant/40 space-y-3">
-                        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-                          <div className="min-w-0 flex-1">
-                            <div className="text-[11px] text-on-surface-variant font-bold mb-1">
-                              {isInternal
-                                ? (lang === "ar" ? "معرف Bybit UID للتحويل الداخلي المجاني:" : "Bybit UID for Zero-Fee Internal Transfer:")
-                                : (lang === "ar" ? `عنوان المحفظة (${selectedBybitNetwork}):` : `Wallet Address (${selectedBybitNetwork}):`)}
-                            </div>
-                            <div className="text-sm font-mono font-bold text-primary select-all truncate dir-ltr text-right">
-                              {currentVal}
-                            </div>
-                            {isInternal && (
-                              <div className="text-xs text-on-surface-variant font-medium mt-1">
-                                {lang === "ar" ? "اسم الحساب: ARABTECH (تحويل فوري مجاني بدون رسوم غاز)" : "Account: ARABTECH (Free & Instant)"}
-                              </div>
-                            )}
-                          </div>
-
+                      <div className="p-3 sm:p-4 rounded-xl bg-surface-container-lowest border border-outline-variant/40 space-y-2.5 w-full overflow-hidden">
+                        <div className="flex items-center justify-between gap-2 flex-wrap">
+                          <span className="text-[11px] font-bold text-on-surface-variant">
+                            {isInternal
+                              ? (lang === "ar" ? "معرف Bybit UID للتحويل الداخلي المجاني:" : "Bybit UID for Zero-Fee Internal Transfer:")
+                              : (lang === "ar" ? `عنوان المحفظة (${selectedBybitNetwork}):` : `Wallet Address (${selectedBybitNetwork}):`)}
+                          </span>
                           <button
                             type="button"
                             onClick={() => handleCopy(currentVal, "bybit-copy-btn")}
-                            className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all shadow-sm shrink-0 active:scale-95 ${
+                            className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm shrink-0 active:scale-95 ${
                               copiedId === "bybit-copy-btn"
                                 ? "bg-emerald-500 text-white"
                                 : "bg-primary text-on-primary hover:bg-primary-dim"
                             }`}
                           >
-                            <span className="material-symbols-outlined text-sm">
+                            <span className="material-symbols-outlined text-xs">
                               {copiedId === "bybit-copy-btn" ? "check" : "content_copy"}
                             </span>
-                            <span>{copiedId === "bybit-copy-btn" ? (lang === "ar" ? "تم النسخ" : "Copied") : (lang === "ar" ? "نسخ" : "Copy")}</span>
+                            <span>{copiedId === "bybit-copy-btn" ? (lang === "ar" ? "تم النسخ" : "Copied") : (lang === "ar" ? "نسخ العنوان" : "Copy")}</span>
                           </button>
                         </div>
+
+                        <div className="p-2.5 sm:p-3 rounded-lg bg-surface-container/70 border border-outline-variant/30 w-full overflow-hidden">
+                          <code className="text-xs sm:text-sm font-mono font-bold text-primary select-all break-all dir-ltr text-left block w-full leading-relaxed">
+                            {currentVal}
+                          </code>
+                        </div>
+
+                        {isInternal && (
+                          <div className="text-xs text-on-surface-variant font-medium">
+                            {lang === "ar" ? "اسم الحساب: ARABTECH (تحويل فوري مجاني بدون رسوم غاز)" : "Account: ARABTECH (Free & Instant)"}
+                          </div>
+                        )}
                       </div>
                     );
                   })()}
