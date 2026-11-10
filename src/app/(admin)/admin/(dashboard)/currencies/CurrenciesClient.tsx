@@ -66,6 +66,14 @@ interface CurrencyConfig {
     email: string;
     isActive: boolean;
   };
+  bybit?: {
+    nameAr?: string;
+    nameEn?: string;
+    uid: string;
+    instructionsAr?: string;
+    instructionsEn?: string;
+    isActive: boolean;
+  };
   customMethods?: Array<{
     id: string;
     nameAr: string;
@@ -570,6 +578,52 @@ export default function CurrenciesClient() {
                   }
                   className="w-full px-3.5 py-2.5 bg-surface-container border border-outline-variant/40 rounded-xl font-mono text-xs font-bold text-on-surface text-left dir-ltr"
                 />
+              </div>
+            </div>
+
+            {/* Bybit Pay & Deposit */}
+            <div className="p-4 rounded-2xl bg-surface-container-lowest border border-outline-variant/20 space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="material-symbols-outlined text-orange-400 text-lg">currency_exchange</span>
+                  <span className="font-bold text-xs text-on-surface">باي بيت (Bybit Pay & Deposit فوري)</span>
+                </div>
+                <input
+                  type="checkbox"
+                  checked={config.bybit?.isActive ?? true}
+                  onChange={(e) =>
+                    setConfig({
+                      ...config,
+                      bybit: {
+                        ...(config.bybit || { uid: "600627456" }),
+                        isActive: e.target.checked
+                      }
+                    })
+                  }
+                  className="w-4 h-4 accent-primary"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-bold text-on-surface-variant mb-1">Bybit UID (للتحويل الداخلي):</label>
+                <input
+                  type="text"
+                  value={config.bybit?.uid || "600627456"}
+                  onChange={(e) =>
+                    setConfig({
+                      ...config,
+                      bybit: {
+                        ...(config.bybit || { isActive: true }),
+                        uid: e.target.value
+                      }
+                    })
+                  }
+                  className="w-full px-3.5 py-2.5 bg-surface-container border border-outline-variant/40 rounded-xl font-mono text-xs font-bold text-on-surface text-left dir-ltr"
+                />
+              </div>
+
+              <div className="p-2.5 rounded-lg bg-surface-container text-[11px] text-on-surface-variant leading-relaxed">
+                <span className="font-bold text-orange-400">الشبكات المدعومة تلقائياً:</span> TRC20, BSC (BEP20), TON, SOL, ERC20, Polygon, Arbitrum. يتم التحقق من الإيداعات آلياً عبر Bybit V5 API.
               </div>
             </div>
 

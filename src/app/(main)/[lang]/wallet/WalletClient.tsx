@@ -43,6 +43,7 @@ interface PaymentMethod {
   isCustom?: boolean;
   isAutomaticPayPal?: boolean;
   isAutomaticBinance?: boolean;
+  isAutomaticBybit?: boolean;
   isBankak?: boolean;
   isFawry?: boolean;
   isRewarble?: boolean;
@@ -114,6 +115,21 @@ interface CurrencyConfig {
     clientId?: string;
     isActive: boolean;
   };
+  bybit?: {
+    nameAr?: string;
+    nameEn?: string;
+    uid: string;
+    networks?: Array<{
+      chain: string;
+      chainType: string;
+      address: string;
+      nameAr: string;
+      nameEn: string;
+    }>;
+    instructionsAr?: string;
+    instructionsEn?: string;
+    isActive: boolean;
+  };
   customMethods?: Array<{
     id: string;
     nameAr: string;
@@ -169,6 +185,16 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
     amount: number;
   } | null>(null);
   const [binancePollingActive, setBinancePollingActive] = useState<boolean>(false);
+  const [isVerifyingBybit, setIsVerifyingBybit] = useState<boolean>(false);
+  const [bybitModalData, setBybitModalData] = useState<{
+    orderId: string;
+    amount: number;
+    recipientAddress: string;
+    network: string;
+    bybitUid: string;
+  } | null>(null);
+  const [selectedBybitNetwork, setSelectedBybitNetwork] = useState<string>("TRX");
+  const [bybitTxIdInput, setBybitTxIdInput] = useState<string>("");
   const [transactions, setTransactions] = useState<DBTransaction[]>([]);
 
   // Fetch Currency & Payment Settings from Backend
@@ -372,6 +398,28 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
         currencyConfig?.binance?.instructionsEn ||
         "Enter amount and click Pay with Binance to open Binance Pay gateway directly with instant automatic credit.",
       isAutomaticBinance: true
+    });
+  }
+
+  // Bybit Pay & Deposit
+  if (currencyConfig?.bybit?.isActive !== false) {
+    paymentMethods.push({
+      id: "bybit",
+      nameAr: currencyConfig?.bybit?.nameAr || "Bybit (باي بيت فوري تلقائي)",
+      nameEn: currencyConfig?.bybit?.nameEn || "Bybit (Instant Auto Pay & Deposit)",
+      badge: "BYBIT",
+      icon: "currency_exchange",
+      color: "from-amber-400 via-orange-500 to-amber-600",
+      copyValue: currencyConfig?.bybit?.uid || "600627456",
+      detailLabelAr: "الدفع والتحويل التلقائي عبر Bybit (جميع الشبكات + التحويل الداخلي):",
+      detailLabelEn: "Direct Bybit Instant Deposit (All Networks + Internal UID):",
+      instructionsAr:
+        currencyConfig?.bybit?.instructionsAr ||
+        "اختر الشبكة المناسبة أو التحويل الداخلي عبر Bybit UID، حول المبلغ المطلوب ثم الصق هاش المعاملة (TxID) للتأكيد التلقائي الفوري وشحن الرصيد مباشرة.",
+      instructionsEn:
+        currencyConfig?.bybit?.instructionsEn ||
+        "Select network or Bybit internal transfer via UID, transfer the funds and enter TxID for instant automated verification.",
+      isAutomaticBybit: true
     });
   }
 
@@ -630,6 +678,106 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
     return () => clearInterval(interval);
   }, [binancePollingActive, binanceModalData?.orderId, userSession]);
 
+  // Handle Bybit Deposit Intent & Modal Activation
+  const handleStartBybitPay = async () => {
+    setErrorMessage("");
+    setSuccessMessage("");
+    const num = parseFloat(depositAmount || "0");
+    if (isNaN(num) || num < 1.0) {
+      setErrorMessage(lang === "ar" ? "الحد الأدنى للإيداع عبر Bybit هو $1.00 USD" : "Minimum deposit is $1.00 USD");
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const token = localStorage.getItem("user_token");
+      const res = await userApiFetch("/api/wallet/bybit/create-intent", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {})
+        },
+        body: JSON.stringify({ amount: num, network: selectedBybitNetwork })
+      });
+
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data.success || !data.orderId) {
+        setErrorMessage(data.error || (lang === "ar" ? "فشل إنشاء طلب الإيداع عبر Bybit" : "Failed to create Bybit order"));
+        return;
+      }
+
+      setBybitModalData({
+        orderId: data.orderId,
+        amount: data.amount,
+        recipientAddress: data.recipientAddress,
+        network: data.network,
+        bybitUid: data.bybitUid || "600627456"
+      });
+    } catch (err: any) {
+      setErrorMessage(err?.message || (lang === "ar" ? "خطأ في الاتصال بسيرفر Bybit" : "Connection error with Bybit"));
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleBybitVerifyDeposit = async (orderIdToVerify?: string) => {
+    const targetOrderId = orderIdToVerify || bybitModalData?.orderId;
+    if (!targetOrderId) {
+      setErrorMessage(lang === "ar" ? "رقم الطلب غير متوفر" : "Order ID is missing");
+      return;
+    }
+
+    if (!bybitTxIdInput.trim()) {
+      setErrorMessage(lang === "ar" ? "يرجى إدخال هاش المعاملة (TxID / Hash) للتحقق الفوري" : "Please enter the transaction hash (TxID)");
+      return;
+    }
+
+    setIsVerifyingBybit(true);
+    setErrorMessage("");
+    setSuccessMessage("");
+
+    try {
+      const token = localStorage.getItem("user_token");
+      const res = await userApiFetch("/api/wallet/bybit/verify-deposit", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {})
+        },
+        body: JSON.stringify({
+          orderId: targetOrderId,
+          txId: bybitTxIdInput.trim()
+        })
+      });
+
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && data.success && data.paid) {
+        setBybitModalData(null);
+        setBybitTxIdInput("");
+
+        const successMsg = lang === "ar"
+          ? `تم استلام الدفعة بنجاح عبر Bybit وإضافة $${data.amount} USD إلى محفظتك! رصيدك الجديد: $${data.balance}`
+          : `Bybit deposit verified! $${data.amount} USD added. New balance: $${data.balance}`;
+        setSuccessMessage(successMsg);
+
+        if (userSession) {
+          const updated = { ...userSession, balance: data.balance };
+          localStorage.setItem("user_session", JSON.stringify(updated));
+          setUserSession(updated);
+          window.dispatchEvent(new Event("user_session_change"));
+        }
+
+        fetchRealTransactions(userSession?.id, userSession?.email);
+      } else {
+        setErrorMessage(data.error || (lang === "ar" ? "تعذر التحقق من العملية في Bybit، تأكد من الهاش والمبلغ" : "Failed to verify deposit in Bybit"));
+      }
+    } catch {
+      setErrorMessage(lang === "ar" ? "خطأ في الاتصال أثناء التحقق من Bybit" : "Connection error verifying Bybit deposit");
+    } finally {
+      setIsVerifyingBybit(false);
+    }
+  };
+
   const fetchRealTransactions = async (userId?: string, email?: string) => {
     setIsFetchingTx(true);
     try {
@@ -744,7 +892,7 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
       return;
     }
 
-    if (activeMethod.isAutomaticPayPal || activeMethod.isAutomaticBinance) {
+    if (activeMethod.isAutomaticPayPal || activeMethod.isAutomaticBinance || activeMethod.isAutomaticBybit) {
       return;
     }
 
@@ -945,6 +1093,124 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
                 onClick={() => {
                   setBinanceModalData(null);
                   setBinancePollingActive(false);
+                }}
+                className="text-xs text-on-surface-variant hover:text-white font-semibold underline underline-offset-4"
+              >
+                {lang === "ar" ? "إغلاق النافذة (يمكنك التحقق لاحقاً)" : "Close (You can verify later)"}
+              </button>
+            </div>
+          </div>
+        )}
+
+                {/* BYBIT PAY & DEPOSIT MODAL */}
+        {bybitModalData && (
+          <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-xl flex items-center justify-center p-4 animate-in fade-in duration-200">
+            <div className="bg-surface-container-lowest border-2 border-orange-500/50 rounded-3xl p-6 sm:p-8 max-w-lg w-full shadow-2xl space-y-5 text-center relative overflow-hidden max-h-[90vh] overflow-y-auto">
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-400 via-orange-500 to-amber-600 text-slate-950 flex items-center justify-center text-3xl mx-auto shadow-lg shadow-orange-500/30">
+                <span className="material-symbols-outlined">account_balance_wallet</span>
+              </div>
+
+              <div className="space-y-1">
+                <h3 className="text-xl font-black text-white">
+                  {lang === "ar" ? "بوابة الإيداع الفوري - باي بيت (Bybit)" : "Bybit Instant Deposit"}
+                </h3>
+                <p className="text-xs text-on-surface-variant font-mono">
+                  {lang === "ar" ? "رقم الطلب:" : "Order Ref:"} {bybitModalData.orderId}
+                </p>
+                <div className="inline-block px-4 py-1.5 rounded-full bg-orange-500/20 text-orange-300 font-mono font-bold text-sm border border-orange-500/40">
+                  {lang === "ar" ? "المبلغ المطلوب:" : "Required:"} ${bybitModalData.amount.toFixed(2)} USDT
+                </div>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-surface-container border border-outline-variant/30 space-y-3">
+                <div className="text-xs font-bold text-slate-300">
+                  {selectedBybitNetwork === "UID"
+                    ? (lang === "ar" ? "Bybit UID للتحويل الداخلي المجاني:" : "Bybit UID for Zero-Fee Transfer:")
+                    : (lang === "ar" ? `عنوان المحفظة (${selectedBybitNetwork}):` : `Deposit Address (${selectedBybitNetwork}):`)}
+                </div>
+
+                {selectedBybitNetwork !== "UID" && (
+                  <div className="flex justify-center py-2">
+                    <img
+                      src={`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(bybitModalData.recipientAddress)}`}
+                      alt="Deposit QR Code"
+                      className="w-40 h-40 rounded-xl border-2 border-orange-400/50 shadow-md bg-white p-2"
+                    />
+                  </div>
+                )}
+
+                <div className="p-3 rounded-xl bg-surface-container-lowest border border-orange-400/30 flex items-center justify-between gap-2">
+                  <span className="text-xs font-mono font-bold text-orange-400 select-all truncate">
+                    {selectedBybitNetwork === "UID" ? bybitModalData.bybitUid : bybitModalData.recipientAddress}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => handleCopy(selectedBybitNetwork === "UID" ? bybitModalData.bybitUid : bybitModalData.recipientAddress, "modal-bybit-copy")}
+                    className="px-2.5 py-1 rounded-lg bg-orange-500 text-slate-950 font-bold text-xs shrink-0 flex items-center gap-1 active:scale-95"
+                  >
+                    <span className="material-symbols-outlined text-xs">
+                      {copiedId === "modal-bybit-copy" ? "check" : "content_copy"}
+                    </span>
+                    <span>{copiedId === "modal-bybit-copy" ? (lang === "ar" ? "تم" : "Copied") : (lang === "ar" ? "نسخ" : "Copy")}</span>
+                  </button>
+                </div>
+              </div>
+
+              <ol className="text-xs text-on-surface-variant text-start space-y-1.5 list-decimal list-inside bg-surface-container-high/40 p-3.5 rounded-xl border border-outline-variant/20">
+                <li>
+                  {lang === "ar"
+                    ? `أرسل بالضبط ${bybitModalData.amount.toFixed(2)} USDT إلى العنوان أو المعرف أعلاه.`
+                    : `Send exactly ${bybitModalData.amount.toFixed(2)} USDT to the address or UID above.`}
+                </li>
+                <li>
+                  {lang === "ar"
+                    ? "انسخ رقم المعاملة (TxID / Hash) بعد التحويل، ثم الصقه بالأسفل واضغط تحقق."
+                    : "Copy TxID / Hash after sending, paste it below and click verify."}
+                </li>
+                <li>
+                  {lang === "ar"
+                    ? "يقوم السيرفر بالتحقق من Bybit آلياً وإضافة الرصيد إلى محفظتك فوراً."
+                    : "Server verifies via Bybit automatically and credits your wallet balance instantly."}
+                </li>
+              </ol>
+
+              <div className="space-y-2 text-start">
+                <label className="text-xs font-bold text-on-surface block">
+                  {lang === "ar" ? "هاش المعاملة (TxID / Hash) من Bybit:" : "Transaction Hash (TxID / Hash):"}
+                </label>
+                <input
+                  type="text"
+                  value={bybitTxIdInput}
+                  onChange={(e) => setBybitTxIdInput(e.target.value)}
+                  placeholder={lang === "ar" ? "الصق هاش المعاملة هنا (TxID)..." : "Paste TxID / Hash here..."}
+                  className="w-full px-3.5 py-2.5 bg-surface-container border border-orange-400/50 rounded-xl font-mono text-xs font-bold text-on-surface outline-none focus:border-orange-400"
+                />
+              </div>
+
+              <button
+                type="button"
+                onClick={() => handleBybitVerifyDeposit(bybitModalData.orderId)}
+                disabled={isVerifyingBybit || !bybitTxIdInput.trim()}
+                className="w-full bg-gradient-to-r from-amber-400 via-orange-500 to-amber-600 text-slate-950 py-3.5 px-4 rounded-xl font-black text-sm hover:shadow-xl hover:shadow-orange-500/30 transition-all flex items-center justify-center gap-2 shadow-md disabled:opacity-50 active:scale-95"
+              >
+                {isVerifyingBybit ? (
+                  <>
+                    <span className="w-4 h-4 border-2 border-slate-950 border-t-transparent rounded-full animate-spin"></span>
+                    <span>{lang === "ar" ? "جاري التحقق من Bybit..." : "Verifying with Bybit..."}</span>
+                  </>
+                ) : (
+                  <>
+                    <span className="material-symbols-outlined text-lg">check_circle</span>
+                    <span>{lang === "ar" ? "تأكيد واستلام الرصيد فوراً" : "Verify and Receive Balance"}</span>
+                  </>
+                )}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setBybitModalData(null);
+                  setBybitTxIdInput("");
                 }}
                 className="text-xs text-on-surface-variant hover:text-white font-semibold underline underline-offset-4"
               >
@@ -1214,6 +1480,8 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
                               ? `سعر الصرف: 1$ = ${sdgRate} SDG`
                               : m.isAutomaticPayPal
                               ? (lang === "ar" ? "شحن تلقائي داخل الموقع" : "In-Page Direct Top-up")
+                              : m.isAutomaticBybit
+                              ? (lang === "ar" ? "شحن آلي فوري (Bybit)" : "Instant Auto Deposit (Bybit)")
                               : m.isAutomaticBinance
                               ? (lang === "ar" ? "دفع وخصم وتأكيد فوري" : "Instant Pay & Auto Credit")
                               : isSelected
@@ -1342,8 +1610,116 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
                 </div>
               )}
 
+              {/* BYBIT PAY & DEPOSIT INSTANT PAYMENT CARD */}
+              {activeMethod.isAutomaticBybit && (
+                <div className="p-5 rounded-2xl bg-gradient-to-br from-amber-500/15 via-surface-container-high to-orange-500/10 border-2 border-orange-500/50 shadow-xl space-y-4 animate-in fade-in slide-in-from-top-2">
+                  <div className="flex items-center justify-between flex-wrap gap-2">
+                    <div className="flex items-center gap-2 font-black text-sm text-orange-400">
+                      <span className="w-2.5 h-2.5 rounded-full bg-orange-400 animate-ping"></span>
+                      <span className="text-xl">BYBIT</span>
+                      <span>{lang === "ar" ? "بوابة شحن Bybit الفورية (تأكيد آلي مباشر)" : "Bybit Instant Deposit Gateway"}</span>
+                    </div>
+
+                    <span className="text-xs font-mono font-bold text-orange-300 bg-orange-500/20 px-2.5 py-1 rounded-lg border border-orange-500/30">
+                      1 USD = 1.00 USDT
+                    </span>
+                  </div>
+
+                  {/* Network Selector Tabs */}
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold text-on-surface block">
+                      {lang === "ar" ? "اختر شبكة التحويل أو التحويل الداخلي:" : "Select Network or Bybit Internal UID:"}
+                    </label>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                      {[
+                        { key: "TRX", name: "TRON (TRC20)", label: "TRC20 (ترون)" },
+                        { key: "BSC", name: "BSC (BEP20)", label: "BEP20 (بينانس)" },
+                        { key: "UID", name: "Bybit UID", label: "UID تحويل داخلي" },
+                        { key: "TON", name: "TON", label: "TON (تون)" },
+                        { key: "SOL", name: "SOL", label: "SOL (سولانا)" },
+                        { key: "ETH", name: "Ethereum (ERC20)", label: "ERC20 (إيثيريوم)" },
+                        { key: "MATIC", name: "Polygon PoS", label: "Polygon (بوليجون)" },
+                        { key: "ARBI", name: "Arbitrum One", label: "Arbitrum" }
+                      ].map((net) => {
+                        const isNetSelected = selectedBybitNetwork === net.key;
+                        return (
+                          <button
+                            key={net.key}
+                            type="button"
+                            onClick={() => setSelectedBybitNetwork(net.key)}
+                            className={`p-2 rounded-xl text-xs font-bold transition-all border text-center ${
+                              isNetSelected
+                                ? "bg-orange-500 text-slate-950 border-orange-400 font-extrabold shadow-md"
+                                : "bg-surface-container border-outline-variant/30 text-on-surface hover:border-orange-400/50"
+                            }`}
+                          >
+                            <div>{net.label}</div>
+                            <div className="text-[10px] font-mono opacity-80">{net.key}</div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Current Active Deposit Address / UID Display */}
+                  {(() => {
+                    const bybitNetworksMap: Record<string, string> = {
+                      TRX: "TFT4t2shanZFQn5aT5Kvas7bsf3Xap9toe",
+                      BSC: "0xafd534f94c99aa0ae7de9b1967bd0f4e038644c5",
+                      UID: currencyConfig?.bybit?.uid || "600627456",
+                      TON: "UQB6wXz3mUc2I6b_hdPQTiyEyt3xkXl0_km4_mxgz36OyC0E",
+                      SOL: "Gu7hKmCXNKr8An1ZaaNRpseLkdguHnpBht4jZtGgJpqY",
+                      ETH: "0xafd534f94c99aa0ae7de9b1967bd0f4e038644c5",
+                      MATIC: "0xafd534f94c99aa0ae7de9b1967bd0f4e038644c5",
+                      ARBI: "0xafd534f94c99aa0ae7de9b1967bd0f4e038644c5"
+                    };
+                    const currentVal = bybitNetworksMap[selectedBybitNetwork] || bybitNetworksMap.TRX;
+                    const isInternal = selectedBybitNetwork === "UID";
+
+                    return (
+                      <div className="p-3.5 rounded-xl bg-surface-container-lowest border border-orange-400/40 space-y-3">
+                        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                          <div className="min-w-0">
+                            <div className="text-[11px] text-on-surface-variant font-bold">
+                              {isInternal
+                                ? (lang === "ar" ? "معرف Bybit UID للتحويل الداخلي المجاني:" : "Bybit UID for Zero-Fee Internal Transfer:")
+                                : (lang === "ar" ? `عنوان المحفظة (${selectedBybitNetwork}):` : `Wallet Address (${selectedBybitNetwork}):`)}
+                            </div>
+                            <div className="text-sm font-mono font-bold text-orange-400 select-all truncate">
+                              {currentVal}
+                            </div>
+                            {isInternal && (
+                              <div className="text-xs text-on-surface-variant font-medium mt-0.5">
+                                {lang === "ar" ? "اسم الحساب: ARABTECH (تحويل فوري مجاني)" : "Account: ARABTECH (Free & Instant)"}
+                              </div>
+                            )}
+                          </div>
+
+                          <button
+                            type="button"
+                            onClick={() => handleCopy(currentVal, "bybit-copy-btn")}
+                            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all shadow-md shrink-0 active:scale-95 ${
+                              copiedId === "bybit-copy-btn" ? "bg-emerald-500 text-white" : "bg-orange-500 hover:bg-orange-400 text-slate-950"
+                            }`}
+                          >
+                            <span className="material-symbols-outlined text-sm">
+                              {copiedId === "bybit-copy-btn" ? "check" : "content_copy"}
+                            </span>
+                            <span>{copiedId === "bybit-copy-btn" ? (lang === "ar" ? "تم النسخ" : "Copied") : (lang === "ar" ? "نسخ" : "Copy")}</span>
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })()}
+
+                  <p className="text-xs text-on-surface-variant leading-relaxed font-medium">
+                    {cleanHtmlToText(lang === "ar" ? activeMethod.instructionsAr : activeMethod.instructionsEn)}
+                  </p>
+                </div>
+              )}
+
               {/* OTHER MANUAL PAYMENT DETAILS CARD */}
-              {!activeMethod.isAutomaticPayPal && !activeMethod.isAutomaticBinance && !activeMethod.isBankak && !activeMethod.isFawry && (
+              {!activeMethod.isAutomaticPayPal && !activeMethod.isAutomaticBinance && !activeMethod.isAutomaticBybit && !activeMethod.isBankak && !activeMethod.isFawry && (
                 <div className="p-5 rounded-2xl bg-gradient-to-r from-primary/15 via-surface-container-high to-primary/15 border-2 border-primary/50 shadow-xl space-y-4 animate-in fade-in slide-in-from-top-2">
                   <div className="flex items-center justify-between flex-wrap gap-2">
                     <div className="flex items-center gap-2 font-extrabold text-sm text-primary">
@@ -1494,7 +1870,7 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
                     </div>
                   </div>
 
-                  {!activeMethod.isAutomaticPayPal && !activeMethod.isAutomaticBinance && (
+                  {!activeMethod.isAutomaticPayPal && !activeMethod.isAutomaticBinance && !activeMethod.isAutomaticBybit && (
                     <div className="space-y-2">
                       <label className="text-xs font-extrabold text-on-surface uppercase tracking-wider block">
                         {lang === "ar" ? "رقم التحويل / رقم المحفظة المحول منها" : "Transaction Ref / Sender Number"}
@@ -1509,7 +1885,7 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
                     </div>
                   )}
 
-                  {activeMethod.isAutomaticBinance && (
+                  {(activeMethod.isAutomaticBinance || activeMethod.isAutomaticBybit) && (
                     <div className="space-y-2">
                       <label className="text-xs font-extrabold text-on-surface uppercase tracking-wider block">
                         {lang === "ar" ? "اختيار سريع للمبلغ ($ USD):" : "Quick Amount ($ USD):"}
@@ -1559,7 +1935,7 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
               )}
 
               {/* RECEIPT FILE UPLOAD FIELD - MANDATORY */}
-              {!activeMethod.isAutomaticPayPal && !activeMethod.isAutomaticBinance && (
+              {!activeMethod.isAutomaticPayPal && !activeMethod.isAutomaticBinance && !activeMethod.isAutomaticBybit && (
                 <div className="space-y-2 pt-2 border-t border-outline-variant/20">
                   <div className="flex items-center justify-between">
                     <label className="text-xs font-extrabold text-on-surface uppercase tracking-wider flex items-center gap-1.5">
@@ -1753,6 +2129,43 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
                           {lang === "ar"
                             ? `فتح بوابة Binance Pay والدفع الآن ($${parseFloat(depositAmount || "0").toFixed(2)} USD)`
                             : `Pay with Binance Pay ($${parseFloat(depositAmount || "0").toFixed(2)} USD)`}
+                        </span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              ) : activeMethod.isAutomaticBybit ? (
+                <div className="space-y-3 pt-2">
+                  <div className="p-4 rounded-2xl bg-orange-500/15 border-2 border-orange-400/50 shadow-lg text-orange-200 space-y-1">
+                    <div className="flex items-center gap-2 text-orange-300 font-extrabold text-sm">
+                      <span className="material-symbols-outlined text-xl text-orange-400 shrink-0">bolt</span>
+                      <span>{lang === "ar" ? "شحن المحفظة التلقائي الفوري عبر Bybit" : "In-Page Instant Bybit Top-up"}</span>
+                    </div>
+                    <p className="text-xs text-slate-200 font-medium leading-relaxed">
+                      {lang === "ar"
+                        ? `المبلغ المطلوب إيداعه: ${parseFloat(depositAmount || "10.00").toFixed(2)} USD (يعادل ${parseFloat(depositAmount || "10.00").toFixed(2)} USDT). اضغط بالأسفل لعرض تفاصيل التحويل والـ QR وإتمام التحقق الفوري.`
+                        : `Top-up Amount: ${parseFloat(depositAmount || "10.00").toFixed(2)} USD. Click below to view address, QR code, and verify.`}
+                    </p>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={handleStartBybitPay}
+                    disabled={isLoading || isVerifyingBybit || !depositAmount || parseFloat(depositAmount) < 1.0}
+                    className="w-full bg-gradient-to-r from-amber-400 via-orange-500 to-amber-600 text-slate-950 py-4 rounded-2xl font-black text-sm hover:shadow-xl hover:shadow-orange-500/30 transition-all flex items-center justify-center gap-2 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
+                  >
+                    {isLoading ? (
+                      <>
+                        <span className="material-symbols-outlined animate-spin text-lg">refresh</span>
+                        <span>{lang === "ar" ? "جاري تجهيز بوابة Bybit..." : "Preparing Bybit Gateway..."}</span>
+                      </>
+                    ) : (
+                      <>
+                        <span className="material-symbols-outlined text-xl">account_balance_wallet</span>
+                        <span>
+                          {lang === "ar"
+                            ? `متابعة الإيداع عبر Bybit (${parseFloat(depositAmount || "0").toFixed(2)} USD)`
+                            : `Proceed with Bybit (${parseFloat(depositAmount || "0").toFixed(2)} USD)`}
                         </span>
                       </>
                     )}

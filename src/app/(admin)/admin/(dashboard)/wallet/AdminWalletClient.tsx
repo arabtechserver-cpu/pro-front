@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect, useRef, useCallback, useDeferredValue } from "react";
 import { buildAdminTransactionsUrl, mergeTransactionPages } from "../../../../../lib/admin-wallet-pagination";
