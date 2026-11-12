@@ -8,6 +8,7 @@ import Script from "next/script";
 import { Locale } from "@/i18n/config";
 import TermsModal from "@/components/TermsModal";
 import CloudflareTurnstile, { resetTurnstile } from "@/components/CloudflareTurnstile";
+import { saveClientUserSession } from "@/lib/user-api-fetch";
 
 const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || "";
 
@@ -289,13 +290,7 @@ export default function RegisterClient({ lang, dict }: { lang: Locale; dict: any
       const data = await res.json();
 
       if (res.ok && data.success) {
-        if (data.token) {
-          localStorage.setItem("user_token", data.token);
-        }
-        if (data.user) {
-          localStorage.setItem("user_session", JSON.stringify(data.user));
-          window.dispatchEvent(new Event("user_session_change"));
-        }
+        saveClientUserSession(data.token, data.user);
         setSuccessMessage(lang === "ar" ? "تم تسجيل الدخول بحساب Google بنجاح! جاري التوجيه..." : "Google login successful! Redirecting...");
         setTimeout(() => {
           window.location.href = `/${lang}`;
@@ -450,13 +445,7 @@ export default function RegisterClient({ lang, dict }: { lang: Locale; dict: any
       const data = await res.json().catch(() => ({}));
 
       if (res.ok && data.success) {
-        if (data.token) {
-          localStorage.setItem("user_token", data.token);
-        }
-        if (data.user) {
-          localStorage.setItem("user_session", JSON.stringify(data.user));
-          window.dispatchEvent(new Event("user_session_change"));
-        }
+        saveClientUserSession(data.token, data.user);
         setSuccessMessage(lang === "ar" ? "تم إنشاء الحساب وتسجيل الدخول بنجاح! جاري التوجيه..." : "Account created & logged in successfully!");
         setTimeout(() => {
           window.location.href = `/${lang}`;

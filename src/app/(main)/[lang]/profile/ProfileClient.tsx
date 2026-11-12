@@ -1,6 +1,6 @@
 "use client";
 
-import { userApiFetch } from "@/lib/user-api-fetch";
+import { userApiFetch, saveClientUserSession } from "@/lib/user-api-fetch";
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
@@ -318,7 +318,10 @@ export default function ProfileClient({ lang, dict }: { lang: string; dict: any 
 
       const data = await res.json();
       if (res.ok && data.success) {
-        if (data.token) localStorage.setItem('user_token', data.token);
+        const updatedUser = data.user ? { ...userSession, ...data.user } : undefined;
+        if (data.token || updatedUser) {
+          saveClientUserSession(data.token, updatedUser);
+        }
         setSettingsSuccess(isAr ? "تم تحديث بيانات حسابك بنجاح!" : "Your account details were updated successfully!");
         setFormData(prev => ({
           ...prev,
@@ -327,12 +330,9 @@ export default function ProfileClient({ lang, dict }: { lang: string; dict: any 
           confirmPassword: ""
         }));
 
-        if (data.user) {
-          const updated = { ...userSession, ...data.user };
-          setUserSession(updated);
-          localStorage.setItem("user_session", JSON.stringify(updated));
+        if (updatedUser) {
+          setUserSession(updatedUser);
           setProfile(prev => prev ? { ...prev, ...data.user } : null);
-          window.dispatchEvent(new Event("user_session_change"));
         }
       } else {
         setSettingsError(data.error || (isAr ? "فشل تحديث البيانات، تأكد من صحة كلمة المرور" : "Failed to update profile"));

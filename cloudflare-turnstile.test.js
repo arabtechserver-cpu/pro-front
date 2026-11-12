@@ -210,6 +210,7 @@ for (const file of [
         './actions': { loginAdmin() { throw new Error('Unexpected action fallback'); } },
         '@/lib/server-action-utils': { isServerActionMismatchError: () => false },
         '@/lib/secure-password': { securePassword: () => 'secure-password' },
+        '@/lib/user-api-fetch': { saveClientUserSession() {} },
         '@/components/TermsModal': { __esModule: true, default: 'terms' },
         '@/components/CloudflareTurnstile': { __esModule: true, default: 'turnstile', resetTurnstile() {} },
         '@/utils/deviceUtils': {

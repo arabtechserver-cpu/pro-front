@@ -6,6 +6,7 @@ import BrandLogo from "@/components/BrandLogo";
 import Script from "next/script";
 import { Locale } from "@/i18n/config";
 import CloudflareTurnstile, { resetTurnstile } from "@/components/CloudflareTurnstile";
+import { saveClientUserSession } from "@/lib/user-api-fetch";
 
 const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || "";
 
@@ -19,7 +20,16 @@ export default function LoginClient({ lang, dict }: { lang: Locale; dict: any })
   const [turnstileToken, setTurnstileToken] = useState("");
 
   useEffect(() => {
-    if (new URLSearchParams(window.location.search).get("reason") === "session-expired") {
+    const reason = new URLSearchParams(window.location.search).get("reason");
+    if (reason === "idle-timeout") {
+      setErrorMessage(
+        lang === "ar"
+          ? "تم تسجيل خروجك تلقائياً لعدم فتح أو استخدام الموقع لمدة 30 دقيقة. سجّل دخولك مرة أخرى للمتابعة."
+          : "You were automatically signed out after 30 minutes of inactivity. Sign in again to continue."
+      );
+      return;
+    }
+    if (reason === "session-expired") {
       setErrorMessage(lang === "ar" ? "انتهت جلسة الدخول. سجّل دخولك مرة أخرى لاستكمال استخدام حسابك." : "Your session expired. Sign in again to continue.");
     }
   }, [lang]);
@@ -51,13 +61,7 @@ export default function LoginClient({ lang, dict }: { lang: Locale; dict: any })
       const data = await res.json();
 
       if (res.ok && data.success) {
-        if (data.token) {
-          localStorage.setItem("user_token", data.token);
-        }
-        if (data.user) {
-          localStorage.setItem("user_session", JSON.stringify(data.user));
-          window.dispatchEvent(new Event("user_session_change"));
-        }
+        saveClientUserSession(data.token, data.user);
         setSuccessMessage(lang === "ar" ? "تم تسجيل الدخول بحساب Google بنجاح! جاري التوجيه..." : "Google login successful! Redirecting...");
         setTimeout(() => {
           window.location.href = `/${lang}`;
@@ -138,13 +142,7 @@ export default function LoginClient({ lang, dict }: { lang: Locale; dict: any })
       const data = await res.json().catch(() => ({}));
 
       if (res.ok && data.success) {
-        if (data.token) {
-          localStorage.setItem("user_token", data.token);
-        }
-        if (data.user) {
-          localStorage.setItem("user_session", JSON.stringify(data.user));
-          window.dispatchEvent(new Event("user_session_change"));
-        }
+        saveClientUserSession(data.token, data.user);
         setSuccessMessage(lang === "ar" ? "تم تسجيل الدخول بنجاح! جاري التوجيه..." : "Login successful! Redirecting...");
         setTimeout(() => {
           window.location.href = `/${lang}`;

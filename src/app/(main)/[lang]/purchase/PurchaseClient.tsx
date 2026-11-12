@@ -309,9 +309,13 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
     fetchServices();
   }, []);
 
-  // Fetch only the selected service's heavy fields instead of loading them for every service.
+  // Fetch only the selected service's heavy fields once service discovery confirms it exists.
   useEffect(() => {
-    if (!selectedServiceId || loadedServiceDetails[selectedServiceId]) return;
+    if (loadingServices || !selectedServiceId || loadedServiceDetails[selectedServiceId]) return;
+    const serviceExists = categoriesList.some((group) =>
+      Array.isArray(group.services) && group.services.some((service: any) => service.id === selectedServiceId)
+    );
+    if (!serviceExists) return;
 
     let active = true;
     fetch(`/api/dhru/services/${encodeURIComponent(selectedServiceId)}`)
@@ -334,7 +338,7 @@ function PurchaseClientContent({ lang, dict }: { lang: string, dict: any }) {
     return () => {
       active = false;
     };
-  }, [loadedServiceDetails, selectedServiceId]);
+  }, [categoriesList, loadedServiceDetails, loadingServices, selectedServiceId]);
 
   // 3. Auto Sync Category & Service Selection from Query Param (serviceId)
   useEffect(() => {

@@ -26,21 +26,105 @@ export async function readBoundedBody(request: Request, maxBytes = 15 * 1024 * 1
   } finally { signal?.removeEventListener('abort', abort); reader.releaseLock(); }
 }
 
+export interface ForwardBodyOptions {
+  signal?: AbortSignal;
+  idleTimeoutMs?: number;
+}
+
+function isStreamAbortOrTimeoutError(error: unknown): boolean {
+  if (!error || typeof error !== 'object') return false;
+  const err = error as { name?: string; code?: string; message?: string; cause?: unknown };
+  const name = err.name || '';
+  const msg = (err.message || '').toLowerCase();
+  if (name === 'AbortError' || name === 'TimeoutError' || err.code === 'ABORT_ERR' || err.code === 'UND_ERR_ABORTED') {
+    return true;
+  }
+  if (msg.includes('aborted') || msg.includes('terminated') || msg.includes('premature close')) {
+    return true;
+  }
+  return err.cause ? isStreamAbortOrTimeoutError(err.cause) : false;
+}
+
 // Preserve backpressure and release the admission slot only when the body ends.
-export function forwardBody(body: ReadableStream<Uint8Array> | null, done: () => void): ReadableStream<Uint8Array> | null {
+export function forwardBody(
+  body: ReadableStream<Uint8Array> | null,
+  done: () => void,
+  options?: ForwardBodyOptions
+): ReadableStream<Uint8Array> | null {
   if (!body) { done(); return null; }
+  if (options?.signal?.aborted) {
+    void body.cancel().catch(() => {});
+    done();
+    return null;
+  }
   const reader = body.getReader();
   let closed = false;
-  const finish = () => { if (!closed) { closed = true; reader.releaseLock(); done(); } };
+  let idleTimer: ReturnType<typeof setTimeout> | null = null;
+  let abortedOrTimedOut = false;
+
+  const clearIdleTimer = () => {
+    if (idleTimer) {
+      clearTimeout(idleTimer);
+      idleTimer = null;
+    }
+  };
+
+  const onAbort = () => {
+    abortedOrTimedOut = true;
+    clearIdleTimer();
+    void reader.cancel().catch(() => {});
+  };
+
+  const finish = () => {
+    clearIdleTimer();
+    options?.signal?.removeEventListener('abort', onAbort);
+    if (!closed) {
+      closed = true;
+      try { reader.releaseLock(); } catch {}
+      done();
+    }
+  };
+
+  options?.signal?.addEventListener('abort', onAbort, { once: true });
+
   return new ReadableStream<Uint8Array>({
     async pull(controller) {
       try {
+        if (options?.signal?.aborted) {
+          abortedOrTimedOut = true;
+          try { controller.close(); } catch {}
+          finish();
+          return;
+        }
+        if (options?.idleTimeoutMs && options.idleTimeoutMs > 0) {
+          idleTimer = setTimeout(() => {
+            abortedOrTimedOut = true;
+            void reader.cancel().catch(() => {});
+          }, options.idleTimeoutMs);
+        }
         const item = await reader.read();
-        if (item.done) { controller.close(); finish(); }
-        else controller.enqueue(item.value);
-      } catch (error) { controller.error(error); finish(); }
+        clearIdleTimer();
+        if (item.done) {
+          try { controller.close(); } catch {}
+          finish();
+        } else {
+          controller.enqueue(item.value);
+        }
+      } catch (error) {
+        clearIdleTimer();
+        if (abortedOrTimedOut || options?.signal?.aborted || isStreamAbortOrTimeoutError(error)) {
+          try { controller.close(); } catch {}
+          finish();
+        } else {
+          controller.error(error);
+          finish();
+        }
+      }
     },
-    async cancel(reason) { try { await reader.cancel(reason); } finally { finish(); } }
+    async cancel(reason) {
+      clearIdleTimer();
+      try { await reader.cancel(reason); } finally { finish(); }
+    }
   });
 }
 

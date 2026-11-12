@@ -7,6 +7,7 @@ import { useEffect, useRef, useState, type FormEvent } from "react";
 import { ArrowLeft, ArrowRight, ChevronDown, FileText, Globe, LogOut, Menu, Moon, Search, Sun, Wallet, X } from "lucide-react";
 import { useTheme } from "@/context/ThemeContext";
 import { morePages, primaryPages, sitePages, type SitePage } from "@/lib/site-pages";
+import { performClientUserLogout } from "@/lib/user-api-fetch";
 import styles from "./StorefrontHome.module.css";
 
 export function SiteBrand({ lang }: { lang: string }) {
@@ -48,7 +49,7 @@ export default function SiteHeader({ lang }: { lang: "ar" | "en" }) {
     return <Link key={key} href={href} aria-current={active ? "page" : undefined} className={active ? styles.activePage : undefined} onClick={() => setMenuOpen(false)}>{page[lang]}<NavigationPending ar={ar} /></Link>;
   };
   const search = (event: FormEvent<HTMLFormElement>) => { if (!query.trim()) { event.preventDefault(); headerRef.current?.querySelector<HTMLInputElement>("input[type=search]")?.focus(); } };
-  const logout = () => { localStorage.removeItem("user_session"); localStorage.removeItem("user_token"); setUser(null); window.dispatchEvent(new Event("user_session_change")); };
+  const logout = () => { setUser(null); performClientUserLogout({ reason: "manual", redirect: false }); };
   const Arrow = ar ? ArrowLeft : ArrowRight;
 
   return <>

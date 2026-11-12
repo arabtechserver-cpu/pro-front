@@ -122,12 +122,16 @@ async function proxyRequest(
 }
 
 
+function getProxyHeaderTimeoutMs(path: string): number {
+  return /^(orders\/(dispatch-provider|auto-dispatch)|providers|api-providers|foxreload\/(sync|products|categories)|backup)(\/|$)/.test(path)
+    ? 65000
+    : 29000;
+}
+
 async function handler(
   request: NextRequest,
   { params }: { params: Promise<{ path: string[] }> }
 ) {
-  // One budget covers backend discovery and reading the complete response body.
-  const signal = AbortSignal.timeout(29000);
   const resolvedParams = await params;
   let path = resolvedParams.path.join('/');
   const search = request.nextUrl.search;
@@ -142,6 +146,30 @@ async function handler(
   if (path.startsWith('_next')) {
     return NextResponse.json({ ok: false }, { status: 404 });
   }
+
+  const headerTimeoutMs = getProxyHeaderTimeoutMs(path);
+  // Timeout only covers queue admission, body upload, and waiting for response headers.
+  // Keeping an active fetch AbortSignal during body streaming causes Next.js "failed to pipe response".
+  const headerController = new AbortController();
+  let headerTimedOut = false;
+  const headerTimer = setTimeout(() => {
+    headerTimedOut = true;
+    headerController.abort(new DOMException('The operation was aborted due to timeout', 'TimeoutError'));
+  }, headerTimeoutMs);
+  const onClientAbort = () => {
+    clearTimeout(headerTimer);
+    headerController.abort(request.signal?.reason);
+  };
+  if (request.signal?.aborted) {
+    onClientAbort();
+  } else {
+    request.signal?.addEventListener('abort', onClientAbort, { once: true });
+  }
+  const cleanupHeaderSignal = () => {
+    clearTimeout(headerTimer);
+    request.signal?.removeEventListener('abort', onClientAbort);
+  };
+  const signal = headerController.signal;
 
   const candidates = getBackendCandidates(cachedBackendUrl, process.env.INTERNAL_API_URL, process.platform === 'win32');
   if (cachedBackendUrl && candidates[0] !== cachedBackendUrl) {
@@ -180,11 +208,19 @@ async function handler(
 
   let release: () => void;
   try { release = await admitProxyRequest(heavy, signal); }
-  catch { return NextResponse.json({ error: 'Request queue timed out or is full. Please retry shortly.' }, { status: signal.aborted ? 504 : 503, headers: { 'Retry-After': '2' } }); }
+  catch {
+    cleanupHeaderSignal();
+    const status = request.signal?.aborted ? 499 : (headerTimedOut || signal.aborted ? 504 : 503);
+    return NextResponse.json({ error: 'Request queue timed out or is full. Please retry shortly.' }, { status, headers: { 'Retry-After': '2' } });
+  }
   let body: ReadableStream<Uint8Array> | undefined;
   const imageBody = /^(upload|transactions)(\/|$)/.test(path);
   try { body = isIdempotent ? undefined : streamRequestBody(request, (imageBody ? 15 : 5) * 1024 * 1024, signal); }
-  catch { release(); return NextResponse.json({ error: signal.aborted ? 'Request body timed out' : 'Request body exceeds the allowed size' }, { status: signal.aborted ? 408 : 413 }); }
+  catch {
+    cleanupHeaderSignal();
+    release();
+    return NextResponse.json({ error: signal.aborted ? 'Request body timed out' : 'Request body exceeds the allowed size' }, { status: signal.aborted ? 408 : 413 });
+  }
 
   let lastError: unknown;
   let cachedConnectionFailed = false;
@@ -193,6 +229,7 @@ async function handler(
     const targetUrl = `${baseUrl}/api/${path}${search}`;
     try {
       const res = await proxyRequest(request, targetUrl, body, signal);
+      cleanupHeaderSignal();
 
       const responseHeaders = new Headers();
       res.headers.forEach((val, key) => {
@@ -207,19 +244,21 @@ async function handler(
         console.log(`[API Proxy] Backend found at: ${baseUrl} - caching for future requests`);
       }
 
-
       if (res.status >= 400) {
         console.warn(`[API Proxy] ${request.method} /api/${path} returned status ${res.status}`);
       }
 
-      return new NextResponse(forwardBody(res.body, release), {
-        status: res.status,
-        headers: responseHeaders,
-      });
+      return new NextResponse(
+        forwardBody(res.body, release, { signal: request.signal, idleTimeoutMs: headerTimeoutMs }),
+        {
+          status: res.status,
+          headers: responseHeaders,
+        }
+      );
     } catch (err: unknown) {
       lastError = err;
       if (baseUrl === cachedBackendUrl && isBackendConnectionFailure(err)) cachedConnectionFailed = true;
-      if (signal.aborted) break;
+      if (headerTimedOut || signal.aborted) break;
       if (!isBackendConnectionFailure(err)) {
         const msg = err instanceof Error ? err.message : String(err);
         console.warn(`[API Proxy] ${baseUrl} failed: ${msg}`);
@@ -227,13 +266,23 @@ async function handler(
     }
   }
 
+  cleanupHeaderSignal();
+
   // Forget a cached address only after a connection or DNS failure.
   if (cachedBackendUrl && cachedConnectionFailed) {
     console.warn(`[API Proxy] Cached backend ${cachedBackendUrl} is down - resetting cache`);
     cachedBackendUrl = null;
   }
 
-  if (signal.aborted) {
+  const clientAborted = Boolean(request.signal?.aborted) && !headerTimedOut;
+  const timedOut = headerTimedOut || (signal.aborted && !clientAborted);
+
+  if (clientAborted) {
+    release();
+    return new NextResponse(null, { status: 499 });
+  }
+
+  if (timedOut) {
     console.warn(`[API Proxy] Request deadline exceeded for /api/${path}; timeout alone does not mark the backend down`);
   } else {
     const now = Date.now();
@@ -245,12 +294,14 @@ async function handler(
   release();
   return NextResponse.json(
     {
-      error: signal.aborted
-        ? (isIdempotent ? 'API request timed out after 29 seconds. Please retry.' : 'API request timed out. Check the request status before submitting it again.')
+      error: timedOut
+        ? (isIdempotent
+          ? `API request timed out after ${Math.round(headerTimeoutMs / 1000)} seconds. Please retry.`
+          : 'API request timed out. Check the request status before submitting it again.')
         : 'Backend unavailable',
-      ...(!signal.aborted ? { hint: 'Check the backend service and INTERNAL_API_URL in Dokploy frontend env vars' } : {}),
+      ...(!timedOut ? { hint: 'Check the backend service and INTERNAL_API_URL in Dokploy frontend env vars' } : {}),
     },
-    { status: signal.aborted ? 504 : 502 }
+    { status: timedOut ? 504 : 502 }
   );
 }
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { userApiFetch } from "@/lib/user-api-fetch";
+import { userApiFetch, performClientUserLogout } from "@/lib/user-api-fetch";
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
@@ -206,13 +206,10 @@ export default function Navbar({ lang, dict }: NavbarProps) {
     window.dispatchEvent(new Event("currency_change"));
   };
 
-  // Sign out user session
   const handleLogout = () => {
-    localStorage.removeItem("user_session");
-    localStorage.removeItem("user_token");
     setUserSession(null);
     setUserDropdownOpen(false);
-    window.dispatchEvent(new Event("user_session_change"));
+    performClientUserLogout({ reason: "manual", redirect: false });
   };
 
   return (

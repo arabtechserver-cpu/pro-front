@@ -146,3 +146,57 @@ test('auth budget never authorizes insecure or malformed production origin confi
     assert.equal(response.status, 403, value);
   }
 });
+
+test('forwardBody closes cleanly without piping crash on TimeoutError or client abort, while still propagating real stream errors', async () => {
+  const { forwardBody } = load('proxy-stream');
+
+  let finishedTimeout = 0;
+  const timedOutUpstream = new ReadableStream({
+    pull(c) {
+      c.enqueue(new Uint8Array([9, 8]));
+    },
+  });
+  let pulledOnce = false;
+  const abortingUpstream = new ReadableStream({
+    pull(c) {
+      if (!pulledOnce) {
+        pulledOnce = true;
+        c.enqueue(new Uint8Array([1, 2]));
+        return;
+      }
+      throw Object.assign(new Error('The operation was aborted due to timeout'), { name: 'TimeoutError' });
+    }
+  });
+  const bytes = await new Response(forwardBody(abortingUpstream, () => finishedTimeout++)).arrayBuffer();
+  assert.deepEqual([...new Uint8Array(bytes)], [1, 2]);
+  assert.equal(finishedTimeout, 1);
+
+  let finishedAbort = 0;
+  let cancelledByAbort = 0;
+  const clientController = new AbortController();
+  const slowStream = new ReadableStream({
+    pull() { return new Promise(() => {}); },
+    cancel() { cancelledByAbort++; }
+  });
+  const forwardedAbort = forwardBody(slowStream, () => finishedAbort++, { signal: clientController.signal });
+  const abortReader = forwardedAbort.getReader();
+  const pendingRead = abortReader.read();
+  clientController.abort();
+  const readResult = await pendingRead;
+  assert.equal(readResult.done, true);
+  assert.equal(cancelledByAbort, 1);
+  assert.equal(finishedAbort, 1);
+  void timedOutUpstream.cancel().catch(() => {});
+
+  let finishedErr = 0;
+  const brokenUpstream = new ReadableStream({
+    pull() {
+      throw new Error('unexpected socket failure');
+    }
+  });
+  await assert.rejects(
+    new Response(forwardBody(brokenUpstream, () => finishedErr++)).arrayBuffer(),
+    /unexpected socket failure/
+  );
+  assert.equal(finishedErr, 1);
+});

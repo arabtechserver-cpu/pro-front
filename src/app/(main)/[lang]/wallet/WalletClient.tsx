@@ -619,6 +619,7 @@ export default function WalletClient({ lang, dict }: { lang: Locale; dict: any }
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          ...(silent ? { "x-passive-poll": "true" } : {}),
           ...(token ? { Authorization: `Bearer ${token}` } : {})
         },
         body: JSON.stringify({ orderId })
