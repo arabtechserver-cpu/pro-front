@@ -1404,7 +1404,7 @@ export default function ProfileClient({ lang, dict }: { lang: string; dict: any 
                     {isAr ? "رابط نقطة النهاية (API Endpoint URL)" : "API Endpoint URL"}
                   </span>
                   <p className="text-primary font-bold break-all">
-                    https://arabtechproserver.tech/api/v1/provider
+                    https://arabproserver.com/api/v1/provider
                   </p>
                 </div>
 

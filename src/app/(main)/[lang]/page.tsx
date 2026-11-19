@@ -20,7 +20,7 @@ export async function generateMetadata(props: { params: Promise<{ lang: Locale }
   const shareImg = getBrandShareImage(params.lang);
 
   return {
-    metadataBase: new URL("https://arabtechproserver.tech"),
+    metadataBase: new URL("https://arabproserver.com"),
     title,
     description,
     keywords: [
@@ -29,7 +29,7 @@ export async function generateMetadata(props: { params: Promise<{ lang: Locale }
       "سيرفر عرب تك",
       "Arab Tech Pro Server",
       "Arab Tech Pro Server Pro",
-      "arabtechproserver.tech",
+      "arabproserver.com",
       "سيرفر فك الهواتف",
       "فك شبكات",
       "تخطي iCloud",
@@ -38,7 +38,7 @@ export async function generateMetadata(props: { params: Promise<{ lang: Locale }
     openGraph: {
       title,
       description,
-      url: `https://arabtechproserver.tech/${params.lang}`,
+      url: `https://arabproserver.com/${params.lang}`,
       siteName: isAr ? "عرب تك برو سيرفر - Arab Tech Pro Server" : "Arab Tech Pro Server",
       images: [
         {

@@ -16,7 +16,7 @@ const jakarta = Plus_Jakarta_Sans({ subsets: ["latin"], variable: "--font-jakart
 const jetbrains = JetBrains_Mono({ subsets: ["latin"], variable: "--font-jetbrains", display: "swap" });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://arabtechproserver.tech"),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://arabproserver.com"),
   title: "Admin Dashboard | Arab Tech Pro Server",
   description: "Admin Management Portal",
   icons: {

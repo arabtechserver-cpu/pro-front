@@ -4,7 +4,7 @@ import { notFound } from 'next/navigation';
 
 async function getVideo(id: string) {
   try {
-    const res = await fetch(`https://api.arabtechproserver.tech/api/videos/tutorials/${id}`, { cache: 'no-store' });
+    const res = await fetch(`https://api.arabproserver.com/api/videos/tutorials/${id}`, { cache: 'no-store' });
     if (!res.ok) return null;
     return await res.json();
   } catch {

@@ -16,7 +16,7 @@ async function getPost(id: string) {
     try {
       cleanId = encodeURIComponent(decodeURIComponent(id).trim());
     } catch (_) {}
-    const res = await fetch(`https://api.arabtechproserver.tech/api/blog/posts/${cleanId}`, {
+    const res = await fetch(`https://api.arabproserver.com/api/blog/posts/${cleanId}`, {
       cache: "no-store", // We could use revalidate if we wanted ISR
     });
     if (!res.ok) return null;
@@ -43,7 +43,7 @@ export async function generateMetadata(props: Props, parent: ResolvingMetadata):
 
   // Set up SEO properties
   return {
-    metadataBase: new URL("https://arabtechproserver.tech"),
+    metadataBase: new URL("https://arabproserver.com"),
     title: title,
     description: description,
     openGraph: {

@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect } from "react";
 
@@ -37,7 +37,7 @@ export default function AdminNewsletterPage() {
   const [title, setTitle] = useState("");
   const [subject, setSubject] = useState("");
   const [message, setMessage] = useState("");
-  const [actionUrl, setActionUrl] = useState("https://arabtechproserver.tech/ar/pricing");
+  const [actionUrl, setActionUrl] = useState("https://arabproserver.com/ar/pricing");
   const [actionText, setActionText] = useState("تصفح العرض واطلب الآن");
   const [sendingBroadcast, setSendingBroadcast] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -165,21 +165,21 @@ export default function AdminNewsletterPage() {
       setTitle("توفر تفعيل رسمي فوري لأداة جديدة!");
       setSubject("أداة جديدة وتفعيل فوري على سيرفر عرب تك برو");
       setMessage("يسرنا إعلامكم بتوفر تراخيص وتفعيلات رسمية جديدة لأقوى أدوات السوفت وير بأسعار حصرية وتسليم فوري تلقائي عبر السيرفر. تفضل بالطلب الآن واستمتع بأعلى سرعة وأفضل دعم فني.");
-      setActionUrl("https://arabtechproserver.tech/ar/pricing");
+      setActionUrl("https://arabproserver.com/ar/pricing");
       setActionText("طلب وتفعيل الأداة فوراً");
     } else if (type === "discount") {
       setCategory("Hot Offer");
       setTitle("تخفيضات خاصة وعروض جملة لفترة محدودة!");
       setSubject("خصم خاص على باقات وتفعيلات السيرفر للوكلاء");
       setMessage("عرض خاص لجميع عملائنا ووكلائنا الكرام! تخفيضات حصرية على أرصدة السيرفرات وفك الشفرات وتخطي الحسابات لفترة محدودة. اشحن محفظتك الآن واستفد من العرض قبل انتهائه.");
-      setActionUrl("https://arabtechproserver.tech/ar/pricing");
+      setActionUrl("https://arabproserver.com/ar/pricing");
       setActionText("استعراض العروض المخفضة");
     } else if (type === "server") {
       setCategory("Service Update");
       setTitle("تحديث جديد: دعم فك شفرات موديلات إضافية");
       setSubject("تحديث جديد لسيرفر فك الشفرات وتخطي الحسابات");
       setMessage("تم تحديث خدمات الـ IMEI والسيرفر لدعم أحدث الحمايات والموديلات العالمية لفك الشبكات وتخطي FRP و iCloud بكفاءة عالية وبأسرع وقت تسليم.");
-      setActionUrl("https://arabtechproserver.tech/ar/pricing?cat=imei");
+      setActionUrl("https://arabproserver.com/ar/pricing?cat=imei");
       setActionText("عرض قائمة الخدمات المحدثة");
     }
   };
@@ -475,7 +475,7 @@ export default function AdminNewsletterPage() {
 
                 <div className="pt-4 border-t border-violet-400/15 text-[10px] text-white/40 text-center space-y-1">
                   <p>تصلك هذه الرسالة لاشتراكك في نشرة عرب تك برو سيرفر.</p>
-                  <p>https://arabtechproserver.tech</p>
+                  <p>https://arabproserver.com</p>
                 </div>
               </div>
             </div>

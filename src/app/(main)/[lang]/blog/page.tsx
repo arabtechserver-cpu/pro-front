@@ -1,11 +1,11 @@
-﻿import { getDictionary } from "@/i18n/get-dictionary";
+import { getDictionary } from "@/i18n/get-dictionary";
 import { Locale } from "@/i18n/config";
 import Link from "next/link";
 import NewsletterSection from "@/components/NewsletterSection";
 
 async function getPosts() {
   try {
-    const res = await fetch('https://api.arabtechproserver.tech/api/blog/posts', {
+    const res = await fetch('https://api.arabproserver.com/api/blog/posts', {
       cache: 'no-store'
     });
     if (!res.ok) return [];

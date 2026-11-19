@@ -3,12 +3,12 @@
 > The premier official server for remote mobile phone unlocking, GSM tools activations, IMEI checks, FRP bypass, and instant server credits.
 > الموقع الرسمي المعتمد لمنصة عرب تك برو سيرفر (عرب تيك سيرفر) لخدمات فك شفرات الهواتف، تفعيل أدوات وبرامج السوفت وير، تخطي آيكلود وFRP، وخدمات IMEI والسيرفرات عن بعد.
 
-- **Website**: https://arabtechproserver.tech
-- **Arabic Portal**: https://arabtechproserver.tech/ar
-- **English Portal**: https://arabtechproserver.tech/en
-- **Pricing & Services Catalog**: https://arabtechproserver.tech/ar/pricing
-- **Purchase & Ordering**: https://arabtechproserver.tech/ar/purchase
-- **API Documentation**: https://arabtechproserver.tech/ar/api-developer
+- **Website**: https://arabproserver.com
+- **Arabic Portal**: https://arabproserver.com/ar
+- **English Portal**: https://arabproserver.com/en
+- **Pricing & Services Catalog**: https://arabproserver.com/ar/pricing
+- **Purchase & Ordering**: https://arabproserver.com/ar/purchase
+- **API Documentation**: https://arabproserver.com/ar/api-developer
 - **Telegram Support**: https://t.me/ARABTECHSUPPURT2
 - **Telegram Channel**: https://t.me/arabtechserver
 - **Support WhatsApp / Phone**: +16728972935
@@ -41,7 +41,7 @@
 4. **Reseller API Integration (ربط الـ API للموزعين وأصحاب السيرفرات)**:
    - Fully compatible with Dhru Fusion, Webx, and custom GSM CRM APIs.
    - Live automated order dispatch and real-time status webhooks.
-   - Endpoint: `https://arabtechproserver.tech/api/v1/provider`
+   - Endpoint: `https://arabproserver.com/api/v1/provider`
 
 5. **Payment Methods & Instant Wallet Funding (طرق الدفع والشحن الفوري)**:
    - Instapay (Egypt)

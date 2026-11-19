@@ -73,10 +73,10 @@ export async function generateMetadata(
     }
   }
 
-  const currentUrl = `https://arabtechproserver.tech/${params.lang}/pricing${section ? `?section=${encodeURIComponent(section)}` : ''}`;
+  const currentUrl = `https://arabproserver.com/${params.lang}/pricing${section ? `?section=${encodeURIComponent(section)}` : ''}`;
 
   return {
-    metadataBase: new URL("https://arabtechproserver.tech"),
+    metadataBase: new URL("https://arabproserver.com"),
     title,
     description,
     openGraph: {

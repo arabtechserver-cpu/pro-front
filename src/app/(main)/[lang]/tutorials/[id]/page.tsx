@@ -9,7 +9,7 @@ async function getTutorial(id: string) {
     try {
       cleanId = encodeURIComponent(decodeURIComponent(id).trim());
     } catch (_) {}
-    const res = await fetch(`https://api.arabtechproserver.tech/api/videos/tutorials/${cleanId}`, {
+    const res = await fetch(`https://api.arabproserver.com/api/videos/tutorials/${cleanId}`, {
       cache: 'no-store'
     });
     if (!res.ok) return null;

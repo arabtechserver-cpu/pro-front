@@ -20,7 +20,7 @@ export async function addBlogPost(formData: FormData) {
   const headers: Record<string, string> = { 'Content-Type': 'application/json' };
   if (token) headers['Authorization'] = `Bearer ${token}`;
 
-  const res = await fetch('https://api.arabtechproserver.tech/api/blog/post', {
+  const res = await fetch('https://api.arabproserver.com/api/blog/post', {
     method: 'POST',
     headers,
     body: JSON.stringify(payload)
@@ -48,7 +48,7 @@ export async function addVideoTutorial(formData: FormData) {
   const headers: Record<string, string> = { 'Content-Type': 'application/json' };
   if (token) headers['Authorization'] = `Bearer ${token}`;
 
-  const res = await fetch('https://api.arabtechproserver.tech/api/blog/tutorial', {
+  const res = await fetch('https://api.arabproserver.com/api/blog/tutorial', {
     method: 'POST',
     headers,
     body: JSON.stringify(payload)
@@ -79,7 +79,7 @@ export async function updateBlogPost(id: string, formData: FormData) {
   const headers: Record<string, string> = { 'Content-Type': 'application/json' };
   if (token) headers['Authorization'] = `Bearer ${token}`;
 
-  const res = await fetch(`https://api.arabtechproserver.tech/api/blog/posts/${id}`, {
+  const res = await fetch(`https://api.arabproserver.com/api/blog/posts/${id}`, {
     method: 'PUT',
     headers,
     body: JSON.stringify(payload)
@@ -99,7 +99,7 @@ export async function deleteBlogPost(id: string) {
   const headers: Record<string, string> = {};
   if (token) headers['Authorization'] = `Bearer ${token}`;
 
-  const res = await fetch(`https://api.arabtechproserver.tech/api/blog/posts/${id}`, {
+  const res = await fetch(`https://api.arabproserver.com/api/blog/posts/${id}`, {
     method: 'DELETE',
     headers
   });

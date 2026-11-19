@@ -27,7 +27,7 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'api.arabtechproserver.tech',
+        hostname: 'api.arabproserver.com',
       },
       {
         protocol: 'https',
@@ -42,6 +42,33 @@ const nextConfig = {
         hostname: 'images.unsplash.com',
       },
     ],
+  },
+  async redirects() {
+    return [
+      {
+        source: '/:path*',
+        has: [
+          {
+            type: 'host',
+            value: '(?:www\\.)?arabtechproserver\\.tech',
+          },
+        ],
+        destination: 'https://arabproserver.com/:path*',
+        statusCode: 301,
+      },
+      {
+        source: '/:path*',
+        has: [
+          {
+            type: 'header',
+            key: 'x-forwarded-host',
+            value: '(?:www\\.)?arabtechproserver\\.tech(?::\\d+)?',
+          },
+        ],
+        destination: 'https://arabproserver.com/:path*',
+        statusCode: 301,
+      },
+    ];
   },
   async headers() {
     return [
@@ -77,7 +104,7 @@ const nextConfig = {
               "font-src 'self' data: https://fonts.gstatic.com",
               "img-src 'self' data: blob: https:",
               "media-src 'self' data: blob: https:",
-              "connect-src 'self' data: blob: https://api.arabtechproserver.tech https://api.borai.store https://borai.store https://www.borai.store https://accounts.google.com https://challenges.cloudflare.com https://www.paypal.com https://www.sandbox.paypal.com https://fonts.googleapis.com https://fonts.gstatic.com",
+              "connect-src 'self' data: blob: https://api.arabproserver.com https://api.borai.store https://borai.store https://www.borai.store https://accounts.google.com https://challenges.cloudflare.com https://www.paypal.com https://www.sandbox.paypal.com https://fonts.googleapis.com https://fonts.gstatic.com",
               "frame-src 'self' https://accounts.google.com https://challenges.cloudflare.com https://www.sandbox.paypal.com https://www.paypal.com",
               "worker-src 'self' blob:",
               "object-src 'none'",

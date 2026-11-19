@@ -56,8 +56,8 @@ export default function robots(): MetadataRoute.Robots {
         ],
       },
     ],
-    sitemap: "https://arabtechproserver.tech/sitemap.xml",
-    host: "https://arabtechproserver.tech",
+    sitemap: "https://arabproserver.com/sitemap.xml",
+    host: "https://arabproserver.com",
   };
 }
 

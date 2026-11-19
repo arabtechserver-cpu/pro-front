@@ -15,7 +15,7 @@ export async function generateMetadata(props: FaqPageProps): Promise<Metadata> {
     description: isAr
       ? "إجابات شاملة لجميع الأسئلة الشائعة حول خدمات فك الشفرات، تفعيل البوكسات والدونجل، ووسائل الدفع المعتمدة."
       : "Comprehensive answers to frequently asked questions about phone unlocking, dongle activations, and accepted payment methods.",
-    metadataBase: new URL("https://arabtechproserver.tech"),
+    metadataBase: new URL("https://arabproserver.com"),
   };
 }
 

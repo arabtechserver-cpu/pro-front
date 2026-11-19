@@ -71,7 +71,7 @@ test('auth budget accepts public HTTPS site origins behind an internal reverse p
   const { authProxyBudget } = load('auth-proxy-budget', { process: { env: { NODE_ENV: 'production' } } });
   for (const origin of [
     'https://borai.store', 'https://www.borai.store',
-    'https://arabtechproserver.tech', 'https://www.arabtechproserver.tech',
+    'https://arabproserver.com', 'https://www.arabproserver.com',
   ]) {
     let calls = 0;
     const response = await authProxyBudget(authRequest('http://127.0.0.1:3000/api/admin/login', {

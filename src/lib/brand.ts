@@ -8,5 +8,5 @@ export const brandAssets = {
   shareEn: "/images/brand/share-en-v2.png",
 } as const;
 
-export const brandOrigin = "https://arabtechproserver.tech";
+export const brandOrigin = "https://arabproserver.com";
 export const getBrandShareImage = (lang: string) => `${brandOrigin}${lang === "ar" ? brandAssets.shareAr : brandAssets.shareEn}`;

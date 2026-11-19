@@ -31,7 +31,7 @@ interface VideoSeriesDetail {
 
 async function getSeriesDetail(id: string): Promise<VideoSeriesDetail | null> {
   try {
-    const res = await fetch(`https://api.arabtechproserver.tech/api/videos/series/${id}`, {
+    const res = await fetch(`https://api.arabproserver.com/api/videos/series/${id}`, {
       cache: 'no-store'
     });
     if (!res.ok) return null;

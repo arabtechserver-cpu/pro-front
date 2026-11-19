@@ -9,7 +9,7 @@ export async function authProxyBudget(
   // Standalone Next.js uses an internal URL behind ingress; only configured public origins may override it.
   const trustedOrigins = new Set([
     request.nextUrl.origin,
-    'https://arabtechproserver.tech', 'https://www.arabtechproserver.tech',
+    'https://arabproserver.com', 'https://www.arabproserver.com',
     'https://borai.store', 'https://www.borai.store',
   ]);
   for (const value of [

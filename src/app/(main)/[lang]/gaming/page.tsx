@@ -54,7 +54,7 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
     ? "سيرفر عرب تك برو لشحن الألعاب والبطاقات الرقمية: ألعاب ببجي وفري فاير وروبلوكس وفالورانت وكول أوف ديوتي، بطاقات جوجل بلاي، آيتونز، بلايستيشن، إكس بوكس، واشتراكات تيليجرام وشاهد بأسعار الجملة."
     : "Digital gaming and voucher store: player ID top-ups for PUBG, Free Fire, Roblox, Valorant, COD, gift cards for Google Play, iTunes, PlayStation, Steam and digital subscriptions at wholesale rates.";
 
-  const currentUrl = `https://arabtechproserver.tech/${params.lang}/gaming${
+  const currentUrl = `https://arabproserver.com/${params.lang}/gaming${
     section ? `?section=${encodeURIComponent(section)}` : ""
   }`;
 
@@ -111,7 +111,7 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
       ].filter(Boolean);
 
   return {
-    metadataBase: new URL("https://arabtechproserver.tech"),
+    metadataBase: new URL("https://arabproserver.com"),
     title,
     description,
     keywords,
@@ -137,9 +137,9 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
     alternates: {
       canonical: currentUrl,
       languages: {
-        ar: `https://arabtechproserver.tech/ar/gaming${section ? `?section=${encodeURIComponent(section)}` : ""}`,
-        en: `https://arabtechproserver.tech/en/gaming${section ? `?section=${encodeURIComponent(section)}` : ""}`,
-        "x-default": `https://arabtechproserver.tech/ar/gaming${section ? `?section=${encodeURIComponent(section)}` : ""}`,
+        ar: `https://arabproserver.com/ar/gaming${section ? `?section=${encodeURIComponent(section)}` : ""}`,
+        en: `https://arabproserver.com/en/gaming${section ? `?section=${encodeURIComponent(section)}` : ""}`,
+        "x-default": `https://arabproserver.com/ar/gaming${section ? `?section=${encodeURIComponent(section)}` : ""}`,
       },
     },
     openGraph: {
@@ -240,54 +240,54 @@ export default async function GamingPage(props: Props) {
     "@graph": [
       {
         "@type": "WebSite",
-        "@id": "https://arabtechproserver.tech/#website",
+        "@id": "https://arabproserver.com/#website",
         "name": isAr ? "عرب تك برو سيرفر" : "Arab Tech Pro Server",
-        "url": "https://arabtechproserver.tech",
+        "url": "https://arabproserver.com",
         "potentialAction": {
           "@type": "SearchAction",
-          "target": `https://arabtechproserver.tech/${params.lang}/gaming?search={search_term_string}`,
+          "target": `https://arabproserver.com/${params.lang}/gaming?search={search_term_string}`,
           "query-input": "required name=search_term_string",
         },
       },
       {
         "@type": "WebPage",
-        "@id": `https://arabtechproserver.tech/${params.lang}/gaming#webpage`,
-        "url": `https://arabtechproserver.tech/${params.lang}/gaming`,
+        "@id": `https://arabproserver.com/${params.lang}/gaming#webpage`,
+        "url": `https://arabproserver.com/${params.lang}/gaming`,
         "name": isAr ? "شحن الألعاب والبطاقات الرقمية والاشتراكات" : "Gaming Top-Ups, Digital Cards & Subscriptions",
         "description": isAr
           ? "منصة لشحن الألعاب المباشر، بطاقات المتاجر والهدايا، والاشتراكات الترفيهية بأسعار الجملة."
           : "Portal for in-game top-ups, digital gift vouchers and subscriptions.",
         "inLanguage": isAr ? "ar" : "en",
         "isPartOf": {
-          "@id": "https://arabtechproserver.tech/#website",
+          "@id": "https://arabproserver.com/#website",
         },
         "breadcrumb": {
-          "@id": `https://arabtechproserver.tech/${params.lang}/gaming#breadcrumb`,
+          "@id": `https://arabproserver.com/${params.lang}/gaming#breadcrumb`,
         },
       },
       {
         "@type": "BreadcrumbList",
-        "@id": `https://arabtechproserver.tech/${params.lang}/gaming#breadcrumb`,
+        "@id": `https://arabproserver.com/${params.lang}/gaming#breadcrumb`,
         "itemListElement": [
           {
             "@type": "ListItem",
             "position": 1,
             "name": isAr ? "الرئيسية" : "Home",
-            "item": `https://arabtechproserver.tech/${params.lang}`,
+            "item": `https://arabproserver.com/${params.lang}`,
           },
           {
             "@type": "ListItem",
             "position": 2,
             "name": isAr ? "الخدمات الرقمية والألعاب" : "Digital & Gaming Services",
-            "item": `https://arabtechproserver.tech/${params.lang}/gaming`,
+            "item": `https://arabproserver.com/${params.lang}/gaming`,
           },
         ],
       },
       {
         "@type": "Store",
-        "@id": "https://arabtechproserver.tech/#store",
+        "@id": "https://arabproserver.com/#store",
         "name": isAr ? "عرب تك برو سيرفر - متجر الخدمات الرقمية والألعاب" : "Arab Tech Pro Server - Digital Gaming Store",
-        "url": `https://arabtechproserver.tech/${params.lang}/gaming`,
+        "url": `https://arabproserver.com/${params.lang}/gaming`,
         "logo": `${brandOrigin}${brandAssets.organizationLogo}`,
         "image": getBrandShareImage(params.lang),
         "description": isAr
@@ -355,19 +355,19 @@ export default async function GamingPage(props: Props) {
       },
       {
         "@type": "Service",
-        "@id": `https://arabtechproserver.tech/${params.lang}/gaming#service`,
+        "@id": `https://arabproserver.com/${params.lang}/gaming#service`,
         "name": isAr
           ? "خدمة شحن الألعاب والبطاقات الرقمية الفورية"
           : "Instant Gaming Top-Up & Digital Voucher Service",
         "serviceType": "Digital In-Game Top-Up & Gift Cards",
         "provider": {
-          "@id": "https://arabtechproserver.tech/#store",
+          "@id": "https://arabproserver.com/#store",
         },
         "areaServed": "Global",
       },
       {
         "@type": "FAQPage",
-        "@id": `https://arabtechproserver.tech/${params.lang}/gaming#faq`,
+        "@id": `https://arabproserver.com/${params.lang}/gaming#faq`,
         "mainEntity": faqs.map((faq) => ({
           "@type": "Question",
           "name": faq.q,

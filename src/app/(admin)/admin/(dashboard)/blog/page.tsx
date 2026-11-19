@@ -37,7 +37,7 @@ export default function AdminBlog() {
   const fetchPosts = async () => {
     try {
       setLoading(true);
-      const res = await fetch("https://api.arabtechproserver.tech/api/blog/posts", { cache: "no-store" });
+      const res = await fetch("https://api.arabproserver.com/api/blog/posts", { cache: "no-store" });
       if (res.ok) {
         const data = await res.json();
         const seen = new Set();

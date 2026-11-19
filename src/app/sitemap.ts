@@ -2,7 +2,7 @@ import { MetadataRoute } from "next";
 import { readPublicPricingCatalog } from "@/lib/pricing-catalog.server";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = "https://arabtechproserver.tech";
+  const baseUrl = "https://arabproserver.com";
   const locales = ["ar", "en"];
   const staticRoutes = [
     "",

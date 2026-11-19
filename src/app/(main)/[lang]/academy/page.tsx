@@ -32,7 +32,7 @@ interface VideoSeries {
 
 async function getSeries(): Promise<VideoSeries[]> {
   try {
-    const res = await fetch('https://api.arabtechproserver.tech/api/videos/series', {
+    const res = await fetch('https://api.arabproserver.com/api/videos/series', {
       cache: 'no-store'
     });
     if (!res.ok) return [];
@@ -46,7 +46,7 @@ async function getSeries(): Promise<VideoSeries[]> {
 
 async function getAllVideos(): Promise<VideoLesson[]> {
   try {
-    const res = await fetch('https://api.arabtechproserver.tech/api/videos/tutorials', {
+    const res = await fetch('https://api.arabproserver.com/api/videos/tutorials', {
       cache: 'no-store'
     });
     if (!res.ok) return [];

@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 
 const TURNSTILE_SITE_KEY =
-  process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || "0x4AAAAAAEjTl6tGMYdu0R-z";
+  process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || "0x4AAAAAAGIvbCEmtozsLAzG";
 
 /**
  * Programmatically reset all mounted Turnstile widgets across the app

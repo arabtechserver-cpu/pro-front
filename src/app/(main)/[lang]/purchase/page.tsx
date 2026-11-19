@@ -58,7 +58,7 @@ export async function generateMetadata(props: Props, parent: ResolvingMetadata):
         ? `اطلب خدمة ${serviceName} بسعر ${priceStr} فقط. وقت التسليم: ${deliveryTime}. قسم: ${groupName}. فك رسمي وسريع عبر منصة عرب تك برو سيرفر.`
         : `Order ${serviceName} for only ${priceStr}. Delivery time: ${deliveryTime}. Category: ${groupName}. Fast & official remote phone unlocking from Arab Tech Pro Server.`;
 
-      const pageUrl = `https://arabtechproserver.tech/${params.lang}/purchase?serviceId=${serviceId}`;
+      const pageUrl = `https://arabproserver.com/${params.lang}/purchase?serviceId=${serviceId}`;
 
       return {
         title,
@@ -96,13 +96,13 @@ export async function generateMetadata(props: Props, parent: ResolvingMetadata):
     : "Choose and order network unlock services, iCloud & FRP bypass, and server credits at the best rates.";
 
   return {
-    metadataBase: new URL("https://arabtechproserver.tech"),
+    metadataBase: new URL("https://arabproserver.com"),
     title: defaultTitle,
     description: defaultDesc,
     openGraph: {
       title: defaultTitle,
       description: defaultDesc,
-      url: `https://arabtechproserver.tech/${params.lang}/purchase`,
+      url: `https://arabproserver.com/${params.lang}/purchase`,
       images: [
         {
           url: getBrandShareImage(params.lang),

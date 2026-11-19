@@ -7,7 +7,7 @@ import { apiRateLimiter } from '../../../lib/api-rate-limiter';
 /**
  * Smart catch-all API proxy with working URL caching.
  *
- * The public domain (arabtechproserver.tech) is NOT reachable from inside
+ * The public domain (arabproserver.com) is NOT reachable from inside
  * the Docker container due to hairpin NAT — so we only try internal hostnames.
  *
  * INTERNAL_API_URL takes priority. If not set (or set to localhost), we try

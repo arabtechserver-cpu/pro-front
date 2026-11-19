@@ -50,7 +50,7 @@ export async function generateMetadata(props: { params: Promise<{ lang: string }
       "Arab Tech Pro Server",
       "Arab Tech Pro Server Pro",
       "Arab Tech Pro Server",
-      "arabtechproserver.tech",
+      "arabproserver.com",
       "سيرفر فك الهواتف",
       "فك شبكات",
       "تخطي iCloud",
@@ -63,9 +63,9 @@ export async function generateMetadata(props: { params: Promise<{ lang: string }
       "iCloud Bypass",
       "FRP Bypass"
     ],
-    metadataBase: new URL("https://arabtechproserver.tech"),
+    metadataBase: new URL("https://arabproserver.com"),
     applicationName: "Arab Tech Pro Server",
-    authors: [{ name: "Arab Tech Pro Server", url: "https://arabtechproserver.tech" }],
+    authors: [{ name: "Arab Tech Pro Server", url: "https://arabproserver.com" }],
     creator: "Arab Tech Pro Server",
     publisher: "Arab Tech Pro Server",
     robots: {
@@ -84,7 +84,7 @@ export async function generateMetadata(props: { params: Promise<{ lang: string }
     openGraph: {
       title: siteTitle,
       description: siteDesc,
-      url: `https://arabtechproserver.tech/${params.lang}`,
+      url: `https://arabproserver.com/${params.lang}`,
       siteName: isAr ? "عرب تك برو سيرفر (عرب تك برو سيرفر) - Arab Tech Pro Server" : "Arab Tech Pro Server",
       images: [
         {
@@ -108,11 +108,11 @@ export async function generateMetadata(props: { params: Promise<{ lang: string }
       ],
     },
     alternates: {
-      canonical: `https://arabtechproserver.tech/${params.lang}`,
+      canonical: `https://arabproserver.com/${params.lang}`,
       languages: {
-        "ar": "https://arabtechproserver.tech/ar",
-        "en": "https://arabtechproserver.tech/en",
-        "x-default": "https://arabtechproserver.tech",
+        "ar": "https://arabproserver.com/ar",
+        "en": "https://arabproserver.com/en",
+        "x-default": "https://arabproserver.com",
       },
     },
     icons: {
@@ -166,14 +166,14 @@ export default async function RootLayout(
       "Arab Tech Pro Server Pro",
       "Arab Tech Pro Server"
     ],
-    "url": "https://arabtechproserver.tech",
+    "url": "https://arabproserver.com",
     "inLanguage": ["ar", "en"],
     "description": isAr
       ? "الموقع الرسمي لمنصة عرب تك برو سيرفر | Arab Tech Pro Server لخدمات فك الهواتف، تخطي iCloud وFRP، وخدمات IMEI والسيرفر عن بعد."
       : "Official Arab Tech Pro Server for remote phone unlocking, iCloud & FRP bypass, and IMEI server services.",
     "potentialAction": {
       "@type": "SearchAction",
-      "target": "https://arabtechproserver.tech/ar/pricing?q={search_term_string}",
+      "target": "https://arabproserver.com/ar/pricing?q={search_term_string}",
       "query-input": "required name=search_term_string"
     }
   };
@@ -192,7 +192,7 @@ export default async function RootLayout(
       "سيرفر عرب تك",
       "Arab Tech Pro Server"
     ],
-    "url": "https://arabtechproserver.tech",
+    "url": "https://arabproserver.com",
     "logo": { "@type": "ImageObject", "url": `${brandOrigin}${brandAssets.organizationLogo}`, "width": 512, "height": 512 },
     "image": getBrandShareImage(lang),
     "sameAs": [
@@ -213,7 +213,7 @@ export default async function RootLayout(
     "name": "Arab Tech Pro Server - عرب تك برو سيرفر",
     "operatingSystem": "All (Web, Windows, Mac, Android, iOS)",
     "applicationCategory": "BusinessApplication, UtilitiesApplication",
-    "url": "https://arabtechproserver.tech",
+    "url": "https://arabproserver.com",
     "offers": {
       "@type": "AggregateOffer",
       "priceCurrency": "USD",
@@ -245,8 +245,8 @@ export default async function RootLayout(
         "acceptedAnswer": {
           "@type": "Answer",
           "text": isAr
-            ? "نعم، المنصة تدعم الربط المباشر المتوافق مع Dhru Fusion وWebx عبر واجهة برمجة التطبيقات API على الرابط: https://arabtechproserver.tech/api/v1/provider."
-            : "Yes, we provide full REST API compatibility with Dhru Fusion and Webx platforms at https://arabtechproserver.tech/api/v1/provider."
+            ? "نعم، المنصة تدعم الربط المباشر المتوافق مع Dhru Fusion وWebx عبر واجهة برمجة التطبيقات API على الرابط: https://arabproserver.com/api/v1/provider."
+            : "Yes, we provide full REST API compatibility with Dhru Fusion and Webx platforms at https://arabproserver.com/api/v1/provider."
         }
       },
       {

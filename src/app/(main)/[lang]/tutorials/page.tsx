@@ -34,7 +34,7 @@ async function getSeries(): Promise<VideoSeries[]> {
   try {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 2000);
-    const res = await fetch('https://api.arabtechproserver.tech/api/videos/series', {
+    const res = await fetch('https://api.arabproserver.com/api/videos/series', {
       next: { revalidate: 60 },
       signal: controller.signal
     });
@@ -51,7 +51,7 @@ async function getAllVideos(): Promise<VideoLesson[]> {
   try {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 2000);
-    const res = await fetch('https://api.arabtechproserver.tech/api/videos/tutorials', {
+    const res = await fetch('https://api.arabproserver.com/api/videos/tutorials', {
       next: { revalidate: 60 },
       signal: controller.signal
     });
