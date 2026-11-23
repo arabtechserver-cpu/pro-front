@@ -273,6 +273,15 @@ export default function RegisterClient({ lang, dict }: { lang: Locale; dict: any
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [turnstileToken, setTurnstileToken] = useState("");
+  const [registrationStep, setRegistrationStep] = useState<"form" | "otp">("form");
+  const [otpCode, setOtpCode] = useState("");
+  const [resendCooldown, setResendCooldown] = useState(0);
+
+  useEffect(() => {
+    if (resendCooldown <= 0) return;
+    const timer = setTimeout(() => setResendCooldown((prev) => Math.max(0, prev - 1)), 1000);
+    return () => clearTimeout(timer);
+  }, [resendCooldown]);
 
   const handleGoogleCallback = useCallback(async (response: any) => {
     if (!response.credential) return;
@@ -381,14 +390,14 @@ export default function RegisterClient({ lang, dict }: { lang: Locale; dict: any
     return password === confirmPassword;
   }, [password, confirmPassword]);
 
-  // Fast Instant Registration Handler
-  const handleFastRegisterSubmit = async (e: React.FormEvent) => {
+  // Step 1: Validate fields and send mandatory Email OTP
+  const handleRequestRegistrationOtp = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage("");
     setSuccessMessage("");
 
-    if (!fullName.trim()) {
-      setErrorMessage(lang === "ar" ? "الرجاء إدخال الاسم الكامل!" : "Please enter your full name!");
+    if (!fullName.trim() || fullName.trim().length < 2) {
+      setErrorMessage(lang === "ar" ? "الرجاء إدخال الاسم الكامل (حرفان على الأقل)!" : "Please enter your full name (at least 2 characters)!");
       return;
     }
     if (!email.trim() || !email.includes("@")) {
@@ -399,12 +408,12 @@ export default function RegisterClient({ lang, dict }: { lang: Locale; dict: any
       setErrorMessage(lang === "ar" ? "الرجاء إدخال رقم الهاتف / الواتساب!" : "Please enter your phone/WhatsApp number!");
       return;
     }
-    if (!username.trim()) {
-      setErrorMessage(lang === "ar" ? "الرجاء إدخال اسم المستخدم!" : "Please enter a username!");
+    if (!username.trim() || username.trim().length < 3) {
+      setErrorMessage(lang === "ar" ? "الرجاء إدخال اسم مستخدم (3 أحرف على الأقل)!" : "Please enter a username (at least 3 characters)!");
       return;
     }
-    if (!password) {
-      setErrorMessage(lang === "ar" ? "الرجاء إدخال كلمة المرور!" : "Please enter a password!");
+    if (!password || password.length < 8) {
+      setErrorMessage(lang === "ar" ? "كلمة المرور يجب أن لا تقل عن 8 أحرف!" : "Password must be at least 8 characters!");
       return;
     }
     if (password !== confirmPassword) {
@@ -416,7 +425,114 @@ export default function RegisterClient({ lang, dict }: { lang: Locale; dict: any
       return;
     }
     if (!turnstileToken) {
-      setErrorMessage(lang === "ar" ? "يرجى إكمال التحقق الأمني قبل إنشاء الحساب." : "Please complete the security check before creating an account.");
+      setErrorMessage(lang === "ar" ? "يرجى إكمال التحقق الأمني قبل إرسال كود التفعيل." : "Please complete the security check before requesting verification code.");
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      const res = await fetch("/api/auth/send-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: email.trim(),
+          username: username.trim(),
+          type: "registration",
+          "cf-turnstile-response": turnstileToken
+        })
+      });
+
+      const data = await res.json().catch(() => ({}));
+
+      if (res.ok && data.success) {
+        setRegistrationStep("otp");
+        setOtpCode("");
+        setResendCooldown(60);
+        setSuccessMessage(
+          lang === "ar"
+            ? `تم إرسال كود التحقق (6 أرقام) إلى بريدك الإلكتروني: ${email.trim()}`
+            : `A 6-digit verification code has been sent to: ${email.trim()}`
+        );
+        setTurnstileToken("");
+        resetTurnstile();
+      } else {
+        const errorMsg = data.error || data.message || (lang === "ar" ? "تعذر إرسال كود التحقق!" : "Failed to send verification code!");
+        setErrorMessage(errorMsg);
+        setTurnstileToken("");
+        resetTurnstile();
+      }
+    } catch {
+      setErrorMessage(lang === "ar" ? "تعذر الاتصال بالسيرفر! يرجى المحاولة لاحقاً." : "Network error! Please try again.");
+      setTurnstileToken("");
+      resetTurnstile();
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Step 2: Resend Registration OTP
+  const handleResendRegistrationOtp = async () => {
+    if (resendCooldown > 0) return;
+    setErrorMessage("");
+    setSuccessMessage("");
+
+    if (!turnstileToken) {
+      setErrorMessage(lang === "ar" ? "يرجى إكمال التحقق الأمني أولاً لإعادة إرسال الكود." : "Please complete the security check first to resend the code.");
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const res = await fetch("/api/auth/send-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: email.trim(),
+          username: username.trim(),
+          type: "registration",
+          "cf-turnstile-response": turnstileToken
+        })
+      });
+
+      const data = await res.json().catch(() => ({}));
+
+      if (res.ok && data.success) {
+        setResendCooldown(60);
+        setSuccessMessage(
+          lang === "ar"
+            ? `تم إرسال كود تحقق جديد إلى: ${email.trim()}`
+            : `A new verification code has been sent to: ${email.trim()}`
+        );
+        setTurnstileToken("");
+        resetTurnstile();
+      } else {
+        setErrorMessage(data.error || data.message || (lang === "ar" ? "تعذر إعادة إرسال الكود!" : "Failed to resend code!"));
+        setTurnstileToken("");
+        resetTurnstile();
+      }
+    } catch {
+      setErrorMessage(lang === "ar" ? "تعذر الاتصال بالسيرفر! يرجى المحاولة لاحقاً." : "Network error! Please try again.");
+      setTurnstileToken("");
+      resetTurnstile();
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Step 2: Verify OTP & Complete Account Registration
+  const handleVerifyAndRegisterSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErrorMessage("");
+    setSuccessMessage("");
+
+    const cleanOtp = otpCode.trim();
+    if (!/^\d{6}$/.test(cleanOtp)) {
+      setErrorMessage(lang === "ar" ? "الرجاء إدخال كود التحقق المكون من 6 أرقام!" : "Please enter the 6-digit verification code!");
+      return;
+    }
+    if (!turnstileToken) {
+      setErrorMessage(lang === "ar" ? "يرجى إكمال التحقق الأمني قبل تأكيد الحساب." : "Please complete the security check before verifying your account.");
       return;
     }
 
@@ -424,8 +540,8 @@ export default function RegisterClient({ lang, dict }: { lang: Locale; dict: any
 
     try {
       const rawPhone = phone.trim();
-      const formattedPhone = rawPhone.startsWith("+") 
-        ? rawPhone 
+      const formattedPhone = rawPhone.startsWith("+")
+        ? rawPhone
         : `${selectedCountry.dialCode} ${rawPhone.replace(/^0+/, "")}`;
 
       const res = await fetch("/api/auth/register", {
@@ -436,6 +552,7 @@ export default function RegisterClient({ lang, dict }: { lang: Locale; dict: any
           email,
           username,
           password,
+          otp: cleanOtp,
           phone: formattedPhone,
           country: selectedCountry.code,
           "cf-turnstile-response": turnstileToken
@@ -446,12 +563,12 @@ export default function RegisterClient({ lang, dict }: { lang: Locale; dict: any
 
       if (res.ok && data.success) {
         saveClientUserSession(data.token, data.user);
-        setSuccessMessage(lang === "ar" ? "تم إنشاء الحساب وتسجيل الدخول بنجاح! جاري التوجيه..." : "Account created & logged in successfully!");
+        setSuccessMessage(lang === "ar" ? "تم تأكيد البريد وإنشاء الحساب بنجاح! جاري التوجيه..." : "Email verified & account created! Redirecting...");
         setTimeout(() => {
           window.location.href = `/${lang}`;
         }, 1000);
       } else {
-        const errorMsg = data.error || data.message || (lang === "ar" ? "حدث خطأ أثناء عملية التسجيل!" : "Registration failed!");
+        const errorMsg = data.error || data.message || (lang === "ar" ? "حدث خطأ أثناء التحقق من الكود!" : "Verification failed!");
         setErrorMessage(errorMsg);
         setTurnstileToken("");
         resetTurnstile();
@@ -513,8 +630,9 @@ export default function RegisterClient({ lang, dict }: { lang: Locale; dict: any
           </div>
         )}
 
-        {/* FAST INSTANT REGISTRATION FORM */}
-        <form onSubmit={handleFastRegisterSubmit} className="relative z-10 grid grid-cols-1 md:grid-cols-2 gap-6" autoComplete="off">
+        {/* TWO-STEP REGISTRATION FORM WITH MANDATORY EMAIL OTP */}
+        {registrationStep === "form" ? (
+        <form onSubmit={handleRequestRegistrationOtp} className="relative z-10 grid grid-cols-1 md:grid-cols-2 gap-6" autoComplete="off">
           {/* Column 1 */}
           <div className="flex flex-col gap-5">
             <div className="flex flex-col gap-2">
@@ -844,7 +962,7 @@ export default function RegisterClient({ lang, dict }: { lang: Locale; dict: any
             />
           </div>
 
-          {/* FAST DIRECT SUBMIT BUTTON */}
+          {/* STEP 1 SUBMIT BUTTON (SEND OTP) */}
           <div className="col-span-1 md:col-span-2">
             <button 
               type="submit" 
@@ -854,14 +972,101 @@ export default function RegisterClient({ lang, dict }: { lang: Locale; dict: any
               {isLoading ? (
                 <>
                   <span className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin"></span>
-                  <span>{lang === "ar" ? "جاري إنشاء الحساب فورا..." : "Creating Account..."}</span>
+                  <span>{lang === "ar" ? "جاري إرسال كود التحقق للبريد..." : "Sending Verification Code..."}</span>
                 </>
               ) : (
-                <span>{dict.register.createAccount}</span>
+                <span>{lang === "ar" ? "إرسال كود التحقق والمتابعة" : "Send Verification Code & Continue"}</span>
               )}
             </button>
           </div>
         </form>
+        ) : (
+        <form onSubmit={handleVerifyAndRegisterSubmit} className="relative z-10 flex flex-col gap-5 max-w-md mx-auto w-full" autoComplete="off">
+          <div className="p-4 rounded-xl bg-surface-container-lowest border border-primary/30 text-xs text-on-surface-variant flex flex-col gap-1.5">
+            <div className="font-bold text-on-surface flex items-center gap-2">
+              <span className="material-symbols-outlined text-primary text-base">mark_email_read</span>
+              <span>{lang === "ar" ? "تأكيد البريد الإلكتروني بكود OTP" : "Email OTP Verification"}</span>
+            </div>
+            <p>
+              {lang === "ar"
+                ? "تم إرسال كود تحقق مكون من 6 أرقام إلى بريدك الإلكتروني:"
+                : "A 6-digit verification code has been sent to:"}{" "}
+              <span className="text-primary font-mono font-bold" dir="ltr">{email.trim()}</span>
+            </p>
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <label htmlFor="reg-otp" className="text-xs font-label-sm text-on-surface-variant uppercase tracking-wider">
+              {lang === "ar" ? "كود التحقق (6 أرقام)" : "Verification Code (6 Digits)"}
+            </label>
+            <input
+              id="reg-otp"
+              name="otp"
+              type="text"
+              inputMode="numeric"
+              maxLength={6}
+              value={otpCode}
+              onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+              placeholder="123456"
+              dir="ltr"
+              autoComplete="one-time-code"
+              className="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-lg py-3.5 px-4 text-center text-2xl tracking-[0.5em] font-mono font-bold text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 transition-all placeholder:text-on-surface-variant/30"
+              autoFocus
+            />
+          </div>
+
+          <div>
+            <CloudflareTurnstile
+              onVerify={(token) => setTurnstileToken(token)}
+              onExpire={() => setTurnstileToken("")}
+              onError={() => setTurnstileToken("")}
+            />
+          </div>
+
+          <button
+            type="submit"
+            disabled={isLoading || !turnstileToken || otpCode.trim().length !== 6}
+            className="w-full bg-primary-container text-on-primary-container py-4 rounded-lg font-bold text-lg hover:bg-primary transition-all glow-primary shadow-[0_0_15px_rgba(124,58,237,0.2)] active:scale-[0.99] flex items-center justify-center gap-2 disabled:opacity-50"
+          >
+            {isLoading ? (
+              <>
+                <span className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin"></span>
+                <span>{lang === "ar" ? "جاري تأكيد الكود وإنشاء الحساب..." : "Verifying & Creating Account..."}</span>
+              </>
+            ) : (
+              <span>{dict.register.createAccount}</span>
+            )}
+          </button>
+
+          <div className="flex items-center justify-between gap-3 pt-2 text-xs">
+            <button
+              type="button"
+              onClick={handleResendRegistrationOtp}
+              disabled={isLoading || resendCooldown > 0 || !turnstileToken}
+              className="text-primary font-bold hover:underline disabled:opacity-50 disabled:no-underline"
+            >
+              {resendCooldown > 0
+                ? (lang === "ar" ? `إعادة الإرسال بعد ${resendCooldown} ثانية` : `Resend in ${resendCooldown}s`)
+                : (lang === "ar" ? "إعادة إرسال كود التحقق" : "Resend Verification Code")}
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                setRegistrationStep("form");
+                setOtpCode("");
+                setErrorMessage("");
+                setSuccessMessage("");
+                setTurnstileToken("");
+                resetTurnstile();
+              }}
+              className="text-on-surface-variant hover:text-on-surface font-semibold"
+            >
+              {lang === "ar" ? "تعديل البيانات" : "Edit Details"}
+            </button>
+          </div>
+        </form>
+        )}
 
         <div className="relative z-10 mt-8 text-center text-sm text-on-surface-variant">
           {dict.register.hasAccount} <Link href={`/${lang}/login`} className="text-primary hover:text-primary-container font-semibold transition-colors">{dict.register.signIn}</Link>

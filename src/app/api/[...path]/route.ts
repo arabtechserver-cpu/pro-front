@@ -71,6 +71,7 @@ async function proxyRequest(
     'x-idempotency-key',
     'x-admin-token',
     'x-admin-request',
+    'x-passive-request',
     'x-user-token',
     'x-forwarded-for',
     'x-forwarded-proto',

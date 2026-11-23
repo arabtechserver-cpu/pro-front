@@ -91,10 +91,14 @@ const nextConfig = {
             key: 'Permissions-Policy',
             value: 'camera=(), microphone=(), geolocation=()',
           },
-          {
-            key: 'Strict-Transport-Security',
-            value: 'max-age=31536000; includeSubDomains; preload',
-          },
+          ...(process.env.NODE_ENV === 'production'
+            ? [
+                {
+                  key: 'Strict-Transport-Security',
+                  value: 'max-age=31536000; includeSubDomains; preload',
+                },
+              ]
+            : []),
           {
             key: 'Content-Security-Policy',
             value: [
@@ -104,7 +108,7 @@ const nextConfig = {
               "font-src 'self' data: https://fonts.gstatic.com",
               "img-src 'self' data: blob: https:",
               "media-src 'self' data: blob: https:",
-              "connect-src 'self' data: blob: https://api.arabproserver.com https://api.borai.store https://borai.store https://www.borai.store https://accounts.google.com https://challenges.cloudflare.com https://www.paypal.com https://www.sandbox.paypal.com https://fonts.googleapis.com https://fonts.gstatic.com",
+              `connect-src 'self' data: blob: ${process.env.NODE_ENV === 'development' ? 'ws: wss:' : ''} https://api.arabproserver.com https://api.borai.store https://borai.store https://www.borai.store https://accounts.google.com https://challenges.cloudflare.com https://www.paypal.com https://www.sandbox.paypal.com https://fonts.googleapis.com https://fonts.gstatic.com`.replace(/\s+/g, ' ').trim(),
               "frame-src 'self' https://accounts.google.com https://challenges.cloudflare.com https://www.sandbox.paypal.com https://www.paypal.com",
               "worker-src 'self' blob:",
               "object-src 'none'",

@@ -7,12 +7,30 @@ import Link from "next/link";
 import Image from "next/image";
 import { cleanHtmlToText } from "@/utils/cleanHtml";
 
+interface CashierPurchaseItem {
+  id: string;
+  planName: string;
+  amountMinor: number;
+  durationDays: number;
+  refNo: string;
+  customerEmail: string;
+  createdAt: string;
+  expiresAt: string | null;
+  used: boolean;
+  revoked: boolean;
+}
+
 export default function OrdersClient({ lang, dict }: { lang: string, dict: any }) {
   const [userSession, setUserSession] = useState<any>(null);
   const [userBalance, setUserBalance] = useState<number>(0.0);
 
   // Orders History State from DB
   const [ordersList, setOrdersList] = useState<any[]>([]);
+  const [cashierPurchases, setCashierPurchases] = useState<CashierPurchaseItem[]>([]);
+  const [revealedKeys, setRevealedKeys] = useState<Record<string, string>>({});
+  const [loadingKeyId, setLoadingKeyId] = useState<string | null>(null);
+  const [keyErrors, setKeyErrors] = useState<Record<string, string>>({});
+  const [copiedKeyId, setCopiedKeyId] = useState<string | null>(null);
   const [loadingOrders, setLoadingOrders] = useState(true);
   const [filterStatus, setFilterStatus] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -54,7 +72,7 @@ export default function OrdersClient({ lang, dict }: { lang: string, dict: any }
     }
   }, []);
 
-  // 2. Fetch Real Customer Orders from Database
+  // 2. Fetch Real Customer Orders & ar-pro Subscriptions from Database
   const fetchCustomerOrders = async () => {
     if (!userSession?.email && !userSession?.id) {
       setLoadingOrders(false);
@@ -68,23 +86,88 @@ export default function OrdersClient({ lang, dict }: { lang: string, dict: any }
       if (token && token !== "null" && token !== "undefined") {
         headers["Authorization"] = `Bearer ${token}`;
       }
-      const res = await userApiFetch(`/api/orders?${param}`, {
-        headers,
-        credentials: "include"
-      });
-      if (res.ok) {
+      const [ordersRes, cashierRes] = await Promise.all([
+        userApiFetch(`/api/orders?${param}`, {
+          headers,
+          credentials: "include"
+        }),
+        userApiFetch("/api/mobile-cashier/checkout", {
+          headers,
+          credentials: "include"
+        }).catch(() => null),
+      ]);
+
+      if (ordersRes.ok) {
         setAuthExpired(false);
-        const data = await res.json().catch(() => ({ orders: [] }));
+        const data = await ordersRes.json().catch(() => ({ orders: [] }));
         if (data.orders && Array.isArray(data.orders)) {
           setOrdersList(data.orders);
         }
-      } else if (res.status === 401) {
+      } else if (ordersRes.status === 401) {
         setAuthExpired(true);
+      }
+
+      if (cashierRes && cashierRes.ok) {
+        const cashierData = await cashierRes.json().catch(() => ({}));
+        if (Array.isArray(cashierData.purchases)) {
+          setCashierPurchases(cashierData.purchases);
+        }
       }
     } catch (e) {
       console.error("Error fetching orders list:", e);
     } finally {
       setLoadingOrders(false);
+    }
+  };
+
+  const revealCashierKey = async (purchaseId: string) => {
+    setLoadingKeyId(purchaseId);
+    setKeyErrors((prev) => {
+      const next = { ...prev };
+      delete next[purchaseId];
+      return next;
+    });
+    try {
+      const token = localStorage.getItem("user_token");
+      const headers: Record<string, string> = {};
+      if (token && token !== "null" && token !== "undefined") {
+        headers["Authorization"] = `Bearer ${token}`;
+      }
+      const res = await userApiFetch(`/api/mobile-cashier/checkout/${purchaseId}/key`, {
+        headers,
+        credentials: "include"
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data.key) {
+        setKeyErrors((prev) => ({
+          ...prev,
+          [purchaseId]: data.error || (lang === "ar" ? "تعذر عرض مفتاح التفعيل حالياً" : "Unable to reveal activation key")
+        }));
+        return;
+      }
+      setRevealedKeys((prev) => ({ ...prev, [purchaseId]: data.key }));
+    } catch {
+      setKeyErrors((prev) => ({
+        ...prev,
+        [purchaseId]: lang === "ar" ? "تعذر الاتصال بالسيرفر لعرض المفتاح" : "Network error while fetching key"
+      }));
+    } finally {
+      setLoadingKeyId(null);
+    }
+  };
+
+  const copyCashierKey = async (purchaseId: string, keyValue: string) => {
+    try {
+      await navigator.clipboard.writeText(keyValue);
+      setCopiedKeyId(purchaseId);
+      setTimeout(() => {
+        setCopiedKeyId((current) => (current === purchaseId ? null : current));
+      }, 2000);
+    } catch {
+      setKeyErrors((prev) => ({
+        ...prev,
+        [purchaseId]: lang === "ar" ? "حدد المفتاح وانسخه يدوياً" : "Select and copy the key manually"
+      }));
     }
   };
 
@@ -94,8 +177,40 @@ export default function OrdersClient({ lang, dict }: { lang: string, dict: any }
     }
   }, [userSession]);
 
+  // Merge standard orders with ar-pro subscription purchases sorted newest first
+  const combinedOrders = [
+    ...ordersList,
+    ...cashierPurchases.map((p) => {
+      const statusLabel = p.revoked
+        ? lang === "ar"
+          ? "الكود موقوف"
+          : "Code revoked"
+        : p.used && p.expiresAt
+          ? lang === "ar"
+            ? `مفعّل حتى ${new Date(p.expiresAt).toLocaleDateString("ar-EG")}`
+            : `Activated until ${new Date(p.expiresAt).toLocaleDateString("en-GB")}`
+          : lang === "ar"
+            ? "جاهز للتفعيل"
+            : "Ready to activate";
+
+      return {
+        id: p.id,
+        displayId: p.refNo,
+        isArPro: true,
+        revoked: p.revoked,
+        serviceName: lang === "ar" ? `اشتراك ar-pro — ${p.planName}` : `ar-pro Subscription — ${p.planName}`,
+        notes: `${p.durationDays} ${lang === "ar" ? "يوم" : "days"} · ${statusLabel}`,
+        targetInput: p.customerEmail,
+        price: p.amountMinor / 100,
+        quantity: 1,
+        status: p.revoked ? "failed" : "completed",
+        createdAt: p.createdAt,
+      };
+    }),
+  ].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
   // Filtered Orders for the table
-  const filteredOrders = ordersList.filter(o => {
+  const filteredOrders = combinedOrders.filter(o => {
     if (filterStatus === "processing" && !(o.status === "processing" || o.status === "pending")) return false;
     if (filterStatus === "completed" && o.status !== "completed") return false;
     if (filterStatus === "failed" && !(o.status === "failed" || o.status === "rejected")) return false;
@@ -103,11 +218,12 @@ export default function OrdersClient({ lang, dict }: { lang: string, dict: any }
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase().trim();
       const orderId = (o.id || "").toLowerCase();
+      const displayId = (o.displayId || "").toLowerCase();
       const serviceName = (o.serviceName || "").toLowerCase();
       const targetInput = (o.targetInput || "").toLowerCase();
       const notes = (o.notes || "").toLowerCase();
 
-      return orderId.includes(q) || serviceName.includes(q) || targetInput.includes(q) || notes.includes(q);
+      return orderId.includes(q) || displayId.includes(q) || serviceName.includes(q) || targetInput.includes(q) || notes.includes(q);
     }
 
     return true;
@@ -309,13 +425,21 @@ export default function OrdersClient({ lang, dict }: { lang: string, dict: any }
                   return (
                     <tr key={ord.id} className="hover:bg-surface-container-high/40 transition-colors">
                       <td className="p-4 font-bold text-primary font-mono text-xs dir-ltr text-start">
-                        #{ord.id.slice(-6).toUpperCase()}
+                        {ord.isArPro ? ord.displayId : `#${ord.id.slice(-6).toUpperCase()}`}
                       </td>
 
                       <td className="p-4 font-bold text-on-surface text-start">
-                        <div className="flex flex-col">
+                        <div className="flex flex-col gap-1">
                           <span>{ord.serviceName}</span>
                           {ord.notes && <span className="text-[10px] text-on-surface-variant/70 font-normal">{ord.notes}</span>}
+                          {ord.isArPro && (
+                            <Link
+                              href={`/${lang}/ar-pro`}
+                              className="text-[11px] font-bold text-primary hover:underline w-fit"
+                            >
+                              {lang === 'ar' ? 'تحميل ar-pro' : 'Download ar-pro'}
+                            </Link>
+                          )}
                         </div>
                       </td>
 
@@ -327,7 +451,48 @@ export default function OrdersClient({ lang, dict }: { lang: string, dict: any }
 
                       {/* UNLOCK CODE / RESULT REPLY DISPLAY */}
                       <td className="p-4 text-start font-mono text-xs">
-                        {ord.reply ? (
+                        {ord.isArPro ? (
+                          ord.revoked ? (
+                            <span className="text-red-400 font-bold text-[11px]">{lang === 'ar' ? 'الكود موقوف' : 'Revoked'}</span>
+                          ) : revealedKeys[ord.id] ? (
+                            <div className="space-y-1.5">
+                              <div className="flex items-center gap-2">
+                                <span className="bg-violet-500/10 border border-violet-500/30 text-violet-400 font-bold px-3 py-1 rounded-xl text-xs select-all dir-ltr glow-cyan break-all">
+                                  {revealedKeys[ord.id]}
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() => copyCashierKey(ord.id, revealedKeys[ord.id])}
+                                  className="px-2.5 py-1 rounded-lg bg-surface-container-high border border-outline-variant/30 text-on-surface hover:text-primary font-sans font-bold text-[11px] transition-colors shrink-0"
+                                  title={lang === 'ar' ? 'نسخ المفتاح' : 'Copy key'}
+                                >
+                                  {copiedKeyId === ord.id ? (lang === 'ar' ? 'تم النسخ' : 'Copied') : (lang === 'ar' ? 'نسخ' : 'Copy')}
+                                </button>
+                              </div>
+                              <p className="font-sans text-[10px] text-on-surface-variant">
+                                {lang === 'ar'
+                                  ? 'افتح ar-pro ← عندي مفتاح ← بنفس البريد الظاهر'
+                                  : 'Open ar-pro -> I have a key -> with the email shown'}
+                              </p>
+                            </div>
+                          ) : (
+                            <div className="space-y-1">
+                              <button
+                                type="button"
+                                onClick={() => revealCashierKey(ord.id)}
+                                disabled={loadingKeyId === ord.id}
+                                className="px-3 py-1.5 rounded-xl bg-primary/15 border border-primary/30 text-primary hover:bg-primary hover:text-on-primary font-sans font-bold text-xs transition-all disabled:opacity-50"
+                              >
+                                {loadingKeyId === ord.id
+                                  ? (lang === 'ar' ? 'جاري العرض...' : 'Loading...')
+                                  : (lang === 'ar' ? 'عرض مفتاح التفعيل' : 'Show Activation Key')}
+                              </button>
+                              {keyErrors[ord.id] && (
+                                <p className="font-sans text-[10px] text-red-400">{keyErrors[ord.id]}</p>
+                              )}
+                            </div>
+                          )
+                        ) : ord.reply ? (
                           <div className="flex items-center gap-2">
                             <span className="bg-violet-500/10 border border-violet-500/30 text-violet-400 font-bold px-3 py-1 rounded-xl text-xs select-all dir-ltr glow-cyan whitespace-pre-wrap block">
                               {cleanHtmlToText(ord.reply)}

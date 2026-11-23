@@ -12,6 +12,11 @@ export async function authProxyBudget(
     'https://arabproserver.com', 'https://www.arabproserver.com',
     'https://borai.store', 'https://www.borai.store',
   ]);
+  if (process.env.NODE_ENV !== 'production') {
+    const port = request.nextUrl.port || '3000';
+    trustedOrigins.add(`http://localhost:${port}`);
+    trustedOrigins.add(`http://127.0.0.1:${port}`);
+  }
   for (const value of [
     process.env.NEXT_PUBLIC_SITE_URL,
     ...(process.env.FRONTEND_URL || '').split(','),

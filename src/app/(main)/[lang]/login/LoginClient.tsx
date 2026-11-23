@@ -10,6 +10,13 @@ import { saveClientUserSession } from "@/lib/user-api-fetch";
 
 const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || "";
 
+function loginDestination(lang: Locale) {
+  const returnTo = new URLSearchParams(window.location.search).get("returnTo");
+  const checkout = `/${lang}/ar-pro/checkout`;
+  if (returnTo === checkout || returnTo?.startsWith(`${checkout}?`)) return returnTo;
+  return `/${lang}`;
+}
+
 export default function LoginClient({ lang, dict }: { lang: Locale; dict: any }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -64,7 +71,7 @@ export default function LoginClient({ lang, dict }: { lang: Locale; dict: any })
         saveClientUserSession(data.token, data.user);
         setSuccessMessage(lang === "ar" ? "تم تسجيل الدخول بحساب Google بنجاح! جاري التوجيه..." : "Google login successful! Redirecting...");
         setTimeout(() => {
-          window.location.href = `/${lang}`;
+          window.location.href = loginDestination(lang);
         }, 1000);
       } else {
         setErrorMessage(data.error || (lang === "ar" ? "فشل تسجيل الدخول بحساب Google" : "Google Sign-In failed"));
@@ -145,7 +152,7 @@ export default function LoginClient({ lang, dict }: { lang: Locale; dict: any })
         saveClientUserSession(data.token, data.user);
         setSuccessMessage(lang === "ar" ? "تم تسجيل الدخول بنجاح! جاري التوجيه..." : "Login successful! Redirecting...");
         setTimeout(() => {
-          window.location.href = `/${lang}`;
+          window.location.href = loginDestination(lang);
         }, 1000);
       } else {
         const errorMsg = data.error || data.message || (lang === "ar" ? "بيانات الدخول غير صحيحة!" : "Invalid login credentials!");

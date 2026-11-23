@@ -299,6 +299,7 @@ export default async function RootLayout(
         />
       </head>
       <body
+        suppressHydrationWarning
         className={`${cairo.variable} ${inter.variable} ${jakarta.variable} ${jetbrains.variable} font-sans bg-[#f8fafc] text-slate-900 dark:bg-[#0b0f17] dark:text-slate-100 subpixel-antialiased min-h-screen flex flex-col relative`}
       >
         <ThemeProvider>

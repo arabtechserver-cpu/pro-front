@@ -28,7 +28,9 @@ function handleExpiredSessionOnce(reason: 'session-expired' | 'idle-timeout' = '
   redirecting = true;
   clearClientSessionState();
   const lang = window.location.pathname.split('/')[1] === 'en' ? 'en' : 'ar';
-  window.location.replace(`/${lang}/login?reason=${reason}`);
+  const checkout = `/${lang}/ar-pro/checkout`;
+  const returnQuery = window.location.pathname === checkout ? `&returnTo=${encodeURIComponent(checkout + window.location.search)}` : '';
+  window.location.replace(`/${lang}/login?reason=${reason}${returnQuery}`);
 }
 
 export function saveClientUserSession(token: string | null | undefined, user: unknown) {

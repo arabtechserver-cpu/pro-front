@@ -1,6 +1,7 @@
 export const sitePages = {
   home: { path: "", ar: "الرئيسية", en: "Home" },
   pricing: { path: "/pricing", ar: "أسعار الوكلاء", en: "Reseller pricing" },
+  cashier: { path: "/ar-pro", ar: "ar-pro", en: "ar-pro" },
   gaming: { path: "/gaming", ar: "الألعاب والبطاقات", en: "Games & cards" },
   orders: { path: "/orders", ar: "طلباتي", en: "My orders" },
   wallet: { path: "/wallet", ar: "المحفظة", en: "Wallet" },
@@ -18,5 +19,5 @@ export const sitePages = {
 } as const;
 
 export type SitePage = keyof typeof sitePages;
-export const primaryPages: SitePage[] = ["home", "pricing", "gaming", "blog", "contact"];
+export const primaryPages: SitePage[] = ["home", "pricing", "cashier", "gaming", "blog", "contact"];
 export const morePages: SitePage[] = ["api", "faq", "terms", "refund"];

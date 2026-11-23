@@ -12,6 +12,7 @@ const NAV_ITEMS = [
   { href: "/admin", label: "ملخص الإحصائيات", icon: "dashboard" },
   { href: "/admin/orders", label: "الطلبات", icon: "shopping_cart" },
   { href: "/admin/services", label: "الخدمات والأقسام", icon: "category" },
+  { href: "/admin/ar-pro", label: "ar-pro", icon: "point_of_sale" },
   { href: "/admin/foxreload", label: "الخدمات الرقمية والترفيه (FoxReload)", icon: "sports_esports" },
   { href: "/admin/users", label: "إدارة المستخدمين المسجلين", icon: "manage_accounts" },
   { href: "/admin/api-users", label: "إدارة مشتركي الـ API", icon: "api" },

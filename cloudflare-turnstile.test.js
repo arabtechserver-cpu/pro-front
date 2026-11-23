@@ -57,6 +57,7 @@ function loadComponent(file, { props = {}, env = {}, imports = {} } = {}) {
         useMemo: callback => callback(), useCallback: callback => callback,
       };
       if (name === '@/components/BrandLogo') return { default: 'brand-logo', __esModule: true };
+      if (name === '@/components/ThemeToggle') return { default: 'theme-toggle', __esModule: true };
       if (Object.hasOwn(imports, name)) return imports[name];
       throw new Error(`Unexpected import: ${name}`);
     },

@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { securePassword } from '@/lib/secure-password';
@@ -210,11 +210,31 @@ export default function AdminUsersPage() {
 
     setActionLoadingId(user.id);
     try {
-      await fetch(`/api/users/${user.id}`, { method: "DELETE" });
+      const res = await fetch(`/api/users/${user.id}`, { method: "DELETE" });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || data.success === false) {
+        setToastMessage({
+          type: "error",
+          text: data.error || "تعذر حذف الحساب"
+        });
+        return;
+      }
+
       setUsers((prev) => prev.filter((u) => u.id !== user.id));
-      setToastMessage({ type: "success", text: "تم حذف الحساب بنجاح" });
+      setStats((prev) => ({
+        total: Math.max(0, prev.total - 1),
+        active: user.status === "active" ? Math.max(0, prev.active - 1) : prev.active,
+        suspended: user.status === "suspended" ? Math.max(0, prev.suspended - 1) : prev.suspended
+      }));
+      setToastMessage({
+        type: "success",
+        text: data.message || "تم حذف الحساب بنجاح"
+      });
     } catch {
-      setUsers((prev) => prev.filter((u) => u.id !== user.id));
+      setToastMessage({
+        type: "error",
+        text: "تعذر الاتصال بالسيرفر لحذف الحساب"
+      });
     } finally {
       setActionLoadingId(null);
       setTimeout(() => setToastMessage(null), 3000);
@@ -385,8 +405,18 @@ export default function AdminUsersPage() {
     <div className="space-y-6">
       {/* Toast Notification */}
       {toastMessage && (
-        <div className="fixed bottom-6 left-6 z-50 p-4 rounded-xl bg-surface-container-high border border-primary/40 text-on-surface shadow-2xl flex items-center gap-3 animate-in fade-in slide-in-from-bottom-4 duration-300">
-          <span className="material-symbols-outlined text-primary text-xl">check_circle</span>
+        <div
+          className={`fixed bottom-6 left-6 z-50 p-4 rounded-xl bg-surface-container-high border text-on-surface shadow-2xl flex items-center gap-3 animate-in fade-in slide-in-from-bottom-4 duration-300 ${
+            toastMessage.type === "error" ? "border-red-500/40" : "border-primary/40"
+          }`}
+        >
+          <span
+            className={`material-symbols-outlined text-xl ${
+              toastMessage.type === "error" ? "text-red-400" : "text-primary"
+            }`}
+          >
+            {toastMessage.type === "error" ? "error" : "check_circle"}
+          </span>
           <span className="text-sm font-bold">{toastMessage.text}</span>
         </div>
       )}
@@ -670,7 +700,8 @@ export default function AdminUsersPage() {
                         {/* Delete User */}
                         <button
                           onClick={() => handleDeleteUser(user)}
-                          className="p-1.5 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 transition-all"
+                          disabled={actionLoadingId === user.id}
+                          className="p-1.5 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 transition-all disabled:opacity-50"
                           title="حذف الحساب"
                         >
                           <span className="material-symbols-outlined text-sm">delete</span>

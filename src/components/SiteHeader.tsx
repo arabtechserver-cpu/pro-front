@@ -45,7 +45,8 @@ export default function SiteHeader({ lang }: { lang: "ar" | "en" }) {
   const switchLanguage = pathname === "/" ? (ar ? "/en" : "/ar") : pathname.replace(/^\/(ar|en)(?=\/|$)/, ar ? "/en" : "/ar");
   const pageLink = (key: SitePage) => {
     const page = sitePages[key]; const href = `${base}${page.path}`;
-    const active = page.path ? pathname === href || pathname.startsWith(`${href}/`) : pathname === "/" || pathname === base || pathname === `${base}/`;
+    const active = page.path ? pathname === href || pathname.startsWith(`${href}/`) ||
+      (key === "cashier" && pathname === `${base}/mobile-cashier`) : pathname === "/" || pathname === base || pathname === `${base}/`;
     return <Link key={key} href={href} aria-current={active ? "page" : undefined} className={active ? styles.activePage : undefined} onClick={() => setMenuOpen(false)}>{page[lang]}<NavigationPending ar={ar} /></Link>;
   };
   const search = (event: FormEvent<HTMLFormElement>) => { if (!query.trim()) { event.preventDefault(); headerRef.current?.querySelector<HTMLInputElement>("input[type=search]")?.focus(); } };

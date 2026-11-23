@@ -53,6 +53,7 @@ export default function AdminRootLayout({
         />
       </head>
       <body
+        suppressHydrationWarning
         className={`${cairo.variable} ${inter.variable} ${jakarta.variable} ${jetbrains.variable} font-sans bg-background text-on-surface antialiased transition-colors duration-200`}
       >
         <ThemeProvider defaultTheme="dark">
