@@ -51,7 +51,7 @@ export default function ScreenTour({ lang }: { lang: Lang }) {
             </div>
           </div>
           <button className={styles.primaryScreen} type="button" onClick={() => dialog.current?.showModal()} aria-label={(ar ? "تكبير شاشة " : "Enlarge ") + active.title[lang]}>
-            <Image src={screenPath(active.id)} alt={active.title[lang]} width={1440} height={900} sizes="(max-width: 820px) 94vw, 65vw" />
+            <Image src={screenPath(active.id)} alt={active.title[lang]} width={1440} height={900} sizes="(max-width: 820px) 94vw, 65vw" loading="eager" unoptimized />
             <span><Expand size={15} aria-hidden="true" />{ar ? "عرض بالحجم الكامل" : "View full size"}</span>
           </button>
         </div>
@@ -61,7 +61,7 @@ export default function ScreenTour({ lang }: { lang: Lang }) {
               setSelected(screen.id);
               viewer.current?.scrollIntoView({ block: "nearest", behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
             }}>
-              <Image src={screenPath(screen.id)} alt="" width={1440} height={900} sizes="(max-width: 700px) 44vw, (max-width: 980px) 29vw, 22vw" />
+              <Image src={screenPath(screen.id)} alt="" width={1440} height={900} sizes="(max-width: 700px) 44vw, (max-width: 980px) 29vw, 22vw" unoptimized />
               <span>{screen.title[lang]}</span>
             </button>
           ))}
@@ -72,7 +72,7 @@ export default function ScreenTour({ lang }: { lang: Lang }) {
       }}>
         <div className={styles.dialogInner}>
           <div><strong>{active.title[lang]}</strong><button autoFocus type="button" aria-label={ar ? "إغلاق الصورة" : "Close image"} onClick={() => dialog.current?.close()}><X size={22} /></button></div>
-          <Image src={screenPath(active.id)} alt={active.title[lang]} width={1440} height={900} sizes="95vw" />
+          <Image src={screenPath(active.id)} alt={active.title[lang]} width={1440} height={900} sizes="95vw" unoptimized />
         </div>
       </dialog>
     </section>

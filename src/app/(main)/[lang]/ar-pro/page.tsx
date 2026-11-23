@@ -72,7 +72,7 @@ export default async function ArPro({ params }: Props) {
             </div>
             <figure className={styles.heroWindow}>
               <figcaption><span dir="ltr">ar-pro</span><span><Monitor size={15} />{c("نقطة البيع", "Point of sale")}</span></figcaption>
-              <Image src="/images/ar-pro/sales.webp" alt={c("شاشة نقطة البيع الكاملة في ar-pro تعرض المنتجات وسلة البيع", "Full ar-pro point-of-sale screen with products and the checkout basket")} width={1440} height={900} sizes="(max-width: 980px) 94vw, 57vw" loading="eager" fetchPriority="high" />
+              <Image src="/images/ar-pro/sales.webp" alt={c("شاشة نقطة البيع الكاملة في ar-pro تعرض المنتجات وسلة البيع", "Full ar-pro point-of-sale screen with products and the checkout basket")} width={1440} height={900} sizes="(max-width: 980px) 94vw, 57vw" loading="eager" fetchPriority="high" unoptimized />
             </figure>
           </div>
           <div className={styles.facts}>
@@ -86,7 +86,7 @@ export default async function ArPro({ params }: Props) {
       <section className={styles.story}>
         <div className={styles.wrap}>
           <div className={styles.storyGrid}>
-            <Image src="/images/ar-pro/workbench.webp" alt={c("هاتف وأدوات دقيقة وطابعة إيصالات على طاولة محل موبايلات", "Phone, precision tools and a receipt printer on a mobile repair counter")} width={1536} height={1024} sizes="(max-width: 820px) 94vw, 50vw" />
+            <Image src="/images/ar-pro/workbench.webp" alt={c("هاتف وأدوات دقيقة وطابعة إيصالات على طاولة محل موبايلات", "Phone, precision tools and a receipt printer on a mobile repair counter")} width={1536} height={1024} sizes="(max-width: 820px) 94vw, 50vw" unoptimized />
             <div>
               <h2>{c("شغل المحل، من الكاونتر لطاولة الصيانة.", "From the counter to the workbench.")}</h2>
               <div className={styles.storyItems}>
