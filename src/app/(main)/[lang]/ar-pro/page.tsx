@@ -6,7 +6,7 @@ import { getProduct } from "./product";
 import ScreenTour from "./ScreenTour";
 import styles from "./product.module.css";
 
-const defaultDownloadUrl = "https://www.mediafire.com/file/rtet2dxrja5i241/ar-pro-Setup-1.2.7.exe/file";
+const defaultDownloadUrl = "https://www.mediafire.com/file/7b68gzjgaiy1v9d/ar-pro-Setup-1.2.8.exe/file";
 
 export const dynamic = "force-dynamic";
 
