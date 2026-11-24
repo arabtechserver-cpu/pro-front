@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowDown, ArrowUpRight, ChevronDown, Download, HardDrive, Headset, KeyRound, Monitor, ReceiptText, Wrench } from "lucide-react";
+import { ArrowUpRight, ChevronDown, Download, HardDrive, Headset, KeyRound, Monitor, ReceiptText, Wrench } from "lucide-react";
 import { getProduct } from "./product";
 import ScreenTour from "./ScreenTour";
 import styles from "./product.module.css";
+
+const defaultDownloadUrl = "https://www.mediafire.com/file/rtet2dxrja5i241/ar-pro-Setup-1.2.7.exe/file";
 
 export const dynamic = "force-dynamic";
 
@@ -30,6 +32,10 @@ export default async function ArPro({ params }: Props) {
   const c = (arabic: string, english: string) => ar ? arabic : english;
   const contactPath = "/" + lang + "/contact";
   const checkoutPath = "/" + lang + "/ar-pro/checkout";
+  const downloadUrl = product?.downloadUrl || defaultDownloadUrl;
+  const externalDownloadProps = downloadUrl.startsWith("https://")
+    ? { target: "_blank" as const, rel: "noopener noreferrer" }
+    : {};
   const currency = (value: number, code: string) => new Intl.NumberFormat(ar ? "ar-EG" : "en", { style: "currency", currency: code, currencyDisplay: code === "USD" ? "narrowSymbol" : "symbol" }).format(value / 100);
   const duration = (days: number) => {
     if (days === 30) return c("اشتراك شهر واحد", "1 month of access");
@@ -64,9 +70,7 @@ export default async function ArPro({ params }: Props) {
               <h1>{c("من أول فاتورة", "From the first sale")}<br /><em>{c("لحد تسليم الجهاز.", "to device pickup.")}</em></h1>
               <p>{c("برنامج لمحل الموبايل يجمع الكاشير والمخزون وطلبات الصيانة. تابع البيع والإصلاح والتسليم من نفس مساحة العمل.", "A Windows workspace for phone shops that brings checkout, stock and repairs together, from the counter to the workbench.")}</p>
               <div className={styles.actions}>
-                {product?.downloadUrl
-                  ? <a className={styles.limeButton} href={product.downloadUrl}><Download size={18} />{c("تحميل لويندوز", "Download for Windows")}</a>
-                  : <a className={styles.limeButton} href="#screens">{c("اتفرج على البرنامج", "Explore the app")} <ArrowDown size={18} /></a>}
+                <a className={styles.limeButton} href={downloadUrl} {...externalDownloadProps}><Download size={18} />{c("تحميل لويندوز", "Download for Windows")}</a>
                 <a className={styles.ghostButton} href="#plans">{c("الباقات والأسعار", "Plans and pricing")}</a>
               </div>
             </div>
@@ -111,7 +115,7 @@ export default async function ArPro({ params }: Props) {
               <h3>{c("التجربة المجانية", "Free trial")}</h3>
               <p className={styles.price}>{ar ? "٣ أيام" : "3 days"}</p>
               <p>{c("تبدأ من أول تسجيل ناجح على جهازك.", "Begins with the first successful registration on your device.")}</p>
-              <a className={styles.darkButton} href={product?.downloadUrl ?? "#screens"}>{product?.downloadUrl ? c("تحميل البرنامج", "Download the app") : c("جولة في البرنامج", "Take a tour")} <ArrowUpRight size={17} /></a>
+              <a className={styles.darkButton} href={downloadUrl} {...externalDownloadProps}>{c("تحميل البرنامج", "Download the app")} <ArrowUpRight size={17} /></a>
             </article>
             {product?.plans.map((plan) => (
               <article className={styles.paidPlan} key={plan.id}>
