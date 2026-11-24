@@ -296,6 +296,7 @@ export default function ProvidersClient() {
           apiUrl: formData.apiUrl,
           username: formData.username,
           apiKey: formData.apiKey,
+          type: formData.type,
           providerId: editingProvider?.id
         })
       });
@@ -989,7 +990,11 @@ export default function ProvidersClient() {
                           {provider.isActive ? "نشط" : "معطل"}
                         </span>
                         <span className="text-[10px] px-2 py-0.5 rounded-md bg-surface-container-high text-on-surface-variant font-mono">
-                          {provider.type === "dhru" ? "Dhru Fusion API" : "Dynamic Mapper"}
+                          {provider.type === "foxreload" || provider.id === "foxreload-provider"
+                            ? "FoxReload API"
+                            : provider.type === "dhru"
+                              ? "Dhru Fusion API"
+                              : "Dynamic Mapper"}
                         </span>
                       </div>
 
@@ -1043,6 +1048,15 @@ export default function ProvidersClient() {
                   </div>
 
                   <div className="flex items-center justify-end gap-2.5 flex-wrap">
+                    {(provider.type === "foxreload" || provider.id === "foxreload-provider") && (
+                      <Link
+                        href="/admin/foxreload"
+                        className="px-3.5 py-2 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 text-amber-400 text-xs font-bold transition-all flex items-center gap-1.5 border border-amber-500/30 shadow-sm"
+                      >
+                        <span className="material-symbols-outlined text-sm">sports_esports</span>
+                        <span>لوحة FoxReload المتقدمة</span>
+                      </Link>
+                    )}
                     <button
                       onClick={() => setRawExportModalProvider(provider)}
                       className="px-3.5 py-2 rounded-xl bg-violet-500/15 hover:bg-violet-500/25 text-violet-400 text-xs font-bold transition-all flex items-center gap-1.5 border border-violet-500/30 shadow-sm"
@@ -1130,7 +1144,7 @@ export default function ProvidersClient() {
                 <input
                   type="url"
                   required
-                  placeholder="https://server-domain.com/api/index.php"
+                  placeholder={formData.type === "foxreload" ? "https://public-api.foxreload.com" : "https://server-domain.com/api/index.php"}
                   value={formData.apiUrl}
                   onChange={(e) => setFormData({ ...formData, apiUrl: e.target.value })}
                   className="w-full px-4 py-3 bg-surface-container-lowest border border-outline-variant/40 rounded-xl focus:border-primary outline-none text-xs font-mono text-on-surface text-left dir-ltr transition-all"
@@ -1144,7 +1158,7 @@ export default function ProvidersClient() {
                   </label>
                   <input
                     type="text"
-                    placeholder="Username"
+                    placeholder={formData.type === "foxreload" ? "غير مطلوب لـ FoxReload" : "Username"}
                     value={formData.username}
                     onChange={(e) => setFormData({ ...formData, username: e.target.value })}
                     className="w-full px-4 py-3 bg-surface-container-lowest border border-outline-variant/40 rounded-xl focus:border-primary outline-none text-xs font-mono text-on-surface text-left dir-ltr transition-all"
@@ -1170,10 +1184,18 @@ export default function ProvidersClient() {
                 <label className="block text-xs font-bold text-on-surface-variant mb-1.5">نوع النظام والبروتوكول:</label>
                 <select
                   value={formData.type}
-                  onChange={(e) => setFormData({ ...formData, type: e.target.value })}
+                  onChange={(e) => {
+                    const nextType = e.target.value;
+                    setFormData({
+                      ...formData,
+                      type: nextType,
+                      apiUrl: nextType === "foxreload" && !formData.apiUrl.trim() ? "https://public-api.foxreload.com" : formData.apiUrl
+                    });
+                  }}
                   className="w-full px-4 py-3 bg-surface-container-lowest border border-outline-variant/40 rounded-xl focus:border-primary outline-none text-xs font-bold text-on-surface transition-all cursor-pointer"
                 >
                   <option value="dhru">قياسي (Dhru Fusion / PerfectPanel / GSM Standard)</option>
+                  <option value="foxreload">FoxReload API (الألعاب والبطاقات الرقمية و eSIM)</option>
                   <option value="dynamic">مخصص (Dynamic Mapper - ربط ديناميكي)</option>
                 </select>
               </div>
