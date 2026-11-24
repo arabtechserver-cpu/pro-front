@@ -88,6 +88,7 @@ async function proxyRequest(
     'x-real-ip',
     'true-client-ip',
     'x-device-fingerprint',
+    'x-cashier-nonce',
     'x-api-key',
     'x-username',
     'x-action',
