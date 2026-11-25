@@ -125,7 +125,7 @@ async function proxyRequest(
 
 
 function getProxyHeaderTimeoutMs(path: string): number {
-  return /^(orders\/(dispatch-provider|auto-dispatch)|providers|api-providers|foxreload\/(sync|products|categories)|backup)(\/|$)/.test(path)
+  return /^(orders\/(dispatch-provider|auto-dispatch)|providers|api-providers|foxreload\/(admin\/(sync|catalog|category)|sync|products|categories)|backup)(\/|$)/.test(path)
     ? 65000
     : 29000;
 }
