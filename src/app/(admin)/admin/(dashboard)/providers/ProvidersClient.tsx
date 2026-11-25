@@ -992,9 +992,11 @@ export default function ProvidersClient() {
                         <span className="text-[10px] px-2 py-0.5 rounded-md bg-surface-container-high text-on-surface-variant font-mono">
                           {provider.type === "foxreload" || provider.id === "foxreload-provider"
                             ? "FoxReload API"
-                            : provider.type === "dhru"
-                              ? "Dhru Fusion API"
-                              : "Dynamic Mapper"}
+                            : provider.type === "dhru_fusion_pro"
+                              ? "Dhru Fusion Pro"
+                              : provider.type === "dhru"
+                                ? "Dhru Fusion API"
+                                : "Dynamic Mapper"}
                         </span>
                       </div>
 
@@ -1144,9 +1146,23 @@ export default function ProvidersClient() {
                 <input
                   type="url"
                   required
-                  placeholder={formData.type === "foxreload" ? "https://public-api.foxreload.com" : "https://server-domain.com/api/index.php"}
+                  placeholder={
+                    formData.type === "foxreload"
+                      ? "https://public-api.foxreload.com"
+                      : formData.type === "dhru_fusion_pro"
+                        ? "https://api.gsmgenesis.com"
+                        : "https://server-domain.com/api/index.php"
+                  }
                   value={formData.apiUrl}
-                  onChange={(e) => setFormData({ ...formData, apiUrl: e.target.value })}
+                  onChange={(e) => {
+                    const nextUrl = e.target.value;
+                    const looksFusionPro = /\/api\/reseller\/v\d+/i.test(nextUrl) || /gsmgenesis\.com/i.test(nextUrl);
+                    setFormData({
+                      ...formData,
+                      apiUrl: nextUrl,
+                      type: looksFusionPro && formData.type === "dhru" ? "dhru_fusion_pro" : formData.type
+                    });
+                  }}
                   className="w-full px-4 py-3 bg-surface-container-lowest border border-outline-variant/40 rounded-xl focus:border-primary outline-none text-xs font-mono text-on-surface text-left dir-ltr transition-all"
                 />
               </div>
@@ -1158,7 +1174,13 @@ export default function ProvidersClient() {
                   </label>
                   <input
                     type="text"
-                    placeholder={formData.type === "foxreload" ? "غير مطلوب لـ FoxReload" : "Username"}
+                    placeholder={
+                      formData.type === "foxreload"
+                        ? "غير مطلوب لـ FoxReload"
+                        : formData.type === "dhru_fusion_pro"
+                          ? "غير مطلوب لـ Fusion Pro"
+                          : "Username"
+                    }
                     value={formData.username}
                     onChange={(e) => setFormData({ ...formData, username: e.target.value })}
                     className="w-full px-4 py-3 bg-surface-container-lowest border border-outline-variant/40 rounded-xl focus:border-primary outline-none text-xs font-mono text-on-surface text-left dir-ltr transition-all"
@@ -1167,14 +1189,24 @@ export default function ProvidersClient() {
 
                 <div>
                   <label className="block text-xs font-bold text-on-surface-variant mb-1.5">
-                    مفتاح الـ API (API Key / Access Key):
+                    {formData.type === "dhru_fusion_pro"
+                      ? "رمز الوصول (Access Token):"
+                      : "مفتاح الـ API (API Key / Access Key):"}
                   </label>
                   <input
                     type="text"
                     required
-                    placeholder="API Key"
+                    placeholder={formData.type === "dhru_fusion_pro" ? "Access Token (eyJ...)" : "API Key"}
                     value={formData.apiKey}
-                    onChange={(e) => setFormData({ ...formData, apiKey: e.target.value })}
+                    onChange={(e) => {
+                      const nextKey = e.target.value;
+                      const looksJwt = /^eyJ[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,}$/.test(nextKey.trim());
+                      setFormData({
+                        ...formData,
+                        apiKey: nextKey,
+                        type: looksJwt && formData.type === "dhru" ? "dhru_fusion_pro" : formData.type
+                      });
+                    }}
                     className="w-full px-4 py-3 bg-surface-container-lowest border border-outline-variant/40 rounded-xl focus:border-primary outline-none text-xs font-mono text-on-surface text-left dir-ltr transition-all"
                   />
                 </div>
@@ -1194,7 +1226,8 @@ export default function ProvidersClient() {
                   }}
                   className="w-full px-4 py-3 bg-surface-container-lowest border border-outline-variant/40 rounded-xl focus:border-primary outline-none text-xs font-bold text-on-surface transition-all cursor-pointer"
                 >
-                  <option value="dhru">قياسي (Dhru Fusion / PerfectPanel / GSM Standard)</option>
+                  <option value="dhru">قياسي (Dhru Fusion Classic / PerfectPanel / GSM Standard)</option>
+                  <option value="dhru_fusion_pro">Dhru Fusion Pro (REST v1 - Access Token / GsmGenesis)</option>
                   <option value="foxreload">FoxReload API (الألعاب والبطاقات الرقمية و eSIM)</option>
                   <option value="dynamic">مخصص (Dynamic Mapper - ربط ديناميكي)</option>
                 </select>
