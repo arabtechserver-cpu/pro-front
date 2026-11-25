@@ -2,12 +2,13 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { ArrowLeft, ArrowRight, ChevronLeft, ChevronRight, Cpu, Database, FileText, Gamepad2, CreditCard, Headset, Wallet, MousePointer2, ClipboardList, MessageCircle } from "lucide-react";
+import { ArrowLeft, ArrowRight, Cpu, Database, FileText, Gamepad2, CreditCard, Headset, Wallet, MousePointer2, ClipboardList, MessageCircle } from "lucide-react";
 import ToolMark from "./ToolMark";
 import { Gift, Percent, ShoppingBag } from "lucide-react";
 import styles from "./StorefrontHome.module.css";
 import useHomeMotion from "./useHomeMotion";
 import DigitalServices from "./DigitalServices";
+import ArProHeroShowcase from "./ArProHeroShowcase";
 
 export default function StorefrontHome({ lang }: { lang: "ar" | "en" }) {
   const ar = lang === "ar";
@@ -15,7 +16,6 @@ export default function StorefrontHome({ lang }: { lang: "ar" | "en" }) {
   const t = (arabic: string, english: string) => ar ? arabic : english;
   const base = `/${lang}`;
   const [filter, setFilter] = useState("all");
-  const [slide, setSlide] = useState(0);
   const Arrow = ar ? ArrowLeft : ArrowRight;
   const services = [
     { title: t("خدمات IMEI", "IMEI services"), desc: t("خدمات فك القفل والمعالجات", "Phone unlocking and servicing"), icon: Cpu, href: "/pricing?category=imei" },
@@ -42,18 +42,7 @@ export default function StorefrontHome({ lang }: { lang: "ar" | "en" }) {
   return <div ref={rootRef} className={`${styles.container} ${styles.motionRoot}`}>
       <div ref={progressRef} className={styles.scrollProgress} aria-hidden="true" />
       <section className={styles.heroGrid} aria-label={t("الخدمات والعروض", "Services and offers")}>
-        <div data-motion-scene className={`${styles.hero} ${styles.remoteHero}`}>
-          <img className={styles.remoteHeroImage} src="/images/homepage/hero-phone-remote.webp" width={1000} height={750} alt={t("هواتف مع قفل مفتوح واتصال عن بُعد", "Smartphones with an open padlock and remote connection")} fetchPriority="high" />
-          <div key={slide} className={styles.heroCopy}>
-            <span className={styles.eyebrow}>{t("تفعيل وفك الهواتف عن بُعد", "Phone activation & remote unlocking")}</span>
-            <h1>{slide === 0 ? <>{t("تفعيل وفك الهواتف.", "Phone activation.")}<strong>{t("عن بُعد، بكل سهولة.", "& remote unlocking.")}</strong></> : <>{t("خدمات هاتفك.", "Your phone services.")}<strong>{t("تصلك أينما كنت.", "Wherever you are.")}</strong></>}</h1>
-            <p>{slide === 0 ? t("خدمات تفعيل وفك الهواتف والشبكات عن بُعد", "Phone activation and network unlocking, delivered remotely") : t("اختر خدمة التفعيل أو فك القفل المناسبة لهاتفك", "Choose the right activation or unlocking service for your phone")}</p>
-            <Link className={styles.limeButton} href={`${base}/pricing?category=remote`}>{t("استعرض خدمات الهواتف", "Browse phone services")}<Arrow size={20} /></Link>
-          </div>
-          <button className={`${styles.slideArrow} ${styles.prev}`} onClick={() => setSlide(slide === 0 ? 1 : 0)} aria-label={t("العرض السابق", "Previous offer")}><ChevronLeft size={24} /></button>
-          <button className={`${styles.slideArrow} ${styles.next}`} onClick={() => setSlide(slide === 0 ? 1 : 0)} aria-label={t("العرض التالي", "Next offer")}><ChevronRight size={24} /></button>
-          <div className={styles.dots}>{[0, 1].map(index => <button key={index} onClick={() => setSlide(index)} className={slide === index ? styles.activeDot : ""} aria-label={t(`العرض ${index + 1}`, `Offer ${index + 1}`)} aria-pressed={slide === index} />)}</div>
-        </div>
+        <ArProHeroShowcase lang={lang} />
         <div className={styles.sidePromos}>
           <div className={`${styles.promo} ${styles.gamePromo}`}>
             <img className={styles.productArt} src="/images/homepage/controller.webp" alt="" width={1536} height={1024} />

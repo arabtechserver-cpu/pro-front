@@ -377,16 +377,16 @@ export default function OrdersClient({ lang, dict }: { lang: string, dict: any }
 
         {/* Table */}
         <div className="overflow-x-auto">
-          <table className="w-full text-start border-collapse text-xs">
+          <table className="w-full min-w-[880px] text-start border-collapse text-xs">
             <thead>
               <tr className="border-b border-outline-variant/20 bg-surface-container-high/60 text-on-surface-variant font-bold text-[11px] uppercase tracking-wider">
-                <th className="p-4 text-start">{lang === 'ar' ? 'رقم الطلب' : 'Order ID'}</th>
-                <th className="p-4 text-start">{lang === 'ar' ? 'اسم الخدمة' : 'Service Name'}</th>
-                <th className="p-4 text-start">{lang === 'ar' ? 'رقم الجهاز / البيانات' : 'Target Input / IMEI'}</th>
-                <th className="p-4 text-start">{lang === 'ar' ? 'النتيجة وكود الفك' : 'Result / Unlock Code'}</th>
-                <th className="p-4 text-start">{lang === 'ar' ? 'الكمية والسعر' : 'Qty & Cost'}</th>
-                <th className="p-4 text-center">{lang === 'ar' ? 'حالة الطلب' : 'Status'}</th>
-                <th className="p-4 text-end">{lang === 'ar' ? 'تاريخ وساعة الطلب' : 'Date & Time'}</th>
+                <th className="p-4 text-start whitespace-nowrap">{lang === 'ar' ? 'رقم الطلب' : 'Order ID'}</th>
+                <th className="p-4 text-start whitespace-nowrap">{lang === 'ar' ? 'اسم الخدمة' : 'Service Name'}</th>
+                <th className="p-4 text-start whitespace-nowrap">{lang === 'ar' ? 'رقم الجهاز / البيانات' : 'Target Input / IMEI'}</th>
+                <th className="p-4 text-start whitespace-nowrap">{lang === 'ar' ? 'النتيجة وكود الفك' : 'Result / Unlock Code'}</th>
+                <th className="p-4 text-start whitespace-nowrap">{lang === 'ar' ? 'الكمية والسعر' : 'Qty & Cost'}</th>
+                <th className="p-4 text-center whitespace-nowrap">{lang === 'ar' ? 'حالة الطلب' : 'Status'}</th>
+                <th className="p-4 text-end whitespace-nowrap">{lang === 'ar' ? 'تاريخ وساعة الطلب' : 'Date & Time'}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-outline-variant/10 font-medium">
@@ -424,11 +424,11 @@ export default function OrdersClient({ lang, dict }: { lang: string, dict: any }
 
                   return (
                     <tr key={ord.id} className="hover:bg-surface-container-high/40 transition-colors">
-                      <td className="p-4 font-bold text-primary font-mono text-xs dir-ltr text-start">
+                      <td className="p-4 font-bold text-primary font-mono text-xs dir-ltr text-start whitespace-nowrap">
                         {ord.isArPro ? ord.displayId : `#${ord.id.slice(-6).toUpperCase()}`}
                       </td>
 
-                      <td className="p-4 font-bold text-on-surface text-start">
+                      <td className="p-4 font-bold text-on-surface text-start min-w-[200px] max-w-[280px] whitespace-normal leading-relaxed">
                         <div className="flex flex-col gap-1">
                           <span>{ord.serviceName}</span>
                           {ord.notes && <span className="text-[10px] text-on-surface-variant/70 font-normal">{ord.notes}</span>}
@@ -443,14 +443,17 @@ export default function OrdersClient({ lang, dict }: { lang: string, dict: any }
                         </div>
                       </td>
 
-                      <td className="p-4 font-mono text-on-surface dir-ltr text-start select-all">
-                        <span className="bg-surface-container-lowest px-3 py-1 rounded-xl border border-outline-variant/20 font-bold text-[11px] text-primary inline-block max-w-[200px] truncate">
+                      <td className="p-4 font-mono text-on-surface dir-ltr text-start select-all whitespace-nowrap">
+                        <span
+                          title={ord.targetInput || ""}
+                          className="bg-surface-container-lowest px-3 py-1 rounded-xl border border-outline-variant/20 font-bold text-[11px] text-primary inline-block max-w-[220px] truncate"
+                        >
                           {ord.targetInput || 'N/A'}
                         </span>
                       </td>
 
                       {/* UNLOCK CODE / RESULT REPLY DISPLAY */}
-                      <td className="p-4 text-start font-mono text-xs">
+                      <td className="p-4 text-start font-mono text-xs min-w-[250px] max-w-[380px] whitespace-normal">
                         {ord.isArPro ? (
                           ord.revoked ? (
                             <span className="text-red-400 font-bold text-[11px]">{lang === 'ar' ? 'الكود موقوف' : 'Revoked'}</span>
@@ -493,8 +496,8 @@ export default function OrdersClient({ lang, dict }: { lang: string, dict: any }
                             </div>
                           )
                         ) : ord.reply ? (
-                          <div className="flex items-center gap-2">
-                            <span className="bg-violet-500/10 border border-violet-500/30 text-violet-400 font-bold px-3 py-1 rounded-xl text-xs select-all dir-ltr glow-cyan whitespace-pre-wrap block">
+                          <div className="flex items-start gap-2">
+                            <span className="bg-violet-500/10 border border-violet-500/30 text-violet-400 font-bold px-3 py-2 rounded-xl text-[11px] leading-relaxed select-all dir-ltr text-left glow-cyan whitespace-pre-wrap break-words block max-h-44 overflow-y-auto flex-1 min-w-0">
                               {cleanHtmlToText(ord.reply)}
                             </span>
                             <button
@@ -502,7 +505,7 @@ export default function OrdersClient({ lang, dict }: { lang: string, dict: any }
                                 navigator.clipboard.writeText(cleanHtmlToText(ord.reply));
                                 alert(lang === 'ar' ? 'تم نسخ الكود/النتيجة بنجاح' : 'Code copied to clipboard!');
                               }}
-                              className="p-1 text-on-surface-variant hover:text-primary transition-colors"
+                              className="shrink-0 mt-1 p-1.5 rounded-lg hover:bg-surface-container-high text-on-surface-variant hover:text-primary transition-colors"
                               title="نسخ النتيجة"
                               aria-label="نسخ النتيجة"
                             >
@@ -518,14 +521,14 @@ export default function OrdersClient({ lang, dict }: { lang: string, dict: any }
                         )}
                       </td>
 
-                      <td className="p-4 text-start">
+                      <td className="p-4 text-start whitespace-nowrap">
                         <div className="flex flex-col">
                           <span className="font-bold text-on-surface font-mono dir-ltr">${parseFloat(ord.price || 0).toFixed(2)} USD</span>
                           <span className="text-[10px] text-on-surface-variant">{lang === 'ar' ? `الكمية: ${ord.quantity || 1}` : `Qty: ${ord.quantity || 1}`}</span>
                         </div>
                       </td>
 
-                      <td className="p-4 text-center">
+                      <td className="p-4 text-center whitespace-nowrap">
                         {isCompleted && (
                           <span className="px-3.5 py-1 rounded-full bg-violet-500/15 border border-violet-500/30 text-violet-400 font-bold text-[11px] inline-flex items-center gap-1.5">
                             <span className="w-1.5 h-1.5 rounded-full bg-violet-400"></span>
@@ -546,7 +549,7 @@ export default function OrdersClient({ lang, dict }: { lang: string, dict: any }
                         )}
                       </td>
 
-                      <td className="p-4 text-end text-on-surface-variant font-mono text-[11px]">
+                      <td className="p-4 text-end text-on-surface-variant font-mono text-[11px] whitespace-nowrap">
                         {new Date(ord.createdAt).toLocaleString('ar-EG', {
                           year: 'numeric',
                           month: 'short',

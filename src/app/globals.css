@@ -1173,21 +1173,19 @@ html.dark body {
   text-align: right;
 }
 
-.overflow-x-auto > table th,
-.overflow-x-auto > table td {
-  overflow-wrap: anywhere;
-  word-break: break-word;
+.overflow-x-auto > table th {
+  white-space: nowrap;
   vertical-align: middle;
 }
 
 .overflow-x-auto > table td {
-  max-width: 260px;
+  overflow-wrap: break-word;
+  vertical-align: middle;
 }
 
 @media (max-width: 768px) {
   .overflow-x-auto > table th,
   .overflow-x-auto > table td {
-    max-width: 190px;
     padding-left: 0.75rem;
     padding-right: 0.75rem;
   }
