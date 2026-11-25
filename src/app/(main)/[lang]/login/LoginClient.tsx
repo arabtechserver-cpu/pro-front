@@ -25,6 +25,8 @@ export default function LoginClient({ lang, dict }: { lang: Locale; dict: any })
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [turnstileToken, setTurnstileToken] = useState("");
+  const [twoFaChallenge, setTwoFaChallenge] = useState<{ challengeToken: string } | null>(null);
+  const [twoFaCode, setTwoFaCode] = useState("");
 
   useEffect(() => {
     const reason = new URLSearchParams(window.location.search).get("reason");
@@ -68,6 +70,12 @@ export default function LoginClient({ lang, dict }: { lang: Locale; dict: any })
       const data = await res.json();
 
       if (res.ok && data.success) {
+        if (data.require2fa && data.challengeToken) {
+          setTwoFaChallenge({ challengeToken: data.challengeToken });
+          setTwoFaCode("");
+          setSuccessMessage(data.message || (lang === "ar" ? "أدخل رمز المصادقة الثنائية (2FA) لإكمال الدخول." : "Enter your 2FA code to complete sign in."));
+          return;
+        }
         saveClientUserSession(data.token, data.user);
         setSuccessMessage(lang === "ar" ? "تم تسجيل الدخول بحساب Google بنجاح! جاري التوجيه..." : "Google login successful! Redirecting...");
         setTimeout(() => {
@@ -115,6 +123,45 @@ export default function LoginClient({ lang, dict }: { lang: Locale; dict: any })
   }, [initGoogleAuth]);
 
   // Login Submit Handler
+  const handleVerify2faSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!twoFaChallenge?.challengeToken) return;
+    setErrorMessage("");
+    setSuccessMessage("");
+
+    if (!twoFaCode.trim()) {
+      setErrorMessage(lang === "ar" ? "يرجى إدخال رمز المصادقة الثنائية" : "Please enter your 2FA code");
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const res = await fetch("/api/auth/verify-2fa", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          challengeToken: twoFaChallenge.challengeToken,
+          code: twoFaCode.trim()
+        })
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && data.success) {
+        saveClientUserSession(data.token, data.user);
+        setTwoFaChallenge(null);
+        setSuccessMessage(lang === "ar" ? "تم التحقق والدخول بنجاح! جاري التوجيه..." : "Verified! Redirecting...");
+        setTimeout(() => {
+          window.location.href = loginDestination(lang);
+        }, 800);
+      } else {
+        setErrorMessage(data.error || (lang === "ar" ? "رمز المصادقة الثنائية غير صحيح" : "Invalid 2FA code"));
+      }
+    } catch {
+      setErrorMessage(lang === "ar" ? "تعذر الاتصال بالسيرفر! يرجى المحاولة لاحقاً." : "Network error! Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage("");
@@ -149,6 +196,12 @@ export default function LoginClient({ lang, dict }: { lang: Locale; dict: any })
       const data = await res.json().catch(() => ({}));
 
       if (res.ok && data.success) {
+        if (data.require2fa && data.challengeToken) {
+          setTwoFaChallenge({ challengeToken: data.challengeToken });
+          setTwoFaCode("");
+          setSuccessMessage(data.message || (lang === "ar" ? "أدخل رمز المصادقة الثنائية (2FA) لإكمال الدخول." : "Enter your 2FA code to complete sign in."));
+          return;
+        }
         saveClientUserSession(data.token, data.user);
         setSuccessMessage(lang === "ar" ? "تم تسجيل الدخول بنجاح! جاري التوجيه..." : "Login successful! Redirecting...");
         setTimeout(() => {
@@ -311,7 +364,62 @@ export default function LoginClient({ lang, dict }: { lang: Locale; dict: any })
           </div>
         )}
 
-        {/* Login Form */}
+        {/* Login Form or 2FA Challenge Form */}
+        {twoFaChallenge ? (
+          <form onSubmit={handleVerify2faSubmit} className="relative z-10 flex flex-col gap-5" autoComplete="off">
+            <div className="p-4 rounded-xl bg-primary/10 border border-primary/25 text-xs text-on-surface leading-relaxed">
+              {lang === "ar"
+                ? "الحساب محمي بالمصادقة الثنائية (2FA). أدخل الرمز المكون من 6 أرقام من تطبيق المصادقة أو أحد رموز الاسترداد."
+                : "This account is protected by 2FA. Enter the 6-digit code from your authenticator app or a backup recovery code."}
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <label htmlFor="login-2fa-code" className="text-sm font-label-sm text-on-surface-variant uppercase tracking-wider">
+                {lang === "ar" ? "رمز المصادقة (2FA)" : "2FA Verification Code"}
+              </label>
+              <input
+                id="login-2fa-code"
+                type="text"
+                value={twoFaCode}
+                onChange={(e) => setTwoFaCode(e.target.value)}
+                placeholder="000000"
+                autoFocus
+                className="w-full bg-surface-container-lowest border border-outline-variant/40 rounded-lg py-3 px-4 text-center font-mono text-lg font-bold tracking-[0.3em] text-on-surface dir-ltr focus:outline-none focus:border-primary"
+              />
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                type="submit"
+                disabled={isLoading || !twoFaCode.trim()}
+                className="flex-1 bg-primary-container text-on-primary-container py-3.5 rounded-lg font-bold hover:bg-primary transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+              >
+                {isLoading ? (
+                  <>
+                    <span className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></span>
+                    <span>{lang === "ar" ? "جاري التحقق..." : "Verifying..."}</span>
+                  </>
+                ) : (
+                  <span>{lang === "ar" ? "تأكيد والدخول" : "Verify & Sign In"}</span>
+                )}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setTwoFaChallenge(null);
+                  setTwoFaCode("");
+                  setErrorMessage("");
+                  setSuccessMessage("");
+                  setTurnstileToken("");
+                  resetTurnstile();
+                }}
+                className="px-4 py-3.5 rounded-lg bg-surface-container-high text-on-surface-variant hover:text-on-surface font-bold text-xs"
+              >
+                {lang === "ar" ? "رجوع" : "Back"}
+              </button>
+            </div>
+          </form>
+        ) : (
         <form onSubmit={handleLoginSubmit} className="relative z-10 flex flex-col gap-5" autoComplete="off">
           <div className="flex flex-col gap-2">
             <label htmlFor="login-email" className="text-sm font-label-sm text-on-surface-variant uppercase tracking-wider">{dict.login.emailLabel}</label>
@@ -424,6 +532,7 @@ export default function LoginClient({ lang, dict }: { lang: Locale; dict: any })
             )}
           </button>
         </form>
+        )}
 
         <div className="relative z-10 mt-8 text-center text-sm text-on-surface-variant">
           {dict.login.noAccount} <Link href={`/${lang}/register`} className="text-primary hover:text-primary-container font-semibold transition-colors">{dict.login.registerNow}</Link>

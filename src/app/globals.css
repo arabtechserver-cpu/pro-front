@@ -1159,3 +1159,36 @@ html.dark body {
 .animate-banner-aura {
   animation: bannerAuraPulse 4s ease-in-out infinite;
 }
+
+/* ============================================================
+   RTL & Mobile Table Alignment & Column Overflow Prevention
+   ============================================================ */
+.dir-ltr {
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+
+[dir="rtl"] table td.dir-ltr,
+[dir="rtl"] table th.dir-ltr {
+  text-align: right;
+}
+
+.overflow-x-auto > table th,
+.overflow-x-auto > table td {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  vertical-align: middle;
+}
+
+.overflow-x-auto > table td {
+  max-width: 260px;
+}
+
+@media (max-width: 768px) {
+  .overflow-x-auto > table th,
+  .overflow-x-auto > table td {
+    max-width: 190px;
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+}

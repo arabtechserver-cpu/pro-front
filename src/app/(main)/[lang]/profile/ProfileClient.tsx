@@ -31,6 +31,8 @@ interface UserProfile {
   apiKey?: string | null;
   apiSiteName?: string | null;
   apiSiteUrl?: string | null;
+  twoFactorEnabled?: boolean;
+  twoFactorEnabledAt?: string | null;
   createdAt?: string;
 }
 
@@ -130,6 +132,19 @@ export default function ProfileClient({ lang, dict }: { lang: string; dict: any 
   const [showApiKey, setShowApiKey] = useState(false);
   const [copiedKey, setCopiedKey] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+
+  // Two-Factor Authentication (2FA) State
+  const [twoFaEnabled, setTwoFaEnabled] = useState(false);
+  const [twoFaEnabledAt, setTwoFaEnabledAt] = useState<string | null>(null);
+  const [twoFaRemainingBackups, setTwoFaRemainingBackups] = useState(0);
+  const [twoFaSetup, setTwoFaSetup] = useState<{ secret: string; otpauthUrl: string; qrSvg: string } | null>(null);
+  const [twoFaCodeInput, setTwoFaCodeInput] = useState("");
+  const [twoFaBackupCodes, setTwoFaBackupCodes] = useState<string[] | null>(null);
+  const [twoFaLoading, setTwoFaLoading] = useState(false);
+  const [twoFaError, setTwoFaError] = useState<string | null>(null);
+  const [twoFaSuccess, setTwoFaSuccess] = useState<string | null>(null);
+  const [twoFaActionMode, setTwoFaActionMode] = useState<"idle" | "disable" | "regen">("idle");
+  const [twoFaActionCode, setTwoFaActionCode] = useState("");
 
   // 1. Initial Session Load
   useEffect(() => {
@@ -258,13 +273,153 @@ export default function ProfileClient({ lang, dict }: { lang: string; dict: any 
     }
   };
 
+  const fetch2faStatus = async () => {
+    try {
+      const token = localStorage.getItem("user_token");
+      const headers: Record<string, string> = {};
+      if (token && token !== "null" && token !== "undefined") {
+        headers["Authorization"] = `Bearer ${token}`;
+      }
+      const res = await userApiFetch("/api/users/2fa/status", { headers, credentials: "include" });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success) {
+          setTwoFaEnabled(Boolean(data.enabled));
+          setTwoFaEnabledAt(data.enabledAt || null);
+          setTwoFaRemainingBackups(Number(data.remainingBackupCodes) || 0);
+        }
+      }
+    } catch {}
+  };
+
   useEffect(() => {
     if (userSession) {
       fetchProfile();
       fetchOrders();
       fetchTransactions();
+      fetch2faStatus();
     }
   }, [userSession?.id]);
+
+  const handleStart2faSetup = async () => {
+    setTwoFaError(null);
+    setTwoFaSuccess(null);
+    setTwoFaLoading(true);
+    try {
+      const res = await userApiFetch("/api/users/2fa/setup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" }
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setTwoFaSetup({ secret: data.secret, otpauthUrl: data.otpauthUrl, qrSvg: data.qrSvg });
+        setTwoFaCodeInput("");
+      } else {
+        setTwoFaError(data.error || (isAr ? "تعذر بدء إعداد المصادقة الثنائية" : "Failed to start 2FA setup"));
+      }
+    } catch {
+      setTwoFaError(isAr ? "تعذر الاتصال بالخادم" : "Connection error");
+    } finally {
+      setTwoFaLoading(false);
+    }
+  };
+
+  const handleEnable2fa = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setTwoFaError(null);
+    setTwoFaSuccess(null);
+    if (!twoFaCodeInput.trim()) {
+      setTwoFaError(isAr ? "أدخل رمز التحقق المكون من 6 أرقام من التطبيق" : "Enter the 6-digit code from your authenticator app");
+      return;
+    }
+    setTwoFaLoading(true);
+    try {
+      const res = await userApiFetch("/api/users/2fa/enable", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code: twoFaCodeInput.trim() })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setTwoFaEnabled(true);
+        setTwoFaEnabledAt(data.enabledAt || new Date().toISOString());
+        setTwoFaRemainingBackups(Array.isArray(data.backupCodes) ? data.backupCodes.length : 8);
+        setTwoFaBackupCodes(Array.isArray(data.backupCodes) ? data.backupCodes : null);
+        setTwoFaSetup(null);
+        setTwoFaCodeInput("");
+        setTwoFaSuccess(isAr ? "تم تفعيل المصادقة الثنائية (2FA) بنجاح! احفظ رموز الاسترداد في مكان آمن." : "2FA enabled! Save your backup codes safely.");
+      } else {
+        setTwoFaError(data.error || (isAr ? "رمز التحقق غير صحيح" : "Invalid verification code"));
+      }
+    } catch {
+      setTwoFaError(isAr ? "تعذر الاتصال بالخادم" : "Connection error");
+    } finally {
+      setTwoFaLoading(false);
+    }
+  };
+
+  const handleDisable2fa = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setTwoFaError(null);
+    setTwoFaSuccess(null);
+    if (!twoFaActionCode.trim()) return;
+    setTwoFaLoading(true);
+    try {
+      const res = await userApiFetch("/api/users/2fa/disable", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code: twoFaActionCode.trim() })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        if (data.token) {
+          saveClientUserSession(data.token, userSession);
+        }
+        setTwoFaEnabled(false);
+        setTwoFaEnabledAt(null);
+        setTwoFaRemainingBackups(0);
+        setTwoFaBackupCodes(null);
+        setTwoFaActionMode("idle");
+        setTwoFaActionCode("");
+        setTwoFaSuccess(isAr ? "تم تعطيل المصادقة الثنائية بنجاح." : "Two-factor authentication disabled.");
+      } else {
+        setTwoFaError(data.error || (isAr ? "رمز التحقق غير صحيح" : "Invalid verification code"));
+      }
+    } catch {
+      setTwoFaError(isAr ? "تعذر الاتصال بالخادم" : "Connection error");
+    } finally {
+      setTwoFaLoading(false);
+    }
+  };
+
+  const handleRegenerateBackupCodes = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setTwoFaError(null);
+    setTwoFaSuccess(null);
+    if (!twoFaActionCode.trim()) return;
+    setTwoFaLoading(true);
+    try {
+      const res = await userApiFetch("/api/users/2fa/regenerate-backup-codes", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code: twoFaActionCode.trim() })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setTwoFaBackupCodes(Array.isArray(data.backupCodes) ? data.backupCodes : null);
+        setTwoFaRemainingBackups(Array.isArray(data.backupCodes) ? data.backupCodes.length : 8);
+        setTwoFaActionMode("idle");
+        setTwoFaActionCode("");
+        setTwoFaSuccess(isAr ? "تم إصدار رموز استرداد جديدة بنجاح." : "New backup codes generated.");
+      } else {
+        setTwoFaError(data.error || (isAr ? "رمز المصادقة غير صحيح" : "Invalid authenticator code"));
+      }
+    } catch {
+      setTwoFaError(isAr ? "تعذر الاتصال بالخادم" : "Connection error");
+    } finally {
+      setTwoFaLoading(false);
+    }
+  };
 
   // Handle Profile Update Submission
   const handleUpdateProfile = async (e: React.FormEvent) => {
@@ -1172,8 +1327,253 @@ export default function ProfileClient({ lang, dict }: { lang: string; dict: any 
             </div>
           </div>
 
-          {/* Form Card */}
-          <div className="lg:col-span-2 glass-card rounded-3xl p-6 sm:p-8 border border-outline-variant/30 shadow-2xl space-y-6">
+          {/* Right Column: Two-Factor Authentication + Form Card */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Two-Factor Authentication (2FA) Card */}
+            <div className="glass-card rounded-3xl p-6 sm:p-8 border border-outline-variant/30 shadow-2xl space-y-5">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div className="space-y-1">
+                  <h2 className="text-lg font-bold text-on-surface flex items-center gap-2">
+                    <span className="material-symbols-outlined text-primary text-xl">verified_user</span>
+                    <span>{isAr ? "المصادقة الثنائية (2FA)" : "Two-Factor Authentication (2FA)"}</span>
+                  </h2>
+                  <p className="text-xs text-on-surface-variant">
+                    {isAr
+                      ? "احمِ حسابك برمز متغير كل 30 ثانية عبر Google Authenticator أو Authy عند تسجيل الدخول."
+                      : "Protect your account with a 6-digit code from Google Authenticator or Authy when signing in."}
+                  </p>
+                </div>
+                <span
+                  className={`px-3 py-1 rounded-full text-[11px] font-bold border flex items-center gap-1.5 ${
+                    twoFaEnabled
+                      ? "bg-emerald-500/15 text-emerald-400 border-emerald-500/30"
+                      : "bg-amber-500/15 text-amber-400 border-amber-500/30"
+                  }`}
+                >
+                  <span className={`w-1.5 h-1.5 rounded-full ${twoFaEnabled ? "bg-emerald-400" : "bg-amber-400"}`}></span>
+                  <span>{twoFaEnabled ? (isAr ? "مفعّلة" : "Enabled") : (isAr ? "غير مفعّلة" : "Not Enabled")}</span>
+                </span>
+              </div>
+
+              {twoFaSuccess && (
+                <div className="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-bold flex items-center gap-2">
+                  <span className="material-symbols-outlined text-base">check_circle</span>
+                  <span>{twoFaSuccess}</span>
+                </div>
+              )}
+
+              {twoFaError && (
+                <div className="p-3.5 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-bold flex items-center gap-2">
+                  <span className="material-symbols-outlined text-base">error</span>
+                  <span>{twoFaError}</span>
+                </div>
+              )}
+
+              {twoFaBackupCodes && (
+                <div className="p-4 sm:p-5 rounded-2xl bg-amber-500/10 border border-amber-500/30 space-y-3">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <h3 className="text-xs font-black text-amber-300 flex items-center gap-1.5">
+                      <span className="material-symbols-outlined text-base">key</span>
+                      <span>{isAr ? "رموز الاسترداد الاحتياطية (تُستخدم لمرة واحدة فقط)" : "Backup Recovery Codes (One-time use)"}</span>
+                    </h3>
+                    <button
+                      type="button"
+                      onClick={() => copyToClipboard(twoFaBackupCodes.join("\n"), "backup-codes-all")}
+                      className="px-3 py-1 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-200 text-[11px] font-bold flex items-center gap-1"
+                    >
+                      <span className="material-symbols-outlined text-xs">{copiedId === "backup-codes-all" ? "done" : "content_copy"}</span>
+                      <span>{copiedId === "backup-codes-all" ? (isAr ? "تم النسخ" : "Copied") : (isAr ? "نسخ الكل" : "Copy All")}</span>
+                    </button>
+                  </div>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 dir-ltr">
+                    {twoFaBackupCodes.map((c) => (
+                      <div key={c} className="px-3 py-2 rounded-lg bg-surface-container-lowest border border-outline-variant/30 text-center font-mono text-xs font-bold text-on-surface select-all">
+                        {c}
+                      </div>
+                    ))}
+                  </div>
+                  <div className="flex justify-end">
+                    <button
+                      type="button"
+                      onClick={() => setTwoFaBackupCodes(null)}
+                      className="text-xs font-bold text-on-surface-variant hover:text-on-surface"
+                    >
+                      {isAr ? "حفظت الرموز، إغلاق" : "I saved these codes"}
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {!twoFaEnabled && !twoFaSetup && (
+                <button
+                  type="button"
+                  onClick={handleStart2faSetup}
+                  disabled={twoFaLoading}
+                  className="w-full sm:w-auto px-5 py-3 rounded-xl border-2 border-primary/50 bg-primary/10 hover:bg-primary/20 text-primary font-bold text-xs transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                >
+                  <span className="material-symbols-outlined text-base">add_moderator</span>
+                  <span>{isAr ? "+ تفعيل المصادقة الثنائية (2FA)" : "+ Add Authentication (2FA)"}</span>
+                </button>
+              )}
+
+              {!twoFaEnabled && twoFaSetup && (
+                <form onSubmit={handleEnable2fa} className="p-4 sm:p-5 rounded-2xl bg-surface-container-high/50 border border-outline-variant/30 space-y-4">
+                  <div className="flex flex-col sm:flex-row items-center gap-5">
+                    <div
+                      className="p-3 bg-white rounded-2xl border border-outline-variant/30 shrink-0 shadow-md"
+                      dangerouslySetInnerHTML={{ __html: twoFaSetup.qrSvg }}
+                    />
+                    <div className="flex-1 space-y-3 w-full">
+                      <p className="text-xs text-on-surface leading-relaxed font-semibold">
+                        {isAr
+                          ? "1. امسح رمز QR بتطبيق المصادقة (Google Authenticator / Authy) أو انسخ المفتاح يدوياً:"
+                          : "1. Scan this QR code in your authenticator app or copy the secret manually:"}
+                      </p>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="text"
+                          readOnly
+                          value={twoFaSetup.secret}
+                          className="flex-1 bg-surface-container-lowest border border-outline-variant/40 rounded-xl px-3 py-2 text-xs font-mono text-primary dir-ltr select-all"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => copyToClipboard(twoFaSetup.secret, "totp-secret")}
+                          className="px-3 py-2 rounded-xl bg-primary/15 text-primary text-xs font-bold flex items-center gap-1"
+                        >
+                          <span className="material-symbols-outlined text-sm">{copiedId === "totp-secret" ? "done" : "content_copy"}</span>
+                          <span>{copiedId === "totp-secret" ? (isAr ? "تم" : "Copied") : (isAr ? "نسخ" : "Copy")}</span>
+                        </button>
+                      </div>
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-bold text-on-surface-variant">
+                          {isAr ? "2. أدخل الرمز المكون من 6 أرقام للتأكيد:" : "2. Enter the 6-digit confirmation code:"}
+                        </label>
+                        <div className="flex flex-col sm:flex-row gap-2">
+                          <input
+                            type="text"
+                            inputMode="numeric"
+                            maxLength={6}
+                            value={twoFaCodeInput}
+                            onChange={(e) => setTwoFaCodeInput(e.target.value.replace(/\D/g, ""))}
+                            placeholder="000000"
+                            className="flex-1 bg-surface-container-lowest border border-outline-variant/40 rounded-xl px-4 py-2.5 text-center font-mono text-sm font-bold tracking-[0.3em] text-on-surface dir-ltr focus:outline-none focus:border-primary"
+                          />
+                          <button
+                            type="submit"
+                            disabled={twoFaLoading || twoFaCodeInput.length < 6}
+                            className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-primary to-secondary text-on-primary font-bold text-xs disabled:opacity-50"
+                          >
+                            {twoFaLoading ? (isAr ? "جاري التفعيل..." : "Enabling...") : (isAr ? "تأكيد وتفعيل" : "Verify & Enable")}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setTwoFaSetup(null);
+                              setTwoFaCodeInput("");
+                            }}
+                            className="px-4 py-2.5 rounded-xl bg-surface-container-lowest border border-outline-variant/30 text-on-surface-variant text-xs font-bold"
+                          >
+                            {isAr ? "إلغاء" : "Cancel"}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </form>
+              )}
+
+              {twoFaEnabled && (
+                <div className="space-y-4">
+                  <div className="flex flex-wrap items-center justify-between gap-3 p-4 rounded-2xl bg-surface-container-high/50 border border-outline-variant/25 text-xs">
+                    <div className="space-y-1">
+                      <p className="font-bold text-on-surface">
+                        {isAr ? "حماية 2FA نشطة على حسابك" : "2FA Protection Active"}
+                      </p>
+                      <p className="text-on-surface-variant">
+                        {isAr
+                          ? `رموز الاسترداد المتبقية: ${twoFaRemainingBackups}`
+                          : `Remaining backup codes: ${twoFaRemainingBackups}`}
+                        {twoFaEnabledAt && (
+                          <span className="mx-2">
+                            • {new Date(twoFaEnabledAt).toLocaleDateString(isAr ? "ar-EG" : "en-US")}
+                          </span>
+                        )}
+                      </p>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setTwoFaActionMode(twoFaActionMode === "regen" ? "idle" : "regen");
+                          setTwoFaActionCode("");
+                          setTwoFaError(null);
+                        }}
+                        className="px-3.5 py-2 rounded-xl bg-primary/15 border border-primary/30 text-primary text-xs font-bold hover:bg-primary/25 transition-all"
+                      >
+                        {isAr ? "إصدار رموز استرداد جديدة" : "Regenerate Backup Codes"}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setTwoFaActionMode(twoFaActionMode === "disable" ? "idle" : "disable");
+                          setTwoFaActionCode("");
+                          setTwoFaError(null);
+                        }}
+                        className="px-3.5 py-2 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-bold hover:bg-red-500/20 transition-all"
+                      >
+                        {isAr ? "تعطيل 2FA" : "Disable 2FA"}
+                      </button>
+                    </div>
+                  </div>
+
+                  {twoFaActionMode !== "idle" && (
+                    <form
+                      onSubmit={twoFaActionMode === "disable" ? handleDisable2fa : handleRegenerateBackupCodes}
+                      className="p-4 rounded-2xl bg-surface-container-high/60 border border-outline-variant/30 flex flex-col sm:flex-row items-stretch sm:items-center gap-3"
+                    >
+                      <input
+                        type="text"
+                        value={twoFaActionCode}
+                        onChange={(e) => setTwoFaActionCode(e.target.value)}
+                        placeholder={
+                          twoFaActionMode === "disable"
+                            ? (isAr ? "أدخل رمز التطبيق (6 أرقام) أو رمز استرداد" : "Enter 6-digit TOTP or backup code")
+                            : (isAr ? "أدخل رمز التطبيق (6 أرقام)" : "Enter 6-digit authenticator code")
+                        }
+                        className="flex-1 bg-surface-container-lowest border border-outline-variant/40 rounded-xl px-4 py-2.5 text-xs font-mono text-on-surface dir-ltr focus:outline-none focus:border-primary"
+                      />
+                      <button
+                        type="submit"
+                        disabled={twoFaLoading || !twoFaActionCode.trim()}
+                        className={`px-5 py-2.5 rounded-xl font-bold text-xs disabled:opacity-50 ${
+                          twoFaActionMode === "disable"
+                            ? "bg-red-500 text-white hover:bg-red-600"
+                            : "bg-primary text-on-primary"
+                        }`}
+                      >
+                        {twoFaActionMode === "disable"
+                          ? (isAr ? "تأكيد التعطيل" : "Confirm Disable")
+                          : (isAr ? "تأكيد التوليد" : "Generate")}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setTwoFaActionMode("idle");
+                          setTwoFaActionCode("");
+                        }}
+                        className="px-4 py-2.5 rounded-xl bg-surface-container-lowest border border-outline-variant/30 text-on-surface-variant text-xs font-bold"
+                      >
+                        {isAr ? "إلغاء" : "Cancel"}
+                      </button>
+                    </form>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Form Card */}
+            <div className="glass-card rounded-3xl p-6 sm:p-8 border border-outline-variant/30 shadow-2xl space-y-6">
             <h2 className="text-lg font-bold text-on-surface flex items-center gap-2">
               <span className="material-symbols-outlined text-primary text-xl">tune</span>
               <span>{isAr ? "تعديل البيانات وكلمة المرور" : "Edit Profile & Password"}</span>
@@ -1325,6 +1725,7 @@ export default function ProfileClient({ lang, dict }: { lang: string; dict: any 
                 </button>
               </div>
             </form>
+            </div>
           </div>
         </div>
       )}

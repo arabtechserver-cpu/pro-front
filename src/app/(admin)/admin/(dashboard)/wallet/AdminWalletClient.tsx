@@ -382,14 +382,14 @@ export default function AdminWalletClient() {
             <table className="w-full text-start border-collapse text-xs">
               <thead>
                 <tr className="bg-surface-container-high/60 text-on-surface-variant font-bold border-b border-outline-variant/20">
-                  <th className="p-4 text-start">اسم العميل والبيانات</th>
-                  <th className="p-4 text-start">نوع المعاملة والطريقة</th>
-                  <th className="p-4 text-start">رقم المرجع / الإيصال</th>
-                  <th className="p-4 text-start">إشعارات تلجرام</th>
-                  <th className="p-4 text-start">المبلغ ($ USD)</th>
-                  <th className="p-4 text-start">التاريخ</th>
-                  <th className="p-4 text-start">الحالة</th>
-                  <th className="p-4 text-center">الإجراءات والتحكم</th>
+                  <th className="p-3 sm:p-4 text-start whitespace-nowrap">اسم العميل والبيانات</th>
+                  <th className="p-3 sm:p-4 text-start whitespace-nowrap">نوع المعاملة والطريقة</th>
+                  <th className="p-3 sm:p-4 text-start whitespace-nowrap">رقم المرجع / الإيصال</th>
+                  <th className="p-3 sm:p-4 text-start whitespace-nowrap">إشعارات تلجرام</th>
+                  <th className="p-3 sm:p-4 text-start whitespace-nowrap">المبلغ ($ USD)</th>
+                  <th className="p-3 sm:p-4 text-start whitespace-nowrap">التاريخ</th>
+                  <th className="p-3 sm:p-4 text-start whitespace-nowrap">الحالة</th>
+                  <th className="p-3 sm:p-4 text-center whitespace-nowrap">الإجراءات والتحكم</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-outline-variant/10">
@@ -400,9 +400,9 @@ export default function AdminWalletClient() {
                   return (
                     <tr key={tx.id} className="hover:bg-surface-container-high/30 transition-colors">
                       {/* Customer Info */}
-                      <td className="p-4">
-                        <div className="font-bold text-on-surface">{tx.user?.fullName || "عميل مسجل"}</div>
-                        <div className="text-[11px] text-on-surface-variant font-mono">
+                      <td className="p-3 sm:p-4 max-w-[210px]">
+                        <div className="font-bold text-on-surface break-words">{tx.user?.fullName || "عميل مسجل"}</div>
+                        <div className="text-[11px] text-on-surface-variant font-mono break-all">
                           {tx.user?.email || tx.userId}
                         </div>
                         {tx.user?.phone && (
@@ -426,18 +426,20 @@ export default function AdminWalletClient() {
                       </td>
 
                       {/* Transaction Method */}
-                      <td className="p-4">
+                      <td className="p-3 sm:p-4 max-w-[190px] break-words">
                         <div className="font-bold text-on-surface">{tx.type}</div>
                         <div className="text-[11px] text-on-surface-variant">{tx.method}</div>
                       </td>
 
                       {/* Reference Number */}
-                      <td className="p-4 font-mono font-bold text-primary dir-ltr">
-                        {tx.refNo}
+                      <td className="p-3 sm:p-4 font-mono font-bold text-primary max-w-[180px] break-all">
+                        <span dir="ltr" className="inline-block break-all">
+                          {tx.refNo || "-"}
+                        </span>
                       </td>
 
                       {/* Telegram Direct Delivery & Receipt Image */}
-                      <td className="p-4">
+                      <td className="p-3 sm:p-4 whitespace-nowrap">
                         {tx.hasReceipt ? (
                           <button
                             onClick={() => handleViewReceipt(tx.id)}
@@ -461,17 +463,17 @@ export default function AdminWalletClient() {
                       </td>
 
                       {/* Amount */}
-                      <td className="p-4 font-mono font-bold text-base text-violet-400 dir-ltr">
-                        +${tx.amount.toFixed(2)}
+                      <td className="p-3 sm:p-4 font-mono font-bold text-base text-violet-400 whitespace-nowrap">
+                        <span dir="ltr">+${tx.amount.toFixed(2)}</span>
                       </td>
 
                       {/* Date */}
-                      <td className="p-4 text-on-surface-variant font-mono text-[11px]">
+                      <td className="p-3 sm:p-4 text-on-surface-variant font-mono text-[11px] whitespace-nowrap">
                         {new Date(tx.createdAt).toLocaleString("ar-EG")}
                       </td>
 
                       {/* Status Pill */}
-                      <td className="p-4">
+                      <td className="p-3 sm:p-4 whitespace-nowrap">
                         {tx.status === "completed" && (
                           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-violet-500/15 border border-violet-500/30 text-violet-400 font-bold text-[11px]">
                             <span className="w-1.5 h-1.5 rounded-full bg-violet-400"></span>
@@ -493,7 +495,7 @@ export default function AdminWalletClient() {
                       </td>
 
                       {/* Admin Actions */}
-                      <td className="p-4 text-center">
+                      <td className="p-3 sm:p-4 text-center whitespace-nowrap">
                         {isPending ? (
                           <div className="flex items-center justify-center gap-2">
                             <button
