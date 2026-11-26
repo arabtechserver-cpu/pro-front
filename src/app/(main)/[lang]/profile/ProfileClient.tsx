@@ -6,6 +6,8 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { cleanHtmlToText } from "@/utils/cleanHtml";
+import ProfileGratitudeBanner from "./ProfileGratitudeBanner";
+import heroStyles from "./ProfileHero.module.css";
 
 interface UserProfile {
   id: string;
@@ -601,17 +603,19 @@ export default function ProfileClient({ lang, dict }: { lang: string; dict: any 
   return (
     <div className="min-h-screen py-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-8">
       {/* 1. HERO HEADER WITH USER PROFILE SUMMARY */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-surface-container-lowest via-surface-container-low to-surface-container-high border border-outline-variant/30 shadow-2xl p-6 sm:p-10">
+      <div className={`${heroStyles.profileHeroGlass} relative overflow-hidden rounded-3xl p-5 sm:p-8`}>
         {/* Ambient Glow Orbs */}
-        <div className="absolute -top-24 -start-24 w-72 h-72 bg-primary/20 rounded-full blur-3xl pointer-events-none"></div>
-        <div className="absolute -bottom-24 -end-24 w-72 h-72 bg-secondary/15 rounded-full blur-3xl pointer-events-none"></div>
+        <div className="absolute -top-24 -start-24 w-72 h-72 bg-primary/12 rounded-full blur-3xl pointer-events-none"></div>
+        <div className="absolute -bottom-24 -end-24 w-72 h-72 bg-secondary/10 rounded-full blur-3xl pointer-events-none"></div>
+
+        <ProfileGratitudeBanner isAr={isAr} />
 
         <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
           {/* User Info & Avatar */}
           <div className="flex items-center gap-5 sm:gap-6">
             <div className="relative shrink-0">
               <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-gradient-to-tr from-primary via-purple-400 to-secondary p-1 shadow-[0_0_30px_rgba(124,58,237,0.3)]">
-                <div className="w-full h-full rounded-[14px] bg-surface-container-lowest flex items-center justify-center text-3xl sm:text-4xl font-black text-primary">
+                <div className="w-full h-full rounded-[14px] bg-surface-container-lowest/55 backdrop-blur-md flex items-center justify-center text-3xl sm:text-4xl font-black text-primary">
                   {(profile?.fullName || userSession?.fullName || "U").charAt(0).toUpperCase()}
                 </div>
               </div>
@@ -642,7 +646,7 @@ export default function ProfileClient({ lang, dict }: { lang: string; dict: any 
                 </span>
 
                 {/* Role Badge */}
-                <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-surface-container-highest/80 text-on-surface-variant border border-outline-variant/30">
+                <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-surface-container-highest/35 backdrop-blur-md text-on-surface-variant border border-outline-variant/30">
                   {userSession?.role === "admin" ? (isAr ? "مدير النظام" : "Admin") : (isAr ? "عميل معتمد" : "Client")}
                 </span>
               </div>
@@ -689,7 +693,7 @@ export default function ProfileClient({ lang, dict }: { lang: string; dict: any 
 
             <Link
               href={`/${lang}/pricing`}
-              className="flex-1 sm:flex-initial flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-surface-container-high border border-outline-variant/40 hover:border-primary/50 text-on-surface font-bold text-xs hover:bg-surface-container-highest transition-all"
+              className="flex-1 sm:flex-initial flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-surface-container-high/35 backdrop-blur-md border border-outline-variant/40 hover:border-primary/50 text-on-surface font-bold text-xs hover:bg-surface-container-highest/55 transition-all"
             >
               <span className="material-symbols-outlined text-base text-primary">shopping_bag</span>
               <span>{isAr ? "طلب خدمة جديدة" : "New Order"}</span>
